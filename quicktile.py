@@ -35,6 +35,11 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
  - Can I hook into the GNOME and KDE keybinding APIs without using PyKDE or
    gnome-python? (eg. using D-Bus, perhaps?)
 
+@todo: Merge remaining appropriate portions of:
+ - https://thomas.apestaart.org/thomas/trac/changeset/1123/patches/quicktile/quicktile.py
+ - https://thomas.apestaart.org/thomas/trac/changeset/1122/patches/quicktile/quicktile.py
+ - https://thomas.apestaart.org/thomas/trac/browser/patches/quicktile/README
+
 References and code used:
  - http://faq.pygtk.org/index.py?req=show&file=faq23.039.htp
  - http://www.larsen-b.com/Article/184.html
@@ -53,6 +58,8 @@ import pygtk
 pygtk.require('2.0')
 
 import errno, logging, gtk, gobject, sys
+
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 try:
     from Xlib import X
@@ -155,17 +162,25 @@ class WindowManager(object):
 
         @returns: The target monitor ID
         @rtype: int
+
+        @bug: I may have to hack up my own maximization detector since
+              win.get_state() seems to be broken.
         """
 
         win, monitorGeom, winGeom, monitorID = self.getGeometries(window)
 
-        newMonitorID = monitorID % self._root.get_n_monitors()
-        newMonitorGeom = root.get_monitor_geometry(newMonitorID)
+        if monitorID == 0:
+            newMonitorID = 1
+        else:
+            newMonitorID = (monitorID + 1) % self._root.get_n_monitors()
+
+        newMonitorGeom = self._root.get_monitor_geometry(newMonitorID)
+        logging.debug("Moving window to monitor %s" % newMonitorID)
 
         if win.get_state() & gtk.gdk.WINDOW_STATE_MAXIMIZED:
-            self.cmd_toggleMaximize(win)
+            self.cmd_toggleMaximize(win, False)
             self.reposition(win, winGeom, newMonitorGeom)
-            self.cmd_toggleMaximize(win)
+            self.cmd_toggleMaximize(win, True)
         else:
             self.reposition(win, winGeom, newMonitorGeom)
 
@@ -186,13 +201,15 @@ class WindowManager(object):
 
         @bug: win.unmaximize() seems to have no effect.
         """
-        win = win or self.getGeometries()[0]
+        win = win or self.get_active_window()
 
         if state is False or (state is None and
                 (win.get_state() & gtk.gdk.WINDOW_STATE_MAXIMIZED)):
+            logging.debug('unmaximize')
             win.unmaximize()
             return False
         else:
+            logging.debug('maximize')
             win.maximize()
             return True
 
@@ -207,6 +224,9 @@ class WindowManager(object):
 
         @returns: The new window dimensions.
         @rtype: C{gtk.gdk.Rectangle}
+
+        @bug: This currently trips over panels (eg. gnome-panel) unless they're
+            hidden/auto-hide.
         """
         win, monitorGeom, winGeom = self.getGeometries(window)[0:3]
 
@@ -373,10 +393,15 @@ if __name__ == '__main__':
         default=False, help="Use python-xlib to set up keybindings and then wait.")
     parser.add_option('--valid-args', action="store_true", dest="showArgs",
         default=False, help="List valid arguments for use without --bindkeys.")
+    parser.add_option('--debug', action="store_true", dest="debug",
+        default=False, help="List valid arguments for use without --bindkeys.")
 
     opts, args = parser.parse_args()
-    wm = WindowManager(POSITIONS)
 
+    if opts.debug:
+        logging.getLogger().setLevel(logging.DEBUG)
+
+    wm = WindowManager(POSITIONS)
     if opts.daemonize:
         if not XLIB_PRESENT:
             print "ERROR: Could not find python-xlib. Cannot bind keys."
