@@ -1,47 +1,47 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""deitarion/SSokolow's Linux WinSplit clone in need of a name
+"""QuickTile, a WinSplit clone for X11 desktops
 
 When using --bindkeys, keybindings are Ctrl+Alt+0 through Ctrl+Alt+9 and
 Ctrl+Alt+Enter (keypad only). For non-keybinding use, see --help.
 
 Requirements:
-- Python 2.3 (Tested on 2.5 but I don't see any newer constructs in the code.)
-- PyGTK 2.2 (assuming get_active_window() isn't newer than that)
-- X11 (The code expects _NETWM hints and X11-style window decorations)
-- python-xlib (optional, required for --bindkeys, tested with 0.12)
+ - Python 2.3 (Tested on 2.5 but I don't see any newer constructs in the code.)
+ - PyGTK 2.2 (assuming get_active_window() isn't newer than that)
+ - X11 (The code expects _NETWM hints and X11-style window decorations)
+ - python-xlib (optional, required for --bindkeys, tested with 0.12)
 
-Known Bugs:
-- The internal keybindings only work with NumLock and CapsLock off.
-- The "monitor-switch" action only works on non-maximized windows.
-- The toggleMaximize function powering the "maximize" action can't unmaximize.
-  (Workaround: Use one of the regular tiling actions to unmaximize)
+@bug: The internal keybindings only work with NumLock and CapsLock off.
+@bug: The "monitor-switch" action only works on non-maximized windows.
+@bug: The toggleMaximize function powering the "maximize" action can't unmaximize.
+      (Workaround: Use one of the regular tiling actions to unmaximize)
 
-TODO:
-- Decide how to handle maximization and stick with it.
-- Implement the secondary major features of WinSplit Revolution (eg.
-  process-shape associations, locking/welding window edges, etc.)
-- Clean up the code. It's functional, but an ugly rush-job.
-- Figure out how to implement a --list-keybindings option.
-- Consider binding KP+ and KP- to allow comfy customization of split widths.
-  (or heights, for the vertical split)
-- Consider rewriting cycleDimensions to allow command-line use to jump to a
-  specific index without actually flickering the window through all the
-  intermediate shapes.
-- Expose a D-Bus API for --bindkeys and consider changing it so that, if
-  python-xlib isn't present it displays an error message but keeps running
-  anyway to provide the D-Bus service.
-- Can I hook into the GNOME and KDE keybinding APIs without using PyKDE or
-  gnome-python? (eg. using D-Bus, perhaps?)
+@todo:
+ - Decide how to handle maximization and stick with it.
+ - Implement the secondary major features of WinSplit Revolution (eg.
+   process-shape associations, locking/welding window edges, etc.)
+ - Clean up the code. It's functional, but an ugly rush-job.
+ - Figure out how to implement a --list-keybindings option.
+ - Consider binding KP+ and KP- to allow comfy customization of split widths.
+   (or heights, for the vertical split)
+ - Consider rewriting cycleDimensions to allow command-line use to jump to a
+   specific index without actually flickering the window through all the
+   intermediate shapes.
+ - Expose a D-Bus API for --bindkeys and consider changing it so that, if
+   python-xlib isn't present it displays an error message but keeps running
+   anyway to provide the D-Bus service.
+ - Can I hook into the GNOME and KDE keybinding APIs without using PyKDE or
+   gnome-python? (eg. using D-Bus, perhaps?)
 
 References and code used:
-- http://faq.pygtk.org/index.py?req=show&file=faq23.039.htp
-- http://www.larsen-b.com/Article/184.html
-- http://www.pygtk.org/pygtk2tutorial/sec-MonitoringIO.html
+ - http://faq.pygtk.org/index.py?req=show&file=faq23.039.htp
+ - http://www.larsen-b.com/Article/184.html
+ - http://www.pygtk.org/pygtk2tutorial/sec-MonitoringIO.html
 """
 
-__author__ = "Stephan Sokolow (deitarion/SSokolow)"
-__version__ = "0.1.3"
+__appname__ = "QuickTile"
+__author__  = "Stephan Sokolow (deitarion/SSokolow)"
+__version__ = "0.1.4"
 __license__ = "GNU GPL 2.0 or later"
 
 
@@ -333,4 +333,3 @@ if __name__ == '__main__':
             doCommand(args[0])
         while gtk.events_pending():
             gtk.main_iteration()
-
