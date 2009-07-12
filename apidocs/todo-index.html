@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>To Do List</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="quicktile-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th bgcolor="#70b0f0" class="navbar-select"
+          >&nbsp;&nbsp;&nbsp;Indices&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">&nbsp;</td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="todo-index.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<center><b>[
+ <a href="identifier-index.html">Identifiers</a>
+| <a href="bug-index.html">Bugs</a>
+| <a href="todo-index.html">To Do</a>
+]</b></center><br />
+<h1 class="epydoc"><a name="todo">To Do List</a></h1>
+<br />
+<div>
+<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile-module.html">quicktile</a></b>    <ul class="nomargin">
+      <li><ul>
+      <li>
+        Clean up the code. It's functional, but an ugly rush-job.
+      </li>
+      <li>
+        Figure out how to implement a --list-keybindings option.
+      </li>
+      <li>
+        Decide how to handle maximization and stick with it.
+      </li>
+      <li>
+        Implement the secondary major features of WinSplit Revolution (eg. 
+        process-shape associations, locking/welding window edges, etc.)
+      </li>
+      <li>
+        Consider binding KP+ and KP- to allow comfy customization of split 
+        widths. (or heights, for the vertical split)
+      </li>
+      <li>
+        Consider rewriting cycleDimensions to allow command-line use to 
+        jump to a specific index without actually flickering the window 
+        through all the intermediate shapes.
+      </li>
+      <li>
+        Expose a D-Bus API for --bindkeys and consider changing it so that,
+        if python-xlib isn't present it displays an error message but keeps
+        running anyway to provide the D-Bus service.
+      </li>
+      <li>
+        Can I hook into the GNOME and KDE keybinding APIs without using 
+        PyKDE or gnome-python? (eg. using D-Bus, perhaps?)
+      </li>
+    </ul></li>
+      <li>Merge remaining appropriate portions of:
+    <ul>
+      <li>
+        
+        https://thomas.apestaart.org/thomas/trac/changeset/1123/patches/quicktile/quicktile.py
+      </li>
+      <li>
+        
+        https://thomas.apestaart.org/thomas/trac/changeset/1122/patches/quicktile/quicktile.py
+      </li>
+      <li>
+        
+        https://thomas.apestaart.org/thomas/trac/browser/patches/quicktile/README
+      </li>
+    </ul>
+    <p>References and code used:</p>
+    <ul>
+      <li>
+        http://faq.pygtk.org/index.py?req=show&amp;file=faq23.039.htp
+      </li>
+      <li>
+        http://www.larsen-b.com/Article/184.html
+      </li>
+      <li>
+        http://www.pygtk.org/pygtk2tutorial/sec-MonitoringIO.html
+      </li>
+    </ul></li>
+    </ul>
+</table></div>
+<div>
+<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.WindowManager-class.html#__init__">quicktile.WindowManager.__init__</a></b>    <ul class="nomargin">
+      <li>Confirm that the root window only changes on X11 server restart. 
+    (Something which will crash QuickTile anyway since PyGTK makes X server
+    disconnects uncatchable.)
+    <p>It could possibly change while toggling &quot;allow desktop 
+    icons&quot; in KDE 3.x. (Not sure what would be equivalent 
+    elsewhere)</p></li>
+    </ul>
+</table></div>
+<div>
+<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.WindowManager-class.html#getGeometries">quicktile.WindowManager.getGeometries</a></b>    <ul class="nomargin">
+      <li>Confirm that changing WMs doesn't mess up quicktile.</li>
+    </ul>
+</table></div>
+<br /><!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="quicktile-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th bgcolor="#70b0f0" class="navbar-select"
+          >&nbsp;&nbsp;&nbsp;Indices&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sun Jul 12 12:48:47 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

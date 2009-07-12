@@ -1,0 +1,705 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>quicktile.WindowManager</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="quicktile-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="quicktile-module.html">Module&nbsp;quicktile</a> ::
+        Class&nbsp;WindowManager
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="quicktile.WindowManager-class.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class WindowManager</h1><p class="nomargin-top"><span class="codelink"><a href="quicktile-pysrc.html#WindowManager">source&nbsp;code</a></span></p>
+<pre class="base-tree">
+object --+
+         |
+        <strong class="uidshort">WindowManager</strong>
+</pre>
+
+<hr />
+<p>A simple API-wrapper class for manipulating window positioning.</p>
+
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">commands</span>,
+        <span class="summary-sig-arg">screen</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Initializes WindowManager.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">int</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#cmd_cycleMonitors" class="summary-sig-name">cmd_cycleMonitors</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">window</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Cycle the specified window (the active window if none was explicitly 
+      specified) between monitors while leaving the position within the 
+      monitor unchanged.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.cmd_cycleMonitors">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">bool</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#cmd_toggleMaximize" class="summary-sig-name">cmd_toggleMaximize</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">win</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">state</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Given a window, toggle its maximization state or, optionally, set a 
+      specific state.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.cmd_toggleMaximize">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>gtk.gdk.Rectangle</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#cycleDimensions" class="summary-sig-name">cycleDimensions</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">dimensions</span>,
+        <span class="summary-sig-arg">window</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Given a window and a list of 4-tuples containing dimensions as a 
+      decimal percentage of monitor size, cycle through the list, taking 
+      one step each time this function is called.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.cycleDimensions">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#doCommand" class="summary-sig-name">doCommand</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">command</span>)</span><br />
+      Resolve a textual positioning command and execute it.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.doCommand">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>gtk.gdk.Screen</code> or <code>None</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#get_active_window" class="summary-sig-name">get_active_window</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Retrieve the active window.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_active_window">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>gtk.gdk.Rectangle</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#get_combined_dimensions" class="summary-sig-name">get_combined_dimensions</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">win</span>)</span><br />
+      Given a window, return a tuple of:</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_combined_dimensions">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>tuple(int, int)</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#get_frame_thickness" class="summary-sig-name">get_frame_thickness</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">win</span>)</span><br />
+      Given a window, return a (border, titlebar) thickness tuple.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_frame_thickness">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">tuple</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#getGeometries" class="summary-sig-name">getGeometries</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">win</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Get the geometry for the given window (including window decorations) 
+      and the monitor it's on.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.getGeometries">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>gtk.gdk.Rectangle</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#reposition" class="summary-sig-name">reposition</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">win</span>,
+        <span class="summary-sig-arg">geom</span>,
+        <span class="summary-sig-arg">monitor</span>=<span class="summary-sig-default">gtk.gdk.Rectangle(0, 0, 0, 0)</span>)</span><br />
+      Position and size a window, decorations inclusive, according to the 
+      provided target window and monitor geometry rectangles.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.reposition">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
+      <code>__format__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__new__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== PROPERTIES ==================== -->
+<a name="section-Properties"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Properties</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Properties"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__init__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">commands</span>,
+        <span class="sig-arg">screen</span>=<span class="sig-default">None</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.__init__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Initializes WindowManager.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>screen</code></strong> (<code>gtk.gdk.Screen</code>) - The X11 screen to operate on. If <code>None</code>, the default 
+          screen as retrieved by <code>gtk.gdk.screen_get_default</code> 
+          will be used.</li>
+        <li><strong class="pname"><code>commands</code></strong> (dict) - A dict of commands for <a 
+          href="quicktile.WindowManager-class.html#doCommand" 
+          class="link">doCommand</a> to resolve.</li>
+    </ul></dd>
+    <dt>Overrides:
+        object.__init__
+    </dt>
+  </dl>
+<div class="fields">      <p><strong>To Do:</strong>
+        Confirm that the root window only changes on X11 server restart. 
+    (Something which will crash QuickTile anyway since PyGTK makes X server
+    disconnects uncatchable.)
+    <p>It could possibly change while toggling &quot;allow desktop 
+    icons&quot; in KDE 3.x. (Not sure what would be equivalent 
+    elsewhere)</p>
+      </p>
+</div></td></tr></table>
+</div>
+<a name="cmd_cycleMonitors"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">cmd_cycleMonitors</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">window</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.cmd_cycleMonitors">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Cycle the specified window (the active window if none was explicitly 
+  specified) between monitors while leaving the position within the monitor
+  unchanged.</p>
+  <dl class="fields">
+    <dt>Returns: int</dt>
+        <dd>The target monitor ID</dd>
+  </dl>
+<div class="fields">      <p><strong>Bug:</strong>
+        I may have to hack up my own maximization detector since 
+    win.get_state() seems to be broken.
+      </p>
+</div></td></tr></table>
+</div>
+<a name="cmd_toggleMaximize"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">cmd_toggleMaximize</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">win</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">state</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.cmd_toggleMaximize">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Given a window, toggle its maximization state or, optionally, set a 
+  specific state.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>win</code></strong> (<code>gtk.gdk.Window</code>) - The window on which to operate</li>
+        <li><strong class="pname"><code>state</code></strong> (<code>bool</code> or <code>None</code>) - If this is not None, set a specific maximization state. 
+          Otherwise, toggle maximization.</li>
+    </ul></dd>
+    <dt>Returns: bool</dt>
+        <dd>The target state as a boolean. (True = maximized)</dd>
+  </dl>
+<div class="fields">      <p><strong>Bug:</strong>
+        win.unmaximize() seems to have no effect.
+      </p>
+</div></td></tr></table>
+</div>
+<a name="cycleDimensions"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">cycleDimensions</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">dimensions</span>,
+        <span class="sig-arg">window</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.cycleDimensions">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Given a window and a list of 4-tuples containing dimensions as a 
+  decimal percentage of monitor size, cycle through the list, taking one 
+  step each time this function is called.</p>
+  <p>If the window's dimensions are not in the list, set them to the first 
+  list entry.</p>
+  <dl class="fields">
+    <dt>Returns: <code>gtk.gdk.Rectangle</code></dt>
+        <dd>The new window dimensions.</dd>
+  </dl>
+<div class="fields">      <p><strong>Bug:</strong>
+        This currently trips over panels (eg. gnome-panel) unless they're 
+    hidden/auto-hide.
+      </p>
+</div></td></tr></table>
+</div>
+<a name="doCommand"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">doCommand</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">command</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.doCommand">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Resolve a textual positioning command and execute it.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>command</code></strong> (<code>str</code>)</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="get_active_window"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_active_window</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_active_window">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Retrieve the active window.</p>
+  <dl class="fields">
+    <dt>Returns: <code>gtk.gdk.Screen</code> or <code>None</code></dt>
+        <dd>The GDK Screen for the active window or None if the 
+          _NET_ACTIVE_WINDOW hint isn't supported or the desktop is the 
+          active window.</dd>
+  </dl>
+<div class="fields">      <p><strong>Note:</strong>
+        Checks for _NET* must be done every time since WMs support 
+        --replace
+      </p>
+</div></td></tr></table>
+</div>
+<a name="get_combined_dimensions"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_combined_dimensions</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">win</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_combined_dimensions">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Given a window, return a tuple of:</p>
+  <ul>
+    <li>
+      the rectangle for its dimensions (frame included) relative to the 
+      monitor the window is on
+    </li>
+    <li>
+      the rectangle for the monitor the window is in relative to the root 
+      window
+    </li>
+  </ul>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>win</code></strong> (<code>gtk.gdk.Window</code>)</li>
+    </ul></dd>
+    <dt>Returns: <code>gtk.gdk.Rectangle</code></dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="get_frame_thickness"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_frame_thickness</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">win</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_frame_thickness">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Given a window, return a (border, titlebar) thickness tuple.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>win</code></strong> (<code>gtk.gdk.Window</code>)</li>
+    </ul></dd>
+    <dt>Returns: <code>tuple(int, int)</code></dt>
+        <dd>A tuple of the form (window border thickness, titlebar thickness)</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="getGeometries"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getGeometries</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">win</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.getGeometries">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Get the geometry for the given window (including window decorations) 
+  and the monitor it's on. If not window is specified, the active window is
+  used.</p>
+  <p>Returns a tuple of the window object, two gtk.gdk.Rectangle objects 
+  containing the monitor and window geometry, respectively, and the monitor
+  ID (for multi-head desktops).</p>
+  <p>Returns (None, None, None, None) if the specified window is a desktop 
+  window or if no window was specified and _NET_ACTIVE_WINDOW is 
+  unsupported.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>win</code></strong> (<code>gtk.gdk.Window</code>)</li>
+    </ul></dd>
+    <dt>Returns: tuple</dt>
+  </dl>
+<div class="fields">      <strong>Notes:</strong>
+      <ul class="nomargin-top">
+        <li>
+        Window geometry is relative to the monitor, not the desktop.
+        </li>
+        <li>
+        Checks for _NET* must remain here here since WMs support --replace
+        </li>
+      </ul>
+      <p><strong>To Do:</strong>
+        Confirm that changing WMs doesn't mess up quicktile.
+      </p>
+</div></td></tr></table>
+</div>
+<a name="reposition"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">reposition</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">win</span>,
+        <span class="sig-arg">geom</span>,
+        <span class="sig-arg">monitor</span>=<span class="sig-default">gtk.gdk.Rectangle(0, 0, 0, 0)</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.reposition">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Position and size a window, decorations inclusive, according to the 
+  provided target window and monitor geometry rectangles.</p>
+  <p>If no monitor rectangle is specified, position relative to the desktop
+  as a whole.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>win</code></strong> (<code>gtk.gdk.Window</code>)</li>
+    </ul></dd>
+    <dt>Returns: <code>gtk.gdk.Rectangle</code></dt>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="quicktile-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sun Jul 12 12:48:47 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

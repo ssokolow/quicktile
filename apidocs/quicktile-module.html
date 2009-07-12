@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>quicktile</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th bgcolor="#70b0f0" class="navbar-select"
+          >&nbsp;&nbsp;&nbsp;Home&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Module&nbsp;quicktile
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="quicktile-module.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== MODULE DESCRIPTION ==================== -->
+<h1 class="epydoc">Module quicktile</h1><p class="nomargin-top"><span class="codelink"><a href="quicktile-pysrc.html">source&nbsp;code</a></span></p>
+<p>QuickTile, a WinSplit clone for X11 desktops</p>
+  <p>Thanks to Thomas Vander Stichele for some of the documentation 
+  cleanups.</p>
+
+<hr />
+<div class="fields">      <strong>Bugs:</strong>
+      <ul class="nomargin-top">
+        <li>
+        The internal keybindings only work with NumLock and CapsLock off.
+        </li>
+        <li>
+        The &quot;monitor-switch&quot; action only works on non-maximized 
+    windows.
+        </li>
+        <li>
+        The toggleMaximize function powering the &quot;maximize&quot; action 
+    can't unmaximize. (Workaround: Use one of the regular tiling actions to
+    unmaximize)
+        </li>
+      </ul>
+      <strong>To Do:</strong>
+      <ul class="nomargin-top">
+        <li>
+        <ul>
+      <li>
+        Clean up the code. It's functional, but an ugly rush-job.
+      </li>
+      <li>
+        Figure out how to implement a --list-keybindings option.
+      </li>
+      <li>
+        Decide how to handle maximization and stick with it.
+      </li>
+      <li>
+        Implement the secondary major features of WinSplit Revolution (eg. 
+        process-shape associations, locking/welding window edges, etc.)
+      </li>
+      <li>
+        Consider binding KP+ and KP- to allow comfy customization of split 
+        widths. (or heights, for the vertical split)
+      </li>
+      <li>
+        Consider rewriting cycleDimensions to allow command-line use to 
+        jump to a specific index without actually flickering the window 
+        through all the intermediate shapes.
+      </li>
+      <li>
+        Expose a D-Bus API for --bindkeys and consider changing it so that,
+        if python-xlib isn't present it displays an error message but keeps
+        running anyway to provide the D-Bus service.
+      </li>
+      <li>
+        Can I hook into the GNOME and KDE keybinding APIs without using 
+        PyKDE or gnome-python? (eg. using D-Bus, perhaps?)
+      </li>
+    </ul>
+        </li>
+        <li>
+        Merge remaining appropriate portions of:
+    <ul>
+      <li>
+        
+        https://thomas.apestaart.org/thomas/trac/changeset/1123/patches/quicktile/quicktile.py
+      </li>
+      <li>
+        
+        https://thomas.apestaart.org/thomas/trac/changeset/1122/patches/quicktile/quicktile.py
+      </li>
+      <li>
+        
+        https://thomas.apestaart.org/thomas/trac/browser/patches/quicktile/README
+      </li>
+    </ul>
+    <p>References and code used:</p>
+    <ul>
+      <li>
+        http://faq.pygtk.org/index.py?req=show&amp;file=faq23.039.htp
+      </li>
+      <li>
+        http://www.larsen-b.com/Article/184.html
+      </li>
+      <li>
+        http://www.pygtk.org/pygtk2tutorial/sec-MonitoringIO.html
+      </li>
+    </ul>
+        </li>
+      </ul>
+      <p><strong>Version:</strong>
+        0.1.4
+      </p>
+      <p><strong>Author:</strong>
+        Stephan Sokolow (deitarion/SSokolow)
+      </p>
+      <p><strong>License:</strong>
+        GNU GPL 2.0 or later
+      </p>
+      <p><strong>Application Name:</strong>
+        QuickTile
+      </p>
+</div><!-- ==================== CLASSES ==================== -->
+<a name="section-Classes"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Classes</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Classes"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="quicktile.WindowManager-class.html" class="summary-name">WindowManager</a><br />
+      A simple API-wrapper class for manipulating window positioning.
+    </td>
+  </tr>
+</table>
+<!-- ==================== VARIABLES ==================== -->
+<a name="section-Variables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Variables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="XLIB_PRESENT"></a><span class="summary-name">XLIB_PRESENT</span> = <code title="True">True</code><br />
+      Indicates whether python-xlib was found
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="quicktile-module.html#POSITIONS" class="summary-name">POSITIONS</a> = <code title="{'bottom': ((0, 0.5, 1, 0.5),
+            (0.333333333333, 0.5, 0.333333333333, 0.5)),
+ 'bottom-left': ((0, 0.5, 0.5, 0.5),
+                 (0, 0.5, 0.333333333333, 0.5),
+                 (0, 0.5, 0.666666666667, 0.5)),
+ 'bottom-right': ((0.5, 0.5, 0.5, 0.5),
+                  (0.666666666667, 0.5, 0.333333333333, 0.5),
+                  (0.333333333333, 0.5, 0.666666666667, 0.5)),
+..."><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">bottom</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-group">(</code>0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>1<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">, </code><code class="variable-group">(</code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-ellipsis">...</code></code><br />
+      command-to-action mappings
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="quicktile-module.html#keys" class="summary-name">keys</a> = <code title="{65421: 'monitor-switch',
+ 65456: 'maximize',
+ 65457: 'bottom-left',
+ 65458: 'bottom',
+ 65459: 'bottom-right',
+ 65460: 'left',
+ 65461: 'middle',
+ 65462: 'right',
+..."><code class="variable-group">{</code>65421<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">monitor-switch</code><code class="variable-quote">'</code><code class="variable-op">, </code>65456<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">maximize</code><code class="variable-quote">'</code><code class="variable-op">, </code>65457<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bo</code><code class="variable-ellipsis">...</code></code><br />
+      keybinding-to-command mappings
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="None">None</code>
+    </td>
+  </tr>
+</table>
+<!-- ==================== VARIABLES DETAILS ==================== -->
+<a name="section-VariablesDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Variables Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-VariablesDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="POSITIONS"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">POSITIONS</h3>
+  <p>command-to-action mappings</p>
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">bottom</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-group">(</code>0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>1<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
+            <code class="variable-group">(</code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">bottom-left</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-group">(</code>0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
+                 <code class="variable-group">(</code>0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
+                 <code class="variable-group">(</code>0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.666666666667<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">bottom-right</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-group">(</code>0.5<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
+                  <code class="variable-group">(</code>0.666666666667<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
+                  <code class="variable-group">(</code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.666666666667<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-group">)</code><code class="variable-op">,</code>
+<code class="variable-ellipsis">...</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="keys"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">keys</h3>
+  <p>keybinding-to-command mappings</p>
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-group">{</code>65421<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">monitor-switch</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ 65456<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">maximize</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ 65457<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom-left</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ 65458<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ 65459<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom-right</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ 65460<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">left</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ 65461<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">middle</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ 65462<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">right</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+<code class="variable-ellipsis">...</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th bgcolor="#70b0f0" class="navbar-select"
+          >&nbsp;&nbsp;&nbsp;Home&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sun Jul 12 12:48:47 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>
