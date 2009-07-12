@@ -20,9 +20,6 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
  - Consider rewriting cycleDimensions to allow command-line use to jump to a
    specific index without actually flickering the window through all the
    intermediate shapes.
- - Expose a D-Bus API for --bindkeys and consider changing it so that, if
-   python-xlib isn't present it displays an error message but keeps running
-   anyway to provide the D-Bus service.
  - Can I hook into the GNOME and KDE keybinding APIs without using PyKDE or
    gnome-python? (eg. using D-Bus, perhaps?)
 
@@ -59,6 +56,17 @@ try:
     XLIB_PRESENT = True #: Indicates whether python-xlib was found
 except ImportError:
     XLIB_PRESENT = False #: Indicates whether python-xlib was found
+
+try:
+    import dbus.service
+    from dbus import SessionBus
+    from dbus.mainloop.glib import DBusGMainLoop
+
+    DBusGMainLoop(set_as_default=True)
+    sessBus = SessionBus()
+    DBUS_PRESENT = True
+except: # TODO: figure out what signal other than ImportError to catch
+    DBUS_PRESENT = False
 
 POSITIONS = {
     'left'           : (
@@ -240,21 +248,26 @@ class WindowManager(object):
     def doCommand(self, command):
         """Resolve a textual positioning command and execute it.
 
+        @returns: A boolean indicating success/failure.
         @type command: C{str}
+        @rtype: C{bool}
         """
         int_command = self.commands.get(command, None)
         if isinstance(int_command, (tuple, list)):
             self.cycleDimensions(int_command)
+            return True
         elif isinstance(int_command, basestring):
             cmd = getattr(self, 'cmd_' + int_command, None)
             if cmd:
                 cmd()
+                return True
             else:
                 logging.error("Invalid internal command name: %s", int_command)
         elif int_command is None:
             logging.error("Invalid external command name: %r", command)
         else:
             logging.error("Unrecognized command type for %r", int_command)
+        return False
 
     def get_active_window(self):
         """
@@ -394,37 +407,59 @@ if __name__ == '__main__':
 
     wm = WindowManager(POSITIONS)
     if opts.daemonize:
-        if not XLIB_PRESENT:
-            print "ERROR: Could not find python-xlib. Cannot bind keys."
+        success = False     # This will be changed on success
+
+        if XLIB_PRESENT:
+            disp = Display()
+            root = disp.screen().root
+
+            # We want to receive KeyPress events
+            root.change_attributes(event_mask = X.KeyPressMask)
+            keys = dict([(disp.keysym_to_keycode(x), keys[x]) for x in keys])
+
+            for keycode in keys:
+                root.grab_key(keycode, X.ControlMask | X.Mod1Mask, 1, X.GrabModeAsync, X.GrabModeAsync)
+
+            # If we don't do this, then nothing works.
+            # I assume it flushes the XGrabKey calls to the server.
+            for x in range(0, root.display.pending_events()):
+                root.display.next_event()
+
+            def handle_xevent(src, cond, handle=root.display):
+                """Handle pending python-xlib events"""
+                for i in range(0, handle.pending_events()):
+                    xevent = handle.next_event()
+                    if xevent.type == X.KeyPress:
+                        keycode = xevent.detail
+                        wm.doCommand(keys[keycode])
+                return True
+
+            # Merge python-xlib into the Glib event loop and start things going.
+            gobject.io_add_watch(root.display, gobject.IO_IN, handle_xevent)
+            success = True
+        else:
+            logging.error("Could not find python-xlib. Cannot bind keys.")
+
+        if DBUS_PRESENT:
+            class QuickTile(dbus.service.Object):
+                def __init__(self):
+                    dbus.service.Object.__init__(self, sessBus, '/com/ssokolow/QuickTile')
+
+                @dbus.service.method(dbus_interface='com.ssokolow.QuickTile',
+                         in_signature='s', out_signature='b')
+                def doCommand(self, command):
+                    return wm.doCommand(command)
+
+            dbusName = dbus.service.BusName("com.ssokolow.QuickTile", sessBus)
+            dbusObj = QuickTile()
+            success = True
+        else:
+            logging.warn("Could not connect to the D-Bus Session Bus.")
+
+        if not success:
             sys.exit(errno.ENOENT)
             #FIXME: What's the proper exit code for "library not found"?
 
-        disp = Display()
-        root = disp.screen().root
-
-        # We want to receive KeyPress events
-        root.change_attributes(event_mask = X.KeyPressMask)
-        keys = dict([(disp.keysym_to_keycode(x), keys[x]) for x in keys])
-
-        for keycode in keys:
-            root.grab_key(keycode, X.ControlMask | X.Mod1Mask, 1, X.GrabModeAsync, X.GrabModeAsync)
-
-        # If we don't do this, then nothing works.
-        # I assume it flushes the XGrabKey calls to the server.
-        for x in range(0, root.display.pending_events()):
-            root.display.next_event()
-
-        def handle_xevent(src, cond, handle=root.display):
-            """Handle pending python-xlib events"""
-            for i in range(0, handle.pending_events()):
-                xevent = handle.next_event()
-                if xevent.type == X.KeyPress:
-                    keycode = xevent.detail
-                    wm.doCommand(keys[keycode])
-            return True
-
-        # Merge python-xlib into the Glib event loop and start things going.
-        gobject.io_add_watch(root.display, gobject.IO_IN, handle_xevent)
         gtk.main()
     elif not opts.daemonize:
         badArgs = [x for x in args if x not in wm.commands]
