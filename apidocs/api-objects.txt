@@ -1,8 +1,10 @@
 quicktile	quicktile-module.html
-quicktile.keys	quicktile-module.html#keys
 quicktile.POSITIONS	quicktile-module.html#POSITIONS
-quicktile.XLIB_PRESENT	quicktile-module.html#XLIB_PRESENT
+quicktile.DBUS_PRESENT	quicktile-module.html#DBUS_PRESENT
+quicktile.sessBus	quicktile-module.html#sessBus
 quicktile.__package__	quicktile-module.html#__package__
+quicktile.keys	quicktile-module.html#keys
+quicktile.XLIB_PRESENT	quicktile-module.html#XLIB_PRESENT
 quicktile.WindowManager	quicktile.WindowManager-class.html
 quicktile.WindowManager.cycleDimensions	quicktile.WindowManager-class.html#cycleDimensions
 quicktile.WindowManager.getGeometries	quicktile.WindowManager-class.html#getGeometries
