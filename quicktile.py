@@ -393,12 +393,16 @@ if __name__ == '__main__':
     from optparse import OptionParser
     parser = OptionParser(usage="%prog [options] [arguments]",
             version="%%prog v%s" % __version__)
+    parser.add_option('-d', '--daemonize', action="store_true", dest="daemonize",
+        default=False, help="Attempt to set up global keybindings using "
+        "python-xlib and a D-Bus service using dbus-python. Exit if neither "
+        "succeeds.")
     parser.add_option('-b', '--bindkeys', action="store_true", dest="daemonize",
-        default=False, help="Use python-xlib to set up keybindings and then wait.")
+        default=False, help="Deprecated alias for --daemonize.")
     parser.add_option('--valid-args', action="store_true", dest="showArgs",
         default=False, help="List valid arguments for use without --bindkeys.")
     parser.add_option('--debug', action="store_true", dest="debug",
-        default=False, help="List valid arguments for use without --bindkeys.")
+        default=False, help="Display debug messages.")
 
     opts, args = parser.parse_args()
 
