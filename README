@@ -1,0 +1,12 @@
+QuickTile, a WinSplit clone for X11 desktops
+
+When using --bindkeys, keybindings are Ctrl+Alt+0 through Ctrl+Alt+9 and
+Ctrl+Alt+Enter (keypad only). For non-keybinding use, see --help.
+
+Requirements:
+ - Python 2.3 (Tested on 2.5 but I don't see any newer constructs in the code.)
+ - PyGTK 2.2 (assuming get_active_window() isn't newer than that)
+ - X11 (The code expects _NETWM hints and X11-style window decorations)
+ - python-xlib (optional, required for --bindkeys, tested with 0.12)
+
+Thanks to Thomas Vander Stichele for some of the documentation cleanups.
