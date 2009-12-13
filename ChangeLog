@@ -3,6 +3,7 @@
 - Docstrings reformatted for epydoc 3.x
 - Renamed --bindkeys to --daemonize (--bindkeys usable but deprecated)
 - Added a D-Bus API which uses the same commands as the command-line API.
+- Fix Exceptions when trying to use QuickTile on windows like MPlayer.
 
 0.1.3:
 - Last version offered via ssokolow.com/scripts/

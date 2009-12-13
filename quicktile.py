@@ -159,14 +159,18 @@ class WindowManager(object):
         specified) between monitors while leaving the position within the monitor
         unchanged.
 
-        @returns: The target monitor ID
-        @rtype: int
+        @returns: The target monitor ID or None if the current window could not
+            be found.
+        @rtype: C{int} or C{None}
 
         @bug: I may have to hack up my own maximization detector since
               win.get_state() seems to be broken.
         """
 
         win, monitorGeom, winGeom, monitorID = self.getGeometries(window)
+
+        if not monitorID:
+            return None
 
         if monitorID == 0:
             newMonitorID = 1
@@ -195,12 +199,15 @@ class WindowManager(object):
         @type win: C{gtk.gdk.Window}
         @type state: C{bool} or C{None}
 
-        @returns: The target state as a boolean. (True = maximized)
-        @rtype: bool
+        @returns: The target state as a boolean (True = maximized) or None if
+            the active window could not be retrieved.
+        @rtype: C{bool} or C{None}
 
         @bug: win.unmaximize() seems to have no effect.
         """
         win = win or self.get_active_window()
+        if not win:
+            return None
 
         if state is False or (state is None and
                 (win.get_state() & gtk.gdk.WINDOW_STATE_MAXIMIZED)):
@@ -228,6 +235,10 @@ class WindowManager(object):
             hidden/auto-hide.
         """
         win, monitorGeom, winGeom = self.getGeometries(window)[0:3]
+
+        # This temporary hack prevents an Exception with MPlayer.
+        if not monitorGeom:
+            return None
 
         dims = []
         for tup in dimensions:
@@ -289,8 +300,10 @@ class WindowManager(object):
             return None
 
         # Do nothing if the desktop is the active window
-        if (win.property_get("_NET_WM_WINDOW_TYPE")[-1][0] ==
-                '_NET_WM_WINDOW_TYPE_DESKTOP'):
+        # (The "not winType" check seems required for fullscreen MPlayer)
+        winType = win.property_get("_NET_WM_WINDOW_TYPE")
+        logging.debug("NET_WM_WINDOW_TYPE: %r", winType)
+        if not winType or winType[-1][0] == '_NET_WM_WINDOW_TYPE_DESKTOP':
             return None
 
         return win
