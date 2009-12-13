@@ -4,12 +4,14 @@
 
 Thanks to Thomas Vander Stichele for some of the documentation cleanups.
 
-@bug: The internal keybindings only work with NumLock and CapsLock off.
+@bug: The internal keybindings only work with CapsLock off.
 @bug: The "monitor-switch" action only works on non-maximized windows.
 @bug: The toggleMaximize function powering the "maximize" action can't unmaximize.
       (Workaround: Use one of the regular tiling actions to unmaximize)
 
 @todo:
+ - Look into supporting xpyb (the Python equivalent to libxcb) for global
+   keybinding.
  - Decide whether to amend the euclidean distance matching so un-tiled windows
    are guaranteed to start at the beginning of the sequence.
  - Clean up the code. It's functional, but an ugly rush-job.
@@ -445,6 +447,7 @@ if __name__ == '__main__':
 
             for keycode in keys:
                 root.grab_key(keycode, X.ControlMask | X.Mod1Mask, 1, X.GrabModeAsync, X.GrabModeAsync)
+                root.grab_key(keycode, X.ControlMask | X.Mod1Mask | X.Mod2Mask, 1, X.GrabModeAsync, X.GrabModeAsync)
 
             # If we don't do this, then nothing works.
             # I assume it flushes the XGrabKey calls to the server.
