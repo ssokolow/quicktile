@@ -10,6 +10,8 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
       (Workaround: Use one of the regular tiling actions to unmaximize)
 
 @todo:
+ - Decide whether to amend the euclidean distance matching so un-tiled windows
+   are guaranteed to start at the beginning of the sequence.
  - Clean up the code. It's functional, but an ugly rush-job.
  - Figure out how to implement a --list-keybindings option.
  - Decide how to handle maximization and stick with it.
@@ -46,6 +48,7 @@ import pygtk
 pygtk.require('2.0')
 
 import errno, logging, gtk, gobject, sys
+from heapq import heappop, heappush
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
@@ -230,9 +233,6 @@ class WindowManager(object):
 
         @returns: The new window dimensions.
         @rtype: C{gtk.gdk.Rectangle}
-
-        @bug: This currently trips over panels (eg. gnome-panel) unless they're
-            hidden/auto-hide.
         """
         win, monitorGeom, winGeom = self.getGeometries(window)[0:3]
 
@@ -247,12 +247,21 @@ class WindowManager(object):
                         int(tup[2] * monitorGeom.width),
                         int(tup[3] * monitorGeom.height)))
 
-        result = gtk.gdk.Rectangle(*dims[0])
-        for pos, val in enumerate(dims):
-            if tuple(winGeom) == tuple(val):
-                result = gtk.gdk.Rectangle(*dims[(pos + 1) % len(dims)])
-                break
+        logging.debug("winGeom %r", tuple(winGeom))
+        logging.debug("dims %r", dims)
 
+        # Calculate euclidean distances between the window's current geometry
+        # and all presets and store them in a min heap.
+        euclid_distance = []
+        for pos, val in enumerate(dims):
+            distance = sum([(wg-vv)**2 for (wg, vv) in zip(tuple(winGeom), tuple(val))])
+            heappush(euclid_distance, (distance, pos))
+
+        # Get minimum euclidean distance. (Closest match)
+        pos = heappop(euclid_distance)[1]
+        result = gtk.gdk.Rectangle(*dims[(pos + 1) % len(dims)])
+
+        logging.debug("result %r", tuple(result))
         self.reposition(win, result, monitorGeom)
         return result
 
