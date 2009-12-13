@@ -174,7 +174,7 @@ class WindowManager(object):
 
         win, monitorGeom, winGeom, monitorID = self.getGeometries(window)
 
-        if not monitorID:
+        if monitorID is None:
             return None
 
         if monitorID == 0:
