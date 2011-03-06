@@ -383,18 +383,14 @@ class WindowManager(object):
         if not win:
             return None, None, None, None
 
-        # Calculate the size of the wm decorations
-        winw, winh = win.get_geometry()[2:4]
-        border, titlebar = self.get_frame_thickness(win)
-        w, h = winw + (border * 2), winh + (titlebar+border)
-
-        # Calculate the position of where the wm decorations start (not the window itself)
-        screenposx, screenposy = win.get_root_origin()
-
+        #FIXME: How do I retrieve the root window from a given one?
         monitorID = self._root.get_monitor_at_window(win)
         monitorGeom = self._root.get_monitor_geometry(monitorID)
-        winGeom = gtk.gdk.Rectangle(screenposx - monitorGeom.x,
-                screenposy - monitorGeom.y, w, h)
+
+        # Get position relative to the monitor rather than the desktop
+        winGeom = win.get_frame_extents()
+        winGeom.x -= monitorGeom.x
+        winGeom.y -= monitorGeom.y
 
         return win, monitorGeom, winGeom, monitorID
 
