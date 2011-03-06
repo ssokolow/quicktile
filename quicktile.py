@@ -5,7 +5,6 @@
 Thanks to Thomas Vander Stichele for some of the documentation cleanups.
 
 @bug: The internal keybindings only work with CapsLock off.
-@bug: The "monitor-switch" action only works on non-maximized windows.
 @bug: The toggleMaximize function powering the "maximize" action can't unmaximize.
       (Workaround: Use one of the regular tiling actions to unmaximize)
 
@@ -209,7 +208,7 @@ class WindowManager(object):
             the active window could not be retrieved.
         @rtype: C{bool} or C{None}
 
-        @bug: win.unmaximize() seems to have no effect.
+        @bug: win.unmaximize() seems to either have no effect or not get called
         """
         win = win or self.get_active_window()
         if not win:
@@ -384,6 +383,9 @@ class WindowManager(object):
         @type win: C{gtk.gdk.Window}
         @rtype: C{gtk.gdk.Rectangle}
         """
+        #Workaround for my inability to reliably detect maximization.
+        win.unmaximize()
+
         border, titlebar = self.get_frame_thickness(win)
         win.move_resize(geom.x + monitor.x, geom.y + monitor.y,
                 geom.width - (border * 2), geom.height - (titlebar + border))
