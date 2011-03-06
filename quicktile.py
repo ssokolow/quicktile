@@ -33,6 +33,7 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
  - https://thomas.apestaart.org/thomas/trac/browser/patches/quicktile/README
 
 References and code used:
+ - http://faq.pygtk.org/index.py?req=show&file=faq23.017.htp
  - http://faq.pygtk.org/index.py?req=show&file=faq23.039.htp
  - http://www.larsen-b.com/Article/184.html
  - http://www.pygtk.org/pygtk2tutorial/sec-MonitoringIO.html
@@ -358,6 +359,12 @@ class WindowManager(object):
         #FIXME: How do I retrieve the root window from a given one?
         monitorID = self._root.get_monitor_at_window(win)
         monitorGeom = self._root.get_monitor_geometry(monitorID)
+
+        #TODO: Support non-rectangular usable areas. (eg. Xinerama)
+        if self._root.supports_net_wm_hint("_NET_WORKAREA"):
+            p = gtk.gdk.atom_intern('_NET_WORKAREA')
+            desktopGeo = self._root.get_root_window().property_get(p)[2][0:4]
+            monitorGeom = gtk.gdk.Rectangle(*desktopGeo).intersect(monitorGeom)
 
         # Get position relative to the monitor rather than the desktop
         winGeom = win.get_frame_extents()
