@@ -319,34 +319,6 @@ class WindowManager(object):
 
         return win
 
-    def get_combined_dimensions(self, win):
-        """Given a window, return a tuple of:
-        - the rectangle for its dimensions (frame included) relative to the
-          monitor the window is on
-        - the rectangle for the monitor the window is in relative to the root
-          window
-
-        @type win: C{gtk.gdk.Window}
-        @rtype: C{gtk.gdk.Rectangle}
-        """
-        # Calculate the size of the wm decorations
-        winw, winh = win.get_geometry()[2:4]
-        border, titlebar = self.get_frame_thickness(win)
-        w, h = winw + (border * 2), winh + (titlebar+border)
-
-        # Calculate the position of where the wm decorations start (not the window itself)
-        screenposx, screenposy = win.get_root_origin()
-
-        # Adjust the position to make it relative to the monitor rather than
-        # the desktop
-        #FIXME: How do I retrieve the root window from a given one?
-        monitorID = self._root.get_monitor_at_window(win)
-        monitorGeom = self._root.get_monitor_geometry(monitorID)
-        winGeom = gtk.gdk.Rectangle(screenposx - monitorGeom.x,
-                screenposy - monitorGeom.y, w, h)
-
-        return monitorGeom, winGeom
-
     def get_frame_thickness(self, win):
         """Given a window, return a (border, titlebar) thickness tuple.
         @type win: C{gtk.gdk.Window}
@@ -379,7 +351,7 @@ class WindowManager(object):
         @todo: Confirm that changing WMs doesn't mess up quicktile.
         """
         # Get the active window
-        win = self.get_active_window()
+        win = win or self.get_active_window()
         if not win:
             return None, None, None, None
 
