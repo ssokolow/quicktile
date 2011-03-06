@@ -103,7 +103,7 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">int</span>
+      <span class="summary-type"><code>int</code> or <code>None</code></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -123,7 +123,7 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">bool</span>
+      <span class="summary-type"><code>bool</code> or <code>None</code></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -190,24 +190,6 @@ object --+
       Retrieve the active window.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_active_window">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>gtk.gdk.Rectangle</code></span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#get_combined_dimensions" class="summary-sig-name">get_combined_dimensions</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">win</span>)</span><br />
-      Given a window, return a tuple of:</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_combined_dimensions">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -396,8 +378,9 @@ object --+
   specified) between monitors while leaving the position within the monitor
   unchanged.</p>
   <dl class="fields">
-    <dt>Returns: int</dt>
-        <dd>The target monitor ID</dd>
+    <dt>Returns: <code>int</code> or <code>None</code></dt>
+        <dd>The target monitor ID or None if the current window could not be 
+          found.</dd>
   </dl>
 <div class="fields">      <p><strong>Bug:</strong>
         I may have to hack up my own maximization detector since 
@@ -430,11 +413,12 @@ object --+
         <li><strong class="pname"><code>state</code></strong> (<code>bool</code> or <code>None</code>) - If this is not None, set a specific maximization state. 
           Otherwise, toggle maximization.</li>
     </ul></dd>
-    <dt>Returns: bool</dt>
-        <dd>The target state as a boolean. (True = maximized)</dd>
+    <dt>Returns: <code>bool</code> or <code>None</code></dt>
+        <dd>The target state as a boolean (True = maximized) or None if the 
+          active window could not be retrieved.</dd>
   </dl>
 <div class="fields">      <p><strong>Bug:</strong>
-        win.unmaximize() seems to have no effect.
+        win.unmaximize() seems to either have no effect or not get called
       </p>
 </div></td></tr></table>
 </div>
@@ -463,11 +447,7 @@ object --+
     <dt>Returns: <code>gtk.gdk.Rectangle</code></dt>
         <dd>The new window dimensions.</dd>
   </dl>
-<div class="fields">      <p><strong>Bug:</strong>
-        This currently trips over panels (eg. gnome-panel) unless they're 
-    hidden/auto-hide.
-      </p>
-</div></td></tr></table>
+</td></tr></table>
 </div>
 <a name="doCommand"></a>
 <div>
@@ -521,41 +501,6 @@ object --+
         --replace
       </p>
 </div></td></tr></table>
-</div>
-<a name="get_combined_dimensions"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_combined_dimensions</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">win</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_combined_dimensions">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Given a window, return a tuple of:</p>
-  <ul>
-    <li>
-      the rectangle for its dimensions (frame included) relative to the 
-      monitor the window is on
-    </li>
-    <li>
-      the rectangle for the monitor the window is in relative to the root 
-      window
-    </li>
-  </ul>
-  <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>win</code></strong> (<code>gtk.gdk.Window</code>)</li>
-    </ul></dd>
-    <dt>Returns: <code>gtk.gdk.Rectangle</code></dt>
-  </dl>
-</td></tr></table>
 </div>
 <a name="get_frame_thickness"></a>
 <div>
@@ -685,7 +630,7 @@ object --+
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Jul 12 15:51:49 2009
+    Generated by Epydoc 3.0.1 on Sun Mar  6 15:30:45 2011
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
