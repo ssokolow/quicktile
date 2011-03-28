@@ -48,7 +48,7 @@ __license__ = "GNU GPL 2.0 or later"
 import pygtk
 pygtk.require('2.0')
 
-import errno, logging, gtk, gobject, sys
+import errno, logging, gtk, gobject, os, sys
 from heapq import heappop, heappush
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
@@ -173,8 +173,12 @@ class WindowManager(object):
 
         win, monitorGeom, winGeom, monitorID = self.getGeometries(window)
 
-        if monitorID is None:
+        if os.name == 'nt':
+            self.reposition(win, winGeom, newMonitorGeom)
             return None
+            
+        if monitorID is None:
+                return None
 
         if monitorID == 0:
             newMonitorID = 1
@@ -302,6 +306,19 @@ class WindowManager(object):
         @note: Checks for _NET* must be done every time since WMs support
                --replace
         """
+        
+        if os.name == 'nt':
+            import win32gui
+            hWnd = win32gui.GetForegroundWindow()
+            win = gtk.gdk.window_foreign_new(hWnd)
+            
+            # TODO: Figure out why these return different values
+            #wGeom = win32gui.GetWindowRect(hWnd)
+            #winGeom = win.get_frame_extents()
+            #print wGeom, winGeom
+            
+            return win
+        
         # Get the root and active window
         if (self._root.supports_net_wm_hint("_NET_ACTIVE_WINDOW") and
                 self._root.supports_net_wm_hint("_NET_WM_WINDOW_TYPE")):
@@ -349,10 +366,24 @@ class WindowManager(object):
         @note: Checks for _NET* must remain here here since WMs support --replace
         @todo: Confirm that changing WMs doesn't mess up quicktile.
         """
+            
         # Get the active window
         win = win or self.get_active_window()
+
         if not win:
             return None, None, None, None
+
+        if os.name == 'nt':
+            import win32gui
+            from win32api import GetSystemMetrics
+            
+            width, height = GetSystemMetrics(0), GetSystemMetrics(1)
+            monitorGeom = gtk.gdk.Rectangle(0, 0, width, height)
+            #TODO: Take multiple monitor desktops into account.
+            
+            winGeom = gtk.gdk.Rectangle(*win32gui.GetWindowRect(win.handle))
+            
+            return win, monitorGeom, winGeom, None
 
         #FIXME: How do I retrieve the root window from a given one?
         monitorID = self._root.get_monitor_at_window(win)
@@ -382,6 +413,22 @@ class WindowManager(object):
         @type win: C{gtk.gdk.Window}
         @rtype: C{gtk.gdk.Rectangle}
         """
+        if os.name == 'nt':
+            import win32gui
+            #win32gui.SetWindowPos()
+            # TODO: Report that the following causes a segfault
+            # preceeded by this: 
+            # 420: GtkWarning: gdk_region_copy: assertion `region != NULL' failed
+            #   win.move_resize(*tuple(geom))
+            # 
+            #win.move_resize(*tuple(geom))
+            win32gui.MoveWindow(win.handle,
+                geom.x, geom.y,
+                geom.width, geom.height,
+                True)
+            return #TODO: Unify all this code.
+            
+        
         #Workaround for my inability to reliably detect maximization.
         win.unmaximize()
 
@@ -412,6 +459,13 @@ if __name__ == '__main__':
     wm = WindowManager(POSITIONS)
     if opts.daemonize:
         success = False     # This will be changed on success
+
+        #TODO: Figure out how to integrate this into the GTK+ loop:
+        # http://timgolden.me.uk/python/win32_how_do_i/catch_system_wide_hotkeys.html
+        #
+        # Worst case, use this somehow:
+        # while gtk.events_pending():    
+        #     gtk.main_iteration()
 
         if XLIB_PRESENT:
             disp = Display()
