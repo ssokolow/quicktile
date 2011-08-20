@@ -359,6 +359,12 @@ class WindowManager(object):
         monitorGeom = self._root.get_monitor_geometry(monitorID)
 
         #TODO: Support non-rectangular usable areas. (eg. Xinerama)
+        # (And, once I've got a solution, mention it on http://stackoverflow.com/q/2598580/435253 )
+        #
+        # Potentially-useful stuff:
+        # - http://old.nabble.com/Re%3A-_NET_WORKAREA-and-multiple-monitors-p24812662.html
+        # - http://thread.gmane.org/gmane.comp.gnome.wm-spec/1531/focus=1772
+        # - http://standards.freedesktop.org/wm-spec/wm-spec-1.3.html#id2507618
         if self._root.supports_net_wm_hint("_NET_WORKAREA"):
             p = gtk.gdk.atom_intern('_NET_WORKAREA')
             desktopGeo = self._root.get_root_window().property_get(p)[2][0:4]
