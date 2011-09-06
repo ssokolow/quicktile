@@ -57,6 +57,7 @@ try:
     from Xlib import X
     from Xlib.display import Display
     from Xlib.keysymdef import miscellany as _m
+    from Xlib.keysymdef import latin_1 as _l
     XLIB_PRESENT = True #: Indicates whether python-xlib was found
 except ImportError:
     XLIB_PRESENT = False #: Indicates whether python-xlib was found
@@ -118,6 +119,9 @@ POSITIONS = {
     ),
     'maximize'       : 'toggleMaximize',
     'monitor-switch' : 'cycleMonitors',
+    'vertical-maximize'   : 'vertMaximize',
+    'horizontal-maximize' : 'horzMaximize',
+    'move-to-center'      : 'moveCenter',
 } #: command-to-action mappings
 
 if XLIB_PRESENT:
@@ -133,6 +137,9 @@ if XLIB_PRESENT:
         _m.XK_KP_8     : "top",
         _m.XK_KP_9     : "top-right",
         _m.XK_KP_Enter : "monitor-switch",
+        _l.XK_V        : "vertical-maximize",
+        _l.XK_H        : "horizontal-maximize",
+        _l.XK_C        : "move-to-center",
     } #: keybinding-to-command mappings
 
 class WindowManager(object):
@@ -266,6 +273,50 @@ class WindowManager(object):
         self.reposition(win, result, monitorGeom)
         return result
 
+    def cmd_vertMaximize(self, window=None):
+        """
+        Given a window and a list of 4-tuples containing dimensions as a decimal
+        percentage of monitor size, cycle through the list, taking one step each
+        time this function is called.
+
+        If the window's dimensions are not in the list, set them to the first list
+        entry.
+
+        @returns: The new window dimensions.
+        @rtype: C{gtk.gdk.Rectangle}
+        """
+        win, monitorGeom, winGeom = self.getGeometries(window)[0:3]
+
+        # This temporary hack prevents an Exception with MPlayer.
+        if not monitorGeom:
+            return None
+
+        dims = []
+        for tup in dimensions:
+            dims.append((int(tup[0] * monitorGeom.width),
+                        int(tup[1] * monitorGeom.height),
+                        int(tup[2] * monitorGeom.width),
+                        int(tup[3] * monitorGeom.height)))
+
+        logging.debug("winGeom %r", tuple(winGeom))
+        logging.debug("dims %r", dims)
+
+        # Calculate euclidean distances between the window's current geometry
+        # and all presets and store them in a min heap.
+        euclid_distance = []
+        for pos, val in enumerate(dims):
+            distance = sum([(wg-vv)**2 for (wg, vv) in zip(tuple(winGeom), tuple(val))])
+            heappush(euclid_distance, (distance, pos))
+
+        # Get minimum euclidean distance. (Closest match)
+        pos = heappop(euclid_distance)[1]
+        result = gtk.gdk.Rectangle(*dims[(pos + 1) % len(dims)])
+
+        logging.debug("result %r", tuple(result))
+        self.reposition(win, result, monitorGeom)
+        return result
+
+
     def doCommand(self, command):
         """Resolve a textual positioning command and execute it.
 
@@ -365,10 +416,10 @@ class WindowManager(object):
         # - http://old.nabble.com/Re%3A-_NET_WORKAREA-and-multiple-monitors-p24812662.html
         # - http://thread.gmane.org/gmane.comp.gnome.wm-spec/1531/focus=1772
         # - http://standards.freedesktop.org/wm-spec/wm-spec-1.3.html#id2507618
-        if self._root.supports_net_wm_hint("_NET_WORKAREA"):
-            p = gtk.gdk.atom_intern('_NET_WORKAREA')
-            desktopGeo = self._root.get_root_window().property_get(p)[2][0:4]
-            monitorGeom = gtk.gdk.Rectangle(*desktopGeo).intersect(monitorGeom)
+        #if self._root.supports_net_wm_hint("_NET_WORKAREA"):
+        #    p = gtk.gdk.atom_intern('_NET_WORKAREA')
+        #    desktopGeo = self._root.get_root_window().property_get(p)[2][0:4]
+        #    monitorGeom = gtk.gdk.Rectangle(*desktopGeo).intersect(monitorGeom)
 
         # Get position relative to the monitor rather than the desktop
         winGeom = win.get_frame_extents()
