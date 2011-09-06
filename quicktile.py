@@ -57,6 +57,7 @@ try:
     from Xlib import X
     from Xlib.display import Display
     from Xlib.keysymdef import miscellany as _m
+    from Xlib.keysymdef import latin1 as _l
     XLIB_PRESENT = True #: Indicates whether python-xlib was found
 except ImportError:
     XLIB_PRESENT = False #: Indicates whether python-xlib was found
@@ -118,6 +119,9 @@ POSITIONS = {
     ),
     'maximize'       : 'toggleMaximize',
     'monitor-switch' : 'cycleMonitors',
+    'vertical-maximize'   : 'vertMaximize',
+    'horizontal-maximize' : 'horzMaximize',
+    'move-to-center'      : 'moveCenter',
 } #: command-to-action mappings
 
 if XLIB_PRESENT:
@@ -133,6 +137,9 @@ if XLIB_PRESENT:
         _m.XK_KP_8     : "top",
         _m.XK_KP_9     : "top-right",
         _m.XK_KP_Enter : "monitor-switch",
+        _l.XK_V        : "vertical-maximize",
+        _l.XK_H        : "horizontal-maximize",
+        _l.XK_C        : "move-to-center",
     } #: keybinding-to-command mappings
 
 class WindowManager(object):
@@ -265,6 +272,99 @@ class WindowManager(object):
         logging.debug("result %r", tuple(result))
         self.reposition(win, result, monitorGeom)
         return result
+
+    def cmd_vertMaximize(self, window=None):
+        """
+        Maximize the window vertically.
+        
+        @returns: The new window dimensions.
+        @rtype: C{gtk.gdk.Rectangle}
+        """
+        win, monitorGeom, winGeom = self.getGeometries(window)[0:3]
+
+        logging.debug("win %r", win)
+        logging.debug("monitorGeom %r", tuple(monitorGeom))
+        logging.debug("winGeom %r", tuple(winGeom))
+
+        # This temporary hack prevents an Exception with MPlayer.
+        if not monitorGeom:
+            return None
+
+        dims = ( int(winGeom.x),
+                 int(monitorGeom.y),
+                 int(winGeom.width),
+                 int(monitorGeom.height) )
+
+        logging.debug("dims %r", dims)
+
+        result = gtk.gdk.Rectangle(*dims)
+
+        logging.debug("result %r", tuple(result))
+        self.reposition(win, result, monitorGeom)
+        return result
+
+
+    def cmd_horzMaximize(self, window=None):
+        """
+        Maximize the window horizontally.
+        
+        @returns: The new window dimensions.
+        @rtype: C{gtk.gdk.Rectangle}
+        """
+        win, monitorGeom, winGeom = self.getGeometries(window)[0:3]
+
+        logging.debug("win %r", win)
+        logging.debug("monitorGeom %r", tuple(monitorGeom))
+        logging.debug("winGeom %r", tuple(winGeom))
+
+        # This temporary hack prevents an Exception with MPlayer.
+        if not monitorGeom:
+            return None
+
+        dims = ( int(monitorGeom.x),
+                 int(winGeom.y),
+                 int(monitorGeom.width),
+                 int(winGeom.height) )
+
+        logging.debug("dims %r", dims)
+
+        result = gtk.gdk.Rectangle(*dims)
+
+        logging.debug("result %r", tuple(result))
+        self.reposition(win, result, monitorGeom)
+        return result
+
+
+    def cmd_moveCenter(self, window=None):
+        """
+        Center the window in the current monitor.
+        
+        @returns: The new window dimensions.
+        @rtype: C{gtk.gdk.Rectangle}
+        """
+        win, monitorGeom, winGeom = self.getGeometries(window)[0:3]
+
+        logging.debug("win %r", win)
+        logging.debug("monitorGeom %r", tuple(monitorGeom))
+        logging.debug("winGeom %r", tuple(winGeom))
+
+        # This temporary hack prevents an Exception with MPlayer.
+        if not monitorGeom:
+            return None
+
+        dims = ( int( (monitorGeom.width-winGeom.width) / 2 ),
+                 int( (monitorGeom.height-winGeom.height) / 2 ),
+                 int(winGeom.width),
+                 int(winGeom.height) )
+
+        logging.debug("dims %r", dims)
+
+        result = gtk.gdk.Rectangle(*dims)
+
+        logging.debug("result %r", tuple(result))
+        self.reposition(win, result, monitorGeom)
+        return result
+
 
     def doCommand(self, command):
         """Resolve a textual positioning command and execute it.
