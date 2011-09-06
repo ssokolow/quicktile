@@ -57,7 +57,7 @@ try:
     from Xlib import X
     from Xlib.display import Display
     from Xlib.keysymdef import miscellany as _m
-    from Xlib.keysymdef import latin_1 as _l
+    from Xlib.keysymdef import latin1 as _l
     XLIB_PRESENT = True #: Indicates whether python-xlib was found
 except ImportError:
     XLIB_PRESENT = False #: Indicates whether python-xlib was found
@@ -275,42 +275,91 @@ class WindowManager(object):
 
     def cmd_vertMaximize(self, window=None):
         """
-        Given a window and a list of 4-tuples containing dimensions as a decimal
-        percentage of monitor size, cycle through the list, taking one step each
-        time this function is called.
-
-        If the window's dimensions are not in the list, set them to the first list
-        entry.
-
+        Maximize the window vertically.
+        
         @returns: The new window dimensions.
         @rtype: C{gtk.gdk.Rectangle}
         """
         win, monitorGeom, winGeom = self.getGeometries(window)[0:3]
 
+        logging.debug("win %r", win)
+        logging.debug("monitorGeom %r", tuple(monitorGeom))
+        logging.debug("winGeom %r", tuple(winGeom))
+
         # This temporary hack prevents an Exception with MPlayer.
         if not monitorGeom:
             return None
 
-        dims = []
-        for tup in dimensions:
-            dims.append((int(tup[0] * monitorGeom.width),
-                        int(tup[1] * monitorGeom.height),
-                        int(tup[2] * monitorGeom.width),
-                        int(tup[3] * monitorGeom.height)))
+        dims = ( int(winGeom.x),
+                 int(monitorGeom.y),
+                 int(winGeom.width),
+                 int(monitorGeom.height) )
 
-        logging.debug("winGeom %r", tuple(winGeom))
         logging.debug("dims %r", dims)
 
-        # Calculate euclidean distances between the window's current geometry
-        # and all presets and store them in a min heap.
-        euclid_distance = []
-        for pos, val in enumerate(dims):
-            distance = sum([(wg-vv)**2 for (wg, vv) in zip(tuple(winGeom), tuple(val))])
-            heappush(euclid_distance, (distance, pos))
+        result = gtk.gdk.Rectangle(*dims)
 
-        # Get minimum euclidean distance. (Closest match)
-        pos = heappop(euclid_distance)[1]
-        result = gtk.gdk.Rectangle(*dims[(pos + 1) % len(dims)])
+        logging.debug("result %r", tuple(result))
+        self.reposition(win, result, monitorGeom)
+        return result
+
+
+    def cmd_horzMaximize(self, window=None):
+        """
+        Maximize the window horizontally.
+        
+        @returns: The new window dimensions.
+        @rtype: C{gtk.gdk.Rectangle}
+        """
+        win, monitorGeom, winGeom = self.getGeometries(window)[0:3]
+
+        logging.debug("win %r", win)
+        logging.debug("monitorGeom %r", tuple(monitorGeom))
+        logging.debug("winGeom %r", tuple(winGeom))
+
+        # This temporary hack prevents an Exception with MPlayer.
+        if not monitorGeom:
+            return None
+
+        dims = ( int(monitorGeom.x),
+                 int(winGeom.y),
+                 int(monitorGeom.width),
+                 int(winGeom.height) )
+
+        logging.debug("dims %r", dims)
+
+        result = gtk.gdk.Rectangle(*dims)
+
+        logging.debug("result %r", tuple(result))
+        self.reposition(win, result, monitorGeom)
+        return result
+
+
+    def cmd_moveCenter(self, window=None):
+        """
+        Center the window in the current monitor.
+        
+        @returns: The new window dimensions.
+        @rtype: C{gtk.gdk.Rectangle}
+        """
+        win, monitorGeom, winGeom = self.getGeometries(window)[0:3]
+
+        logging.debug("win %r", win)
+        logging.debug("monitorGeom %r", tuple(monitorGeom))
+        logging.debug("winGeom %r", tuple(winGeom))
+
+        # This temporary hack prevents an Exception with MPlayer.
+        if not monitorGeom:
+            return None
+
+        dims = ( int( (monitorGeom.width-winGeom.width) / 2 ),
+                 int( (monitorGeom.height-winGeom.height) / 2 ),
+                 int(winGeom.width),
+                 int(winGeom.height) )
+
+        logging.debug("dims %r", dims)
+
+        result = gtk.gdk.Rectangle(*dims)
 
         logging.debug("result %r", tuple(result))
         self.reposition(win, result, monitorGeom)
