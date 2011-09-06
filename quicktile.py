@@ -465,10 +465,10 @@ class WindowManager(object):
         # - http://old.nabble.com/Re%3A-_NET_WORKAREA-and-multiple-monitors-p24812662.html
         # - http://thread.gmane.org/gmane.comp.gnome.wm-spec/1531/focus=1772
         # - http://standards.freedesktop.org/wm-spec/wm-spec-1.3.html#id2507618
-        #if self._root.supports_net_wm_hint("_NET_WORKAREA"):
-        #    p = gtk.gdk.atom_intern('_NET_WORKAREA')
-        #    desktopGeo = self._root.get_root_window().property_get(p)[2][0:4]
-        #    monitorGeom = gtk.gdk.Rectangle(*desktopGeo).intersect(monitorGeom)
+        if self._root.supports_net_wm_hint("_NET_WORKAREA"):
+            p = gtk.gdk.atom_intern('_NET_WORKAREA')
+            desktopGeo = self._root.get_root_window().property_get(p)[2][0:4]
+            monitorGeom = gtk.gdk.Rectangle(*desktopGeo).intersect(monitorGeom)
 
         # Get position relative to the monitor rather than the desktop
         winGeom = win.get_frame_extents()
