@@ -355,6 +355,12 @@ class WindowManager(object):
         else:
             return None
 
+        # Observed breaking quicktile with git-gui on Metacity
+        # TODO: Figure out how to prevent uncaught exceptions from making
+        #       quicktile unresponsive in the general case.
+        if win is None:
+            return None
+
         # Do nothing if the desktop is the active window
         # (The "not winType" check seems required for fullscreen MPlayer)
         winType = win.property_get("_NET_WM_WINDOW_TYPE")
