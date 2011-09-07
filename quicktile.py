@@ -120,7 +120,7 @@ POSITIONS = {
     'maximize'       : 'toggleMaximize',
     'monitor-switch' : 'cycleMonitors',
     'vertical-maximize'   : 'vertMaximize',
-    'horizontal-maximize' : 'horzMaximize',
+    'horizontal-maximize' : 'horizMaximize',
     'move-to-center'      : 'moveCenter',
 } #: command-to-action mappings
 
@@ -304,7 +304,7 @@ class WindowManager(object):
         return result
 
 
-    def cmd_horzMaximize(self, window=None):
+    def cmd_horizMaximize(self, window=None):
         """
         Maximize the window horizontally.
         
