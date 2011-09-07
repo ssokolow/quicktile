@@ -144,7 +144,7 @@ if XLIB_PRESENT:
 
 class WindowManager(object):
     """A simple API-wrapper class for manipulating window positioning."""
-    def __init__(self, commands, screen=None):
+    def __init__(self, commands, screen=None, ignore_workarea=False):
         """
         Initializes WindowManager.
 
@@ -163,6 +163,7 @@ class WindowManager(object):
         """
         self._root = screen or gtk.gdk.screen_get_default()
         self.commands = commands
+        self.ignore_workarea = ignore_workarea
 
     def cmd_cycleMonitors(self, window=None):
         """
@@ -418,7 +419,7 @@ class WindowManager(object):
         # - http://old.nabble.com/Re%3A-_NET_WORKAREA-and-multiple-monitors-p24812662.html
         # - http://thread.gmane.org/gmane.comp.gnome.wm-spec/1531/focus=1772
         # - http://standards.freedesktop.org/wm-spec/wm-spec-1.3.html#id2507618
-        if self._root.supports_net_wm_hint("_NET_WORKAREA"):
+        if not self.ignore_workarea and self._root.supports_net_wm_hint("_NET_WORKAREA"):
             p = gtk.gdk.atom_intern('_NET_WORKAREA')
             desktopGeo = self._root.get_root_window().property_get(p)[2][0:4]
             monitorGeom = gtk.gdk.Rectangle(*desktopGeo).intersect(monitorGeom)
@@ -462,13 +463,16 @@ if __name__ == '__main__':
         default=False, help="List valid arguments for use without --bindkeys.")
     parser.add_option('--debug', action="store_true", dest="debug",
         default=False, help="Display debug messages.")
+    parser.add_option('--no-workarea', action="store_true", dest="no_workarea",
+        default=False, help="Overlap panels but work better with "
+        "non-rectangular desktops.")
 
     opts, args = parser.parse_args()
 
     if opts.debug:
         logging.getLogger().setLevel(logging.DEBUG)
 
-    wm = WindowManager(POSITIONS)
+    wm = WindowManager(POSITIONS, ignore_workarea=opts.no_workarea)
     if opts.daemonize:
         success = False     # This will be changed on success
 
