@@ -117,10 +117,10 @@ POSITIONS = {
         (1.0/3 * 2, 0.5, 1.0/3,     0.5),
         (1.0/3,     0.5, 1.0/3 * 2, 0.5)
     ),
-    'maximize'       : 'toggleMaximize',
-    'monitor-switch' : 'cycleMonitors',
-    'vertical-maximize'   : 'vertMaximize',
-    'horizontal-maximize' : 'horizMaximize',
+    'maximize'            : 'toggleMaximize',
+    'monitor-switch'      : 'cycleMonitors',
+    'vertical-maximize'   : ((None,      0,   None,      1),),
+    'horizontal-maximize' : ((0,      None,   1,      None),),
     'move-to-center'      : 'moveCenter',
 } #: command-to-action mappings
 
@@ -248,12 +248,20 @@ class WindowManager(object):
         if not monitorGeom:
             return None
 
+        # Resolve proportional (eg. 0.5) and preserved (None) coordinates
         dims = []
         for tup in dimensions:
-            dims.append((int(tup[0] * monitorGeom.width),
-                        int(tup[1] * monitorGeom.height),
-                        int(tup[2] * monitorGeom.width),
-                        int(tup[3] * monitorGeom.height)))
+
+            current_dim = []
+            for pos, val in enumerate(tup):
+                if val is None:
+                    current_dim.append(tuple(winGeom)[pos])
+                else:
+                    # FIXME: This is a bit of an ugly way to get (w, h, w, h)
+                    # from monitorGeom.
+                    current_dim.append(int(val * tuple(monitorGeom)[2 + pos % 2]))
+
+            dims.append(current_dim)
 
         logging.debug("winGeom %r", tuple(winGeom))
         logging.debug("dims %r", dims)
@@ -273,72 +281,10 @@ class WindowManager(object):
         self.reposition(win, result, monitorGeom)
         return result
 
-    def cmd_vertMaximize(self, window=None):
-        """
-        Maximize the window vertically.
-        
-        @returns: The new window dimensions.
-        @rtype: C{gtk.gdk.Rectangle}
-        """
-        win, monitorGeom, winGeom = self.getGeometries(window)[0:3]
-
-        logging.debug("win %r", win)
-        logging.debug("monitorGeom %r", tuple(monitorGeom))
-        logging.debug("winGeom %r", tuple(winGeom))
-
-        # This temporary hack prevents an Exception with MPlayer.
-        if not monitorGeom:
-            return None
-
-        dims = ( int(winGeom.x),
-                 0,
-                 int(winGeom.width),
-                 int(monitorGeom.height) )
-
-        logging.debug("dims %r", dims)
-
-        result = gtk.gdk.Rectangle(*dims)
-
-        logging.debug("result %r", tuple(result))
-        self.reposition(win, result, monitorGeom)
-        return result
-
-
-    def cmd_horizMaximize(self, window=None):
-        """
-        Maximize the window horizontally.
-        
-        @returns: The new window dimensions.
-        @rtype: C{gtk.gdk.Rectangle}
-        """
-        win, monitorGeom, winGeom = self.getGeometries(window)[0:3]
-
-        logging.debug("win %r", win)
-        logging.debug("monitorGeom %r", tuple(monitorGeom))
-        logging.debug("winGeom %r", tuple(winGeom))
-
-        # This temporary hack prevents an Exception with MPlayer.
-        if not monitorGeom:
-            return None
-
-        dims = ( 0,
-                 int(winGeom.y),
-                 int(monitorGeom.width),
-                 int(winGeom.height) )
-
-        logging.debug("dims %r", dims)
-
-        result = gtk.gdk.Rectangle(*dims)
-
-        logging.debug("result %r", tuple(result))
-        self.reposition(win, result, monitorGeom)
-        return result
-
-
     def cmd_moveCenter(self, window=None):
         """
         Center the window in the current monitor.
-        
+
         @returns: The new window dimensions.
         @rtype: C{gtk.gdk.Rectangle}
         """
