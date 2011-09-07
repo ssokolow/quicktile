@@ -291,7 +291,7 @@ class WindowManager(object):
             return None
 
         dims = ( int(winGeom.x),
-                 int(monitorGeom.y),
+                 0,
                  int(winGeom.width),
                  int(monitorGeom.height) )
 
@@ -321,7 +321,7 @@ class WindowManager(object):
         if not monitorGeom:
             return None
 
-        dims = ( int(monitorGeom.x),
+        dims = ( 0,
                  int(winGeom.y),
                  int(monitorGeom.width),
                  int(winGeom.height) )
@@ -414,6 +414,7 @@ class WindowManager(object):
         winType = win.property_get("_NET_WM_WINDOW_TYPE")
         logging.debug("NET_WM_WINDOW_TYPE: %r", winType)
         if not winType or winType[-1][0] == '_NET_WM_WINDOW_TYPE_DESKTOP':
+            #XXX: Why does git gui trip this off?
             return None
 
         return win
