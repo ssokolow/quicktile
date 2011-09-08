@@ -8,6 +8,7 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
       (Workaround: Use one of the regular tiling actions to unmaximize)
 
 @todo:
+ - Add a config-file equivalent to --no-workarea.
  - Reconsider use of --daemonize. That tends to imply self-backgrounding.
  - Look into supporting xpyb (the Python equivalent to libxcb) for global
    keybinding.
@@ -127,6 +128,7 @@ POSITIONS = {
 #NOTE: For keysyms outside the latin1 and miscellany groups, you must first
 #      call C{Xlib.XK.load_keysym_group()} with the name (minus extension) of
 #      the appropriate module in site-packages/Xlib/keysymdef/*.py
+#TODO: Implement a load_keysym_groups config key to support this.
 DEFAULT_KEYS = {
     "KP_0"     : "maximize",
     "KP_1"     : "bottom-left",
@@ -143,6 +145,10 @@ DEFAULT_KEYS = {
     "H"        : "horizontal-maximize",
     "C"        : "move-to-center",
 } #: keybinding-to-command mappings
+
+class DependencyError(Exception):
+    """Raised when a required dependency is missing."""
+    pass
 
 class WindowManager(object):
     """A simple API-wrapper class for manipulating window positioning."""
@@ -451,6 +457,84 @@ class WindowManager(object):
         win.move_resize(geom.x + monitor.x, geom.y + monitor.y,
                 geom.width - (border * 2), geom.height - (titlebar + border))
 
+class QuickTileApp(object):
+    def __init__(self, wm, keys=None):
+        self.wm = wm
+        self._keys = keys or {}
+
+    def _init_dbus(self):
+        """Setup dbus-python components in the PyGTK event loop"""
+        class QuickTile(dbus.service.Object):
+            def __init__(self):
+                dbus.service.Object.__init__(self, sessBus, '/com/ssokolow/QuickTile')
+
+            @dbus.service.method(dbus_interface='com.ssokolow.QuickTile',
+                     in_signature='s', out_signature='b')
+            def doCommand(self, command):
+                return wm.doCommand(command)
+
+        self.dbusName = dbus.service.BusName("com.ssokolow.QuickTile", sessBus)
+        self.dbusObj = QuickTile()
+
+    def _init_xlib(self):
+        """Setup python-xlib components in the PyGTK event loop"""
+        disp = Display()
+        self.xroot = disp.screen().root
+
+        # We want to receive KeyPress events
+        self.xroot.change_attributes(event_mask = X.KeyPressMask)
+        self.keys = dict([(disp.keysym_to_keycode(string_to_keysym(x)), self._keys[x]) for x in self._keys])
+
+        #TODO: Move modifier choice to the config file
+        for keycode in self.keys:
+            for ignored in [0, X.Mod2Mask, X.LockMask, X.Mod2Mask | X.LockMask]:
+                self.xroot.grab_key(keycode, X.ControlMask | X.Mod1Mask | ignored, 1, X.GrabModeAsync, X.GrabModeAsync)
+
+        # If we don't do this, then nothing works.
+        # I assume it flushes the XGrabKey calls to the server.
+        for x in range(0, self.xroot.display.pending_events()):
+            self.xroot.display.next_event()
+
+        # Merge python-xlib into the Glib event loop
+        gobject.io_add_watch(self.xroot.display, gobject.IO_IN, self.handle_xevent)
+
+    def run(self):
+        if XLIB_PRESENT:
+            self._init_xlib()
+        else:
+            logging.error("Could not find python-xlib. Cannot bind keys.")
+
+        if DBUS_PRESENT:
+            self._init_dbus()
+        else:
+            logging.warn("Could not connect to the D-Bus Session Bus.")
+
+        if not (XLIB_PRESENT or DBUS_PRESENT):
+            raise DependencyError("Neither the Xlib nor the D-Bus backends were available.")
+
+        gtk.main()
+
+    def handle_xevent(self, src, cond, handle=None):
+        """Handle pending python-xlib events"""
+        handle = handle or self.xroot.display
+
+        for i in range(0, handle.pending_events()):
+            xevent = handle.next_event()
+            if xevent.type == X.KeyPress:
+                keycode = xevent.detail
+                self.wm.doCommand(self.keys[keycode])
+        return True
+
+    def showBinds(self):
+        maxlen_keys = max(len(x) for x in self._keys.keys())
+        maxlen_vals = max(len(x) for x in self._keys.values())
+
+        print "Keybindings defined for use with --daemonize:\n"
+        print "Key".ljust(maxlen_keys), "Action"
+        print "-" * maxlen_keys, "-" * maxlen_vals
+        for row in sorted(self._keys.items(), key=lambda x: x[0]):
+            print row[0].ljust(maxlen_keys), row[1]
+
 if __name__ == '__main__':
     from optparse import OptionParser, OptionGroup
     parser = OptionParser(usage="%prog [options] [action] ...",
@@ -487,97 +571,42 @@ if __name__ == '__main__':
 
     # Either load the keybindings or use and save the defaults
     if config.has_section('keys'):
-        keys = dict(config.items('keys'))
+        keymap = dict(config.items('keys'))
     else:
-        keys = DEFAULT_KEYS
+        keymap = DEFAULT_KEYS
         config.add_section('keys')
-        for row in keys.items():
-            print row
+        for row in keymap.items():
             config.set('keys', row[0], row[1])
 
         with file(cfg_path, 'wb') as cfg_file:
             config.write(cfg_file)
 
-    if opts.showBinds:
-        maxlen_keys = max(len(x) for x in keys.keys())
-        maxlen_vals = max(len(x) for x in keys.values())
+    wm = WindowManager(POSITIONS, ignore_workarea=opts.no_workarea)
+    app = QuickTileApp(wm, keymap)
 
-        print "Keybindings defined for use with --daemonize:\n"
-        print "Key".ljust(maxlen_keys), "Action"
-        print "-" * maxlen_keys, "-" * maxlen_vals
-        for row in sorted(keys.items(), key=lambda x: x[0]):
-            print row[0].ljust(maxlen_keys), row[1]
+    if opts.showBinds:
+        app.showBinds()
         sys.exit()
 
-    wm = WindowManager(POSITIONS, ignore_workarea=opts.no_workarea)
     if opts.daemonize:
-        success = False     # This will be changed on success
-
-        if XLIB_PRESENT:
-            disp = Display()
-            root = disp.screen().root
-
-            # We want to receive KeyPress events
-            root.change_attributes(event_mask = X.KeyPressMask)
-            keys = dict([(disp.keysym_to_keycode(string_to_keysym(x)), keys[x]) for x in keys])
-
-            for keycode in keys:
-                root.grab_key(keycode, X.ControlMask | X.Mod1Mask, 1, X.GrabModeAsync, X.GrabModeAsync)
-                root.grab_key(keycode, X.ControlMask | X.Mod1Mask | X.Mod2Mask, 1, X.GrabModeAsync, X.GrabModeAsync)
-                root.grab_key(keycode, X.ControlMask | X.Mod1Mask | X.Mod2Mask | X.LockMask, 1, X.GrabModeAsync, X.GrabModeAsync)
-                root.grab_key(keycode, X.ControlMask | X.Mod1Mask | X.LockMask, 1, X.GrabModeAsync, X.GrabModeAsync)
-
-            # If we don't do this, then nothing works.
-            # I assume it flushes the XGrabKey calls to the server.
-            for x in range(0, root.display.pending_events()):
-                root.display.next_event()
-
-            def handle_xevent(src, cond, handle=root.display):
-                """Handle pending python-xlib events"""
-                for i in range(0, handle.pending_events()):
-                    xevent = handle.next_event()
-                    if xevent.type == X.KeyPress:
-                        keycode = xevent.detail
-                        wm.doCommand(keys[keycode])
-                return True
-
-            # Merge python-xlib into the Glib event loop and start things going.
-            gobject.io_add_watch(root.display, gobject.IO_IN, handle_xevent)
-            success = True
-        else:
-            logging.error("Could not find python-xlib. Cannot bind keys.")
-
-        if DBUS_PRESENT:
-            class QuickTile(dbus.service.Object):
-                def __init__(self):
-                    dbus.service.Object.__init__(self, sessBus, '/com/ssokolow/QuickTile')
-
-                @dbus.service.method(dbus_interface='com.ssokolow.QuickTile',
-                         in_signature='s', out_signature='b')
-                def doCommand(self, command):
-                    return wm.doCommand(command)
-
-            dbusName = dbus.service.BusName("com.ssokolow.QuickTile", sessBus)
-            dbusObj = QuickTile()
-            success = True
-        else:
-            logging.warn("Could not connect to the D-Bus Session Bus.")
-
-        if not success:
+        try:
+            #TODO: Do this properly
+            app.run()
+        except DependencyError, err:
+            logging.critical(err)
             sys.exit(errno.ENOENT)
             #FIXME: What's the proper exit code for "library not found"?
 
-        gtk.main()
     elif not opts.daemonize:
         badArgs = [x for x in args if x not in wm.commands]
         if not args or badArgs or opts.showArgs:
-            # sorted() was added in 2.4 and everything else should be 2.3-safe.
-            validArgs = list(wm.commands)
-            validArgs.sort()
+            validArgs = sorted(wm.commands)
 
             if badArgs:
                 print "Invalid argument(s): %s" % ' '.join(badArgs)
+
             print "Valid arguments are: \n\t%s" % '\n\t'.join(validArgs)
+
             if not opts.showArgs:
                 print "\nUse --help for a list of valid options."
                 sys.exit(errno.ENOENT)
