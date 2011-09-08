@@ -70,6 +70,13 @@
         <li>
         <ul>
       <li>
+        Add a config-file equivalent to --no-workarea.
+      </li>
+      <li>
+        Reconsider use of --daemonize. That tends to imply 
+        self-backgrounding.
+      </li>
+      <li>
         Look into supporting xpyb (the Python equivalent to libxcb) for 
         global keybinding.
       </li>
@@ -81,18 +88,11 @@
         Clean up the code. It's functional, but an ugly rush-job.
       </li>
       <li>
-        Figure out how to implement a --list-keybindings option.
-      </li>
-      <li>
         Decide how to handle maximization and stick with it.
       </li>
       <li>
         Implement the secondary major features of WinSplit Revolution (eg. 
         process-shape associations, locking/welding window edges, etc.)
-      </li>
-      <li>
-        Consider binding KP+ and KP- to allow comfy customization of split 
-        widths. (or heights, for the vertical split)
       </li>
       <li>
         Consider rewriting cycleDimensions to allow command-line use to 
@@ -139,7 +139,7 @@
         </li>
       </ul>
       <p><strong>Version:</strong>
-        0.1.4
+        0.1.5
       </p>
       <p><strong>Author:</strong>
         Stephan Sokolow (deitarion/SSokolow)
@@ -171,8 +171,23 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a href="quicktile.DependencyError-class.html" class="summary-name">DependencyError</a><br />
+      Raised when a required dependency is missing.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a href="quicktile.WindowManager-class.html" class="summary-name">WindowManager</a><br />
       A simple API-wrapper class for manipulating window positioning.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="quicktile.QuickTileApp-class.html" class="summary-name">QuickTileApp</a>
     </td>
   </tr>
 </table>
@@ -219,6 +234,13 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a name="XDG_CONFIG_DIR"></a><span class="summary-name">XDG_CONFIG_DIR</span> = <code title="'/home/ssokolow/.config'"><code class="variable-quote">'</code><code class="variable-string">/home/ssokolow/.config</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a href="quicktile-module.html#POSITIONS" class="summary-name">POSITIONS</a> = <code title="{'bottom': ((0, 0.5, 1, 0.5),
             (0.333333333333, 0.5, 0.333333333333, 0.5)),
  'bottom-left': ((0, 0.5, 0.5, 0.5),
@@ -235,15 +257,15 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="quicktile-module.html#keys" class="summary-name">keys</a> = <code title="{65421: 'monitor-switch',
- 65456: 'maximize',
- 65457: 'bottom-left',
- 65458: 'bottom',
- 65459: 'bottom-right',
- 65460: 'left',
- 65461: 'middle',
- 65462: 'right',
-..."><code class="variable-group">{</code>65421<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">monitor-switch</code><code class="variable-quote">'</code><code class="variable-op">, </code>65456<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">maximize</code><code class="variable-quote">'</code><code class="variable-op">, </code>65457<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bo</code><code class="variable-ellipsis">...</code></code><br />
+        <a href="quicktile-module.html#DEFAULT_KEYS" class="summary-name">DEFAULT_KEYS</a> = <code title="{'C': 'move-to-center',
+ 'H': 'horizontal-maximize',
+ 'KP_0': 'maximize',
+ 'KP_1': 'bottom-left',
+ 'KP_2': 'bottom',
+ 'KP_3': 'bottom-right',
+ 'KP_4': 'left',
+ 'KP_5': 'middle',
+..."><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">C</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">move-to-center</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">H</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">horizontal-maximi</code><code class="variable-ellipsis">...</code></code><br />
       keybinding-to-command mappings
     </td>
   </tr>
@@ -299,26 +321,26 @@
   </dl>
 </td></tr></table>
 </div>
-<a name="keys"></a>
+<a name="DEFAULT_KEYS"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
-  <h3 class="epydoc">keys</h3>
+  <h3 class="epydoc">DEFAULT_KEYS</h3>
   <p>keybinding-to-command mappings</p>
   <dl class="fields">
   </dl>
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-group">{</code>65421<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">monitor-switch</code><code class="variable-quote">'</code><code class="variable-op">,</code>
- 65456<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">maximize</code><code class="variable-quote">'</code><code class="variable-op">,</code>
- 65457<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom-left</code><code class="variable-quote">'</code><code class="variable-op">,</code>
- 65458<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom</code><code class="variable-quote">'</code><code class="variable-op">,</code>
- 65459<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom-right</code><code class="variable-quote">'</code><code class="variable-op">,</code>
- 65460<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">left</code><code class="variable-quote">'</code><code class="variable-op">,</code>
- 65461<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">middle</code><code class="variable-quote">'</code><code class="variable-op">,</code>
- 65462<code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">right</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+<code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">C</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">move-to-center</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">H</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">horizontal-maximize</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">KP_0</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">maximize</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">KP_1</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom-left</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">KP_2</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">KP_3</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom-right</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">KP_4</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">left</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">KP_5</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">middle</code><code class="variable-quote">'</code><code class="variable-op">,</code>
 <code class="variable-ellipsis">...</code>
 </pre></td></tr></table>
 </dd>
@@ -352,7 +374,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Mar  6 15:30:45 2011
+    Generated by Epydoc 3.0.1 on Thu Sep  8 17:34:53 2011
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

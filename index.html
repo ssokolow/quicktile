@@ -21,6 +21,9 @@
 			background-color: #ffffff;
 			padding: 25px;
 			border: 1px solid gray;
+		}
+
+		#container, pre {
 			border-radius: 1ex;
 			-moz-border-radius: 1ex;
 			-webkit-border-radius: 1ex;
@@ -49,6 +52,10 @@
 
 
 		dt { font-weight: bold; }
+		dd > ul {
+			margin-top: 0.5ex;
+			padding-left: 1em;
+		}
 	</style>
 
 </head>
@@ -82,26 +89,34 @@
 
 	<dl>
 		<dt>Dependencies</dt>
-		<dd><a href="http://python.org/">Python</a> 2.3+,
+		<dd><a href="http://python.org/">Python</a> 2.4+,
 			<a href="http://pygtk.org/">PyGTK</a> 2.2+, and (optional)
-			<a href="http://python-xlib.sourceforge.net/">python-xlib</a></dd>
+			<a href="http://python-xlib.sourceforge.net/">python-xlib</a> or
+			<a href="http://www.freedesktop.org/wiki/Software/DBusBindings">dbus-python</a></dd>
 
 		<dt>Caveats</dt>
-		<dd>There are <a href="apidocs/bug-index.html">known bugs</a> and the
-		minimum dependency versions have not been re-confirmed recently.</dd>
+		<dd>There are few minor <a href="https://github.com/ssokolow/quicktile/issues?labels=bug%2Cconfirmed">known</a>
+			<a href="apidocs/bug-index.html">bugs</a> and the minimum
+			dependency versions have not been re-confirmed recently.</dd>
 
 		<dt>Install</dt>
-		<dd>Just unpack and run. No installation necessary.</dd>
+		<dd>Just unpack and run. No installation necessary. <br />Keybindings for
+			<samp>--daemonize</samp> can be edited in <samp>~/.config/quicktile.cfg</samp>
+		</dd>
 
 		<dt>License</dt>
 		<dd>GNU GPL 2.0 or later</dd>
 
 		<dt>Documentation</dt>
 		<dd>The <a href="http://github.com/ssokolow/quicktile/tree">README</a>,
-				<a href="http://wiki.github.com/ssokolow/quicktile">TODO list</a>,
+				<a href="http://wiki.github.com/ssokolow/quicktile">FAQ/TODO list</a>,
 				and <a href="apidocs/index.html">API documentation</a> can be read online.</dd>
 		<dt>Contact</dt>
-		<dd><a href="http://github.com/ssokolow">Stephan Sokolow (deitarion/SSokolow)</a></dd>
+		<dd><ul>
+				<li>For bugs and feature requests, please use the <a href="https://github.com/ssokolow/quicktile/issues">issue tracker</a>.</li>
+				<li>When submitting patches, please <a href="http://help.github.com/send-pull-requests/">send a pull request</a>.</li>
+				<li>For everything else, message <a href="http://github.com/ssokolow">Stephan Sokolow (deitarion/SSokolow)</a></li>
+		</ul></dd>
 	</dl>
 
     <h2>Download</h2>
