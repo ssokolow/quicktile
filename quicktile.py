@@ -8,6 +8,7 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
       (Workaround: Use one of the regular tiling actions to unmaximize)
 
 @todo:
+ - Reconsider use of --daemonize. That tends to imply self-backgrounding.
  - Look into supporting xpyb (the Python equivalent to libxcb) for global
    keybinding.
  - Decide whether to amend the euclidean distance matching so un-tiled windows
@@ -16,8 +17,6 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
  - Decide how to handle maximization and stick with it.
  - Implement the secondary major features of WinSplit Revolution (eg.
    process-shape associations, locking/welding window edges, etc.)
- - Consider binding KP+ and KP- to allow comfy customization of split widths.
-   (or heights, for the vertical split)
  - Consider rewriting cycleDimensions to allow command-line use to jump to a
    specific index without actually flickering the window through all the
    intermediate shapes.
@@ -451,19 +450,19 @@ class WindowManager(object):
 
 if __name__ == '__main__':
     from optparse import OptionParser, OptionGroup
-    parser = OptionParser(usage="%prog [options] [arguments]",
+    parser = OptionParser(usage="%prog [options] [action] ...",
             version="%%prog v%s" % __version__)
     parser.add_option('-d', '--daemonize', action="store_true", dest="daemonize",
         default=False, help="Attempt to set up global keybindings using "
         "python-xlib and a D-Bus service using dbus-python. Exit if neither "
-        "succeeds.")
+        "succeeds")
     parser.add_option('-b', '--bindkeys', action="store_true", dest="daemonize",
-        default=False, help="Deprecated alias for --daemonize.")
+        default=False, help="Deprecated alias for --daemonize")
     parser.add_option('--debug', action="store_true", dest="debug",
-        default=False, help="Display debug messages.")
+        default=False, help="Display debug messages")
     parser.add_option('--no-workarea', action="store_true", dest="no_workarea",
         default=False, help="Overlap panels but work better with "
-        "non-rectangular desktops.")
+        "non-rectangular desktops")
 
     help_group = OptionGroup(parser, "Additional Help")
     help_group.add_option('--show-bindings', action="store_true",
