@@ -13,7 +13,6 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
  - Decide whether to amend the euclidean distance matching so un-tiled windows
    are guaranteed to start at the beginning of the sequence.
  - Clean up the code. It's functional, but an ugly rush-job.
- - Figure out how to implement a --list-keybindings option.
  - Decide how to handle maximization and stick with it.
  - Implement the secondary major features of WinSplit Revolution (eg.
    process-shape associations, locking/welding window edges, etc.)
@@ -451,7 +450,7 @@ class WindowManager(object):
                 geom.width - (border * 2), geom.height - (titlebar + border))
 
 if __name__ == '__main__':
-    from optparse import OptionParser
+    from optparse import OptionParser, OptionGroup
     parser = OptionParser(usage="%prog [options] [arguments]",
             version="%%prog v%s" % __version__)
     parser.add_option('-d', '--daemonize', action="store_true", dest="daemonize",
@@ -460,18 +459,34 @@ if __name__ == '__main__':
         "succeeds.")
     parser.add_option('-b', '--bindkeys', action="store_true", dest="daemonize",
         default=False, help="Deprecated alias for --daemonize.")
-    parser.add_option('--valid-args', action="store_true", dest="showArgs",
-        default=False, help="List valid arguments for use without --bindkeys.")
     parser.add_option('--debug', action="store_true", dest="debug",
         default=False, help="Display debug messages.")
     parser.add_option('--no-workarea', action="store_true", dest="no_workarea",
         default=False, help="Overlap panels but work better with "
         "non-rectangular desktops.")
 
+    help_group = OptionGroup(parser, "Additional Help")
+    help_group.add_option('--show-bindings', action="store_true",
+        dest="showBinds", default=False, help="List all configured keybindings")
+    help_group.add_option('--show-actions', action="store_true", dest="showArgs",
+        default=False, help="List valid arguments for use without --daemonize")
+    parser.add_option_group(help_group)
+
     opts, args = parser.parse_args()
 
     if opts.debug:
         logging.getLogger().setLevel(logging.DEBUG)
+
+    if opts.showBinds:
+        maxlen_keys = max(len(x) for x in keys.keys())
+        maxlen_vals = max(len(x) for x in keys.values())
+
+        print "Keybindings defined for use with --daemonize:\n"
+        print "Key".ljust(maxlen_keys), "Action"
+        print "-" * maxlen_keys, "-" * maxlen_vals
+        for row in keys.items():
+            print row[0].ljust(maxlen_keys), row[1]
+        sys.exit()
 
     wm = WindowManager(POSITIONS, ignore_workarea=opts.no_workarea)
     if opts.daemonize:
