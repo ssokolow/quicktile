@@ -56,8 +56,7 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 try:
     from Xlib import X
     from Xlib.display import Display
-    from Xlib.keysymdef import miscellany as _m
-    from Xlib.keysymdef import latin1 as _l
+    from Xlib.XK import string_to_keysym
     XLIB_PRESENT = True #: Indicates whether python-xlib was found
 except ImportError:
     XLIB_PRESENT = False #: Indicates whether python-xlib was found
@@ -124,23 +123,25 @@ POSITIONS = {
     'move-to-center'      : 'moveCenter',
 } #: command-to-action mappings
 
-if XLIB_PRESENT:
-    keys = {
-        _m.XK_KP_0     : "maximize",
-        _m.XK_KP_1     : "bottom-left",
-        _m.XK_KP_2     : "bottom",
-        _m.XK_KP_3     : "bottom-right",
-        _m.XK_KP_4     : "left",
-        _m.XK_KP_5     : "middle",
-        _m.XK_KP_6     : "right",
-        _m.XK_KP_7     : "top-left",
-        _m.XK_KP_8     : "top",
-        _m.XK_KP_9     : "top-right",
-        _m.XK_KP_Enter : "monitor-switch",
-        _l.XK_V        : "vertical-maximize",
-        _l.XK_H        : "horizontal-maximize",
-        _l.XK_C        : "move-to-center",
-    } #: keybinding-to-command mappings
+#NOTE: For keysyms outside the latin1 and miscellany groups, you must first
+#      call C{Xlib.XK.load_keysym_group()} with the name (minus extension) of
+#      the appropriate module in site-packages/Xlib/keysymdef/*.py
+keys = {
+    "KP_0"     : "maximize",
+    "KP_1"     : "bottom-left",
+    "KP_2"     : "bottom",
+    "KP_3"     : "bottom-right",
+    "KP_4"     : "left",
+    "KP_5"     : "middle",
+    "KP_6"     : "right",
+    "KP_7"     : "top-left",
+    "KP_8"     : "top",
+    "KP_9"     : "top-right",
+    "KP_Enter" : "monitor-switch",
+    "V"        : "vertical-maximize",
+    "H"        : "horizontal-maximize",
+    "C"        : "move-to-center",
+} #: keybinding-to-command mappings
 
 class WindowManager(object):
     """A simple API-wrapper class for manipulating window positioning."""
@@ -482,7 +483,7 @@ if __name__ == '__main__':
 
             # We want to receive KeyPress events
             root.change_attributes(event_mask = X.KeyPressMask)
-            keys = dict([(disp.keysym_to_keycode(x), keys[x]) for x in keys])
+            keys = dict([(disp.keysym_to_keycode(string_to_keysym(x)), keys[x]) for x in keys])
 
             for keycode in keys:
                 root.grab_key(keycode, X.ControlMask | X.Mod1Mask, 1, X.GrabModeAsync, X.GrabModeAsync)
