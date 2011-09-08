@@ -40,7 +40,7 @@ References and code used:
 
 __appname__ = "QuickTile"
 __author__  = "Stephan Sokolow (deitarion/SSokolow)"
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 __license__ = "GNU GPL 2.0 or later"
 
 
