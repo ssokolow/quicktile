@@ -46,7 +46,8 @@ __license__ = "GNU GPL 2.0 or later"
 import pygtk
 pygtk.require('2.0')
 
-import errno, logging, gtk, gobject, sys
+import errno, gtk, gobject, logging, os, sys
+from ConfigParser import RawConfigParser
 from heapq import heappop, heappush
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
@@ -69,6 +70,8 @@ try:
     DBUS_PRESENT = True
 except: # TODO: figure out what signal other than ImportError to catch
     DBUS_PRESENT = False
+
+XDG_CONFIG_DIR = os.environ.get('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
 
 POSITIONS = {
     'left'           : (
@@ -124,7 +127,7 @@ POSITIONS = {
 #NOTE: For keysyms outside the latin1 and miscellany groups, you must first
 #      call C{Xlib.XK.load_keysym_group()} with the name (minus extension) of
 #      the appropriate module in site-packages/Xlib/keysymdef/*.py
-keys = {
+DEFAULT_KEYS = {
     "KP_0"     : "maximize",
     "KP_1"     : "bottom-left",
     "KP_2"     : "bottom",
@@ -476,6 +479,25 @@ if __name__ == '__main__':
     if opts.debug:
         logging.getLogger().setLevel(logging.DEBUG)
 
+    # Load the config from file if present
+    cfg_path = os.path.join(XDG_CONFIG_DIR, 'quicktile.cfg')
+    config = RawConfigParser()
+    config.optionxform = str # Make keys case-sensitive
+    config.read(cfg_path)
+
+    # Either load the keybindings or use and save the defaults
+    if config.has_section('keys'):
+        keys = dict(config.items('keys'))
+    else:
+        keys = DEFAULT_KEYS
+        config.add_section('keys')
+        for row in keys.items():
+            print row
+            config.set('keys', row[0], row[1])
+
+        with file(cfg_path, 'wb') as cfg_file:
+            config.write(cfg_file)
+
     if opts.showBinds:
         maxlen_keys = max(len(x) for x in keys.keys())
         maxlen_vals = max(len(x) for x in keys.values())
@@ -483,7 +505,7 @@ if __name__ == '__main__':
         print "Keybindings defined for use with --daemonize:\n"
         print "Key".ljust(maxlen_keys), "Action"
         print "-" * maxlen_keys, "-" * maxlen_vals
-        for row in keys.items():
+        for row in sorted(keys.items(), key=lambda x: x[0]):
             print row[0].ljust(maxlen_keys), row[1]
         sys.exit()
 
