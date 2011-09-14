@@ -8,8 +8,8 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
       (Workaround: Use one of the regular tiling actions to unmaximize)
 
 @todo:
- - Add a config-file equivalent to --no-workarea.
  - Reconsider use of --daemonize. That tends to imply self-backgrounding.
+ - See about de-duplicating "This temporary hack prevents an Exception with MPlayer."
  - Look into supporting xpyb (the Python equivalent to libxcb) for global
    keybinding.
  - Decide whether to amend the euclidean distance matching so un-tiled windows
@@ -43,11 +43,10 @@ __author__  = "Stephan Sokolow (deitarion/SSokolow)"
 __version__ = "0.1.5"
 __license__ = "GNU GPL 2.0 or later"
 
-
 import pygtk
 pygtk.require('2.0')
 
-import errno, gtk, gobject, logging, os, sys
+import errno, gtk, gobject, operator, logging, os, sys
 from ConfigParser import RawConfigParser
 from heapq import heappop, heappush
 
@@ -74,6 +73,7 @@ except: # TODO: figure out what signal other than ImportError to catch
 
 XDG_CONFIG_DIR = os.environ.get('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
 
+#TODO: Figure out how best to put this in the config file.
 POSITIONS = {
     'left'           : (
         (0,         0,   0.5,       1),
@@ -128,23 +128,30 @@ POSITIONS = {
 #NOTE: For keysyms outside the latin1 and miscellany groups, you must first
 #      call C{Xlib.XK.load_keysym_group()} with the name (minus extension) of
 #      the appropriate module in site-packages/Xlib/keysymdef/*.py
-#TODO: Implement a load_keysym_groups config key to support this.
-DEFAULT_KEYS = {
-    "KP_0"     : "maximize",
-    "KP_1"     : "bottom-left",
-    "KP_2"     : "bottom",
-    "KP_3"     : "bottom-right",
-    "KP_4"     : "left",
-    "KP_5"     : "middle",
-    "KP_6"     : "right",
-    "KP_7"     : "top-left",
-    "KP_8"     : "top",
-    "KP_9"     : "top-right",
-    "KP_Enter" : "monitor-switch",
-    "V"        : "vertical-maximize",
-    "H"        : "horizontal-maximize",
-    "C"        : "move-to-center",
-} #: keybinding-to-command mappings
+#TODO: Implement a LoadExtraKeysyms config key to support this.
+DEFAULTS = {
+    'general': {
+        # Use Ctrl+Alt as the default base for key combinations
+        'ModMask': 'Control Mod1',
+        'UseWorkarea': True,
+    },
+    'keys': {
+        "KP_0"     : "maximize",
+        "KP_1"     : "bottom-left",
+        "KP_2"     : "bottom",
+        "KP_3"     : "bottom-right",
+        "KP_4"     : "left",
+        "KP_5"     : "middle",
+        "KP_6"     : "right",
+        "KP_7"     : "top-left",
+        "KP_8"     : "top",
+        "KP_9"     : "top-right",
+        "KP_Enter" : "monitor-switch",
+        "V"        : "vertical-maximize",
+        "H"        : "horizontal-maximize",
+        "C"        : "move-to-center",
+    }
+} #: Default content for the config file
 
 class DependencyError(Exception):
     """Raised when a required dependency is missing."""
@@ -458,9 +465,11 @@ class WindowManager(object):
                 geom.width - (border * 2), geom.height - (titlebar + border))
 
 class QuickTileApp(object):
-    def __init__(self, wm, keys=None):
+    def __init__(self, wm, keys=None, modkeys=None):
+        """@todo: document these arguments"""
         self.wm = wm
         self._keys = keys or {}
+        self._modkeys = modkeys or 0
 
     def _init_dbus(self):
         """Setup dbus-python components in the PyGTK event loop"""
@@ -485,10 +494,19 @@ class QuickTileApp(object):
         self.xroot.change_attributes(event_mask = X.KeyPressMask)
         self.keys = dict([(disp.keysym_to_keycode(string_to_keysym(x)), self._keys[x]) for x in self._keys])
 
-        #TODO: Move modifier choice to the config file
-        for keycode in self.keys:
-            for ignored in [0, X.Mod2Mask, X.LockMask, X.Mod2Mask | X.LockMask]:
-                self.xroot.grab_key(keycode, X.ControlMask | X.Mod1Mask | ignored, 1, X.GrabModeAsync, X.GrabModeAsync)
+        # Resolve strings to X11 mask constants for the modifier mask
+        try:
+            modmask = reduce(operator.ior, [getattr(X, "%sMask" % x) for x in self._modkeys])
+        except Exception, err:
+            logging.error("Error while resolving modifier key mask: %s", err)
+            logging.error("Not binding keys for safety reasons. (eg. What if Ctrl+C got bound?)")
+            modmask = 0
+        else:
+            #XXX: Do I need to ignore Scroll lock too?
+            for keycode in self.keys:
+                #Ignore all combinations of Mod2 (NumLock) and Lock (CapsLock)
+                for ignored in [0, X.Mod2Mask, X.LockMask, X.Mod2Mask | X.LockMask]:
+                    self.xroot.grab_key(keycode, modmask | ignored, 1, X.GrabModeAsync, X.GrabModeAsync)
 
         # If we don't do this, then nothing works.
         # I assume it flushes the XGrabKey calls to the server.
@@ -564,25 +582,47 @@ if __name__ == '__main__':
         logging.getLogger().setLevel(logging.DEBUG)
 
     # Load the config from file if present
+    # TODO: Refactor all this
     cfg_path = os.path.join(XDG_CONFIG_DIR, 'quicktile.cfg')
     config = RawConfigParser()
     config.optionxform = str # Make keys case-sensitive
+    #TODO: Maybe switch to two config files so I can have only the keys in the keymap case-sensitive?
     config.read(cfg_path)
+    dirty = False
+
+    if not config.has_section('general'):
+        config.add_section('general')
+        # Change this if you make backwards-incompatible changes to the
+        # section and key naming in the config file.
+        config.set('general', 'cfg_schema', 1)
+        dirty = True
+
+    for key, val in DEFAULTS['general'].items():
+        if not config.has_option('general', key):
+            config.set('general', key, str(val))
+            dirty = True
+
+    modkeys = config.get('general', 'ModMask').split()
 
     # Either load the keybindings or use and save the defaults
     if config.has_section('keys'):
         keymap = dict(config.items('keys'))
     else:
-        keymap = DEFAULT_KEYS
+        keymap = DEFAULTS['keys']
         config.add_section('keys')
         for row in keymap.items():
             config.set('keys', row[0], row[1])
+        dirty = True
 
-        with file(cfg_path, 'wb') as cfg_file:
-            config.write(cfg_file)
+    if dirty:
+        cfg_file = file(cfg_path, 'wb')
+        config.write(cfg_file)
+        cfg_file.close()
 
-    wm = WindowManager(POSITIONS, ignore_workarea=opts.no_workarea)
-    app = QuickTileApp(wm, keymap)
+    ignore_workarea = (not config.getboolean('general', 'UseWorkarea')) or opts.no_workarea
+
+    wm = WindowManager(POSITIONS, ignore_workarea=ignore_workarea)
+    app = QuickTileApp(wm, keymap, modkeys=modkeys)
 
     if opts.showBinds:
         app.showBinds()

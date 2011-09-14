@@ -6,7 +6,7 @@ the initial run) in ~/.config/quicktile
 For details and non-keybinding use, see --help.
 
 Requirements:
- - Python 2.4 (Tested on 2.7 but I don't see any newer constructs in the code.)
+ - Python 2.4+ (Tested with 2.5 on 2011-09-10. Developed on 2.7)
  - PyGTK 2.2 (assuming get_active_window() isn't newer than that)
  - X11 (The code expects _NETWM hints and X11-style window decorations)
  - python-xlib (optional, required for key-binding, tested with 0.15_rc1)

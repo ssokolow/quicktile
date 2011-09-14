@@ -1,6 +1,6 @@
 0.1.5 (git HEAD):
-- Keybindings can now be set via ~/.config/quicktile.cfg
-- Added a --no-workarea flag for non-rectangular desktops
+- Keybindings and base modifier key can now be set via ~/.config/quicktile.cfg
+- Added a --no-workarea flag and config file key for non-rectangular desktops
 - Added a --show-bindings option to list keybindings
 - Added horizontal-maximize, vertical-maximize, and move-to-center (crantok)
 - More internal restructuring
