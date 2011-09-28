@@ -9,7 +9,7 @@
 
 		<style type="text/css">
 			body {
-				margin-top: 1.0em;
+				margin: 0;
 				background-color: #aac;
 				font-family: "sans-serif";
 				color: #000000;
@@ -20,13 +20,6 @@
 				max-width: 750px;
 				background-color: #ffffff;
 				padding: 25px;
-				border: 1px solid gray;
-			}
-
-			#container, pre {
-				border-radius: 1ex;
-				-moz-border-radius: 1ex;
-				-webkit-border-radius: 1ex;
 			}
 
 			h1 {
@@ -43,18 +36,32 @@
 			h3 { text-align: center; color: #000000; }
 			.ribbon { position: absolute; top: 0; right: 0; border: 0; }
 			.description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
+			.filename { font-family: monospace; }
 			.download { float: right; }
 			.ohloh_btn { float: right; }
-			pre { background: #000; color: #fff; padding: 15px;}
 			hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
 			.footer { text-align:center; padding-top:30px; font-style: italic; }
 			.footer img { vertical-align: top; }
 
 
-			dt { font-weight: bold; }
-			dd > ul {
+			dt {
 				margin-top: 0.5ex;
-				padding-left: 1em;
+				font-weight: bold;
+			}
+			dd > ul { padding-left: 1em; }
+
+			pre {
+				padding: 15px;
+				border-radius: 1ex;
+				background: black;
+				color: white;
+
+				-moz-border-radius: 1ex;
+				-webkit-border-radius: 1ex;
+
+				box-shadow: inset 2px 3px 5px black, 0px 1px 1px #333;
+				-moz-box-shadow: inset 2px 3px 5px black, 0px 1px 1px #333;
+				-webkit-box-shadow: inset 2px 3px 5px black, 0px 1px 1px #333;
 			}
 
 			/* Draw the prompt in CSS for easy copy-paste */
@@ -111,9 +118,11 @@
 				<dd>GNU GPL 2.0 or later</dd>
 
 				<dt>Documentation</dt>
-				<dd>The <a href="http://github.com/ssokolow/quicktile/tree">README</a>,
-					<a href="http://wiki.github.com/ssokolow/quicktile">FAQ/TODO list</a>,
-					and <a href="apidocs/index.html">API documentation</a> can be read online.</dd>
+				<dd><ul>
+						<li><a class="filename" href="http://github.com/ssokolow/quicktile/tree">README</a></li>
+						<li><a href="http://wiki.github.com/ssokolow/quicktile">FAQ/TODO list</a></li>
+						<li><a href="apidocs/index.html">API documentation</a></li>
+				</ul></dd>
 				<dt>Contact</dt>
 				<dd><ul>
 						<li>For bugs and feature requests, please use the <a href="https://github.com/ssokolow/quicktile/issues">issue tracker</a>.</li>
