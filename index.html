@@ -56,6 +56,9 @@
 				margin-top: 0.5ex;
 				padding-left: 1em;
 			}
+
+			/* Draw the prompt in CSS for easy copy-paste */
+			kbd.sh:before { content: "$ "; }
 		</style>
 
 	</head>
@@ -129,7 +132,7 @@
 			</p>
 			<p>You can also clone the project with <a href="http://git-scm.com">Git</a>
 				by running:</p>
-			<pre>$ git clone git://github.com/ssokolow/quicktile</pre>
+			<pre><kbd class="sh">git clone git://github.com/ssokolow/quicktile</kbd></pre>
 
 			<div class="footer">
 				<img src="wrench.png" alt="" />
