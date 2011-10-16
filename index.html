@@ -55,7 +55,11 @@
 
 			.filename { font-family: monospace; }
 			.download { float: right; }
-			.ohloh_btn { float: right; }
+			.ohloh_btn {
+				float: right;
+				margin-left: 0.5ex;
+				margin-right: 0.5ex;
+			}
 
 			.footer {
 				text-align: center;
@@ -88,7 +92,17 @@
 			/* Draw the prompt in CSS for easy copy-paste */
 			kbd.sh:before { content: "$ "; }
 		</style>
-
+		<script type="text/javascript">
+		/* <![CDATA[ */
+			(function() {
+				var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
+				s.type = 'text/javascript';
+				s.async = true;
+				s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto';
+				t.parentNode.insertBefore(s, t);
+			})();
+		/* ]]> */
+		</script>
 	</head>
 
 	<body>
@@ -153,6 +167,11 @@
 			</dl>
 
 			<h2>Download</h2>
+			<div class="ohloh_btn">
+				<a class="FlattrButton" style="display:none;" href="http://ssokolow.github.com/quicktile/"></a>
+				<noscript><a href="http://flattr.com/thing/416917/QuickTile" target="_blank">
+				<img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a></noscript>
+			</div>
 			<div class="ohloh_btn"><script type="text/javascript"
 					src="http://www.ohloh.net/p/349825/widgets/project_users.js"></script></div>
 			<p>
