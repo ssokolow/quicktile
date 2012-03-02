@@ -62,16 +62,22 @@ try:
 except ImportError:
     XLIB_PRESENT = False #: Indicates whether python-xlib was found
 
+DBUS_PRESENT = False
 try:
     import dbus.service
     from dbus import SessionBus
+    from dbus.exceptions import DBusException
     from dbus.mainloop.glib import DBusGMainLoop
-
-    DBusGMainLoop(set_as_default=True)
-    sessBus = SessionBus()
-    DBUS_PRESENT = True
-except: # TODO: figure out what signal other than ImportError to catch
-    DBUS_PRESENT = False
+except ImportError:
+    pass
+else:
+    try:
+        DBusGMainLoop(set_as_default=True)
+        sessBus = SessionBus()
+    except DBusException:
+        pass
+    else:
+        DBUS_PRESENT = True
 
 XDG_CONFIG_DIR = os.environ.get('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
 
@@ -158,7 +164,7 @@ DEFAULTS = {
 def powerset(iterable):
     "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
     s = list(iterable)
-    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+    return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
 
 class DependencyError(Exception):
     """Raised when a required dependency is missing."""
@@ -201,7 +207,7 @@ class WindowManager(object):
               win.get_state() seems to be broken.
         """
 
-        win, monitorGeom, winGeom, monitorID = self.getGeometries(window)
+        win, _, winGeom, monitorID = self.getGeometries(window)
 
         if monitorID is None:
             return None
@@ -212,7 +218,7 @@ class WindowManager(object):
             newMonitorID = (monitorID + 1) % self._root.get_n_monitors()
 
         newMonitorGeom = self._root.get_monitor_geometry(newMonitorID)
-        logging.debug("Moving window to monitor %s" % newMonitorID)
+        logging.debug("Moving window to monitor %s", newMonitorID)
 
         if win.get_state() & gtk.gdk.WINDOW_STATE_MAXIMIZED:
             self.cmd_toggleMaximize(win, False)
@@ -293,7 +299,7 @@ class WindowManager(object):
         # and all presets and store them in a min heap.
         euclid_distance = []
         for pos, val in enumerate(dims):
-            distance = sum([(wg-vv)**2 for (wg, vv) in zip(tuple(winGeom), tuple(val))])
+            distance = sum([(wg - vv) ** 2 for (wg, vv) in zip(tuple(winGeom), tuple(val))])
             heappush(euclid_distance, (distance, pos))
 
         # Get minimum euclidean distance. (Closest match)
@@ -321,10 +327,10 @@ class WindowManager(object):
         if not monitorGeom:
             return None
 
-        dims = ( int( (monitorGeom.width-winGeom.width) / 2 ),
-                 int( (monitorGeom.height-winGeom.height) / 2 ),
+        dims = (int((monitorGeom.width - winGeom.width) / 2),
+                 int((monitorGeom.height - winGeom.height) / 2),
                  int(winGeom.width),
-                 int(winGeom.height) )
+                 int(winGeom.height))
 
         logging.debug("dims %r", dims)
 
@@ -499,7 +505,7 @@ class QuickTileApp(object):
         self.xroot = self.xdisp.screen().root
 
         # We want to receive KeyPress events
-        self.xroot.change_attributes(event_mask = X.KeyPressMask)
+        self.xroot.change_attributes(event_mask=X.KeyPressMask)
         self.keys = dict([(self.xdisp.keysym_to_keycode(string_to_keysym(x)), self._keys[x]) for x in self._keys])
 
         # Resolve strings to X11 mask constants for the modifier mask
@@ -516,7 +522,7 @@ class QuickTileApp(object):
             for keycode in self.keys:
                 #Ignore all combinations of Mod2 (NumLock) and Lock (CapsLock)
                 for ignored in powerset([X.Mod2Mask, X.LockMask, X.Mod5Mask]):
-                    ignored = reduce(lambda x,y: x|y, ignored, 0)
+                    ignored = reduce(lambda x, y: x | y, ignored, 0)
                     self.xroot.grab_key(keycode, modmask | ignored, 1, X.GrabModeAsync, X.GrabModeAsync)
 
         # If we don't do this, then nothing works.
@@ -558,7 +564,7 @@ class QuickTileApp(object):
         """Handle pending python-xlib events"""
         handle = handle or self.xroot.display
 
-        for i in range(0, handle.pending_events()):
+        for _ in range(0, handle.pending_events()):
             xevent = handle.next_event()
             if xevent.type == X.KeyPress:
                 keycode = xevent.detail
