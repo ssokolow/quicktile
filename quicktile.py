@@ -55,6 +55,7 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 try:
     from Xlib import X
     from Xlib.display import Display
+    from Xlib.error import BadAccess
     from Xlib.XK import string_to_keysym
     XLIB_PRESENT = True #: Indicates whether python-xlib was found
 except ImportError:
@@ -464,6 +465,8 @@ class WindowManager(object):
                 geom.width - (border * 2), geom.height - (titlebar + border))
 
 class QuickTileApp(object):
+    keybinds_failed = False
+
     def __init__(self, wm, keys=None, modkeys=None):
         """@todo: document these arguments"""
         self.wm = wm
@@ -486,12 +489,12 @@ class QuickTileApp(object):
 
     def _init_xlib(self):
         """Setup python-xlib components in the PyGTK event loop"""
-        disp = Display()
-        self.xroot = disp.screen().root
+        self.xdisp = Display()
+        self.xroot = self.xdisp.screen().root
 
         # We want to receive KeyPress events
         self.xroot.change_attributes(event_mask = X.KeyPressMask)
-        self.keys = dict([(disp.keysym_to_keycode(string_to_keysym(x)), self._keys[x]) for x in self._keys])
+        self.keys = dict([(self.xdisp.keysym_to_keycode(string_to_keysym(x)), self._keys[x]) for x in self._keys])
 
         # Resolve strings to X11 mask constants for the modifier mask
         try:
@@ -501,6 +504,8 @@ class QuickTileApp(object):
             logging.error("Not binding keys for safety reasons. (eg. What if Ctrl+C got bound?)")
             modmask = 0
         else:
+            self.xdisp.set_error_handler(self.handle_xerror)
+
             #XXX: Do I need to ignore Scroll lock too?
             for keycode in self.keys:
                 #Ignore all combinations of Mod2 (NumLock) and Lock (CapsLock)
@@ -509,8 +514,9 @@ class QuickTileApp(object):
 
         # If we don't do this, then nothing works.
         # I assume it flushes the XGrabKey calls to the server.
-        for x in range(0, self.xroot.display.pending_events()):
-            self.xroot.display.next_event()
+        self.xdisp.sync()
+        if self.keybinds_failed:
+            logging.warning("One or more requested keybindings were already in use and could not be bound.")
 
         # Merge python-xlib into the Glib event loop
         gobject.io_add_watch(self.xroot.display, gobject.IO_IN, self.handle_xevent)
@@ -530,6 +536,16 @@ class QuickTileApp(object):
             raise DependencyError("Neither the Xlib nor the D-Bus backends were available.")
 
         gtk.main()
+
+    def handle_xerror(self, err, req=None):
+        """
+        @note: If you can make python-xlib's C{CatchError} actually work or if
+               you can retrieve more information to show, feel free.
+        """
+        if isinstance(err, BadAccess):
+            self.keybinds_failed = True
+        else:
+            self.xdisp.display.default_error_handler(err)
 
     def handle_xevent(self, src, cond, handle=None):
         """Handle pending python-xlib events"""
