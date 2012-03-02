@@ -381,8 +381,7 @@ class WindowManager(object):
         # (The "not winType" check seems required for fullscreen MPlayer)
         winType = win.property_get("_NET_WM_WINDOW_TYPE")
         logging.debug("NET_WM_WINDOW_TYPE: %r", winType)
-        if not winType or winType[-1][0] == '_NET_WM_WINDOW_TYPE_DESKTOP':
-            #XXX: Why does git gui trip this off?
+        if winType and winType[-1][0] == '_NET_WM_WINDOW_TYPE_DESKTOP':
             return None
 
         return win
