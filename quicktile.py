@@ -49,6 +49,7 @@ pygtk.require('2.0')
 import errno, gtk, gobject, operator, logging, os, sys
 from ConfigParser import RawConfigParser
 from heapq import heappop, heappush
+from itertools import chain, combinations
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
@@ -153,6 +154,11 @@ DEFAULTS = {
         "C"        : "move-to-center",
     }
 } #: Default content for the config file
+
+def powerset(iterable):
+    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
 
 class DependencyError(Exception):
     """Raised when a required dependency is missing."""
@@ -509,7 +515,8 @@ class QuickTileApp(object):
             #XXX: Do I need to ignore Scroll lock too?
             for keycode in self.keys:
                 #Ignore all combinations of Mod2 (NumLock) and Lock (CapsLock)
-                for ignored in [0, X.Mod2Mask, X.LockMask, X.Mod2Mask | X.LockMask]:
+                for ignored in powerset([X.Mod2Mask, X.LockMask, X.Mod5Mask]):
+                    ignored = reduce(lambda x,y: x|y, ignored, 0)
                     self.xroot.grab_key(keycode, modmask | ignored, 1, X.GrabModeAsync, X.GrabModeAsync)
 
         # If we don't do this, then nothing works.
