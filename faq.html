@@ -1,0 +1,29 @@
+---
+layout: default
+title: FAQ
+---
+
+<h2>Frequently/Potentially Asked Questions</h2>
+
+<dl class="big">
+    <dt>I have monitors of different sizes. How do I make QuickTile work properly?</dt>
+    <dd>
+        <p>This happens because the current (easy) method QuickTile uses to avoid overlapping your DE's widget panels (the <code>_NET_WORKAREA</code> WM hint) can only return a rectangle.</p>
+        <p>If you don't mind QuickTile positioning your windows under/over any widget panels your desktop environment provides, you can run QuickTile with the <code>--no-workarea</code> switch to fix the problem.</p>
+        <p>If neither choice really appeals to you and you have more free time than I do (usually none), QuickTile's source code contains partial instructions for implementing a more involved but more correct alternative.</p>
+    </dd>
+
+    <dt>QuickTile resizes but doesn't move my windows. What do I do?</dt>
+    <dd>
+        <p>Some window managers can be set to ignore requests by applications to move your windows. It's supposed to let you assert dominance over certain kinds of badly-designed applications but, because QuickTile is also an ordinary application in the eyes of the window manager, it's also affected.</p>
+        <p>Under Metacity, you can disable this behaviour with the following command:</p>
+
+        {% highlight bash %}gconftool-2 --set "/apps/metacity/general/disable_workarounds" false --type bool{% endhighlight %}
+    </dd>
+
+    <dt>QuickTile doesn't meet my needs. What can I do?</dt>
+    <dd>
+        <p>Assuming you don't feel like either contributing code or <a href="https://github.com/ssokolow/quicktile/issues">filing a feature request</a> and waiting, the Wikipedia <a href="https://secure.wikimedia.org/wikipedia/en/wiki/Tiling_window_manager">Tiling window manager</a> page does contain a section listing tiling utilities for X11 desktops. (Windows too, for that matter)</p>
+        <p>QuickTile does not and will not support MacOS (though, depending on how complete X11.app is, it _may_ work) so OSX users are invited to visit <a href="http://stackoverflow.com/questions/273242/is-there-anything-like-winsplit-revolution-for-mac-os-x">StackOverflow</a> for a list of alternatives.</p>
+    </dd>
+</dl>

@@ -1,207 +1,74 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+---
+layout: default
+title: Main
+---
+<div class="description">
+	An X11 analogue to WinSplit Revolution for people who don't want to use the Compiz Grid plugin
+</div>
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-		<meta name="viewport" content="width=550" />
-
-		<title>ssokolow/quicktile @ GitHub</title>
-
-		<style type="text/css">
-			body {
-				margin: 0;
-				padding: 0;
-				background-color: #aac;
-				font-family: sans-serif;
-				color: #000000;
-			}
-
-			#container {
-				margin: 0 auto;
-				max-width: 750px;
-				background-color: #ffffff;
-				padding: 25px;
-			}
-
-			h1 {
-				font-size: 3em;
-				color: #000000;
-				margin-bottom: 3px;
-				font-style: italic;
-			}
-
-			a img { border: 0; }
-			h1 .subtitle {
-				font-size: 40%;
-				display: inline-block;
-			}
-			h1 a { text-decoration: none; color: black; }
-			h2 { font-size: 1.5em; color: #000000; }
-
-			.ribbon {
-				position: absolute;
-				top: 0;
-				right: 0;
-				border: 0;
-			}
-
-			.description {
-				font-size: 1.2em;
-				margin-bottom: 30px;
-				margin-top: 30px;
-				font-style: italic;
-			}
-
-			.filename { font-family: monospace; }
-			.download { float: right; }
-			.ohloh_btn {
-				float: right;
-				margin-left: 0.5ex;
-				margin-right: 0.5ex;
-			}
-
-			.footer {
-				text-align: center;
-				padding-top: 30px;
-				font-style: italic;
-			}
-			.footer img { vertical-align: top; }
+<p>QuickTile is a simple attempt to duplicate the functionality of <a
+		href="http://www.winsplit-revolution.com/">WinSplit Revolution</a> for
+	X11-based desktops. (eg. Linux)</p>
+<p><strong>Note:</strong> QuickTile cannot be demonstrated by screenshots and I have not yet had
+	time to record some demo videos, so please see the demos on the WinSplit
+	site for examples of what purpose this tool serves.</p>
 
 
-			dt {
-				margin-top: 0.5ex;
-				font-weight: bold;
-			}
-			dd > ul { padding-left: 1em; }
+<dl>
+	<dt>Dependencies</dt>
+	<dd><a href="http://python.org/">Python</a> 2.4+,
+		<a href="http://pygtk.org/">PyGTK</a> 2.2+, and (optional)
+		<a href="http://python-xlib.sourceforge.net/">python-xlib</a> or
+		<a href="http://www.freedesktop.org/wiki/Software/DBusBindings">dbus-python</a></dd>
 
-			pre {
-				padding: 15px;
-				border-radius: 1ex;
-				background: black;
-				color: white;
+	<dt>Caveats</dt>
+	<dd>There are few minor <a href="https://github.com/ssokolow/quicktile/issues?labels=bug%2Cconfirmed">known</a>
+		<a href="apidocs/bug-index.html">bugs</a> and the minimum
+		dependency versions have not been re-confirmed recently.</dd>
 
-				-moz-border-radius: 1ex;
-				-webkit-border-radius: 1ex;
+	<dt>Install</dt>
+	<dd>Just unpack and run. No installation necessary. <br />Keybindings for
+		<kbd>--daemonize</kbd> can be edited in <kbd>~/.config/quicktile.cfg</kbd>
+	</dd>
 
-				box-shadow: inset 2px 3px 5px black, 0px 1px 1px #333;
-				-moz-box-shadow: inset 2px 3px 5px black, 0px 1px 1px #333;
-				-webkit-box-shadow: inset 2px 3px 5px black, 0px 1px 1px #333;
-			}
+	<dt>License</dt>
+	<dd>GNU GPL 2.0 or later</dd>
 
-			/* Draw the prompt in CSS for easy copy-paste */
-			kbd.sh:before { content: "$ "; }
-		</style>
-		<script type="text/javascript">
-		/* <![CDATA[ */
-			(function() {
-				var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
-				s.type = 'text/javascript';
-				s.async = true;
-				s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto';
-				t.parentNode.insertBefore(s, t);
-			})();
-		/* ]]> */
-		</script>
-	</head>
+	<dt>Documentation</dt>
+	<dd><ul>
+			<li><a class="filename" href="http://github.com/ssokolow/quicktile/tree">README</a></li>
+			<li><a href="faq.html">FAQ</a></li>
+			<li><a href="https://github.com/ssokolow/quicktile/wiki/Future-Plans">Future Plans</a></li>
+			<li><a href="apidocs/index.html">API documentation</a></li>
+	</ul></dd>
+	<dt>Contact</dt>
+	<dd><ul>
+			<li>For bugs and feature requests, please use the <a href="https://github.com/ssokolow/quicktile/issues">issue tracker</a>.</li>
+			<li>When submitting patches, please <a href="http://help.github.com/send-pull-requests/">send a pull request</a>.</li>
+			<li>For everything else, message <a href="http://github.com/ssokolow">Stephan Sokolow (deitarion/SSokolow)</a></li>
+	</ul></dd>
+</dl>
 
-	<body>
-		<div class="ribbon"><a href="http://github.com/ssokolow/quicktile"><img src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a></div>
+<h2>Download</h2>
+<div class="ohloh_btn">
+	<a class="FlattrButton" style="display:none;" href="http://ssokolow.github.com/quicktile/"></a>
+	<noscript><a href="http://flattr.com/thing/416917/QuickTile" target="_blank">
+			<img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a></noscript>
+</div>
+<div class="ohloh_btn"><script type="text/javascript"
+		src="http://www.ohloh.net/p/349825/widgets/project_users.js"></script></div>
+<p>
+	You can download this project in either
+	<a href="http://github.com/ssokolow/quicktile/zipball/master">zip</a> or
+	<a href="http://github.com/ssokolow/quicktile/tarball/master">tar</a> formats.
+</p>
+<p>You can also clone the project with <a href="http://git-scm.com">Git</a>
+	by running:
+</p>
+<pre><kbd class="shell_cmd">git clone git://github.com/ssokolow/quicktile</kbd></pre>
 
-		<div id="container">
+<div class="footer">
+	<img src="wrench.png" alt="" />
+	Report issues and browse the commit history on GitHub : <a href="http://github.com/ssokolow/quicktile">ssokolow/quicktile</a>
+</div>
 
-			<div class="download">
-				<a href="http://github.com/ssokolow/quicktile/zipball/master">
-					<img width="90" src="http://github.com/images/modules/download/zip.png" alt="Zip" /></a>
-				<a href="http://github.com/ssokolow/quicktile/tarball/master">
-					<img width="90" src="http://github.com/images/modules/download/tar.png" alt="Tar" /></a>
-			</div>
-
-			<h1><a href="http://github.com/ssokolow/quicktile">QuickTile</a>
-				<span class="subtitle">by <a href="http://github.com/ssokolow">ssokolow</a></span></h1>
-
-			<div class="description">
-				An X11 analogue to WinSplit Revolution for people who don't want to use the Compiz Grid plugin
-			</div>
-
-			<p>QuickTile is a simple attempt to duplicate the functionality of <a
-					href="http://www.winsplit-revolution.com/">WinSplit Revolution</a> for
-				X11-based desktops. (eg. Linux)</p>
-			<p><strong>Note:</strong> QuickTile cannot be demonstrated by screenshots and I have not yet had
-				time to record some demo videos, so please see the demos on the WinSplit
-				site for examples of what purpose this tool serves.</p>
-
-
-			<dl>
-				<dt>Dependencies</dt>
-				<dd><a href="http://python.org/">Python</a> 2.4+,
-					<a href="http://pygtk.org/">PyGTK</a> 2.2+, and (optional)
-					<a href="http://python-xlib.sourceforge.net/">python-xlib</a> or
-					<a href="http://www.freedesktop.org/wiki/Software/DBusBindings">dbus-python</a></dd>
-
-				<dt>Caveats</dt>
-				<dd>There are few minor <a href="https://github.com/ssokolow/quicktile/issues?labels=bug%2Cconfirmed">known</a>
-					<a href="apidocs/bug-index.html">bugs</a> and the minimum
-					dependency versions have not been re-confirmed recently.</dd>
-
-				<dt>Install</dt>
-				<dd>Just unpack and run. No installation necessary. <br />Keybindings for
-					<kbd>--daemonize</kbd> can be edited in <kbd>~/.config/quicktile.cfg</kbd>
-				</dd>
-
-				<dt>License</dt>
-				<dd>GNU GPL 2.0 or later</dd>
-
-				<dt>Documentation</dt>
-				<dd><ul>
-						<li><a class="filename" href="http://github.com/ssokolow/quicktile/tree">README</a></li>
-						<li><a href="http://wiki.github.com/ssokolow/quicktile">FAQ/TODO list</a></li>
-						<li><a href="apidocs/index.html">API documentation</a></li>
-				</ul></dd>
-				<dt>Contact</dt>
-				<dd><ul>
-						<li>For bugs and feature requests, please use the <a href="https://github.com/ssokolow/quicktile/issues">issue tracker</a>.</li>
-						<li>When submitting patches, please <a href="http://help.github.com/send-pull-requests/">send a pull request</a>.</li>
-						<li>For everything else, message <a href="http://github.com/ssokolow">Stephan Sokolow (deitarion/SSokolow)</a></li>
-				</ul></dd>
-			</dl>
-
-			<h2>Download</h2>
-			<div class="ohloh_btn">
-				<a class="FlattrButton" style="display:none;" href="http://ssokolow.github.com/quicktile/"></a>
-				<noscript><a href="http://flattr.com/thing/416917/QuickTile" target="_blank">
-				<img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a></noscript>
-			</div>
-			<div class="ohloh_btn"><script type="text/javascript"
-					src="http://www.ohloh.net/p/349825/widgets/project_users.js"></script></div>
-			<p>
-				You can download this project in either
-				<a href="http://github.com/ssokolow/quicktile/zipball/master">zip</a> or
-				<a href="http://github.com/ssokolow/quicktile/tarball/master">tar</a> formats.
-			</p>
-			<p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-				by running:</p>
-			<pre><kbd class="sh">git clone git://github.com/ssokolow/quicktile</kbd></pre>
-
-			<div class="footer">
-				<img src="wrench.png" alt="" />
-				Report issues and browse the commit history on GitHub : <a href="http://github.com/ssokolow/quicktile">ssokolow/quicktile</a>
-			</div>
-
-		</div>
-
-		<!-- Piwik -->
-		<script type="text/javascript">
-			var pkBaseURL = (("https:" == document.location.protocol) ? "https://blog.ssokolow.com/stats/" : "http://blog.ssokolow.com/stats/");
-			document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
-			</script><script type="text/javascript">
-			try {
-				var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 6);
-				piwikTracker.trackPageView();
-				piwikTracker.enableLinkTracking();
-			} catch( err ) {}
-		</script><noscript><p><img src="http://blog.ssokolow.com/stats/piwik.php?idsite=6" style="border:0" alt="" /></p></noscript>
-		<!-- End Piwik Tracking Code -->
-	</body>
-</html>
-	<!-- vi: set noexpandtab: -->

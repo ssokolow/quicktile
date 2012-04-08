@@ -1,0 +1,85 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #aac;
+    font-family: sans-serif;
+    color: #000000;
+}
+
+#container {
+    margin: 0 auto;
+    max-width: 750px;
+    background-color: #ffffff;
+    padding: 25px;
+}
+
+h1 {
+    font-size: 3em;
+    color: #000000;
+    margin-bottom: 3px;
+    font-style: italic;
+}
+
+a img { border: 0; }
+h1 .subtitle {
+    font-size: 40%;
+    display: inline-block;
+}
+h1 a { text-decoration: none; color: black; }
+h1:hover a { text-decoration: underline; }
+h2 { font-size: 1.5em; color: #000000; }
+
+.ribbon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: 0;
+}
+
+.description {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    margin-top: 30px;
+    font-style: italic;
+}
+
+.filename { font-family: monospace; }
+.download { float: right; }
+.ohloh_btn {
+    float: right;
+    margin-left: 0.5ex;
+    margin-right: 0.5ex;
+}
+
+.footer {
+    text-align: center;
+    padding-top: 30px;
+    font-style: italic;
+}
+.footer img { vertical-align: top; }
+
+
+dt {
+    margin-top: 0.5em;
+    font-weight: bold;
+}
+dl.big dt { margin-top: 2em; }
+dd > ul { padding-left: 1em; }
+
+pre {
+    padding: 15px;
+    border-radius: 1ex;
+    background: black;
+    color: white;
+
+    -moz-border-radius: 1ex;
+    -webkit-border-radius: 1ex;
+
+    box-shadow: inset 2px 3px 5px black, 0px 1px 1px #333;
+    -moz-box-shadow: inset 2px 3px 5px black, 0px 1px 1px #333;
+    -webkit-box-shadow: inset 2px 3px 5px black, 0px 1px 1px #333;
+}
+
+/* Draw the prompt in CSS for easy copy-paste */
+kbd.shell_cmd:before { content: "$ "; }
+
