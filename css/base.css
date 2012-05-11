@@ -45,10 +45,14 @@ h2 { font-size: 1.5em; color: #000000; }
 
 .filename { font-family: monospace; }
 .download { float: right; }
-.ohloh_btn {
+.flattr_btn {
     float: right;
     margin-left: 0.5ex;
     margin-right: 0.5ex;
+}
+.flattr_btn .gitforked-button-container {
+    display: block;
+    margin: 1.5em auto 1ex;
 }
 
 .footer {
