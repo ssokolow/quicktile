@@ -12,8 +12,6 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
  - See about de-duplicating "This temporary hack prevents an Exception with MPlayer."
  - Look into supporting xpyb (the Python equivalent to libxcb) for global
    keybinding.
- - Decide whether to amend the euclidean distance matching so un-tiled windows
-   are guaranteed to start at the beginning of the sequence.
  - Clean up the code. It's functional, but an ugly rush-job.
  - Decide how to handle maximization and stick with it.
  - Implement the secondary major features of WinSplit Revolution (eg.
@@ -292,6 +290,9 @@ class WindowManager(object):
 
             dims.append(current_dim)
 
+        if not dims:
+          return None
+
         logging.debug("winGeom %r", tuple(winGeom))
         logging.debug("dims %r", dims)
 
@@ -302,9 +303,14 @@ class WindowManager(object):
             distance = sum([(wg - vv) ** 2 for (wg, vv) in zip(tuple(winGeom), tuple(val))])
             heappush(euclid_distance, (distance, pos))
 
-        # Get minimum euclidean distance. (Closest match)
-        pos = heappop(euclid_distance)[1]
-        result = gtk.gdk.Rectangle(*dims[(pos + 1) % len(dims)])
+        # If the window is already on one of the configured geometries, advance
+        # to the next configuration. Otherwise, use the first configuration.
+        min_distance = heappop(euclid_distance)
+        if min_distance[0] < 500:
+          pos = (min_distance[1] + 1) % len(dims)
+        else:
+          pos = 0
+        result = gtk.gdk.Rectangle(*dims[pos])
 
         logging.debug("result %r", tuple(result))
         self.reposition(win, result, monitorGeom)
