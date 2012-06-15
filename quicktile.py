@@ -291,7 +291,7 @@ class WindowManager(object):
             dims.append(current_dim)
 
         if not dims:
-          return None
+            return None
 
         logging.debug("winGeom %r", tuple(winGeom))
         logging.debug("dims %r", dims)
@@ -300,16 +300,16 @@ class WindowManager(object):
         # and all presets and store them in a min heap.
         euclid_distance = []
         for pos, val in enumerate(dims):
-            distance = sum([(wg - vv) ** 2 for (wg, vv) in zip(tuple(winGeom), tuple(val))])
+            distance = sum([(wg - vv) ** 2 for (wg, vv) in zip(tuple(winGeom), tuple(val))]) ** 0.5
             heappush(euclid_distance, (distance, pos))
 
         # If the window is already on one of the configured geometries, advance
         # to the next configuration. Otherwise, use the first configuration.
         min_distance = heappop(euclid_distance)
-        if min_distance[0] < 500:
-          pos = (min_distance[1] + 1) % len(dims)
+        if min_distance[0] < 25:
+            pos = (min_distance[1] + 1) % len(dims)
         else:
-          pos = 0
+            pos = 0
         result = gtk.gdk.Rectangle(*dims[pos])
 
         logging.debug("result %r", tuple(result))
