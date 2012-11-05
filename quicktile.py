@@ -582,6 +582,9 @@ class QuickTileApp(object):
         maxlen_vals = max(len(x) for x in self._keys.values())
 
         print "Keybindings defined for use with --daemonize:\n"
+
+        print "Modifier: %s\n" % '+'.join(str(x) for x in self._modkeys)
+
         print "Key".ljust(maxlen_keys), "Action"
         print "-" * maxlen_keys, "-" * maxlen_vals
         for row in sorted(self._keys.items(), key=lambda x: x[0]):
