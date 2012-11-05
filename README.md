@@ -25,6 +25,21 @@ the source code (though it's quite simple). This will be remedied when the
 author has time to decide between extending the standard Python rcfile parser
 and replacing `quicktile.cfg` with `quicktile.json`.
 
+### Important Notes:
+
+ * Some systems may not provide a Python 2.x binary under the name `python2`.
+   If this is the case on yours, you must edit the first line in `quicktile.py`
+   accordingly.
+ * If you are running quicktile from a folder that isn't in your `PATH`,
+   you will need to specify a path like `./quicktile.py` to run `quicktile.py`
+   directly.
+ * If you don't mark `quicktile.py` as executable, you must run
+   `python2 quicktile.py` rather than `quicktile.py`.
+ * You can list your current keybindings by running
+   `quicktile.py --show-bindings`
+ * You can get a list of valid actions for the configuration file by running
+   `quicktile.py --show-actions`
+
 ## Usage (Typical Use)
 
  1. Focus the window you want to tile
@@ -42,17 +57,6 @@ The default keybindings are:
 This works best when combined with functionality your existing window manager
 provides (eg. `Alt+Tab`) to minimize the need to switch your hand between your
 keyboard and your mouse.
-
-### Important Notes:
-
- * You can list your current keybindings by running
-   `quicktile.py --show-bindings`
- * You can get a list of valid actions for the configuration file by running
-   `quicktile.py --show-actions`
- * If you are running quicktile from a folder that isn't in your `PATH`,
-you will need to run `./quicktile.py` rather than `quicktile.py`.
- * If you don't mark `quicktile.py` as executable, you will have to run
-   `python quicktile.py` rather than `quicktile.py`.
 
 ## Advanced Uses
 
