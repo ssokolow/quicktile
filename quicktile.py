@@ -1,4 +1,10 @@
-#!/usr/bin/env python2
+#!/bin/sh
+"""":
+python2 -c "" 2>/dev/null && exec python2 $0 ${1+"$@"}
+python -c "" 2>/dev/null && exec python $0 ${1+"$@"}
+echo "Could not find a python interpreter."
+exit 1
+"""
 # -*- coding: utf-8 -*-
 """QuickTile, a WinSplit clone for X11 desktops
 
