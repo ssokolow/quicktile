@@ -165,6 +165,13 @@ DEFAULTS = {
     }
 } #: Default content for the config file
 
+KEYLOOKUP = {
+    ',' : 'comma',
+    '.' : 'period',
+    '+' : 'plus',
+    '-' : 'minus',
+}
+
 def powerset(iterable):
     "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
     s = list(iterable)
@@ -518,7 +525,16 @@ class QuickTileApp(object):
 
         # We want to receive KeyPress events
         self.xroot.change_attributes(event_mask=X.KeyPressMask)
-        self.keys = dict([(self.xdisp.keysym_to_keycode(string_to_keysym(x)), self._keys[x]) for x in self._keys])
+
+        # unrecognized shortkeys now will be looked up in a hardcoded dict
+        # and replaced by valid names like ',' -> 'comma'
+        # while generating the self.keys dict
+        self.keys = dict()
+        for key in self._keys:
+            transKey = key
+            if key in KEYLOOKUP:
+                transKey = KEYLOOKUP[key]
+            self.keys[self.xdisp.keysym_to_keycode(string_to_keysym(transKey))] = self._keys[key]
 
         # Resolve strings to X11 mask constants for the modifier mask
         try:
