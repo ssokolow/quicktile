@@ -557,7 +557,9 @@ class QuickTileApp(object):
         # I assume it flushes the XGrabKey calls to the server.
         self.xdisp.sync()
         if self.keybinds_failed:
-            logging.warning("One or more requested keybindings were already in use and could not be bound.")
+            logging.warning("One or more requested keybindings were could not"
+                " be bound. Please check that you are using valid X11 key"
+                " names and that the keys are not already bound.")
 
         # Merge python-xlib into the Glib event loop
         gobject.io_add_watch(self.xroot.display, gobject.IO_IN, self.handle_xevent)
