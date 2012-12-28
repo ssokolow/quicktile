@@ -598,7 +598,10 @@ class QuickTileApp(object):
             xevent = handle.next_event()
             if xevent.type == X.KeyPress:
                 keycode = xevent.detail
-                self.wm.doCommand(self.keys[keycode])
+                if keycode in self.keys:
+                    self.wm.doCommand(self.keys[keycode])
+                else:
+                    logging.error("Received an event for an unrecognized keycode: %s" % keycode)
         return True
 
     def showBinds(self):
