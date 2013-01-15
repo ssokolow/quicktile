@@ -21,6 +21,9 @@ title: FAQ
         {% highlight bash %}gconftool-2 --set "/apps/metacity/general/disable_workarounds" false --type bool{% endhighlight %}
     </dd>
 
+    <dt>I set <code>ModMask = Control Shift Mod1</code> but QuickTile isn't responding. Help?</dt>
+    <dd>This usually happens when the Compiz Grid plugin is still consuming keystrokes. Make sure you've disabled the Grid plugin in <acronym title="CompizConfig Settings Manager"><a href="http://wiki.compiz.org/CCSM">CCSM</a></acronym> and then restart Compiz (eg. log out and back in) to make sure it's let go of the keybindings.</dd>
+
     <dt>QuickTile doesn't meet my needs. What can I do?</dt>
     <dd>
         <p>Assuming you don't feel like either contributing code or <a href="https://github.com/ssokolow/quicktile/issues">filing a feature request</a> and waiting, the Wikipedia <a href="https://secure.wikimedia.org/wikipedia/en/wiki/Tiling_window_manager">Tiling window manager</a> page does contain a section listing tiling utilities for X11 desktops. (Windows too, for that matter)</p>
