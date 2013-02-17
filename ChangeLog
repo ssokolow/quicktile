@@ -1,8 +1,10 @@
 0.1.5 (git HEAD):
 - Keybindings and base modifier key can now be set via ~/.config/quicktile.cfg
+- Added a setup.py capable of installing and setting up autostart behaviour.
 - Added a --no-workarea flag and config file key for non-rectangular desktops
 - Added a --show-bindings option to list keybindings
 - Added horizontal-maximize, vertical-maximize, and move-to-center (crantok)
+- Improved the error handling with more helpful messages
 - More internal restructuring
 - Tidied up the --help output a bit
 
