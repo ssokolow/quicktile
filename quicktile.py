@@ -491,6 +491,7 @@ class WindowManager(object):
         #Workaround for my inability to reliably detect maximization.
         win.unmaximize()
 
+        #FIXME: This needs to either ignore, reset, or compensate for window gravity
         border, titlebar = self.get_frame_thickness(win)
         win.move_resize(geom.x + monitor.x, geom.y + monitor.y,
                 geom.width - (border * 2), geom.height - (titlebar + border))
