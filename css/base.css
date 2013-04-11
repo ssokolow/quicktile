@@ -52,7 +52,7 @@ h2 { font-size: 1.5em; color: #000000; }
 }
 .flattr_btn .gitforked-button-container {
     display: block;
-    margin: 1.5em auto 1ex;
+    margin: 0 auto 1ex;
 }
 
 .footer {
