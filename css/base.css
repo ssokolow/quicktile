@@ -29,6 +29,10 @@ h1 a { text-decoration: none; color: black; }
 h1:hover a { text-decoration: underline; }
 h2 { font-size: 1.5em; color: #000000; }
 
+.gittip { /* After-nick icon */
+    vertical-align: middle;
+    margin-left: -2px;
+}
 .ribbon {
     position: absolute;
     top: 0;
