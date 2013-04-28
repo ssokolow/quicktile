@@ -8,6 +8,7 @@ title: FAQ
 <dl class="big">
     <dt>I have monitors of different sizes. How do I make QuickTile work properly?</dt>
     <dd>
+        <p>With the default settings, when QuickTile is run in a system with multiple monitors of different sizes, it will size windows as if the entire bounding rectangle for your desktop is usable. (It ignores dead space)</p>
         <p>This happens because the current (easy) method QuickTile uses to avoid overlapping your DE's widget panels (the <code>_NET_WORKAREA</code> WM hint) can only return a rectangle.</p>
         <p>If you don't mind QuickTile positioning your windows under/over any widget panels your desktop environment provides, you can either set <code>UseWorkarea = False</code> in <code>~/.config/quicktile.cfg</code> or run QuickTile with the <code>--no-workarea</code> switch to fix the problem.</p>
         <p>If neither choice really appeals to you and you have more free time than I do (usually none), QuickTile's source code contains partial instructions for implementing a more involved but more correct alternative.</p>
