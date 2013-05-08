@@ -649,6 +649,8 @@ if __name__ == '__main__':
     # Load the config from file if present
     # TODO: Refactor all this
     cfg_path = os.path.join(XDG_CONFIG_DIR, 'quicktile.cfg')
+    first_run = not os.path.exists(cfg_path)
+
     config = RawConfigParser()
     config.optionxform = str # Make keys case-sensitive
     #TODO: Maybe switch to two config files so I can have only the keys in the keymap case-sensitive?
@@ -683,6 +685,8 @@ if __name__ == '__main__':
         cfg_file = file(cfg_path, 'wb')
         config.write(cfg_file)
         cfg_file.close()
+        if first_run:
+            logging.info("Wrote default config file to %s", cfg_path)
 
     ignore_workarea = (not config.getboolean('general', 'UseWorkarea')) or opts.no_workarea
 
@@ -701,8 +705,7 @@ if __name__ == '__main__':
             logging.critical(err)
             sys.exit(errno.ENOENT)
             #FIXME: What's the proper exit code for "library not found"?
-
-    elif not opts.daemonize:
+    elif not first_run:
         badArgs = [x for x in args if x not in wm.commands]
         if not args or badArgs or opts.showArgs:
             validArgs = sorted(wm.commands)
