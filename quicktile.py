@@ -10,12 +10,12 @@ exit 1
 
 Thanks to Thomas Vander Stichele for some of the documentation cleanups.
 
-@bug: The toggleMaximize function powering the "maximize" action can't unmaximize.
+@bug: The toggleMaximize function powering "maximize" can't unmaximize.
       (Workaround: Use one of the regular tiling actions to unmaximize)
 
 @todo:
  - Reconsider use of --daemonize. That tends to imply self-backgrounding.
- - See about de-duplicating "This temporary hack prevents an Exception with MPlayer."
+ - Try de-duplicating "This temporary hack prevents an Exception with MPlayer."
  - Look into supporting xpyb (the Python equivalent to libxcb) for global
    keybinding.
  - Clean up the code. It's functional, but an ugly rush-job.
@@ -62,9 +62,9 @@ try:
     from Xlib.display import Display
     from Xlib.error import BadAccess
     from Xlib.XK import string_to_keysym
-    XLIB_PRESENT = True #: Indicates whether python-xlib was found
+    XLIB_PRESENT = True  #: Indicates whether python-xlib was found
 except ImportError:
-    XLIB_PRESENT = False #: Indicates whether python-xlib was found
+    XLIB_PRESENT = False  #: Indicates whether python-xlib was found
 
 DBUS_PRESENT = False
 try:
@@ -83,59 +83,60 @@ else:
     else:
         DBUS_PRESENT = True
 
-XDG_CONFIG_DIR = os.environ.get('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
+XDG_CONFIG_DIR = os.environ.get('XDG_CONFIG_HOME',
+                                os.path.expanduser('~/.config'))
 
 #TODO: Figure out how best to put this in the config file.
 POSITIONS = {
-    'left'           : (
-        (0,         0,   0.5,       1),
-        (0,         0,   1.0/3,     1),
-        (0,         0,   1.0/3 * 2, 1)
+    'left': (
+        (0,         0,   0.5,         1),
+        (0,         0,   1.0 / 3,     1),
+        (0,         0,   1.0 / 3 * 2, 1)
     ),
-    'middle'         : (
-        (0,         0,   1,         1),
-        (1.0/3,     0,   1.0/3,     1),
-        (1.0/6,     0,   1.0/3 * 2, 1)
+    'middle': (
+        (0,           0,   1,           1),
+        (1.0 / 3,     0,   1.0 / 3,     1),
+        (1.0 / 6,     0,   1.0 / 3 * 2, 1)
     ),
-    'right'          : (
-        (0.5,       0,   0.5,       1),
-        (1.0/3 * 2, 0,   1.0/3,     1),
-        (1.0/3,     0,   1.0/3 * 2, 1)
+    'right': (
+        (0.5,         0,   0.5,         1),
+        (1.0 / 3 * 2, 0,   1.0 / 3,     1),
+        (1.0 / 3,     0,   1.0 / 3 * 2, 1)
     ),
-    'top'            : (
-        (0,         0,   1,         0.5),
-        (1.0/3,     0,   1.0/3,     0.5)
+    'top': (
+        (0,           0,   1,           0.5),
+        (1.0 / 3,     0,   1.0 / 3,     0.5)
     ),
-    'bottom'         : (
-        (0,         0.5, 1,         0.5),
-        (1.0/3,     0.5, 1.0/3,     0.5)
+    'bottom': (
+        (0,           0.5, 1,           0.5),
+        (1.0 / 3,     0.5, 1.0 / 3,     0.5)
     ),
-    'top-left'       : (
-        (0,         0,   0.5,       0.5),
-        (0,         0,   1.0/3,     0.5),
-        (0,         0,   1.0/3 * 2, 0.5)
+    'top-left': (
+        (0,         0,   0.5,         0.5),
+        (0,         0,   1.0 / 3,     0.5),
+        (0,         0,   1.0 / 3 * 2, 0.5)
     ),
-    'top-right'      : (
-        (0.5,       0,   0.5,       0.5),
-        (1.0/3 * 2, 0,   1.0/3,     0.5),
-        (1.0/3,     0,   1.0/3 * 2, 0.5)
+    'top-right': (
+        (0.5,         0,   0.5,         0.5),
+        (1.0 / 3 * 2, 0,   1.0 / 3,     0.5),
+        (1.0 / 3,     0,   1.0 / 3 * 2, 0.5)
     ),
-    'bottom-left'    : (
-        (0,         0.5, 0.5,       0.5),
-        (0,         0.5, 1.0/3,     0.5),
-        (0,         0.5, 1.0/3 * 2, 0.5)
+    'bottom-left': (
+        (0,           0.5, 0.5,         0.5),
+        (0,           0.5, 1.0 / 3,     0.5),
+        (0,           0.5, 1.0 / 3 * 2, 0.5)
     ),
-    'bottom-right'   : (
-        (0.5,       0.5, 0.5,       0.5),
-        (1.0/3 * 2, 0.5, 1.0/3,     0.5),
-        (1.0/3,     0.5, 1.0/3 * 2, 0.5)
+    'bottom-right': (
+        (0.5,         0.5, 0.5,         0.5),
+        (1.0 / 3 * 2, 0.5, 1.0 / 3,     0.5),
+        (1.0 / 3,     0.5, 1.0 / 3 * 2, 0.5)
     ),
     'maximize'            : 'toggleMaximize',
     'monitor-switch'      : 'cycleMonitors',
     'vertical-maximize'   : ((None,      0,   None,      1),),
     'horizontal-maximize' : ((0,      None,   1,      None),),
     'move-to-center'      : 'moveCenter',
-} #: command-to-action mappings
+}  #: command-to-action mappings
 
 #NOTE: For keysyms outside the latin1 and miscellany groups, you must first
 #      call C{Xlib.XK.load_keysym_group()} with the name (minus extension) of
@@ -163,13 +164,13 @@ DEFAULTS = {
         "H"        : "horizontal-maximize",
         "C"        : "move-to-center",
     }
-} #: Default content for the config file
+}  #: Default content for the config file
 
 KEYLOOKUP = {
-    ',' : 'comma',
-    '.' : 'period',
-    '+' : 'plus',
-    '-' : 'minus',
+    ',': 'comma',
+    '.': 'period',
+    '+': 'plus',
+    '-': 'minus',
 }
 
 def powerset(iterable):
@@ -207,8 +208,8 @@ class WindowManager(object):
     def cmd_cycleMonitors(self, window=None):
         """
         Cycle the specified window (the active window if none was explicitly
-        specified) between monitors while leaving the position within the monitor
-        unchanged.
+        specified) between monitors while leaving the position within the
+        monitor unchanged.
 
         @returns: The target monitor ID or None if the current window could not
             be found.
@@ -272,12 +273,12 @@ class WindowManager(object):
 
     def cycleDimensions(self, dimensions, window=None):
         """
-        Given a window and a list of 4-tuples containing dimensions as a decimal
-        percentage of monitor size, cycle through the list, taking one step each
-        time this function is called.
+        Given a window and a list of 4-tuples containing dimensions as a
+        decimal percentage of monitor size, cycle through the list, taking one
+        step each time this function is called.
 
-        If the window's dimensions are not in the list, set them to the first list
-        entry.
+        If the window's dimensions are not in the list, set them to the first
+        list entry.
 
         @returns: The new window dimensions.
         @rtype: C{gtk.gdk.Rectangle}
@@ -347,9 +348,9 @@ class WindowManager(object):
             return None
 
         dims = (int((monitorGeom.width - winGeom.width) / 2),
-                 int((monitorGeom.height - winGeom.height) / 2),
-                 int(winGeom.width),
-                 int(winGeom.height))
+                int((monitorGeom.height - winGeom.height) / 2),
+                int(winGeom.width),
+                int(winGeom.height))
 
         logging.debug("dims %r", dims)
 
@@ -358,7 +359,6 @@ class WindowManager(object):
         logging.debug("result %r", tuple(result))
         self.reposition(win, result, monitorGeom)
         return result
-
 
     def doCommand(self, command):
         """Resolve a textual positioning command and execute it.
@@ -440,13 +440,14 @@ class WindowManager(object):
         monitor ID (for multi-head desktops).
 
         Returns (None, None, None, None) if the specified window is a desktop
-        window or if no window was specified and _NET_ACTIVE_WINDOW is unsupported.
+        window or if no window was specified and _NET_ACTIVE_WINDOW is
+        unsupported.
 
         @type win: C{gtk.gdk.Window}
         @rtype: tuple
 
         @note: Window geometry is relative to the monitor, not the desktop.
-        @note: Checks for _NET* must remain here here since WMs support --replace
+        @note: Checks for _NET* must remain here since WMs support --replace
         @todo: Confirm that changing WMs doesn't mess up quicktile.
         """
         # Get the active window
@@ -459,7 +460,7 @@ class WindowManager(object):
         monitorGeom = self._root.get_monitor_geometry(monitorID)
 
         #TODO: Support non-rectangular usable areas. (eg. Xinerama)
-        # (And, once I've got a solution, mention it on http://stackoverflow.com/q/2598580/435253 )
+        # (And share my solution on http://stackoverflow.com/q/2598580/435253 )
         #
         # Potentially-useful stuff:
         # - http://old.nabble.com/Re%3A-_NET_WORKAREA-and-multiple-monitors-p24812662.html
@@ -491,7 +492,7 @@ class WindowManager(object):
         #Workaround for my inability to reliably detect maximization.
         win.unmaximize()
 
-        #FIXME: This needs to either ignore, reset, or compensate for window gravity
+        #FIXME: Ignore, reset, or compensate for window gravity
         border, titlebar = self.get_frame_thickness(win)
         win.move_resize(geom.x + monitor.x, geom.y + monitor.y,
                 geom.width - (border * 2), geom.height - (titlebar + border))
@@ -509,7 +510,8 @@ class QuickTileApp(object):
         """Setup dbus-python components in the PyGTK event loop"""
         class QuickTile(dbus.service.Object):
             def __init__(self):
-                dbus.service.Object.__init__(self, sessBus, '/com/ssokolow/QuickTile')
+                dbus.service.Object.__init__(self, sessBus,
+                                             '/com/ssokolow/QuickTile')
 
             @dbus.service.method(dbus_interface='com.ssokolow.QuickTile',
                      in_signature='s', out_signature='b')
@@ -535,14 +537,17 @@ class QuickTileApp(object):
             transKey = key
             if key in KEYLOOKUP:
                 transKey = KEYLOOKUP[key]
-            self.keys[self.xdisp.keysym_to_keycode(string_to_keysym(transKey))] = self._keys[key]
+            code = self.xdisp.keysym_to_keycode(string_to_keysym(transKey))
+            self.keys[code] = self._keys[key]
 
         # Resolve strings to X11 mask constants for the modifier mask
         try:
-            modmask = reduce(operator.ior, [getattr(X, "%sMask" % x) for x in self._modkeys])
+            modmask = reduce(operator.ior, [getattr(X, "%sMask" % x)
+                             for x in self._modkeys])
         except Exception, err:
             logging.error("Error while resolving modifier key mask: %s", err)
-            logging.error("Not binding keys for safety reasons. (eg. What if Ctrl+C got bound?)")
+            logging.error("Not binding keys for safety reasons. "
+                          "(eg. What if Ctrl+C got bound?)")
             modmask = 0
         else:
             self.xdisp.set_error_handler(self.handle_xerror)
@@ -552,7 +557,8 @@ class QuickTileApp(object):
                 #Ignore all combinations of Mod2 (NumLock) and Lock (CapsLock)
                 for ignored in powerset([X.Mod2Mask, X.LockMask, X.Mod5Mask]):
                     ignored = reduce(lambda x, y: x | y, ignored, 0)
-                    self.xroot.grab_key(keycode, modmask | ignored, 1, X.GrabModeAsync, X.GrabModeAsync)
+                    self.xroot.grab_key(keycode, modmask | ignored, 1,
+                                        X.GrabModeAsync, X.GrabModeAsync)
 
         # If we don't do this, then nothing works.
         # I assume it flushes the XGrabKey calls to the server.
@@ -563,7 +569,8 @@ class QuickTileApp(object):
                 " names and that the keys are not already bound.")
 
         # Merge python-xlib into the Glib event loop
-        gobject.io_add_watch(self.xroot.display, gobject.IO_IN, self.handle_xevent)
+        gobject.io_add_watch(self.xroot.display,
+                             gobject.IO_IN, self.handle_xevent)
 
     def run(self):
         if XLIB_PRESENT:
@@ -577,7 +584,8 @@ class QuickTileApp(object):
             logging.warn("Could not connect to the D-Bus Session Bus.")
 
         if not (XLIB_PRESENT or DBUS_PRESENT):
-            raise DependencyError("Neither the Xlib nor the D-Bus backends were available.")
+            raise DependencyError("Neither the Xlib nor the D-Bus backends "
+                                  "were available.")
 
         gtk.main()
 
@@ -602,7 +610,8 @@ class QuickTileApp(object):
                 if keycode in self.keys:
                     self.wm.doCommand(self.keys[keycode])
                 else:
-                    logging.error("Received an event for an unrecognized keycode: %s" % keycode)
+                    logging.error("Received an event for an unrecognized "
+                                  "keycode: %s" % keycode)
         return True
 
     def showBinds(self):
@@ -622,12 +631,13 @@ if __name__ == '__main__':
     from optparse import OptionParser, OptionGroup
     parser = OptionParser(usage="%prog [options] [action] ...",
             version="%%prog v%s" % __version__)
-    parser.add_option('-d', '--daemonize', action="store_true", dest="daemonize",
-        default=False, help="Attempt to set up global keybindings using "
-        "python-xlib and a D-Bus service using dbus-python. Exit if neither "
-        "succeeds")
-    parser.add_option('-b', '--bindkeys', action="store_true", dest="daemonize",
-        default=False, help="Deprecated alias for --daemonize")
+    parser.add_option('-d', '--daemonize', action="store_true",
+        dest="daemonize", default=False, help="Attempt to set up global "
+        "keybindings using python-xlib and a D-Bus service using dbus-python. "
+        "Exit if neither succeeds")
+    parser.add_option('-b', '--bindkeys', action="store_true",
+        dest="daemonize", default=False,
+        help="Deprecated alias for --daemonize")
     parser.add_option('--debug', action="store_true", dest="debug",
         default=False, help="Display debug messages")
     parser.add_option('--no-workarea', action="store_true", dest="no_workarea",
@@ -636,9 +646,10 @@ if __name__ == '__main__':
 
     help_group = OptionGroup(parser, "Additional Help")
     help_group.add_option('--show-bindings', action="store_true",
-        dest="showBinds", default=False, help="List all configured keybindings")
-    help_group.add_option('--show-actions', action="store_true", dest="showArgs",
-        default=False, help="List valid arguments for use without --daemonize")
+        dest="showBinds", default=False, help="List all configured keybinds")
+    help_group.add_option('--show-actions', action="store_true",
+        dest="showArgs", default=False, help="List valid arguments for use "
+        "without --daemonize")
     parser.add_option_group(help_group)
 
     opts, args = parser.parse_args()
@@ -652,8 +663,9 @@ if __name__ == '__main__':
     first_run = not os.path.exists(cfg_path)
 
     config = RawConfigParser()
-    config.optionxform = str # Make keys case-sensitive
-    #TODO: Maybe switch to two config files so I can have only the keys in the keymap case-sensitive?
+    config.optionxform = str  # Make keys case-sensitive
+    #TODO: Maybe switch to two config files so I can have only the keys in the
+    #      keymap case-sensitive?
     config.read(cfg_path)
     dirty = False
 
@@ -688,7 +700,8 @@ if __name__ == '__main__':
         if first_run:
             logging.info("Wrote default config file to %s", cfg_path)
 
-    ignore_workarea = (not config.getboolean('general', 'UseWorkarea')) or opts.no_workarea
+    ignore_workarea = ((not config.getboolean('general', 'UseWorkarea'))
+                       or opts.no_workarea)
 
     wm = WindowManager(POSITIONS, ignore_workarea=ignore_workarea)
     app = QuickTileApp(wm, keymap, modkeys=modkeys)
