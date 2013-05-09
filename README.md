@@ -11,7 +11,7 @@
 If you are running an APT-based Linux distribution with Debian-compatible
 package names (like the Ubuntu family of distros), you can install these
 dependencies via your package manager with
-[one click](apt:python,python-gtk2,python-xlib,python-dbus).
+[one click](apt://python,python-gtk2,python-xlib,python-dbus).
 
 Due to changes in how GTK+ and X11 are accessed, support for Python 3 is
 non-trivial and has been delayed by the author's courseload.
