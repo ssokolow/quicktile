@@ -16,7 +16,7 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
 @todo:
  - Reconsider use of --daemonize. That tends to imply self-backgrounding.
  - Try de-duplicating "This temporary hack prevents an Exception with MPlayer."
- - Look into supporting xpyb (the Python equivalent to libxcb) for globalk
+ - Look into supporting xpyb (the Python equivalent to libxcb) for global
    keybinding.
  - Clean up the code. It's functional, but an ugly rush-job.
  - Decide how to handle maximization and stick with it.
