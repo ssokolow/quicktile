@@ -307,18 +307,20 @@ class GlobalsObject(object):
     def read_monitors_areas(self):
         """Read Monitor(s) Area(s)"""
         strut_windows = self.enumerate_strut_windows(self.disp, self.root)
+        logging.debug("Struts: %r", strut_windows)
         screen = gtk.gdk.screen_get_default()
         self.num_monitors = screen.get_n_monitors()
         self.monitors_areas = []
         drawing_area_size = [0, 0]
         for num_monitor in range(self.num_monitors):
             rect = screen.get_monitor_geometry(num_monitor)
+            logging.debug("Monitor %d: %r", num_monitor, rect)
             self.monitors_areas.append([rect.x, rect.y, rect.width, rect.height])
             if rect.x + rect.width > drawing_area_size[0]: drawing_area_size[0] = rect.x + rect.width
             if rect.y + rect.height > drawing_area_size[1]: drawing_area_size[1] = rect.y + rect.height
             for strut_win in strut_windows:
                 self.monitors_areas[-1] = self.subtract_areas(self.monitors_areas[-1], strut_win)
-        #print self.monitors_areas
+            logging.debug("Monitor %d working area: %r", num_monitor, self.monitors_areas[-1])
         self.drawing_rect = gtk.gdk.Rectangle(0, 0, drawing_area_size[0]/self.DRAW_SCALE,
                                               drawing_area_size[1]/self.DRAW_SCALE)
 
@@ -449,6 +451,7 @@ class WindowManager(object):
         if not dims:
             return None
 
+        logging.debug("monitorGeom %r", monitorGeom)
         logging.debug("winGeom %r", tuple(winGeom))
         logging.debug("dims %r", dims)
 
@@ -873,8 +876,3 @@ if __name__ == '__main__':
             if not opts.showArgs:
                 print "\nUse --help for a list of valid options."
                 sys.exit(errno.ENOENT)
-
-        for arg in args:
-            wm.doCommand(arg)
-        while gtk.events_pending():
-            gtk.main_iteration()
