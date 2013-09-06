@@ -38,6 +38,7 @@ References and code used:
  - http://faq.pygtk.org/index.py?req=show&file=faq23.039.htp
  - http://www.larsen-b.com/Article/184.html
  - http://www.pygtk.org/pygtk2tutorial/sec-MonitoringIO.html
+ - http://www.giuspen.com/x-tile/
 
 @newfield appname: Application Name
 """
@@ -50,6 +51,7 @@ __license__ = "GNU GPL 2.0 or later"
 import pygtk
 pygtk.require('2.0')
 
+import ctypes, ctypes.util
 import errno, gtk, gobject, operator, logging, os, sys
 from ConfigParser import RawConfigParser
 from heapq import heappop, heappush
@@ -182,6 +184,146 @@ class DependencyError(Exception):
     """Raised when a required dependency is missing."""
     pass
 
+# NOTE: Code pulled from X-Tile to get useable monitor areas
+# Many thanks to Giuseppe Penone <giuspen@gmail.com> for figuring this out in X-Tile, this code
+# is copied from there.
+#
+# The following class uses xlib directly to figure out the useable working area for
+# each monitor by subtracting the struts from the total geometry
+class GlobalsObject(object):
+    """Global Variables"""
+
+    #TODO: There are many things in this that could probably be used throughout quicktile
+    # in place of the direct way they are being looked up now
+
+    def __init__(self):
+        """Instantiate global vars"""
+        self.x11 = ctypes.CDLL(ctypes.util.find_library("X11"))
+        self.DRAW_SCALE = 4
+        self.disp = self.x11.XOpenDisplay(0)
+        self.root = self.x11.XDefaultRootWindow(self.disp)
+        self.ret_type = ctypes.c_long()
+        self.ret_format = ctypes.c_long()
+        self.num_items = ctypes.c_long()
+        self.bytes_after = ctypes.c_long()
+        self.ret_pointer = ctypes.pointer(ctypes.c_long())
+        self.XA_CARDINAL = 6
+        self.num_monitors = gtk.gdk.screen_get_default().get_n_monitors()
+
+    def get_property(self, prop_name, window, data_type):  #128*256 longs (128kb) should be good enough...
+        """   gets an x property puts in global return variables
+            property name, window, return data type atom   """
+        prop_atom = self.x11.XInternAtom(self.disp, prop_name, False)
+        self.x11.XGetWindowProperty(self.disp, window, prop_atom, 0, 128*256, False, data_type,
+                            ctypes.byref(self.ret_type), ctypes.byref(self.ret_format), ctypes.byref(self.num_items),
+                            ctypes.byref(self.bytes_after), ctypes.byref(self.ret_pointer))
+
+    def is_inside(self, p, pdim, a, adim):
+        """Returns True if p <---> p+dim is between a <---> a+dim"""
+        return ( (p+pdim/2 > a) and (p+pdim/2 < a+adim) )
+
+    def subtract_areas(self, white_area, black_area):
+        """Returns the white_area without the black_area"""
+        #print "white_area", white
+        #print "black_area", black_area
+        if not self.is_inside(black_area[0], black_area[2], white_area[0], white_area[2])\
+        or not self.is_inside(black_area[1], black_area[3], white_area[1], white_area[3]):
+            #print "not is_inside"
+            return white_area
+        # ignore the desktop strut
+        if black_area[2] > white_area[2]/2 and black_area[3] > white_area[3]/2:
+            #print "strut ignored"
+            return white_area
+        # we have to understand whether the panel is top, bottom, left or right
+        if black_area[2] < black_area[3]:
+            # width < height => this is a left or right panel
+            if black_area[0] == white_area[0]:
+                #print "left panel"
+                white_area[0] += black_area[2]
+                white_area[2] -= black_area[2]
+            else:
+                #print "right panel"
+                white_area[2] -= black_area[2]
+        else:
+            # width > height => this is a top or bottom panel
+            if black_area[1] == white_area[1]:
+                #print "top panel"
+                white_area[1] += black_area[3]
+                white_area[3] -= black_area[3]
+            else:
+                #print "bottom panel"
+                white_area[3] -= black_area[3]
+        return white_area
+
+    def translate_coords(self, win, x, y):
+        """
+        Bool XTranslateCoordinates(display, src_w, dest_w, src_x, src_y, dest_x_return,
+                                dest_y_return, child_return)
+        Display *display;
+        Window src_w, dest_w;
+        int src_x, src_y;
+        int *dest_x_return, *dest_y_return;
+        Window *child_return;
+        """
+        child_return = ctypes.c_ulong()
+        dest_x_return = ctypes.c_int()
+        dest_y_return = ctypes.c_int()
+        self.x11.XTranslateCoordinates(self.disp, win, self.root, x, y,
+                                    ctypes.byref(dest_x_return),
+                                    ctypes.byref(dest_y_return),
+                                    ctypes.byref(child_return))
+        return dest_x_return.value, dest_y_return.value
+
+    def enumerate_strut_windows(self, display, rootwindow):
+        """Retrieve the Strut Windows (the panels)"""
+        strut_windows = []
+        rootr = ctypes.c_ulong()
+        parent = ctypes.c_ulong()
+        children = ctypes.pointer(ctypes.c_ulong())
+        noOfChildren = ctypes.c_int()
+        x_return = ctypes.c_int()
+        y_return = ctypes.c_int()
+        width_return = ctypes.c_int()
+        height_return = ctypes.c_int()
+        dummy = ctypes.c_int()
+        self.get_property("_NET_WM_STRUT_PARTIAL", rootwindow, self.XA_CARDINAL)
+        if self.num_items.value:
+            self.x11.XGetGeometry(display, rootwindow, ctypes.byref(dummy),
+                                  ctypes.byref(x_return),ctypes.byref(y_return),
+                                  ctypes.byref(width_return), ctypes.byref(height_return),
+                                  ctypes.byref(dummy), ctypes.byref(dummy))
+            struct_origin = self.translate_coords(rootwindow, x_return.value, y_return.value)
+            strut_windows.append([struct_origin[0], struct_origin[1],
+                                  width_return.value, height_return.value])
+        status = self.x11.XQueryTree(display, rootwindow, ctypes.byref(rootr),ctypes.byref(parent),
+                                     ctypes.byref(children), ctypes.byref(noOfChildren))
+        if noOfChildren.value:
+            for i in range(0, noOfChildren.value):
+                ptr = ctypes.cast(children[i], ctypes.POINTER(ctypes.c_uint) )
+                strut_windows.extend(self.enumerate_strut_windows(display, children[i]))
+            self.x11.XFree(children)
+        return strut_windows
+
+    def read_monitors_areas(self):
+        """Read Monitor(s) Area(s)"""
+        strut_windows = self.enumerate_strut_windows(self.disp, self.root)
+        logging.debug("Struts: %r", strut_windows)
+        screen = gtk.gdk.screen_get_default()
+        self.num_monitors = screen.get_n_monitors()
+        self.monitors_areas = []
+        drawing_area_size = [0, 0]
+        for num_monitor in range(self.num_monitors):
+            rect = screen.get_monitor_geometry(num_monitor)
+            logging.debug("Monitor %d: %r", num_monitor, rect)
+            self.monitors_areas.append([rect.x, rect.y, rect.width, rect.height])
+            if rect.x + rect.width > drawing_area_size[0]: drawing_area_size[0] = rect.x + rect.width
+            if rect.y + rect.height > drawing_area_size[1]: drawing_area_size[1] = rect.y + rect.height
+            for strut_win in strut_windows:
+                self.monitors_areas[-1] = self.subtract_areas(self.monitors_areas[-1], strut_win)
+            logging.debug("Monitor %d working area: %r", num_monitor, self.monitors_areas[-1])
+        self.drawing_rect = gtk.gdk.Rectangle(0, 0, drawing_area_size[0]/self.DRAW_SCALE,
+                                              drawing_area_size[1]/self.DRAW_SCALE)
+
 class WindowManager(object):
     """A simple API-wrapper class for manipulating window positioning."""
     def __init__(self, commands, screen=None, ignore_workarea=False):
@@ -204,6 +346,8 @@ class WindowManager(object):
         self._root = screen or gtk.gdk.screen_get_default()
         self.commands = commands
         self.ignore_workarea = ignore_workarea
+        self.glob = GlobalsObject()
+        self.glob.read_monitors_areas()
 
     def cmd_cycleMonitors(self, window=None):
         """
@@ -307,6 +451,7 @@ class WindowManager(object):
         if not dims:
             return None
 
+        logging.debug("monitorGeom %r", monitorGeom)
         logging.debug("winGeom %r", tuple(winGeom))
         logging.debug("dims %r", dims)
 
@@ -367,6 +512,7 @@ class WindowManager(object):
         @type command: C{str}
         @rtype: C{bool}
         """
+        logging.debug("Do Command: %r", command)
         int_command = self.commands.get(command, None)
         if isinstance(int_command, (tuple, list)):
             self.cycleDimensions(int_command)
@@ -459,17 +605,8 @@ class WindowManager(object):
         monitorID = self._root.get_monitor_at_window(win)
         monitorGeom = self._root.get_monitor_geometry(monitorID)
 
-        #TODO: Support non-rectangular usable areas. (eg. Xinerama)
-        # (And share my solution on http://stackoverflow.com/q/2598580/435253 )
-        #
-        # Potentially-useful stuff:
-        # - http://old.nabble.com/Re%3A-_NET_WORKAREA-and-multiple-monitors-p24812662.html
-        # - http://thread.gmane.org/gmane.comp.gnome.wm-spec/1531/focus=1772
-        # - http://standards.freedesktop.org/wm-spec/wm-spec-1.3.html#id2507618
         if not self.ignore_workarea and self._root.supports_net_wm_hint("_NET_WORKAREA"):
-            p = gtk.gdk.atom_intern('_NET_WORKAREA')
-            desktopGeo = self._root.get_root_window().property_get(p)[2][0:4]
-            monitorGeom = gtk.gdk.Rectangle(*desktopGeo).intersect(monitorGeom)
+            monitorGeom = gtk.gdk.Rectangle(*self.glob.monitors_areas[monitorID])
 
         # Get position relative to the monitor rather than the desktop
         winGeom = win.get_frame_extents()
@@ -736,3 +873,6 @@ if __name__ == '__main__':
             wm.doCommand(arg)
         while gtk.events_pending():
             gtk.main_iteration()
+            if not opts.showArgs:
+                print "\nUse --help for a list of valid options."
+                sys.exit(errno.ENOENT)
