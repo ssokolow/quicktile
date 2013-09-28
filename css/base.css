@@ -131,7 +131,7 @@ kbd.shell_cmd:before { content: "$ "; }
   background-color: #e6e6e6;
 }
 
-.btn:active { background-color: #cccccc \9; }
+.btn:active { background-color: #cccccc; }
 
 .btn:hover,
 .btn:focus {
