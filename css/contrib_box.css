@@ -1,0 +1,22 @@
+.contrib_box {
+    float: right;
+    font-size: 80%;
+    width: 10em;
+    padding: 5px 1ex 0;
+    background: white;
+    color: black;
+    text-align: center;
+
+    border: 1px solid rgb(187, 187, 187);
+    box-shadow: 3px 4px 0px 0px rgb(221, 221, 221);
+    -moz-box-shadow: 3px 4px 0px 0px rgb(221, 221, 221);
+    -webkit-box-shadow: 3px 4px 0px 0px rgb(221, 221, 221);
+}
+.contrib_box dd { margin: 2px 0; }
+
+ul.icons {
+    padding: 0;
+    text-align: center;
+    list-style-type: none;
+}
+ul.icons li, ul.icons form { display: inline; }

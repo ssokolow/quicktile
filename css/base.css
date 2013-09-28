@@ -49,15 +49,6 @@ h2 { font-size: 1.5em; color: #000000; }
 
 .filename { font-family: monospace; }
 .download { float: right; }
-.flattr_btn {
-    float: right;
-    margin-left: 0.5ex;
-    margin-right: 0.5ex;
-}
-.flattr_btn .gitforked-button-container {
-    display: block;
-    margin: 0 auto 1ex;
-}
 
 .footer {
     text-align: center;
@@ -87,6 +78,9 @@ pre {
     -moz-box-shadow: inset 2px 3px 5px black, 0px 1px 1px #333;
     -webkit-box-shadow: inset 2px 3px 5px black, 0px 1px 1px #333;
 }
+
+/* Workaround for contrib_box and <pre> interaction */
+pre { margin-right: 13em; }
 
 /* Draw the prompt in CSS for easy copy-paste */
 kbd.shell_cmd:before { content: "$ "; }
