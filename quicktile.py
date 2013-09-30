@@ -298,7 +298,6 @@ class WindowManager(object):
         # Resolve proportional (eg. 0.5) and preserved (None) coordinates
         dims = []
         for tup in dimensions:
-
             current_dim = []
             for pos, val in enumerate(tup):
                 if val is None:
@@ -494,7 +493,7 @@ class WindowManager(object):
     def getGeometries(self, win=None):
         """
         Get the geometry for the given window (including window decorations)
-        and the monitor it's on. If not window is specified, the active window
+        and the monitor it's on. If no window is specified, the active window
         is used.
 
         Returns a tuple of the window object, a gtk.gdk.Region object
