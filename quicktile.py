@@ -313,7 +313,6 @@ class WindowManager(object):
         if not dims:
             return None
 
-        logging.debug("winGeom %r", tuple(winGeom))
         logging.debug("dims %r", dims)
 
         # Calculate euclidean distances between the window's current geometry
@@ -344,10 +343,6 @@ class WindowManager(object):
         @rtype: C{gtk.gdk.Rectangle}
         """
         win, usableArea, winGeom = self.getGeometries(window)[0:3]
-
-        logging.debug("win %r", win)
-        logging.debug("monitorGeom %r", tuple(monitorGeom))
-        logging.debug("winGeom %r", tuple(winGeom))
 
         # This temporary hack prevents an Exception with MPlayer.
         if not usableArea:
@@ -533,6 +528,10 @@ class WindowManager(object):
         winGeom.x -= monitorGeom.x
         winGeom.y -= monitorGeom.y
 
+        logging.debug("win %r", win)
+        logging.debug("clipBox %r", usableArea.get_rectangles())
+        logging.debug("winGeom %r", tuple(winGeom))
+        logging.debug("monitorID %r", monitorID)
         return win, usableArea, winGeom, monitorID
 
     def reposition(self, win, geom, monitor=gtk.gdk.Rectangle(0, 0, 0, 0)):
