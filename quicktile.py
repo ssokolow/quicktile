@@ -219,7 +219,7 @@ class WindowManager(object):
               win.get_state() seems to be broken.
         """
 
-        win, _, winGeom, monitorID = self.getGeometries(window)
+        win, _, _, winGeom, monitorID = self.getGeometries(window)
 
         if monitorID is None:
             return None
@@ -283,7 +283,7 @@ class WindowManager(object):
         @returns: The new window dimensions.
         @rtype: C{gtk.gdk.Rectangle}
         """
-        win, usableArea, winGeom = self.getGeometries(window)[0:3]
+        win, usableArea, usableRect, winGeom = self.getGeometries(window)[0:4]
 
         # This temporary hack prevents an Exception with MPlayer.
         if not usableArea:
@@ -329,9 +329,18 @@ class WindowManager(object):
         else:
             pos = 0
         result = gtk.gdk.Rectangle(*dims[pos])
+        result.x += clipBox.x
+        result.y += clipBox.y
+
+        # If we're overlapping a panel, fall back to a monitor-specific
+        # analogue to _NET_WORKAREA to prevent the WM from potentially meddling
+        # with the result of resposition()
+        if not usableArea.rect_in(result) == gtk.gdk.OVERLAP_RECTANGLE_IN:
+            logging.debug("Result overlaps panel. Falling back to usableRect.")
+            result = result.intersect(usableRect)
 
         logging.debug("result %r", tuple(result))
-        self.reposition(win, result, clipBox)
+        self.reposition(win, result)
         return result
 
     def cmd_moveCenter(self, window=None):
@@ -341,20 +350,14 @@ class WindowManager(object):
         @returns: The new window dimensions.
         @rtype: C{gtk.gdk.Rectangle}
         """
-        win, usableArea, winGeom = self.getGeometries(window)[0:3]
+        win, _, usableRect, winGeom = self.getGeometries(window)[0:4]
 
         # This temporary hack prevents an Exception with MPlayer.
-        if not usableArea:
+        if not usableRect:
             return None
 
-        #TODO: Calculate _NET_WORKAREA for the monitor represented by
-        #      usableArea and use that instead.
-        #      (The clipbox will extend under any panels that don't fill 100%
-        #       of their edge of the screen.)
-        clipBox = usableArea.get_clipbox()
-
-        dims = (int((clipBox.width - winGeom.width) / 2),
-                int((clipBox.height - winGeom.height) / 2),
+        dims = (int((usableRect.width - winGeom.width) / 2),
+                int((usableRect.height - winGeom.height) / 2),
                 int(winGeom.width),
                 int(winGeom.height))
 
@@ -363,7 +366,7 @@ class WindowManager(object):
         result = gtk.gdk.Rectangle(*dims)
 
         logging.debug("result %r", tuple(result))
-        self.reposition(win, result, clipBox)
+        self.reposition(win, result, usableRect)
         return result
 
     def doCommand(self, command):
@@ -445,15 +448,20 @@ class WindowManager(object):
         @type monitor: C{int} or C{gtk.gdk.Rectangle}
         @type ignore_struts: C{bool}
 
-        @returns: The usable area.
-        @rtype: C{gtk.gdk.Region}
+        @returns: The usable area as a region and biggest rectangular subset.
+        @rtype: C{gtk.gdk.Region}, C{gtk.gdk.Rectangle}
         """
         if isinstance(monitor, int):
-            monitor = self._root.get_monitor_geometry(monitor)
-        usableRegion = gtk.gdk.region_rectangle(monitor)
+            usableRect = self._root.get_monitor_geometry(monitor)
+        elif not isinstance(monitor, gtk.gdk.Rectangle):
+            usableRect = gtk.gdk.Rectangle(monitor)
+        else:
+            usableRect = monitor
+        usableRegion = gtk.gdk.region_rectangle(usableRect)
+
 
         if ignore_struts:
-            return usableRegion
+            return usableRegion, usableRect
 
         rootWin = self._root.get_root_window()
 
@@ -479,16 +487,29 @@ class WindowManager(object):
                 _Su(_w - g[1], g[6], g[1], g[7] - g[6] + 1)     # right
                 _Su(g[8], 0, g[9] - g[8] + 1, g[2])             # top
                 _Su(g[10], _h - g[3], g[11] - g[10] + 1, g[3])  # bottom
+
+            # Generate a more restrictive version used as a fallback
+            usableRect = usableRegion.copy()
+            _Su = lambda *g: usableRect.subtract(gtk.gdk.region_rectangle(g))
+            for g in struts:
+                # http://standards.freedesktop.org/wm-spec/1.5/ar01s05.html
+                # XXX: Must not cache unless watching for notify events.
+                _Su(0, g[4], g[0], _h)          # left
+                _Su(_w - g[1], g[6], g[1], _h)  # right
+                _Su(0, 0, _w, g[2])             # top
+                _Su(0, _h - g[3], _w, g[3])     # bottom
                 # TODO: The required "+ 1" in certain spots confirms that we're
                 #       going to need unit tests which actually check that the
                 #       WM's code for constraining windows to the usable area
-                #       has no off-by-one bugs.
+                #       doesn't cause off-by-one bugs.
                 #TODO: Share this on http://stackoverflow.com/q/2598580/435253
+            usableRect = usableRect.get_clipbox()
         elif self._root.supports_net_wm_hint("_NET_WORKAREA"):
             desktopGeo = tuple(rootWin.property_get('_NET_WORKAREA')[2][0:4])
             usableRegion.intersect(gtk.gdk.region_rectangle(desktopGeo))
+            usableRect = usableRegion.get_clipbox()
 
-        return usableRegion
+        return usableRegion, usableRect
 
     def getGeometries(self, win=None):
         """
@@ -511,16 +532,17 @@ class WindowManager(object):
         @note: Window geometry is relative to the monitor, not the desktop.
         @note: Checks for _NET* must remain here since WMs support --replace
         @todo: Confirm that changing WMs doesn't mess up quicktile.
+        @todo: Convert this into part of a decorator for command methods.
         """
         # Get the active window
         win = win or self.get_active_window()
         if not win:
-            return None, None, None, None
+            return None, None, None, None, None
 
         #FIXME: How do I retrieve the root window from a given one?
         monitorID = self._root.get_monitor_at_window(win)
         monitorGeom = self._root.get_monitor_geometry(monitorID)
-        usableArea = self.get_workarea(monitorGeom, self.ignore_workarea)
+        useArea, useRect = self.get_workarea(monitorGeom, self.ignore_workarea)
 
         # Get position relative to the monitor rather than the desktop
         winGeom = win.get_frame_extents()
@@ -528,10 +550,11 @@ class WindowManager(object):
         winGeom.y -= monitorGeom.y
 
         logging.debug("win %r", win)
-        logging.debug("clipBox %r", usableArea.get_rectangles())
+        logging.debug("useArea %r", useArea.get_rectangles())
+        logging.debug("useRect %r", useRect)
         logging.debug("winGeom %r", tuple(winGeom))
         logging.debug("monitorID %r", monitorID)
-        return win, usableArea, winGeom, monitorID
+        return win, useArea, useRect, winGeom, monitorID
 
     def reposition(self, win, geom, monitor=gtk.gdk.Rectangle(0, 0, 0, 0)):
         """
