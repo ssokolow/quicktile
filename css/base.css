@@ -80,7 +80,7 @@ pre {
 }
 
 /* Workaround for contrib_box and <pre> interaction */
-.beside-contrib { margin-right: 13em; }
+.beside_contrib { margin-right: 13em; }
 
 /* Draw the prompt in CSS for easy copy-paste */
 kbd.shell_cmd:before { content: "$ "; }
