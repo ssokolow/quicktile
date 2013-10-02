@@ -141,7 +141,8 @@ POSITIONS = {
 #NOTE: For keysyms outside the latin1 and miscellany groups, you must first
 #      call C{Xlib.XK.load_keysym_group()} with the name (minus extension) of
 #      the appropriate module in site-packages/Xlib/keysymdef/*.py
-#TODO: Implement a LoadExtraKeysyms config key to support this.
+#TODO: Migrate to gtk.accelerator_parse() and gtk.accelerator_valid()
+#      Convert using '<%s>' % '><'.join(ModMask.split()))
 DEFAULTS = {
     'general': {
         # Use Ctrl+Alt as the default base for key combinations
@@ -571,7 +572,10 @@ class WindowManager(object):
         win.unmaximize()
 
         #FIXME: Ignore, reset, or compensate for window gravity
+        # Probably needs something like these:
+        #  request.GetWindowAttributes(display, window_id).{bit,win}_gravity
         border, titlebar = self.get_frame_thickness(win)
+
         win.move_resize(geom.x + monitor.x, geom.y + monitor.y,
                 geom.width - (border * 2), geom.height - (titlebar + border))
 
