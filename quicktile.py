@@ -4,9 +4,6 @@
 
 Thanks to Thomas Vander Stichele for some of the documentation cleanups.
 
-@bug: The L{WindowManager.cmd_toggleMaximize} method powering C{maximize} can't
-    unmaximize. (Workaround: Use one of the regular tiling actions)
-
 @todo:
  - Reconsider use of C{--daemonize}. That tends to imply self-backgrounding.
  - Try de-duplicating "This temporary hack prevents an Exception with MPlayer."
@@ -216,9 +213,6 @@ class WindowManager(object):
         @returns: The target monitor ID or C{None} if the current window could
             not be found.
         @rtype: C{int} or C{None}
-
-        @bug: I may have to hack up my own maximization detector since
-              C{win.get_state()} seems to be broken.
         """
 
         win, _, _, winGeom, monitorID = self.getGeometries(window)
@@ -234,12 +228,7 @@ class WindowManager(object):
         newMonitorGeom = self._root.get_monitor_geometry(newMonitorID)
         logging.debug("Moving window to monitor %s", newMonitorID)
 
-        if win.get_state() & gtk.gdk.WINDOW_STATE_MAXIMIZED:
-            self.cmd_toggleMaximize(win, False)
-            self.reposition(win, winGeom, newMonitorGeom)
-            self.cmd_toggleMaximize(win, True)
-        else:
-            self.reposition(win, winGeom, newMonitorGeom)
+        self.reposition(win, winGeom, newMonitorGeom, keep_maximize=True)
 
         return newMonitorID
 
@@ -255,22 +244,20 @@ class WindowManager(object):
         @returns: The target state as a boolean (C{True} = maximized) or
             C{None} if the active window could not be retrieved.
         @rtype: C{bool} or C{None}
-
-        @bug: C{win.unmaximize()} seems to have no effect or not get called
         """
-        win = win or self.get_active_window()
+        win = win or self._wnck_screen.get_active_window()
         if not win:
             return None
 
-        if state is False or (state is None and
-                (win.get_state() & gtk.gdk.WINDOW_STATE_MAXIMIZED)):
-            logging.debug('unmaximize')
-            win.unmaximize()
-            return False
+        if state is None:
+            state = not win.is_maximized()
+
+        logging.debug('maximize: %s', state)
+        if state:
+            win.maximize() if state else win.unmaximize()
         else:
-            logging.debug('maximize')
-            win.maximize()
-            return True
+            win.unmaximize()
+        return state
 
     def cycleDimensions(self, dimensions, window=None):
         """
@@ -401,52 +388,6 @@ class WindowManager(object):
             logging.error("Unrecognized command type for %r", int_command)
         return False
 
-    def get_active_window(self):
-        """
-        Retrieve the active window.
-
-        @rtype: C{gtk.gdk.Window} or C{None}
-        @returns: The GDK Window object for the active window or C{None} if the
-            C{_NET_ACTIVE_WINDOW} hint isn't supported or the desktop is the
-            active window.
-
-        @note: Checks for C{_NET*} must be done every time since WMs support
-               C{--replace}
-        """
-        # Get the root and active window
-        if (self._root.supports_net_wm_hint("_NET_ACTIVE_WINDOW") and
-                self._root.supports_net_wm_hint("_NET_WM_WINDOW_TYPE")):
-            win = self._root.get_active_window()
-        else:
-            return None
-
-        # Observed breaking quicktile with git-gui on Metacity
-        # TODO: Figure out how to prevent uncaught exceptions from making
-        #       quicktile unresponsive in the general case.
-        if win is None:
-            return None
-
-        # Do nothing if the desktop is the active window
-        # (The "not winType" check seems required for fullscreen MPlayer)
-        # Source: http://faq.pygtk.org/index.py?req=show&file=faq23.039.htp
-        winType = win.property_get("_NET_WM_WINDOW_TYPE")
-        logging.debug("NET_WM_WINDOW_TYPE: %r", winType)
-        if winType and winType[-1][0] == '_NET_WM_WINDOW_TYPE_DESKTOP':
-            return None
-
-        return win
-
-    def get_frame_thickness(self, win):
-        """Given a window, return a (border, titlebar) thickness tuple.
-        @type win: C{gtk.gdk.Window}
-
-        @returns: A tuple of the form (window border thickness,
-            titlebar thickness)
-        @rtype: C{tuple(int, int)}
-        """
-        _or, _ror = win.get_origin(), win.get_root_origin()
-        return _or[0] - _ror[0], _or[1] - _ror[1]
-
     def get_workarea(self, monitor, ignore_struts=False):
         """Retrieve the usable area of the specified monitor using
         the most expressive method the window manager supports.
@@ -547,28 +488,31 @@ class WindowManager(object):
         @todo: Convert this into part of a decorator for command methods.
         """
         # Get the active window
-        win = win or self.get_active_window()
+        win = win or self._wnck_screen.get_active_window()
+        logging.debug("win %r", win)
         if not win:
             return None, None, None, None, None
 
         #FIXME: How do I retrieve the root window from a given one?
-        monitorID = self._root.get_monitor_at_window(win)
+        #TODO: Look for a way to get the monitor without this many steps
+        gdkWin = gtk.gdk.window_foreign_new(win.get_xid())
+        monitorID = self._root.get_monitor_at_window(gdkWin)
         monitorGeom = self._root.get_monitor_geometry(monitorID)
         useArea, useRect = self.get_workarea(monitorGeom, self.ignore_workarea)
 
         # Get position relative to the monitor rather than the desktop
-        winGeom = win.get_frame_extents()
+        winGeom = gtk.gdk.Rectangle(*win.get_geometry())
         winGeom.x -= monitorGeom.x
         winGeom.y -= monitorGeom.y
 
-        logging.debug("win %r", win)
         logging.debug("useArea %r", useArea.get_rectangles())
         logging.debug("useRect %r", useRect)
         logging.debug("winGeom %r", tuple(winGeom))
         logging.debug("monitorID %r", monitorID)
         return win, useArea, useRect, winGeom, monitorID
 
-    def reposition(self, win, geom, monitor=gtk.gdk.Rectangle(0, 0, 0, 0)):
+    def reposition(self, win, geom, monitor=gtk.gdk.Rectangle(0, 0, 0, 0),
+            keep_maximize=False):
         """
         Position and size a window, decorations inclusive, according to the
         provided target window and monitor geometry rectangles.
@@ -576,25 +520,28 @@ class WindowManager(object):
         If no monitor rectangle is specified, position relative to the desktop
         as a whole.
 
+        @param keep_maximize: Whether to re-maximize a maximized window after
+            un-maximizing it to move it.
         @type win: C{gtk.gdk.Window}
         @type geom: C{gtk.gdk.Rectangle}
         @type monitor: C{gtk.gdk.Rectangle}
+        @type keep_maximize: C{bool}
 
-        @todo: Should this have a return value?
+        @todo: Also handle horizontal and vertical maximization when
+            C{keep_maximized=True}
         """
-        #Workaround for my inability to reliably detect maximization.
-        win.unmaximize()
-
-        border, titlebar = self.get_frame_thickness(win)
-
-        if isinstance(win, gtk.gdk.Window):
-            win = wnck.window_get(win.xid)
+        is_maxed = win.is_maximized()
+        if is_maxed:
+            win.unmaximize()
 
         win.set_geometry(wnck.WINDOW_GRAVITY_STATIC,
                 wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y |
                 wnck.WINDOW_CHANGE_WIDTH | wnck.WINDOW_CHANGE_HEIGHT,
                 geom.x + monitor.x, geom.y + monitor.y,
                 geom.width, geom.height)
+
+        if is_maxed and keep_maximize:
+            win.maximize()
 
 class QuickTileApp(object):
     """The basic Glib application itself."""
