@@ -6,12 +6,9 @@ title: FAQ
 <h2>Frequently/Potentially Asked Questions</h2>
 
 <dl class="big">
-    <dt>I have monitors of different sizes. How do I make QuickTile work properly?</dt>
-    <dd>
-        <p>With the default settings, when the current stable version of QuickTile is run in a system with multiple monitors of different sizes, it may not use all of the space on the larger monitor(s).</p>
-        <p>This happens because the current (easy) method QuickTile uses to avoid overlapping your DE's widget panels (the <code>_NET_WORKAREA</code> WM hint) can only return a rectangle, so your window manager calculates the largest rectangle which fits within the usable region.</p>
-        <p>If you don't mind QuickTile positioning your windows under/over any widget panels your desktop environment provides, you can set <code>UseWorkarea = False</code> in <code>~/.config/quicktile.cfg</code> to fix the problem.</p>
-        <p><strong>Update:</strong> A proper fix is currently being tested in the <a href="https://github.com/ssokolow/quicktile/tree/struts">struts branch</a>. (<a href="https://github.com/ssokolow/quicktile/archive/struts.zip">Zip Download</a>) Please report any regressions in <a href="https://github.com/ssokolow/quicktile/issues/4">issue #4</a> </p>
+    <dt>How do I keep QuickTile from positioning windows over/under my panels?</dt>
+    <dd><p>You've got an old <code>~/.config/quicktile.cfg</code> with a workaround for another problem that no longer exists.</p>
+        <p>Open it up and change <code>UseWorkarea = False</code> to <code>UseWorkarea = True</code></p>
     </dd>
 
     <dt>QuickTile resizes but doesn't move my windows. What do I do?</dt>

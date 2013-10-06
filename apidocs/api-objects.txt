@@ -23,10 +23,8 @@ quicktile.WindowManager.cycleDimensions	quicktile.WindowManager-class.html#cycle
 quicktile.WindowManager.getGeometries	quicktile.WindowManager-class.html#getGeometries
 quicktile.WindowManager.cmd_toggleMaximize	quicktile.WindowManager-class.html#cmd_toggleMaximize
 quicktile.WindowManager.__init__	quicktile.WindowManager-class.html#__init__
-quicktile.WindowManager.get_frame_thickness	quicktile.WindowManager-class.html#get_frame_thickness
 quicktile.WindowManager.get_workarea	quicktile.WindowManager-class.html#get_workarea
-quicktile.WindowManager.get_active_window	quicktile.WindowManager-class.html#get_active_window
+quicktile.WindowManager.cmd_moveCenter	quicktile.WindowManager-class.html#cmd_moveCenter
 quicktile.WindowManager.cmd_cycleMonitors	quicktile.WindowManager-class.html#cmd_cycleMonitors
 quicktile.WindowManager.reposition	quicktile.WindowManager-class.html#reposition
-quicktile.WindowManager.cmd_moveCenter	quicktile.WindowManager-class.html#cmd_moveCenter
 quicktile.WindowManager.doCommand	quicktile.WindowManager-class.html#doCommand

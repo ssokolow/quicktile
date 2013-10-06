@@ -170,7 +170,7 @@ object --+
         <tr>
           <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#cmd_moveCenter" class="summary-sig-name">cmd_moveCenter</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">window</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Center the window in the current monitor.</td>
+      Center the window in the monitor it currently occupies.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.cmd_moveCenter">source&nbsp;code</a></span>
             
@@ -200,41 +200,6 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>gtk.gdk.Screen</code> or <code>None</code></span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#get_active_window" class="summary-sig-name">get_active_window</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Retrieve the active window.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_active_window">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>tuple(int, int)</code></span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#get_frame_thickness" class="summary-sig-name">get_frame_thickness</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">win</span>)</span><br />
-      Given a window, return a (border, titlebar) thickness tuple.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_frame_thickness">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type"><code>gtk.gdk.Region</code>, <code>gtk.gdk.Rectangle</code></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -255,7 +220,16 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">tuple</span>
+      <span class="summary-type"><ul>
+        <li>
+          <code>(gtk.gdk.Window, gtk.gdk.Region, gtk.gdk.Rectangle, 
+          gtk.gdk.Rectangle, int)</code>
+        </li>
+        <li>
+          <code>(None, None, None, None)</code> (No window or 
+          <code>_NET_ACTIVE_WINDOW</code> unsupported)
+        </li>
+      </ul></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -274,14 +248,15 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>gtk.gdk.Rectangle</code></span>
+      <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#reposition" class="summary-sig-name">reposition</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">win</span>,
         <span class="summary-sig-arg">geom</span>,
-        <span class="summary-sig-arg">monitor</span>=<span class="summary-sig-default">gtk.gdk.Rectangle(0, 0, 0, 0)</span>)</span><br />
+        <span class="summary-sig-arg">monitor</span>=<span class="summary-sig-default">gtk.gdk.Rectangle(0, 0, 0, 0)</span>,
+        <span class="summary-sig-arg">keep_maximize</span>=<span class="summary-sig-default">False</span>)</span><br />
       Position and size a window, decorations inclusive, according to the 
       provided target window and monitor geometry rectangles.</td>
           <td align="right" valign="top">
@@ -421,11 +396,7 @@ object --+
         <dd>The target monitor ID or <code>None</code> if the current window 
           could not be found.</dd>
   </dl>
-<div class="fields">      <p><strong>Bug:</strong>
-        I may have to hack up my own maximization detector since 
-    <code>win.get_state()</code> seems to be broken.
-      </p>
-</div></td></tr></table>
+</td></tr></table>
 </div>
 <a name="cmd_toggleMaximize"></a>
 <div>
@@ -456,10 +427,7 @@ object --+
         <dd>The target state as a boolean (<code>True</code> = maximized) or 
           <code>None</code> if the active window could not be retrieved.</dd>
   </dl>
-<div class="fields">      <p><strong>Bug:</strong>
-        <code>win.unmaximize()</code> seems to have no effect or not get called
-      </p>
-</div></td></tr></table>
+</td></tr></table>
 </div>
 <a name="cycleDimensions"></a>
 <div>
@@ -508,7 +476,7 @@ object --+
     </td>
   </tr></table>
   
-  <p>Center the window in the current monitor.</p>
+  <p>Center the window in the monitor it currently occupies.</p>
   <dl class="fields">
     <dt>Returns: <code>gtk.gdk.Rectangle</code></dt>
         <dd>The new window dimensions.</dd>
@@ -553,59 +521,6 @@ object --+
   </dl>
 </td></tr></table>
 </div>
-<a name="get_active_window"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_active_window</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_active_window">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Retrieve the active window.</p>
-  <dl class="fields">
-    <dt>Returns: <code>gtk.gdk.Screen</code> or <code>None</code></dt>
-        <dd>The GDK Screen for the active window or None if the 
-          _NET_ACTIVE_WINDOW hint isn't supported or the desktop is the 
-          active window.</dd>
-  </dl>
-<div class="fields">      <p><strong>Note:</strong>
-        Checks for _NET* must be done every time since WMs support 
-        --replace
-      </p>
-</div></td></tr></table>
-</div>
-<a name="get_frame_thickness"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_frame_thickness</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">win</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_frame_thickness">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Given a window, return a (border, titlebar) thickness tuple.</p>
-  <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>win</code></strong> (<code>gtk.gdk.Window</code>)</li>
-    </ul></dd>
-    <dt>Returns: <code>tuple(int, int)</code></dt>
-        <dd>A tuple of the form (window border thickness, titlebar thickness)</dd>
-  </dl>
-</td></tr></table>
-</div>
 <a name="get_workarea"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -629,10 +544,10 @@ object --+
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>monitor</code></strong> (<code>int</code> or <code>gtk.gdk.Rectangle</code>) - The number or dimensions of the desired monitor.</li>
         <li><strong class="pname"><code>ignore_struts</code></strong> (<code>bool</code>) - If <code>True</code>, just return the size of the whole monitor, 
-          allowing windows to cover or be covered by panels.</li>
+          allowing windows to overlap panels.</li>
     </ul></dd>
     <dt>Returns: <code>gtk.gdk.Region</code>, <code>gtk.gdk.Rectangle</code></dt>
-        <dd>The usable area as a region and biggest rectangular subset.</dd>
+        <dd>The usable region and its largest rectangular subset.</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -654,19 +569,43 @@ object --+
   <p>Get the geometry for the given window (including window decorations) 
   and the monitor it's on. If no window is specified, the active window is 
   used.</p>
-  <p>Returns a tuple of the window object, a gtk.gdk.Region object 
-  representing the usable portion of the monitor, a gtk.gdk.Rectangle 
-  object containing the window geometry, and the monitor ID (for multi-head
-  desktops).</p>
-  <p>Returns (None, None, None, None) if the specified window is a desktop 
-  window or if no window was specified and _NET_ACTIVE_WINDOW is 
-  unsupported.</p>
+  <p>Returns a tuple consisting of:</p>
+  <ul>
+    <li>
+      <code>win</code> or the <code>gtk.gdk.Window</code> for the active 
+      window
+    </li>
+    <li>
+      A <code>gtk.gdk.Region</code> representing the usable portion of the 
+      monitor
+    </li>
+    <li>
+      A <code>gtk.gdk.Rectangle</code> representing the largest usable 
+      rectangle on the given monitor.
+    </li>
+    <li>
+      A <code>gtk.gdk.Rectangle</code> representing containing the window 
+      geometry
+    </li>
+    <li>
+      The monitor ID number (for multi-head desktops)
+    </li>
+  </ul>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>win</code></strong> (<code>gtk.gdk.Window</code>)</li>
     </ul></dd>
-    <dt>Returns: tuple</dt>
+    <dt>Returns: <ul>
+        <li>
+          <code>(gtk.gdk.Window, gtk.gdk.Region, gtk.gdk.Rectangle, 
+          gtk.gdk.Rectangle, int)</code>
+        </li>
+        <li>
+          <code>(None, None, None, None)</code> (No window or 
+          <code>_NET_ACTIVE_WINDOW</code> unsupported)
+        </li>
+      </ul></dt>
   </dl>
 <div class="fields">      <strong>Notes:</strong>
       <ul class="nomargin-top">
@@ -698,7 +637,8 @@ object --+
   <h3 class="epydoc"><span class="sig"><span class="sig-name">reposition</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">win</span>,
         <span class="sig-arg">geom</span>,
-        <span class="sig-arg">monitor</span>=<span class="sig-default">gtk.gdk.Rectangle(0, 0, 0, 0)</span>)</span>
+        <span class="sig-arg">monitor</span>=<span class="sig-default">gtk.gdk.Rectangle(0, 0, 0, 0)</span>,
+        <span class="sig-arg">keep_maximize</span>=<span class="sig-default">False</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.reposition">source&nbsp;code</a></span>&nbsp;
@@ -712,11 +652,18 @@ object --+
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>keep_maximize</code></strong> (<code>bool</code>) - Whether to re-maximize a maximized window after un-maximizing it 
+          to move it.</li>
         <li><strong class="pname"><code>win</code></strong> (<code>gtk.gdk.Window</code>)</li>
+        <li><strong class="pname"><code>geom</code></strong> (<code>gtk.gdk.Rectangle</code>)</li>
+        <li><strong class="pname"><code>monitor</code></strong> (<code>gtk.gdk.Rectangle</code>)</li>
     </ul></dd>
-    <dt>Returns: <code>gtk.gdk.Rectangle</code></dt>
   </dl>
-</td></tr></table>
+<div class="fields">      <p><strong>To Do:</strong>
+        Also handle horizontal and vertical maximization when 
+    <code>keep_maximized=True</code>
+      </p>
+</div></td></tr></table>
 </div>
 <br />
 <!-- ==================== NAVIGATION BAR ==================== -->
@@ -745,7 +692,7 @@ object --+
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Oct  6 06:27:40 2013
+    Generated by Epydoc 3.0.1 on Sun Oct  6 09:51:27 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
