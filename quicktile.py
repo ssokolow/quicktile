@@ -1,50 +1,38 @@
-#!/bin/sh
-"""":
-python2 -c "" 2>/dev/null && exec python2 $0 ${1+"$@"}
-python -c "" 2>/dev/null && exec python $0 ${1+"$@"}
-echo "Could not find a python interpreter."
-exit 1
-"""
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """QuickTile, a WinSplit clone for X11 desktops
 
 Thanks to Thomas Vander Stichele for some of the documentation cleanups.
 
-@bug: The toggleMaximize function powering "maximize" can't unmaximize.
-      (Workaround: Use one of the regular tiling actions to unmaximize)
+@bug: The L{WindowManager.cmd_toggleMaximize} method powering C{maximize} can't
+    unmaximize. (Workaround: Use one of the regular tiling actions)
 
 @todo:
- - Reconsider use of --daemonize. That tends to imply self-backgrounding.
+ - Reconsider use of C{--daemonize}. That tends to imply self-backgrounding.
  - Try de-duplicating "This temporary hack prevents an Exception with MPlayer."
- - Look into supporting xpyb (the Python equivalent to libxcb) for global
+ - Look into supporting XPyB (the Python equivalent to C{libxcb}) for global
    keybinding.
  - Clean up the code. It's functional, but an ugly rush-job.
  - Decide how to handle maximization and stick with it.
  - Implement the secondary major features of WinSplit Revolution (eg.
    process-shape associations, locking/welding window edges, etc.)
- - Consider rewriting cycleDimensions to allow command-line use to jump to a
+ - Consider rewriting C{cycleDimensions} to allow command-line use to jump to a
    specific index without actually flickering the window through all the
    intermediate shapes.
  - Can I hook into the GNOME and KDE keybinding APIs without using PyKDE or
    gnome-python? (eg. using D-Bus, perhaps?)
 
 @todo: Merge remaining appropriate portions of:
- - https://thomas.apestaart.org/thomas/trac/changeset/1123/patches/quicktile/quicktile.py
- - https://thomas.apestaart.org/thomas/trac/changeset/1122/patches/quicktile/quicktile.py
- - https://thomas.apestaart.org/thomas/trac/browser/patches/quicktile/README
-
-References and code used:
- - http://faq.pygtk.org/index.py?req=show&file=faq23.017.htp
- - http://faq.pygtk.org/index.py?req=show&file=faq23.039.htp
- - http://www.larsen-b.com/Article/184.html
- - http://www.pygtk.org/pygtk2tutorial/sec-MonitoringIO.html
+ - U{https://thomas.apestaart.org/thomas/trac/changeset/1123/patches/quicktile/quicktile.py}
+ - U{https://thomas.apestaart.org/thomas/trac/changeset/1122/patches/quicktile/quicktile.py}
+ - U{https://thomas.apestaart.org/thomas/trac/browser/patches/quicktile/README}
 
 @newfield appname: Application Name
 """
 
 __appname__ = "QuickTile"
 __author__  = "Stephan Sokolow (deitarion/SSokolow)"
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 __license__ = "GNU GPL 2.0 or later"
 
 import pygtk
@@ -85,6 +73,8 @@ else:
 
 XDG_CONFIG_DIR = os.environ.get('XDG_CONFIG_HOME',
                                 os.path.expanduser('~/.config'))
+#{ Settings
+
 
 #TODO: Figure out how best to put this in the config file.
 POSITIONS = {
@@ -172,28 +162,36 @@ KEYLOOKUP = {
     '.': 'period',
     '+': 'plus',
     '-': 'minus',
-}
+}  #: Used for resolving certain keysyms
+
+#}
+#{ Helpers
 
 def powerset(iterable):
     "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
 
+#}
+#{ Exceptions
+
 class DependencyError(Exception):
     """Raised when a required dependency is missing."""
     pass
+
+#}
 
 class WindowManager(object):
     """A simple API-wrapper class for manipulating window positioning."""
     def __init__(self, commands, screen=None, ignore_workarea=False):
         """
-        Initializes WindowManager.
+        Initializes C{WindowManager}.
 
         @param screen: The X11 screen to operate on. If C{None}, the default
             screen as retrieved by C{gtk.gdk.screen_get_default} will be used.
         @param commands: A dict of commands for L{doCommand} to resolve.
         @type screen: C{gtk.gdk.Screen}
-        @type commands: dict
+        @type commands: C{dict}
 
         @todo: Confirm that the root window only changes on X11 server
                restart. (Something which will crash QuickTile anyway since
@@ -208,16 +206,16 @@ class WindowManager(object):
 
     def cmd_cycleMonitors(self, window=None):
         """
-        Cycle the specified window (the active window if none was explicitly
-        specified) between monitors while leaving the position within the
-        monitor unchanged.
+        Cycle the specified window (the active window if C{window=None}
+        between monitors while leaving the position within the monitor
+        unchanged.
 
-        @returns: The target monitor ID or None if the current window could not
-            be found.
+        @returns: The target monitor ID or C{None} if the current window could
+            not be found.
         @rtype: C{int} or C{None}
 
         @bug: I may have to hack up my own maximization detector since
-              win.get_state() seems to be broken.
+              C{win.get_state()} seems to be broken.
         """
 
         win, _, _, winGeom, monitorID = self.getGeometries(window)
@@ -246,17 +244,16 @@ class WindowManager(object):
         """Given a window, toggle its maximization state or, optionally,
         set a specific state.
 
-        @param win: The window on which to operate
-        @param state: If this is not None, set a specific maximization state.
-            Otherwise, toggle maximization.
+        @param state: If this is not C{None}, set a specific maximization
+            state. Otherwise, toggle maximization.
         @type win: C{gtk.gdk.Window}
         @type state: C{bool} or C{None}
 
-        @returns: The target state as a boolean (True = maximized) or None if
-            the active window could not be retrieved.
+        @returns: The target state as a boolean (C{True} = maximized) or
+            C{None} if the active window could not be retrieved.
         @rtype: C{bool} or C{None}
 
-        @bug: win.unmaximize() seems to either have no effect or not get called
+        @bug: C{win.unmaximize()} seems to have no effect or not get called
         """
         win = win or self.get_active_window()
         if not win:
@@ -274,12 +271,16 @@ class WindowManager(object):
 
     def cycleDimensions(self, dimensions, window=None):
         """
-        Given a window and a list of 4-tuples containing dimensions as a
-        decimal percentage of monitor size, cycle through the list, taking one
+        Given a list of shapes and a window, cycle through the list, taking one
         step each time this function is called.
 
-        If the window's dimensions are not in the list, set them to the first
-        list entry.
+        If the window's dimensions are not within 100px (by euclidean distance)
+        of an entry in the list, set them to the first list entry.
+
+        @param dimensions: A list of tuples representing window geometries as
+            floating-point values between 0 and 1, inclusive.
+        @type dimensions: C{[(x, y, w, h), ...]}
+        @type window: C{gtk.gdk.Window}
 
         @returns: The new window dimensions.
         @rtype: C{gtk.gdk.Rectangle}
@@ -290,10 +291,8 @@ class WindowManager(object):
         if not usableArea:
             return None
 
-        #TODO: Calculate _NET_WORKAREA for the monitor represented by
-        #      usableArea and use that instead.
-        #      (The clipbox will extend under any panels that don't fill 100%
-        #       of their edge of the screen.)
+        # Get the bounding box for the usable region (overlaps panels which
+        # don't fill 100% of their edge of the screen)
         clipBox = usableArea.get_clipbox()
 
         # Resolve proportional (eg. 0.5) and preserved (None) coordinates
@@ -334,8 +333,8 @@ class WindowManager(object):
         result.y += clipBox.y
 
         # If we're overlapping a panel, fall back to a monitor-specific
-        # analogue to _NET_WORKAREA to prevent the WM from potentially meddling
-        # with the result of resposition()
+        # analogue to _NET_WORKAREA to prevent overlapping any panels and
+        # risking the WM potentially meddling with the result of resposition()
         if not usableArea.rect_in(result) == gtk.gdk.OVERLAP_RECTANGLE_IN:
             logging.debug("Result overlaps panel. Falling back to usableRect.")
             result = result.intersect(usableRect)
@@ -346,7 +345,7 @@ class WindowManager(object):
 
     def cmd_moveCenter(self, window=None):
         """
-        Center the window in the current monitor.
+        Center the window in the monitor it currently occupies.
 
         @returns: The new window dimensions.
         @rtype: C{gtk.gdk.Rectangle}
@@ -373,6 +372,11 @@ class WindowManager(object):
     def doCommand(self, command):
         """Resolve a textual positioning command and execute it.
 
+        Supported command types:
+            - Tuples/Lists of tuples to be fed to L{cycleDimensions}
+            - Command names which are valid methods of this class when
+              prepended with C{cmd_}.
+
         @returns: A boolean indicating success/failure.
         @type command: C{str}
         @rtype: C{bool}
@@ -398,13 +402,13 @@ class WindowManager(object):
         """
         Retrieve the active window.
 
-        @rtype: C{gtk.gdk.Screen} or C{None}
-        @returns: The GDK Screen for the active window or None if the
-            _NET_ACTIVE_WINDOW hint isn't supported or the desktop is the
+        @rtype: C{gtk.gdk.Window} or C{None}
+        @returns: The GDK Window object for the active window or C{None} if the
+            C{_NET_ACTIVE_WINDOW} hint isn't supported or the desktop is the
             active window.
 
-        @note: Checks for _NET* must be done every time since WMs support
-               --replace
+        @note: Checks for C{_NET*} must be done every time since WMs support
+               C{--replace}
         """
         # Get the root and active window
         if (self._root.supports_net_wm_hint("_NET_ACTIVE_WINDOW") and
@@ -421,6 +425,7 @@ class WindowManager(object):
 
         # Do nothing if the desktop is the active window
         # (The "not winType" check seems required for fullscreen MPlayer)
+        # Source: http://faq.pygtk.org/index.py?req=show&file=faq23.039.htp
         winType = win.property_get("_NET_WM_WINDOW_TYPE")
         logging.debug("NET_WM_WINDOW_TYPE: %r", winType)
         if winType and winType[-1][0] == '_NET_WM_WINDOW_TYPE_DESKTOP':
@@ -445,11 +450,11 @@ class WindowManager(object):
 
         @param monitor: The number or dimensions of the desired monitor.
         @param ignore_struts: If C{True}, just return the size of the whole
-            monitor, allowing windows to cover or be covered by panels.
+            monitor, allowing windows to overlap panels.
         @type monitor: C{int} or C{gtk.gdk.Rectangle}
         @type ignore_struts: C{bool}
 
-        @returns: The usable area as a region and biggest rectangular subset.
+        @returns: The usable region and its largest rectangular subset.
         @rtype: C{gtk.gdk.Region}, C{gtk.gdk.Rectangle}
         """
         if isinstance(monitor, int):
@@ -518,17 +523,20 @@ class WindowManager(object):
         and the monitor it's on. If no window is specified, the active window
         is used.
 
-        Returns a tuple of the window object, a gtk.gdk.Region object
-        representing the usable portion of the monitor, a gtk.gdk.Rectangle
-        object containing the window geometry, and the monitor ID
-        (for multi-head desktops).
-
-        Returns (None, None, None, None) if the specified window is a desktop
-        window or if no window was specified and _NET_ACTIVE_WINDOW is
-        unsupported.
+        Returns a tuple consisting of:
+         - C{win} or the C{gtk.gdk.Window} for the active window
+         - A C{gtk.gdk.Region} representing the usable portion of the monitor
+         - A C{gtk.gdk.Rectangle} representing the largest usable rectangle on
+           the given monitor.
+         - A C{gtk.gdk.Rectangle} representing containing the window geometry
+         - The monitor ID number (for multi-head desktops)
 
         @type win: C{gtk.gdk.Window}
-        @rtype: tuple
+        @rtype:
+            - C{(gtk.gdk.Window, gtk.gdk.Region, gtk.gdk.Rectangle,
+              gtk.gdk.Rectangle, int)}
+            - C{(None, None, None, None)} (No window or C{_NET_ACTIVE_WINDOW}
+                unsupported)
 
         @note: Window geometry is relative to the monitor, not the desktop.
         @note: Checks for _NET* must remain here since WMs support --replace
@@ -566,7 +574,10 @@ class WindowManager(object):
         as a whole.
 
         @type win: C{gtk.gdk.Window}
-        @rtype: C{gtk.gdk.Rectangle}
+        @type geom: C{gtk.gdk.Rectangle}
+        @type monitor: C{gtk.gdk.Rectangle}
+
+        @todo: Should this have a return value?
         """
         #Workaround for my inability to reliably detect maximization.
         win.unmaximize()
@@ -580,16 +591,25 @@ class WindowManager(object):
                 geom.width - (border * 2), geom.height - (titlebar + border))
 
 class QuickTileApp(object):
+    """The basic Glib application itself."""
     keybinds_failed = False
 
     def __init__(self, wm, keys=None, modkeys=None):
-        """@todo: document these arguments"""
+        """Populate the instance variables.
+
+        @param keys: A dict mapping X11 keysyms to L{WindowManager.doCommand}
+            command strings.
+        @param modkeys: A modifier mask to prefix to all keybindings.
+        @type wm: The L{WindowManager} instance to use.
+        @type keys: C{dict}
+        @type modkeys: C{str}
+        """
         self.wm = wm
         self._keys = keys or {}
         self._modkeys = modkeys or 0
 
     def _init_dbus(self):
-        """Setup dbus-python components in the PyGTK event loop"""
+        """Set up dbus-python components in the Glib event loop"""
         class QuickTile(dbus.service.Object):
             def __init__(self):
                 dbus.service.Object.__init__(self, sessBus,
@@ -604,7 +624,10 @@ class QuickTileApp(object):
         self.dbusObj = QuickTile()
 
     def _init_xlib(self):
-        """Setup python-xlib components in the PyGTK event loop"""
+        """Set up python-xlib components in the Glib event loop
+
+        Source: U{http://www.larsen-b.com/Article/184.html}
+        """
         self.xdisp = Display()
         self.xroot = self.xdisp.screen().root
 
@@ -651,10 +674,14 @@ class QuickTileApp(object):
                 " names and that the keys are not already bound.")
 
         # Merge python-xlib into the Glib event loop
+        # Source: http://www.pygtk.org/pygtk2tutorial/sec-MonitoringIO.html
         gobject.io_add_watch(self.xroot.display,
                              gobject.IO_IN, self.handle_xevent)
 
     def run(self):
+        """Call L{_init_xlib} and L{_init_dbus} if available, then
+        call C{gtk.main()}."""
+
         if XLIB_PRESENT:
             self._init_xlib()
         else:
@@ -672,7 +699,7 @@ class QuickTileApp(object):
         gtk.main()
 
     def handle_xerror(self, err, req=None):
-        """
+        """Used to identify when attempts to bind keys fail.
         @note: If you can make python-xlib's C{CatchError} actually work or if
                you can retrieve more information to show, feel free.
         """
@@ -682,7 +709,11 @@ class QuickTileApp(object):
             self.xdisp.display.default_error_handler(err)
 
     def handle_xevent(self, src, cond, handle=None):
-        """Handle pending python-xlib events"""
+        """Handle pending python-xlib events.
+
+        Filters for C{X.KeyPress} events, resolves them to commands, and calls
+        L{WindowManager.doCommand} on them.
+        """
         handle = handle or self.xroot.display
 
         for _ in range(0, handle.pending_events()):
@@ -697,6 +728,9 @@ class QuickTileApp(object):
         return True
 
     def showBinds(self):
+        """Print a formatted readout of defined keybindings and the modifier
+        mask to stdout."""
+
         maxlen_keys = max(len(x) for x in self._keys.keys())
         maxlen_vals = max(len(x) for x in self._keys.values())
 
