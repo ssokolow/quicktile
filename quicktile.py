@@ -6,15 +6,13 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
 
 @todo:
  - Reconsider use of C{--daemonize}. That tends to imply self-backgrounding.
- - Try de-duplicating "This temporary hack prevents an Exception with MPlayer."
  - Look into supporting XPyB (the Python equivalent to C{libxcb}) for global
    keybinding.
  - Clean up the code. It's functional, but an ugly rush-job.
- - Decide how to handle maximization and stick with it.
  - Implement the secondary major features of WinSplit Revolution (eg.
    process-shape associations, locking/welding window edges, etc.)
- - Consider rewriting C{cycleDimensions} to allow command-line use to jump to a
-   specific index without actually flickering the window through all the
+ - Consider rewriting L{cycle_dimensions} to allow command-line use to jump to
+   a specific index without actually flickering the window through all the
    intermediate shapes.
  - Can I hook into the GNOME and KDE keybinding APIs without using PyKDE or
    gnome-python? (eg. using D-Bus, perhaps?)
@@ -36,6 +34,7 @@ import errno, operator, logging, os, sys
 from ConfigParser import RawConfigParser
 from heapq import heappop, heappush
 from itertools import chain, combinations
+from functools import wraps
 
 import pygtk
 pygtk.require('2.0')
@@ -54,7 +53,7 @@ try:
 except ImportError:
     XLIB_PRESENT = False  #: Indicates whether python-xlib was found
 
-DBUS_PRESENT = False
+DBUS_PRESENT = False  #: Indicates whether python-dbus was found
 try:
     import dbus.service
     from dbus import SessionBus
@@ -65,16 +64,15 @@ except ImportError:
 else:
     try:
         DBusGMainLoop(set_as_default=True)
-        sessBus = SessionBus()
+        sessBus = SessionBus()  #: Used by L{QuickTileApp._init_dbus}
     except DBusException:
         pass
     else:
-        DBUS_PRESENT = True
+        DBUS_PRESENT = True  #: Indicates whether python-dbus was found
 
 XDG_CONFIG_DIR = os.environ.get('XDG_CONFIG_HOME',
                                 os.path.expanduser('~/.config'))
 #{ Settings
-
 
 #TODO: Figure out how best to put this in the config file.
 POSITIONS = {
@@ -121,12 +119,7 @@ POSITIONS = {
         (1.0 / 3 * 2, 0.5, 1.0 / 3,     0.5),
         (1.0 / 3,     0.5, 1.0 / 3 * 2, 0.5)
     ),
-    'maximize'            : 'toggleMaximize',
-    'monitor-switch'      : 'cycleMonitors',
-    'vertical-maximize'   : ((None,      0,   None,      1),),
-    'horizontal-maximize' : ((0,      None,   1,      None),),
-    'move-to-center'      : 'moveCenter',
-}  #: command-to-action mappings
+}  #: command-to-position mappings for L{cycle_dimensions}
 
 #NOTE: For keysyms outside the latin1 and miscellany groups, you must first
 #      call C{Xlib.XK.load_keysym_group()} with the name (minus extension) of
@@ -181,17 +174,107 @@ class DependencyError(Exception):
 
 #}
 
+class CommandRegistry(object):
+    """Handles lookup and boilerplate for window management commands.
+
+    Separated from WindowManager so its lifecycle is not tied to a specific
+    GDK Screen object.
+    """
+
+    def __init__(self):
+        self.commands = {}
+
+    def add(self, name, *p_args, **p_kwargs):
+        """Decorator to wrap a function in boilerplate and add it to the
+            command registry under the given name.
+
+            @param name: The name to know the command by.
+            @param p_args: Positional arguments to prepend to all calls made
+                via C{name}.
+            @param p_kwargs: Keyword arguments to prepend to all calls made
+                via C{name}.
+
+            @type name: C{str}
+            """
+
+        def decorate(func):
+            @wraps(func)
+            def wrapper(wm, window=None, *args, **kwargs):
+
+                # Get Wnck and GDK window objects
+                window = window or wm.screen.get_active_window()
+                if isinstance(window, gtk.gdk.Window):
+                    win = wnck.window_get(window.xid)
+                else:
+                    win = window
+
+                logging.debug("window: %s", win)
+                if not win:
+                    return None
+
+                monitor_id, monitor_geom = wm.get_monitor(window)
+
+                use_area, use_rect = wm.get_workarea(monitor_geom,
+                                                     wm.ignore_workarea)
+
+                # TODO: Replace this MPlayer safety hack with a properly
+                #       comprehensive exception catcher.
+                if not use_rect:
+                    logging.debug("use_rect: %s", use_rect)
+                    return None
+
+                state = {
+                    "cmd_name": name,
+                    "monitor_id": monitor_id,
+                    "monitor_geom": monitor_geom,
+                    "usable_region": use_area,
+                    "usable_rect": use_rect,
+                }
+
+                args, kwargs = p_args + args, dict(p_kwargs, **kwargs)
+                func(wm, win, state, *args, **kwargs)
+
+            if name in self.commands:
+                logging.warn("Overwriting command: %s", name)
+            self.commands[name] = wrapper
+
+            # Return the unwrapped function so decorators can be stacked
+            # to define multiple commands using the same code with different
+            # arguments
+            return func
+        return decorate
+
+    def addMany(self, command_map):
+        """Convenience decorator to allow many commands to be defined from
+           the same function with different arguments.
+
+           @param command_map: A dict mapping command names to argument lists.
+           @type command_map: C{dict}
+        """
+        def decorate(func):
+            for cmd, arglist in command_map.items():
+                self.add(cmd, *arglist)(func)
+            return func
+        return decorate
+
+    def call(self, command, wm, *args, **kwargs):
+        """Resolve a textual positioning command and execute it."""
+        cmd = self.commands.get(command, None)
+
+        if cmd:
+            cmd(wm, *args, **kwargs)
+        else:
+            logging.error("Unrecognized command: %s", command)
+
 class WindowManager(object):
     """A simple API-wrapper class for manipulating window positioning."""
-    def __init__(self, commands, screen=None, ignore_workarea=False):
+    def __init__(self, screen=None, ignore_workarea=False):
         """
         Initializes C{WindowManager}.
 
         @param screen: The X11 screen to operate on. If C{None}, the default
             screen as retrieved by C{gtk.gdk.screen_get_default} will be used.
-        @param commands: A dict of commands for L{doCommand} to resolve.
         @type screen: C{gtk.gdk.Screen}
-        @type commands: C{dict}
 
         @todo: Confirm that the root window only changes on X11 server
                restart. (Something which will crash QuickTile anyway since
@@ -200,194 +283,44 @@ class WindowManager(object):
                It could possibly change while toggling "allow desktop icons"
                in KDE 3.x. (Not sure what would be equivalent elsewhere)
         """
-        self._root = screen or gtk.gdk.screen_get_default()
-        self._wnck_screen = wnck.screen_get(self._root.get_number())
-        self.commands = commands
+        self.gdk_screen = screen or gtk.gdk.screen_get_default()
+        self.screen = wnck.screen_get(self.gdk_screen.get_number())
         self.ignore_workarea = ignore_workarea
 
-    def cmd_cycleMonitors(self, window=None):
-        """
-        Cycle the specified window (the active window if C{window=None}
-        between monitors while leaving the position within the monitor
-        unchanged.
+    def get_geometry_rel(self, window, monitor_geom):
+        """Get window position relative to the monitor rather than the desktop.
 
-        @returns: The target monitor ID or C{None} if the current window could
-            not be found.
-        @rtype: C{int} or C{None}
-        """
+        @param monitor_geom: The rectangle returned by
+            C{gdk.Screen.get_monitor_geometry}
+        @type window: C{wnck.Window}
+        @type monitor_geom: C{gtk.gdk.Rectangle}
 
-        win, _, _, winGeom, monitorID = self.getGeometries(window)
-
-        if monitorID is None:
-            return None
-
-        if monitorID == 0:
-            newMonitorID = 1
-        else:
-            newMonitorID = (monitorID + 1) % self._root.get_n_monitors()
-
-        newMonitorGeom = self._root.get_monitor_geometry(newMonitorID)
-        logging.debug("Moving window to monitor %s", newMonitorID)
-
-        self.reposition(win, winGeom, newMonitorGeom, keep_maximize=True)
-
-        return newMonitorID
-
-    def cmd_toggleMaximize(self, win=None, state=None):
-        """Given a window, toggle its maximization state or, optionally,
-        set a specific state.
-
-        @param state: If this is not C{None}, set a specific maximization
-            state. Otherwise, toggle maximization.
-        @type win: C{gtk.gdk.Window}
-        @type state: C{bool} or C{None}
-
-        @returns: The target state as a boolean (C{True} = maximized) or
-            C{None} if the active window could not be retrieved.
-        @rtype: C{bool} or C{None}
-        """
-        win = win or self._wnck_screen.get_active_window()
-        if not win:
-            return None
-
-        if state is None:
-            state = not win.is_maximized()
-
-        logging.debug('maximize: %s', state)
-        if state:
-            win.maximize() if state else win.unmaximize()
-        else:
-            win.unmaximize()
-        return state
-
-    def cycleDimensions(self, dimensions, window=None):
-        """
-        Given a list of shapes and a window, cycle through the list, taking one
-        step each time this function is called.
-
-        If the window's dimensions are not within 100px (by euclidean distance)
-        of an entry in the list, set them to the first list entry.
-
-        @param dimensions: A list of tuples representing window geometries as
-            floating-point values between 0 and 1, inclusive.
-        @type dimensions: C{[(x, y, w, h), ...]}
-        @type window: C{gtk.gdk.Window}
-
-        @returns: The new window dimensions.
         @rtype: C{gtk.gdk.Rectangle}
         """
-        win, usableArea, usableRect, winGeom = self.getGeometries(window)[0:4]
+        win_geom = gtk.gdk.Rectangle(*window.get_geometry())
+        win_geom.x -= monitor_geom.x
+        win_geom.y -= monitor_geom.y
 
-        # This temporary hack prevents an Exception with MPlayer.
-        if not usableArea:
-            return None
+        return win_geom
 
-        # Get the bounding box for the usable region (overlaps panels which
-        # don't fill 100% of their edge of the screen)
-        clipBox = usableArea.get_clipbox()
+    def get_monitor(self, win):
+        """Given a Window (Wnck or GDK), retrieve the monitor ID and geometry.
 
-        # Resolve proportional (eg. 0.5) and preserved (None) coordinates
-        dims = []
-        for tup in dimensions:
-            current_dim = []
-            for pos, val in enumerate(tup):
-                if val is None:
-                    current_dim.append(tuple(winGeom)[pos])
-                else:
-                    # FIXME: This is a bit of an ugly way to get (w, h, w, h)
-                    # from clipBox.
-                    current_dim.append(int(val * tuple(clipBox)[2 + pos % 2]))
-
-            dims.append(current_dim)
-
-        if not dims:
-            return None
-
-        logging.debug("dims %r", dims)
-
-        # Calculate euclidean distances between the window's current geometry
-        # and all presets and store them in a min heap.
-        euclid_distance = []
-        for pos, val in enumerate(dims):
-            distance = sum([(wg - vv) ** 2 for (wg, vv) in zip(tuple(winGeom), tuple(val))]) ** 0.5
-            heappush(euclid_distance, (distance, pos))
-
-        # If the window is already on one of the configured geometries, advance
-        # to the next configuration. Otherwise, use the first configuration.
-        min_distance = heappop(euclid_distance)
-        if min_distance[0] < 100:
-            pos = (min_distance[1] + 1) % len(dims)
-        else:
-            pos = 0
-        result = gtk.gdk.Rectangle(*dims[pos])
-        result.x += clipBox.x
-        result.y += clipBox.y
-
-        # If we're overlapping a panel, fall back to a monitor-specific
-        # analogue to _NET_WORKAREA to prevent overlapping any panels and
-        # risking the WM potentially meddling with the result of resposition()
-        if not usableArea.rect_in(result) == gtk.gdk.OVERLAP_RECTANGLE_IN:
-            logging.debug("Result overlaps panel. Falling back to usableRect.")
-            result = result.intersect(usableRect)
-
-        logging.debug("result %r", tuple(result))
-        self.reposition(win, result)
-        return result
-
-    def cmd_moveCenter(self, window=None):
+        @type win: C{wnck.Window} or C{gtk.gdk.Window}
+        @returns: A tuple containing the monitor ID and geometry.
+        @rtype: C{(int, gtk.gdk.Rectangle)}
         """
-        Center the window in the monitor it currently occupies.
+        #TODO: Look for a way to get the monitor ID without having
+        #      to instantiate a gtk.gdk.Window
+        if not isinstance(win, gtk.gdk.Window):
+            win = gtk.gdk.window_foreign_new(win.get_xid())
 
-        @returns: The new window dimensions.
-        @rtype: C{gtk.gdk.Rectangle}
-        """
-        win, _, usableRect, winGeom = self.getGeometries(window)[0:4]
+        #TODO: How do I retrieve the root window from a given one?
+        monitor_id = wm.gdk_screen.get_monitor_at_window(win)
+        monitor_geom = wm.gdk_screen.get_monitor_geometry(monitor_id)
 
-        # This temporary hack prevents an Exception with MPlayer.
-        if not usableRect:
-            return None
-
-        dims = (int((usableRect.width - winGeom.width) / 2),
-                int((usableRect.height - winGeom.height) / 2),
-                int(winGeom.width),
-                int(winGeom.height))
-
-        logging.debug("dims %r", dims)
-
-        result = gtk.gdk.Rectangle(*dims)
-
-        logging.debug("result %r", tuple(result))
-        self.reposition(win, result, usableRect)
-        return result
-
-    def doCommand(self, command):
-        """Resolve a textual positioning command and execute it.
-
-        Supported command types:
-            - Tuples/Lists of tuples to be fed to L{cycleDimensions}
-            - Command names which are valid methods of this class when
-              prepended with C{cmd_}.
-
-        @returns: A boolean indicating success/failure.
-        @type command: C{str}
-        @rtype: C{bool}
-        """
-        int_command = self.commands.get(command, None)
-        if isinstance(int_command, (tuple, list)):
-            self.cycleDimensions(int_command)
-            return True
-        elif isinstance(int_command, basestring):
-            cmd = getattr(self, 'cmd_' + int_command, None)
-            if cmd:
-                cmd()
-                return True
-            else:
-                logging.error("Invalid internal command name: %s", int_command)
-        elif int_command is None:
-            logging.error("Invalid external command name: %r", command)
-        else:
-            logging.error("Unrecognized command type for %r", int_command)
-        return False
+        logging.debug("Monitor: %s, %s", monitor_id, monitor_geom)
+        return monitor_id, monitor_geom
 
     def get_workarea(self, monitor, ignore_struts=False):
         """Retrieve the usable area of the specified monitor using
@@ -403,25 +336,24 @@ class WindowManager(object):
         @rtype: C{gtk.gdk.Region}, C{gtk.gdk.Rectangle}
         """
         if isinstance(monitor, int):
-            usableRect = self._root.get_monitor_geometry(monitor)
+            usableRect = self.gdk_screen.get_monitor_geometry(monitor)
         elif not isinstance(monitor, gtk.gdk.Rectangle):
             usableRect = gtk.gdk.Rectangle(monitor)
         else:
             usableRect = monitor
         usableRegion = gtk.gdk.region_rectangle(usableRect)
 
-
         if ignore_struts:
             return usableRegion, usableRect
 
-        rootWin = self._root.get_root_window()
+        rootWin = self.gdk_screen.get_root_window()
 
         # TODO: Test and extend to support panels on asymmetric monitors
         struts = []
-        if self._root.supports_net_wm_hint("_NET_WM_STRUT_PARTIAL"):
+        if self.gdk_screen.supports_net_wm_hint("_NET_WM_STRUT_PARTIAL"):
             # Gather all struts
             struts.append(rootWin.property_get("_NET_WM_STRUT_PARTIAL"))
-            if (self._root.supports_net_wm_hint("_NET_CLIENT_LIST")):
+            if (self.gdk_screen.supports_net_wm_hint("_NET_CLIENT_LIST")):
                 # Source: http://stackoverflow.com/a/11332614/435253
                 for id in rootWin.property_get('_NET_CLIENT_LIST')[2]:
                     w = gtk.gdk.window_foreign_new(id)
@@ -430,7 +362,7 @@ class WindowManager(object):
 
             # Subtract the struts from the usable region
             _Su = lambda *g: usableRegion.subtract(gtk.gdk.region_rectangle(g))
-            _w, _h = self._root.get_width(), self._root.get_height()
+            _w, _h = self.gdk_screen.get_width(), self.gdk_screen.get_height()
             for g in struts:
                 # http://standards.freedesktop.org/wm-spec/1.5/ar01s05.html
                 # XXX: Must not cache unless watching for notify events.
@@ -455,64 +387,14 @@ class WindowManager(object):
                 #       doesn't cause off-by-one bugs.
                 #TODO: Share this on http://stackoverflow.com/q/2598580/435253
             usableRect = usableRect.get_clipbox()
-        elif self._root.supports_net_wm_hint("_NET_WORKAREA"):
+        elif self.gdk_screen.supports_net_wm_hint("_NET_WORKAREA"):
             desktopGeo = tuple(rootWin.property_get('_NET_WORKAREA')[2][0:4])
             usableRegion.intersect(gtk.gdk.region_rectangle(desktopGeo))
             usableRect = usableRegion.get_clipbox()
 
         return usableRegion, usableRect
 
-    def getGeometries(self, win=None):
-        """
-        Get the geometry for the given window (including window decorations)
-        and the monitor it's on. If no window is specified, the active window
-        is used.
-
-        Returns a tuple consisting of:
-         - C{win} or the C{gtk.gdk.Window} for the active window
-         - A C{gtk.gdk.Region} representing the usable portion of the monitor
-         - A C{gtk.gdk.Rectangle} representing the largest usable rectangle on
-           the given monitor.
-         - A C{gtk.gdk.Rectangle} representing containing the window geometry
-         - The monitor ID number (for multi-head desktops)
-
-        @type win: C{gtk.gdk.Window}
-        @rtype:
-            - C{(gtk.gdk.Window, gtk.gdk.Region, gtk.gdk.Rectangle,
-              gtk.gdk.Rectangle, int)}
-            - C{(None, None, None, None)} (No window or C{_NET_ACTIVE_WINDOW}
-                unsupported)
-
-        @note: Window geometry is relative to the monitor, not the desktop.
-        @note: Checks for _NET* must remain here since WMs support --replace
-        @todo: Confirm that changing WMs doesn't mess up quicktile.
-        @todo: Convert this into part of a decorator for command methods.
-        """
-        # Get the active window
-        win = win or self._wnck_screen.get_active_window()
-        logging.debug("win %r", win)
-        if not win:
-            return None, None, None, None, None
-
-        #FIXME: How do I retrieve the root window from a given one?
-        #TODO: Look for a way to get the monitor without this many steps
-        gdkWin = gtk.gdk.window_foreign_new(win.get_xid())
-        monitorID = self._root.get_monitor_at_window(gdkWin)
-        monitorGeom = self._root.get_monitor_geometry(monitorID)
-        useArea, useRect = self.get_workarea(monitorGeom, self.ignore_workarea)
-
-        # Get position relative to the monitor rather than the desktop
-        winGeom = gtk.gdk.Rectangle(*win.get_geometry())
-        winGeom.x -= monitorGeom.x
-        winGeom.y -= monitorGeom.y
-
-        logging.debug("useArea %r", useArea.get_rectangles())
-        logging.debug("useRect %r", useRect)
-        logging.debug("winGeom %r", tuple(winGeom))
-        logging.debug("monitorID %r", monitorID)
-        return win, useArea, useRect, winGeom, monitorID
-
-    def reposition(self, win, geom, monitor=gtk.gdk.Rectangle(0, 0, 0, 0),
+    def reposition(self, win, geom=None, monitor=gtk.gdk.Rectangle(0, 0, 0, 0),
             keep_maximize=False):
         """
         Position and size a window, decorations inclusive, according to the
@@ -521,49 +403,63 @@ class WindowManager(object):
         If no monitor rectangle is specified, position relative to the desktop
         as a whole.
 
+        @param monitor: The frame relative to which C{geom} should be
+            interpreted. Leave at the default for the whole desktop.
         @param keep_maximize: Whether to re-maximize a maximized window after
             un-maximizing it to move it.
         @type win: C{gtk.gdk.Window}
         @type geom: C{gtk.gdk.Rectangle}
         @type monitor: C{gtk.gdk.Rectangle}
         @type keep_maximize: C{bool}
-
-        @todo: Also handle horizontal and vertical maximization when
-            C{keep_maximized=True}
         """
-        is_maxed = win.is_maximized()
-        if is_maxed:
-            win.unmaximize()
 
+        geom = geom or wm.get_geometry_rel(win, wm.get_monitor(win)[1])
+
+        max_types, maxed = ['', '_horizontally', '_vertically'], []
+        for mt in max_types:
+            if getattr(win, 'is_maximized' + mt)():
+                maxed.append(mt)
+                getattr(win, 'unmaximize' + mt)()
+
+        new_x, new_y = geom.x + monitor.x, geom.y + monitor.y
+        logging.debug("repositioning to (%d, %d, %d, %d)",
+                new_x, new_y, geom.width, geom.height)
+
+        #XXX: Why is WINDOW_GRAVITY_STATIC behaving as the libwnck docs say
+        #       that WINDOW_GRAVITY_NORTHWEST should?
         win.set_geometry(wnck.WINDOW_GRAVITY_STATIC,
                 wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y |
                 wnck.WINDOW_CHANGE_WIDTH | wnck.WINDOW_CHANGE_HEIGHT,
-                geom.x + monitor.x, geom.y + monitor.y,
-                geom.width, geom.height)
+                new_x, new_y, geom.width, geom.height)
 
-        if is_maxed and keep_maximize:
-            win.maximize()
+        if maxed and keep_maximize:
+            for mt in maxed:
+                getattr(win, 'maximize' + mt)()
 
 class QuickTileApp(object):
     """The basic Glib application itself."""
     keybinds_failed = False
 
-    def __init__(self, wm, keys=None, modkeys=None):
+    def __init__(self, wm, commands, keys=None, modkeys=None):
         """Populate the instance variables.
 
-        @param keys: A dict mapping X11 keysyms to L{WindowManager.doCommand}
-            command strings.
+        @param keys: A dict mapping X11 keysyms to L{CommandRegistry}
+            command names.
         @param modkeys: A modifier mask to prefix to all keybindings.
         @type wm: The L{WindowManager} instance to use.
         @type keys: C{dict}
         @type modkeys: C{str}
         """
         self.wm = wm
+        self.commands = commands
         self._keys = keys or {}
         self._modkeys = modkeys or 0
 
     def _init_dbus(self):
-        """Set up dbus-python components in the Glib event loop"""
+        """Set up dbus-python components in the Glib event loop
+
+        @todo 1.0.0: Retire the C{doCommand} name. (API-breaking)
+        """
         class QuickTile(dbus.service.Object):
             def __init__(self):
                 dbus.service.Object.__init__(self, sessBus,
@@ -572,7 +468,7 @@ class QuickTileApp(object):
             @dbus.service.method(dbus_interface='com.ssokolow.QuickTile',
                      in_signature='s', out_signature='b')
             def doCommand(self, command):
-                return wm.doCommand(command)
+                return self.commands.call(command, wm)
 
         self.dbusName = dbus.service.BusName("com.ssokolow.QuickTile", sessBus)
         self.dbusObj = QuickTile()
@@ -666,7 +562,7 @@ class QuickTileApp(object):
         """Handle pending python-xlib events.
 
         Filters for C{X.KeyPress} events, resolves them to commands, and calls
-        L{WindowManager.doCommand} on them.
+        L{CommandRegistry.call} on them.
         """
         handle = handle or self.xroot.display
 
@@ -675,7 +571,7 @@ class QuickTileApp(object):
             if xevent.type == X.KeyPress:
                 keycode = xevent.detail
                 if keycode in self.keys:
-                    self.wm.doCommand(self.keys[keycode])
+                    self.commands.call(self.keys[keycode], wm)
                 else:
                     logging.error("Received an event for an unrecognized "
                                   "keycode: %s" % keycode)
@@ -696,6 +592,136 @@ class QuickTileApp(object):
         print "-" * maxlen_keys, "-" * maxlen_vals
         for row in sorted(self._keys.items(), key=lambda x: x[0]):
             print row[0].ljust(maxlen_keys), row[1]
+
+commands = CommandRegistry()
+#{ Tiling Commands
+
+@commands.addMany(POSITIONS)
+def cycle_dimensions(wm, win, state, *dimensions):
+    """
+    Given a list of shapes and a window, cycle through the list, taking one
+    step each time this function is called.
+
+    If the window's dimensions are not within 100px (by euclidean distance)
+    of an entry in the list, set them to the first list entry.
+
+    @param dimensions: A list of tuples representing window geometries as
+        floating-point values between 0 and 1, inclusive.
+    @type dimensions: C{[(x, y, w, h), ...]}
+    @type win: C{gtk.gdk.Window}
+
+    @returns: The new window dimensions.
+    @rtype: C{gtk.gdk.Rectangle}
+    """
+    win_geom = wm.get_geometry_rel(win, state['monitor_geom'])
+    usable_region = state['usable_region']
+
+    # Get the bounding box for the usable region (overlaps panels which
+    # don't fill 100% of their edge of the screen)
+    clipBox = usable_region.get_clipbox()
+
+    # Resolve proportional (eg. 0.5) and preserved (None) coordinates
+    dims = []
+    for tup in dimensions:
+        current_dim = []
+        for pos, val in enumerate(tup):
+            if val is None:
+                current_dim.append(tuple(win_geom)[pos])
+            else:
+                # FIXME: This is a bit of an ugly way to get (w, h, w, h)
+                # from clipBox.
+                current_dim.append(int(val * tuple(clipBox)[2 + pos % 2]))
+
+        dims.append(current_dim)
+
+    if not dims:
+        return None
+
+    logging.debug("dims %r", dims)
+
+    # Calculate euclidean distances between the window's current geometry
+    # and all presets and store them in a min heap.
+    euclid_distance = []
+    for pos, val in enumerate(dims):
+        distance = sum([(wg - vv) ** 2 for (wg, vv)
+                        in zip(tuple(win_geom), tuple(val))]) ** 0.5
+        heappush(euclid_distance, (distance, pos))
+
+    # If the window is already on one of the configured geometries, advance
+    # to the next configuration. Otherwise, use the first configuration.
+    min_distance = heappop(euclid_distance)
+    if min_distance[0] < 100:
+        pos = (min_distance[1] + 1) % len(dims)
+    else:
+        pos = 0
+    result = gtk.gdk.Rectangle(*dims[pos])
+    result.x += clipBox.x
+    result.y += clipBox.y
+
+    # If we're overlapping a panel, fall back to a monitor-specific
+    # analogue to _NET_WORKAREA to prevent overlapping any panels and
+    # risking the WM potentially meddling with the result of resposition()
+    if not usable_region.rect_in(result) == gtk.gdk.OVERLAP_RECTANGLE_IN:
+        logging.debug("Result overlaps panel. Falling back to usableRect.")
+        result = result.intersect(state['usable_rect'])
+
+    logging.debug("result %r", tuple(result))
+    wm.reposition(win, result)
+    return result
+
+@commands.add('monitor-switch')
+def cycle_monitors(wm, win, state):
+    """
+    Cycle the specified window (the active window if C{window=None}
+    between monitors while leaving the position within the monitor
+    unchanged.
+    """
+    mon_id = state['monitor_id']
+
+    if mon_id == 0:
+        new_mon_id = 1
+    else:
+        new_mon_id = (mon_id + 1) % wm.gdk_screen.get_n_monitors()
+
+    new_mon_geom = wm.gdk_screen.get_monitor_geometry(new_mon_id)
+    logging.debug("Moving window to monitor %s", new_mon_id)
+
+    wm.reposition(win, None, new_mon_geom, keep_maximize=True)
+
+@commands.add('move-to-center')
+def cmd_moveCenter(wm, win, state):
+    """Center the window in the monitor it currently occupies."""
+    use_rect = state['usable_rect']
+    win_geom = wm.get_geometry_rel(win, state['monitor_geom'])
+
+    #FIXME: Just use use_rect/2 and libwnck's gravity support.
+    dims = (int((use_rect.width - win_geom.width) / 2),
+            int((use_rect.height - win_geom.height) / 2),
+            int(win_geom.width),
+            int(win_geom.height))
+
+    logging.debug("dims %r", dims)
+    result = gtk.gdk.Rectangle(*dims)
+    logging.debug("result %r", tuple(result))
+
+    wm.reposition(win, result, use_rect)
+
+@commands.add('maximize', 'maximize')
+@commands.add('vertical-maximize', 'maximize_vertically')
+@commands.add('horizontal-maximize', 'maximize_horizontally')
+def toggle_state(wm, win, state, command):
+    """Given a window, toggle a state attribute like maximization.
+
+    @param command: The C{wnck.Window} method name to be conditionally prefixed
+        with "un", resolved, and called.
+    @type command: C{str}
+    """
+    target = not win.is_maximized()
+
+    logging.debug('maximize: %s', target)
+    getattr(win, ('' if target else 'un') + command)()
+
+#}
 
 if __name__ == '__main__':
     from optparse import OptionParser, OptionGroup
@@ -773,8 +799,8 @@ if __name__ == '__main__':
     ignore_workarea = ((not config.getboolean('general', 'UseWorkarea'))
                        or opts.no_workarea)
 
-    wm = WindowManager(POSITIONS, ignore_workarea=ignore_workarea)
-    app = QuickTileApp(wm, keymap, modkeys=modkeys)
+    wm = WindowManager(ignore_workarea=ignore_workarea)
+    app = QuickTileApp(wm, commands, keymap, modkeys=modkeys)
 
     if opts.showBinds:
         app.showBinds()
@@ -803,9 +829,9 @@ if __name__ == '__main__':
                 sys.exit(errno.ENOENT)
 
         #TODO: Fix this properly so I doesn't need to call a private member
-        wm._wnck_screen.force_update()
+        wm.screen.force_update()
 
         for arg in args:
-            wm.doCommand(arg)
+            commands.call(arg, wm)
         while gtk.events_pending():
             gtk.main_iteration()
