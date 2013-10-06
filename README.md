@@ -1,4 +1,5 @@
-# QuickTile, a WinSplit clone for X11 desktops
+# QuickTile
+Keyboard-driven Window Tiling for your existing X11 window manager
 
 ## Requirements:
 
