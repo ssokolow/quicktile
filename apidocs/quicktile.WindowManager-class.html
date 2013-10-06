@@ -89,7 +89,6 @@ object --+
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">commands</span>,
         <span class="summary-sig-arg">screen</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">ignore_workarea</span>=<span class="summary-sig-default">False</span>)</span><br />
       Initializes <code>WindowManager</code>.</td>
@@ -104,57 +103,16 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>int</code> or <code>None</code></span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#cmd_cycleMonitors" class="summary-sig-name">cmd_cycleMonitors</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">window</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Cycle the specified window (the active window if 
-      <code>window=None</code> between monitors while leaving the position 
-      within the monitor unchanged.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.cmd_cycleMonitors">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>bool</code> or <code>None</code></span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#cmd_toggleMaximize" class="summary-sig-name">cmd_toggleMaximize</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">win</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">state</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Given a window, toggle its maximization state or, optionally, set a 
-      specific state.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.cmd_toggleMaximize">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type"><code>gtk.gdk.Rectangle</code></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#cycleDimensions" class="summary-sig-name">cycleDimensions</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">dimensions</span>,
-        <span class="summary-sig-arg">window</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Given a list of shapes and a window, cycle through the list, taking 
-      one step each time this function is called.</td>
+          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#get_geometry_rel" class="summary-sig-name">get_geometry_rel</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">window</span>,
+        <span class="summary-sig-arg">monitor_geom</span>)</span><br />
+      Get window position relative to the monitor rather than the desktop.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.cycleDimensions">source&nbsp;code</a></span>
+            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_geometry_rel">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -164,33 +122,15 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>gtk.gdk.Rectangle</code></span>
+      <span class="summary-type"><code>(int, gtk.gdk.Rectangle)</code></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#cmd_moveCenter" class="summary-sig-name">cmd_moveCenter</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">window</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Center the window in the monitor it currently occupies.</td>
+          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#get_monitor" class="summary-sig-name">get_monitor</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">win</span>)</span><br />
+      Given a Window (Wnck or GDK), retrieve the monitor ID and geometry.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.cmd_moveCenter">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>bool</code></span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#doCommand" class="summary-sig-name">doCommand</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">command</span>)</span><br />
-      Resolve a textual positioning command and execute it.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.doCommand">source&nbsp;code</a></span>
+            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_monitor">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -220,41 +160,13 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><ul>
-        <li>
-          <code>(gtk.gdk.Window, gtk.gdk.Region, gtk.gdk.Rectangle, 
-          gtk.gdk.Rectangle, int)</code>
-        </li>
-        <li>
-          <code>(None, None, None, None)</code> (No window or 
-          <code>_NET_ACTIVE_WINDOW</code> unsupported)
-        </li>
-      </ul></span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#getGeometries" class="summary-sig-name">getGeometries</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">win</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Get the geometry for the given window (including window decorations) 
-      and the monitor it's on.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.getGeometries">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#reposition" class="summary-sig-name">reposition</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">win</span>,
-        <span class="summary-sig-arg">geom</span>,
+        <span class="summary-sig-arg">geom</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">monitor</span>=<span class="summary-sig-default">gtk.gdk.Rectangle(0, 0, 0, 0)</span>,
         <span class="summary-sig-arg">keep_maximize</span>=<span class="summary-sig-default">False</span>)</span><br />
       Position and size a window, decorations inclusive, according to the 
@@ -338,7 +250,6 @@ object --+
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">commands</span>,
         <span class="sig-arg">screen</span>=<span class="sig-default">None</span>,
         <span class="sig-arg">ignore_workarea</span>=<span class="sig-default">False</span>)</span>
     <br /><em class="fname">(Constructor)</em>
@@ -355,9 +266,6 @@ object --+
         <li><strong class="pname"><code>screen</code></strong> (<code>gtk.gdk.Screen</code>) - The X11 screen to operate on. If <code>None</code>, the default 
           screen as retrieved by <code>gtk.gdk.screen_get_default</code> 
           will be used.</li>
-        <li><strong class="pname"><code>commands</code></strong> (<code>dict</code>) - A dict of commands for <a 
-          href="quicktile.WindowManager-class.html#doCommand" 
-          class="link">doCommand</a> to resolve.</li>
     </ul></dd>
     <dt>Overrides:
         object.__init__
@@ -373,151 +281,59 @@ object --+
       </p>
 </div></td></tr></table>
 </div>
-<a name="cmd_cycleMonitors"></a>
+<a name="get_geometry_rel"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">cmd_cycleMonitors</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">window</span>=<span class="sig-default">None</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_geometry_rel</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">window</span>,
+        <span class="sig-arg">monitor_geom</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.cmd_cycleMonitors">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_geometry_rel">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
-  <p>Cycle the specified window (the active window if 
-  <code>window=None</code> between monitors while leaving the position 
-  within the monitor unchanged.</p>
-  <dl class="fields">
-    <dt>Returns: <code>int</code> or <code>None</code></dt>
-        <dd>The target monitor ID or <code>None</code> if the current window 
-          could not be found.</dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="cmd_toggleMaximize"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">cmd_toggleMaximize</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">win</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">state</span>=<span class="sig-default">None</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.cmd_toggleMaximize">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Given a window, toggle its maximization state or, optionally, set a 
-  specific state.</p>
+  <p>Get window position relative to the monitor rather than the 
+  desktop.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>state</code></strong> (<code>bool</code> or <code>None</code>) - If this is not <code>None</code>, set a specific maximization 
-          state. Otherwise, toggle maximization.</li>
-        <li><strong class="pname"><code>win</code></strong> (<code>gtk.gdk.Window</code>)</li>
-    </ul></dd>
-    <dt>Returns: <code>bool</code> or <code>None</code></dt>
-        <dd>The target state as a boolean (<code>True</code> = maximized) or 
-          <code>None</code> if the active window could not be retrieved.</dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="cycleDimensions"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">cycleDimensions</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">dimensions</span>,
-        <span class="sig-arg">window</span>=<span class="sig-default">None</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.cycleDimensions">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Given a list of shapes and a window, cycle through the list, taking 
-  one step each time this function is called.</p>
-  <p>If the window's dimensions are not within 100px (by euclidean 
-  distance) of an entry in the list, set them to the first list entry.</p>
-  <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>dimensions</code></strong> (<code>[(x, y, w, h), ...]</code>) - A list of tuples representing window geometries as floating-point
-          values between 0 and 1, inclusive.</li>
-        <li><strong class="pname"><code>window</code></strong> (<code>gtk.gdk.Window</code>)</li>
+        <li><strong class="pname"><code>monitor_geom</code></strong> (<code>gtk.gdk.Rectangle</code>) - The rectangle returned by 
+          <code>gdk.Screen.get_monitor_geometry</code></li>
+        <li><strong class="pname"><code>window</code></strong> (<code>wnck.Window</code>)</li>
     </ul></dd>
     <dt>Returns: <code>gtk.gdk.Rectangle</code></dt>
-        <dd>The new window dimensions.</dd>
   </dl>
 </td></tr></table>
 </div>
-<a name="cmd_moveCenter"></a>
+<a name="get_monitor"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">cmd_moveCenter</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">window</span>=<span class="sig-default">None</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_monitor</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">win</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.cmd_moveCenter">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_monitor">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
-  <p>Center the window in the monitor it currently occupies.</p>
-  <dl class="fields">
-    <dt>Returns: <code>gtk.gdk.Rectangle</code></dt>
-        <dd>The new window dimensions.</dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="doCommand"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">doCommand</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">command</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.doCommand">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Resolve a textual positioning command and execute it.</p>
-  <p>Supported command types:</p>
-  <ul>
-    <li>
-      Tuples/Lists of tuples to be fed to <a 
-      href="quicktile.WindowManager-class.html#cycleDimensions" 
-      class="link">cycleDimensions</a>
-    </li>
-    <li>
-      Command names which are valid methods of this class when prepended 
-      with <code>cmd_</code>.
-    </li>
-  </ul>
+  <p>Given a Window (Wnck or GDK), retrieve the monitor ID and 
+  geometry.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>command</code></strong> (<code>str</code>)</li>
+        <li><strong class="pname"><code>win</code></strong> (<code>wnck.Window</code> or <code>gtk.gdk.Window</code>)</li>
     </ul></dd>
-    <dt>Returns: <code>bool</code></dt>
-        <dd>A boolean indicating success/failure.</dd>
+    <dt>Returns: <code>(int, gtk.gdk.Rectangle)</code></dt>
+        <dd>A tuple containing the monitor ID and geometry.</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -551,82 +367,6 @@ object --+
   </dl>
 </td></tr></table>
 </div>
-<a name="getGeometries"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">getGeometries</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">win</span>=<span class="sig-default">None</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.getGeometries">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Get the geometry for the given window (including window decorations) 
-  and the monitor it's on. If no window is specified, the active window is 
-  used.</p>
-  <p>Returns a tuple consisting of:</p>
-  <ul>
-    <li>
-      <code>win</code> or the <code>gtk.gdk.Window</code> for the active 
-      window
-    </li>
-    <li>
-      A <code>gtk.gdk.Region</code> representing the usable portion of the 
-      monitor
-    </li>
-    <li>
-      A <code>gtk.gdk.Rectangle</code> representing the largest usable 
-      rectangle on the given monitor.
-    </li>
-    <li>
-      A <code>gtk.gdk.Rectangle</code> representing containing the window 
-      geometry
-    </li>
-    <li>
-      The monitor ID number (for multi-head desktops)
-    </li>
-  </ul>
-  <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>win</code></strong> (<code>gtk.gdk.Window</code>)</li>
-    </ul></dd>
-    <dt>Returns: <ul>
-        <li>
-          <code>(gtk.gdk.Window, gtk.gdk.Region, gtk.gdk.Rectangle, 
-          gtk.gdk.Rectangle, int)</code>
-        </li>
-        <li>
-          <code>(None, None, None, None)</code> (No window or 
-          <code>_NET_ACTIVE_WINDOW</code> unsupported)
-        </li>
-      </ul></dt>
-  </dl>
-<div class="fields">      <strong>Notes:</strong>
-      <ul class="nomargin-top">
-        <li>
-        Window geometry is relative to the monitor, not the desktop.
-        </li>
-        <li>
-        Checks for _NET* must remain here since WMs support --replace
-        </li>
-      </ul>
-      <strong>To Do:</strong>
-      <ul class="nomargin-top">
-        <li>
-        Confirm that changing WMs doesn't mess up quicktile.
-        </li>
-        <li>
-        Convert this into part of a decorator for command methods.
-        </li>
-      </ul>
-</div></td></tr></table>
-</div>
 <a name="reposition"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -636,7 +376,7 @@ object --+
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">reposition</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">win</span>,
-        <span class="sig-arg">geom</span>,
+        <span class="sig-arg">geom</span>=<span class="sig-default">None</span>,
         <span class="sig-arg">monitor</span>=<span class="sig-default">gtk.gdk.Rectangle(0, 0, 0, 0)</span>,
         <span class="sig-arg">keep_maximize</span>=<span class="sig-default">False</span>)</span>
   </h3>
@@ -652,18 +392,15 @@ object --+
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>monitor</code></strong> (<code>gtk.gdk.Rectangle</code>) - The frame relative to which <code>geom</code> should be 
+          interpreted. Leave at the default for the whole desktop.</li>
         <li><strong class="pname"><code>keep_maximize</code></strong> (<code>bool</code>) - Whether to re-maximize a maximized window after un-maximizing it 
           to move it.</li>
         <li><strong class="pname"><code>win</code></strong> (<code>gtk.gdk.Window</code>)</li>
         <li><strong class="pname"><code>geom</code></strong> (<code>gtk.gdk.Rectangle</code>)</li>
-        <li><strong class="pname"><code>monitor</code></strong> (<code>gtk.gdk.Rectangle</code>)</li>
     </ul></dd>
   </dl>
-<div class="fields">      <p><strong>To Do:</strong>
-        Also handle horizontal and vertical maximization when 
-    <code>keep_maximized=True</code>
-      </p>
-</div></td></tr></table>
+</td></tr></table>
 </div>
 <br />
 <!-- ==================== NAVIGATION BAR ==================== -->
@@ -692,7 +429,7 @@ object --+
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Oct  6 09:51:27 2013
+    Generated by Epydoc 3.0.1 on Sun Oct  6 15:30:08 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

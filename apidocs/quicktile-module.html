@@ -69,10 +69,6 @@
         self-backgrounding.
       </li>
       <li>
-        Try de-duplicating &quot;This temporary hack prevents an Exception 
-        with MPlayer.&quot;
-      </li>
-      <li>
         Look into supporting XPyB (the Python equivalent to 
         <code>libxcb</code>) for global keybinding.
       </li>
@@ -80,16 +76,14 @@
         Clean up the code. It's functional, but an ugly rush-job.
       </li>
       <li>
-        Decide how to handle maximization and stick with it.
-      </li>
-      <li>
         Implement the secondary major features of WinSplit Revolution (eg. 
         process-shape associations, locking/welding window edges, etc.)
       </li>
       <li>
-        Consider rewriting <code>cycleDimensions</code> to allow 
-        command-line use to jump to a specific index without actually 
-        flickering the window through all the intermediate shapes.
+        Consider rewriting <a href="quicktile-module.html#cycle_dimensions"
+        class="link">cycle_dimensions</a> to allow command-line use to jump
+        to a specific index without actually flickering the window through 
+        all the intermediate shapes.
       </li>
       <li>
         Can I hook into the GNOME and KDE keybinding APIs without using 
@@ -122,7 +116,7 @@
         </li>
       </ul>
       <p><strong>Version:</strong>
-        0.1.6
+        0.2.0
       </p>
       <p><strong>Author:</strong>
         Stephan Sokolow (deitarion/SSokolow)
@@ -154,6 +148,14 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a href="quicktile.CommandRegistry-class.html" class="summary-name">CommandRegistry</a><br />
+      Handles lookup and boilerplate for window management commands.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a href="quicktile.WindowManager-class.html" class="summary-name">WindowManager</a><br />
       A simple API-wrapper class for manipulating window positioning.
     </td>
@@ -164,6 +166,19 @@
     </td><td class="summary">
         <a href="quicktile.QuickTileApp-class.html" class="summary-name">QuickTileApp</a><br />
       The basic Glib application itself.
+    </td>
+  </tr>
+<tr bgcolor="#e8f0f8" >
+  <th colspan="2" class="group-header"
+    >&nbsp;&nbsp;&nbsp;&nbsp;Settings</th></tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="quicktile.GravityLayout-class.html" class="summary-name">GravityLayout</a><br />
+      Helper for generating <a 
+        href="quicktile-module.html#cycle_dimensions" 
+        class="link">cycle_dimensions</a> presets.
     </td>
   </tr>
 <tr bgcolor="#e8f0f8" >
@@ -215,6 +230,90 @@
       
     </td>
   </tr>
+<tr bgcolor="#e8f0f8" >
+  <th colspan="2" class="group-header"
+    >&nbsp;&nbsp;&nbsp;&nbsp;Tiling Commands</th></tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>gtk.gdk.Rectangle</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile-module.html#cycle_dimensions" class="summary-sig-name">cycle_dimensions</a>(<span class="summary-sig-arg">wm</span>,
+        <span class="summary-sig-arg">win</span>,
+        <span class="summary-sig-arg">state</span>,
+        <span class="summary-sig-arg">*dimensions</span>)</span><br />
+      Given a list of shapes and a window, cycle through the list, taking 
+      one step each time this function is called.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#cycle_dimensions">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile-module.html#cycle_monitors" class="summary-sig-name">cycle_monitors</a>(<span class="summary-sig-arg">wm</span>,
+        <span class="summary-sig-arg">win</span>,
+        <span class="summary-sig-arg">state</span>)</span><br />
+      Cycle the specified window (the active window if 
+      <code>window=None</code> between monitors while leaving the position 
+      within the monitor unchanged.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#cycle_monitors">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile-module.html#cmd_moveCenter" class="summary-sig-name">cmd_moveCenter</a>(<span class="summary-sig-arg">wm</span>,
+        <span class="summary-sig-arg">win</span>,
+        <span class="summary-sig-arg">state</span>)</span><br />
+      Center the window in the monitor it currently occupies.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#cmd_moveCenter">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile-module.html#toggle_state" class="summary-sig-name">toggle_state</a>(<span class="summary-sig-arg">wm</span>,
+        <span class="summary-sig-arg">win</span>,
+        <span class="summary-sig-arg">state</span>,
+        <span class="summary-sig-arg">command</span>)</span><br />
+      Given a window, toggle a state attribute like maximization.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#toggle_state">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
 </table>
 <!-- ==================== VARIABLES ==================== -->
 <a name="section-Variables"></a>
@@ -245,14 +344,17 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="sessBus"></a><span class="summary-name">sessBus</span> = <code title="SessionBus()">SessionBus()</code>
+        <a name="sessBus"></a><span class="summary-name">sessBus</span> = <code title="SessionBus()">SessionBus()</code><br />
+      Used by <a href="quicktile.QuickTileApp-class.html#_init_dbus" 
+      class="link" onclick="show_private();">QuickTileApp._init_dbus</a>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="DBUS_PRESENT"></a><span class="summary-name">DBUS_PRESENT</span> = <code title="True">True</code>
+        <a name="DBUS_PRESENT"></a><span class="summary-name">DBUS_PRESENT</span> = <code title="True">True</code><br />
+      Indicates whether python-dbus was found
     </td>
   </tr>
 <tr>
@@ -266,7 +368,42 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a name="commands"></a><span class="summary-name">commands</span> = <code title="CommandRegistry()">CommandRegistry()</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="None">None</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="col"></a><span class="summary-name">col</span> = <code title="0.333333333333">0.333333333333</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="grav"></a><span class="summary-name">grav</span> = <code title="'bottom-right'"><code class="variable-quote">'</code><code class="variable-string">bottom-right</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="gv"></a><span class="summary-name">gv</span> = <code title="&lt;quicktile.GravityLayout object at 0x230f110&gt;">&lt;quicktile.GravityLayout object at 0x230f110&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="x"></a><span class="summary-name">x</span> = <code title="0.666666666667">0.666666666667</code>
     </td>
   </tr>
 <tr bgcolor="#e8f0f8" >
@@ -276,16 +413,18 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="quicktile-module.html#POSITIONS" class="summary-name">POSITIONS</a> = <code title="{'bottom': ((0, 0.5, 1, 0.5),
-            (0.333333333333, 0.5, 0.333333333333, 0.5)),
- 'bottom-left': ((0, 0.5, 0.5, 0.5),
-                 (0, 0.5, 0.333333333333, 0.5),
-                 (0, 0.5, 0.666666666667, 0.5)),
- 'bottom-right': ((0.5, 0.5, 0.5, 0.5),
+        <a href="quicktile-module.html#POSITIONS" class="summary-name">POSITIONS</a> = <code title="{'bottom': [(0.0, 0.5, 1.0, 0.5),
+            (0.333333333333, 0.5, 0.333333333333, 0.5),
+            (0.166666666667, 0.5, 0.666666666667, 0.5)],
+ 'bottom-left': [(0.0, 0.5, 0.5, 0.5),
+                 (0.0, 0.5, 0.333333333333, 0.5),
+                 (0.0, 0.5, 0.666666666667, 0.5)],
+ 'bottom-right': [(0.5, 0.5, 0.5, 0.5),
                   (0.666666666667, 0.5, 0.333333333333, 0.5),
-                  (0.333333333333, 0.5, 0.666666666667, 0.5)),
-..."><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">bottom</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-group">(</code>0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>1<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">, </code><code class="variable-group">(</code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-ellipsis">...</code></code><br />
-      command-to-action mappings
+..."><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">bottom</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">[</code><code class="variable-group">(</code>0.0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>1.0<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">, </code><code class="variable-group">(</code>0.333333333333<code class="variable-op">,</code><code class="variable-ellipsis">...</code></code><br />
+      command-to-position mappings for <a 
+      href="quicktile-module.html#cycle_dimensions" 
+      class="link">cycle_dimensions</a>
     </td>
   </tr>
 <tr>
@@ -313,6 +452,147 @@
     </td>
   </tr>
 </table>
+<!-- ==================== FUNCTION DETAILS ==================== -->
+<a name="section-FunctionDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Function Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-FunctionDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="cycle_dimensions"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">cycle_dimensions</span>(<span class="sig-arg">wm</span>,
+        <span class="sig-arg">win</span>,
+        <span class="sig-arg">state</span>,
+        <span class="sig-arg">*dimensions</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#cycle_dimensions">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Given a list of shapes and a window, cycle through the list, taking 
+  one step each time this function is called.</p>
+  <p>If the window's dimensions are not within 100px (by euclidean 
+  distance) of an entry in the list, set them to the first list entry.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>dimensions</code></strong> (<code>[(x, y, w, h), ...]</code>) - A list of tuples representing window geometries as floating-point
+          values between 0 and 1, inclusive.</li>
+        <li><strong class="pname"><code>win</code></strong> (<code>gtk.gdk.Window</code>)</li>
+    </ul></dd>
+    <dt>Returns: <code>gtk.gdk.Rectangle</code></dt>
+        <dd>The new window dimensions.</dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@commands.addMany(POSITIONS)</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="cycle_monitors"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">cycle_monitors</span>(<span class="sig-arg">wm</span>,
+        <span class="sig-arg">win</span>,
+        <span class="sig-arg">state</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#cycle_monitors">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Cycle the specified window (the active window if 
+  <code>window=None</code> between monitors while leaving the position 
+  within the monitor unchanged.</p>
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@commands.add('monitor-switch')</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="cmd_moveCenter"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">cmd_moveCenter</span>(<span class="sig-arg">wm</span>,
+        <span class="sig-arg">win</span>,
+        <span class="sig-arg">state</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#cmd_moveCenter">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Center the window in the monitor it currently occupies.</p>
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@commands.add('move-to-center')</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="toggle_state"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">toggle_state</span>(<span class="sig-arg">wm</span>,
+        <span class="sig-arg">win</span>,
+        <span class="sig-arg">state</span>,
+        <span class="sig-arg">command</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#toggle_state">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Given a window, toggle a state attribute like maximization.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>command</code></strong> (<code>str</code>) - The <code>wnck.Window</code> method name to be conditionally 
+          prefixed with &quot;un&quot;, resolved, and called.</li>
+    </ul></dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@commands.add('maximize', 'maximize')</code></li>
+        <li><code>@commands.add('vertical-maximize', 'maximize_vertically')</code></li>
+        <li><code>@commands.add('horizontal-maximize', 'maximize_horizontally')</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
 <!-- ==================== VARIABLES DETAILS ==================== -->
 <a name="section-VariablesDetails"></a>
 <table class="details" border="1" cellpadding="3"
@@ -337,20 +617,22 @@
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <h3 class="epydoc">POSITIONS</h3>
-  <p>command-to-action mappings</p>
+  <p>command-to-position mappings for <a 
+  href="quicktile-module.html#cycle_dimensions" 
+  class="link">cycle_dimensions</a></p>
   <dl class="fields">
   </dl>
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">bottom</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-group">(</code>0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>1<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
-            <code class="variable-group">(</code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-group">)</code><code class="variable-op">,</code>
- <code class="variable-quote">'</code><code class="variable-string">bottom-left</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-group">(</code>0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
-                 <code class="variable-group">(</code>0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
-                 <code class="variable-group">(</code>0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.666666666667<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-group">)</code><code class="variable-op">,</code>
- <code class="variable-quote">'</code><code class="variable-string">bottom-right</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-group">(</code>0.5<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
+<code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">bottom</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">[</code><code class="variable-group">(</code>0.0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>1.0<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
+            <code class="variable-group">(</code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
+            <code class="variable-group">(</code>0.166666666667<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.666666666667<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-group">]</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">bottom-left</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">[</code><code class="variable-group">(</code>0.0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
+                 <code class="variable-group">(</code>0.0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
+                 <code class="variable-group">(</code>0.0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.666666666667<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-group">]</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">bottom-right</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">[</code><code class="variable-group">(</code>0.5<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
                   <code class="variable-group">(</code>0.666666666667<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
-                  <code class="variable-group">(</code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.666666666667<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-group">)</code><code class="variable-op">,</code>
 <code class="variable-ellipsis">...</code>
 </pre></td></tr></table>
 </dd>
@@ -428,7 +710,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Oct  6 09:51:27 2013
+    Generated by Epydoc 3.0.1 on Sun Oct  6 15:30:08 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
