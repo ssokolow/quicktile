@@ -6,6 +6,9 @@ title: FAQ
 <h2>Frequently/Potentially Asked Questions</h2>
 
 <dl class="big">
+    <dt>I set <code>ModMask = Control Shift Mod1</code> but QuickTile isn't responding. Help?</dt>
+    <dd>This usually happens when the Compiz Grid plugin is still consuming keystrokes. Make sure you've disabled the Grid plugin in <acronym title="CompizConfig Settings Manager"><a href="http://wiki.compiz.org/CCSM">CCSM</a></acronym> and then restart Compiz (eg. log out and back in) to make sure it's let go of the keybindings.</dd>
+
     <dt>How do I keep QuickTile from positioning windows over/under my panels?</dt>
     <dd><p>You've got an old <code>~/.config/quicktile.cfg</code> with a workaround for another problem that no longer exists.</p>
         <p>Open it up and change <code>UseWorkarea = False</code> to <code>UseWorkarea = True</code></p>
@@ -13,14 +16,12 @@ title: FAQ
 
     <dt>QuickTile resizes but doesn't move my windows. What do I do?</dt>
     <dd>
-        <p>Some window managers can be set to ignore requests by applications to move your windows. It's supposed to let you assert dominance over certain kinds of badly-designed applications but, because QuickTile is also an ordinary application in the eyes of the window manager, it's also affected.</p>
-        <p>Under Metacity, you can disable this behaviour with the following command:</p>
+        <p>Some window managers can be set to ignore requests by applications to move your windows. This used to be a problem before QuickTile started announcing itself to the system as a window-management utility, but it shouldn't be any longer.</p>
+        <p>If you are still experiencing this, please <a href="https://github.com/ssokolow/quicktile/issues">report it</a> so the cause can be invetigated. While you wait, you can work around it by disabling the misbehaving application protection in your window manager.</p>
+        <p>Under Metacity, for example, that is accomplished using the following command:</p>
 
         {% highlight bash %}gconftool-2 --set "/apps/metacity/general/disable_workarounds" false --type bool{% endhighlight %}
     </dd>
-
-    <dt>I set <code>ModMask = Control Shift Mod1</code> but QuickTile isn't responding. Help?</dt>
-    <dd>This usually happens when the Compiz Grid plugin is still consuming keystrokes. Make sure you've disabled the Grid plugin in <acronym title="CompizConfig Settings Manager"><a href="http://wiki.compiz.org/CCSM">CCSM</a></acronym> and then restart Compiz (eg. log out and back in) to make sure it's let go of the keybindings.</dd>
 
     <dt>QuickTile doesn't meet my needs. What can I do?</dt>
     <dd>
