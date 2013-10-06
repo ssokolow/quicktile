@@ -801,6 +801,9 @@ if __name__ == '__main__':
                 print "\nUse --help for a list of valid options."
                 sys.exit(errno.ENOENT)
 
+        #TODO: Fix this properly so I doesn't need to call a private member
+        wm._wnck_screen.force_update()
+
         for arg in args:
             wm.doCommand(arg)
         while gtk.events_pending():
