@@ -5,6 +5,7 @@
  * An X11-based desktop (The code expects NETWM hints and X11-style window decorations)
  * Python 2.x (Tested with 2.5 on 2011-09-10. Developed on 2.7)
  * PyGTK 2.2 (assuming `get_active_window()` isn't newer than that)
+ * `python-wnck`
  * `python-xlib` (optional, required for key-binding)
  * `dbus-python` (optional, required for D-Bus service)
 
@@ -12,7 +13,7 @@ If you are running an APT-based Linux distribution with Debian-compatible
 package names (like the Ubuntu family of distros), you can install these
 dependencies via your package manager by running this command:
 
-    sudo apt-get install python python-gtk2 python-xlib python-dbus
+    sudo apt-get install python python-gtk2 python-xlib python-dbus python-wnck
 
 Due to changes in how GTK+ and X11 are accessed, support for Python 3 is
 non-trivial and has been delayed by the author's courseload.
@@ -81,5 +82,14 @@ keyboard and your mouse.
 As with the built-in keybinding, requesting the same action more than once
 in a row will cycle through the available window sizes. For further details,
 see `--help`.
+
+## Known Bugs
+
+* Under Openbox, QuickTile sends many
+  `Unhandled action type _OB_WM_ACTION_UNDECORATE` messages to the logging
+  output. This is
+  [a bug](https://icculus.org/pipermail/openbox/2009-January/006025.html) in
+  libwnck, which I depend on for reliable window management  and is outside
+  my control.
 
 Thanks to Thomas Vander Stichele for some of the documentation cleanups.

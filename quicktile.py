@@ -35,13 +35,15 @@ __author__  = "Stephan Sokolow (deitarion/SSokolow)"
 __version__ = "0.1.6"
 __license__ = "GNU GPL 2.0 or later"
 
-import pygtk
-pygtk.require('2.0')
-
-import errno, gtk, gobject, operator, logging, os, sys
+import errno, operator, logging, os, sys
 from ConfigParser import RawConfigParser
 from heapq import heappop, heappush
 from itertools import chain, combinations
+
+import pygtk
+pygtk.require('2.0')
+
+import gtk, gobject, wnck
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
@@ -201,6 +203,7 @@ class WindowManager(object):
                in KDE 3.x. (Not sure what would be equivalent elsewhere)
         """
         self._root = screen or gtk.gdk.screen_get_default()
+        self._wnck_screen = wnck.screen_get(self._root.get_number())
         self.commands = commands
         self.ignore_workarea = ignore_workarea
 
@@ -582,13 +585,16 @@ class WindowManager(object):
         #Workaround for my inability to reliably detect maximization.
         win.unmaximize()
 
-        #FIXME: Ignore, reset, or compensate for window gravity
-        # Probably needs something like these:
-        #  request.GetWindowAttributes(display, window_id).{bit,win}_gravity
         border, titlebar = self.get_frame_thickness(win)
 
-        win.move_resize(geom.x + monitor.x, geom.y + monitor.y,
-                geom.width - (border * 2), geom.height - (titlebar + border))
+        if isinstance(win, gtk.gdk.Window):
+            win = wnck.window_get(win.xid)
+
+        win.set_geometry(wnck.WINDOW_GRAVITY_STATIC,
+                wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y |
+                wnck.WINDOW_CHANGE_WIDTH | wnck.WINDOW_CHANGE_HEIGHT,
+                geom.x + monitor.x, geom.y + monitor.y,
+                geom.width, geom.height)
 
 class QuickTileApp(object):
     """The basic Glib application itself."""
