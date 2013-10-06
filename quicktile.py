@@ -74,52 +74,55 @@ XDG_CONFIG_DIR = os.environ.get('XDG_CONFIG_HOME',
                                 os.path.expanduser('~/.config'))
 #{ Settings
 
+class GravityLayout(object):
+    """Helper for generating L{cycle_dimensions} presets."""
+    #TODO: Normalize these to the GTK or CSS terminology for 1.0
+    GRAVITIES = {
+        'top-left': (0.0, 0.0),
+        'top': (0.5, 0.0),
+        'top-right': (1.0, 0.0),
+        'left': (0.0, 0.5),
+        'middle': (0.5, 0.5),
+        'right': (1.0, 0.5),
+        'bottom-left': (0.0, 1.0),
+        'bottom': (0.5, 1.0),
+        'bottom-right': (1.0, 1.0),
+    } #: Possible window alignments relative to the monitor/desktop.
+
+    def __call__(self, w, h, gravity='top-left', x=None, y=None):
+        """
+        @param w: Desired width
+        @param h: Desired height
+        @param gravity: Desired window alignment from L{GRAVITIES}
+        @param x: Desired horizontal position if not the same as C{gravity}
+        @param y: Desired vertical position if not the same as C{gravity}
+
+        @note: All parameters except C{gravity} are decimal values in the range
+        C{0 <= x <= 1}.
+        """
+
+        x = x or self.GRAVITIES[gravity][0]
+        y = y or self.GRAVITIES[gravity][1]
+        offset_x = w * self.GRAVITIES[gravity][0]
+        offset_y = h * self.GRAVITIES[gravity][1]
+
+        return (x - offset_x,
+                y - offset_y,
+                w, h)
+
+col, gv = 1.0 / 3, GravityLayout()
+
 #TODO: Figure out how best to put this in the config file.
 POSITIONS = {
-    'left': (
-        (0,         0,   0.5,         1),
-        (0,         0,   1.0 / 3,     1),
-        (0,         0,   1.0 / 3 * 2, 1)
-    ),
-    'middle': (
-        (0,           0,   1,           1),
-        (1.0 / 3,     0,   1.0 / 3,     1),
-        (1.0 / 6,     0,   1.0 / 3 * 2, 1)
-    ),
-    'right': (
-        (0.5,         0,   0.5,         1),
-        (1.0 / 3 * 2, 0,   1.0 / 3,     1),
-        (1.0 / 3,     0,   1.0 / 3 * 2, 1)
-    ),
-    'top': (
-        (0,           0,   1,           0.5),
-        (1.0 / 3,     0,   1.0 / 3,     0.5)
-    ),
-    'bottom': (
-        (0,           0.5, 1,           0.5),
-        (1.0 / 3,     0.5, 1.0 / 3,     0.5)
-    ),
-    'top-left': (
-        (0,         0,   0.5,         0.5),
-        (0,         0,   1.0 / 3,     0.5),
-        (0,         0,   1.0 / 3 * 2, 0.5)
-    ),
-    'top-right': (
-        (0.5,         0,   0.5,         0.5),
-        (1.0 / 3 * 2, 0,   1.0 / 3,     0.5),
-        (1.0 / 3,     0,   1.0 / 3 * 2, 0.5)
-    ),
-    'bottom-left': (
-        (0,           0.5, 0.5,         0.5),
-        (0,           0.5, 1.0 / 3,     0.5),
-        (0,           0.5, 1.0 / 3 * 2, 0.5)
-    ),
-    'bottom-right': (
-        (0.5,         0.5, 0.5,         0.5),
-        (1.0 / 3 * 2, 0.5, 1.0 / 3,     0.5),
-        (1.0 / 3,     0.5, 1.0 / 3 * 2, 0.5)
-    ),
+    'middle': [gv(x, 1, 'middle') for x in (1.0, col, col * 2)],
 }  #: command-to-position mappings for L{cycle_dimensions}
+
+for grav in ('top', 'bottom'):
+    POSITIONS[grav] = [gv(x, 0.5, grav) for x in (1.0, col, col * 2)]
+for grav in ('left', 'right'):
+    POSITIONS[grav] = [gv(x, 1, grav) for x in (0.5, col, col * 2)]
+for grav in ('top-left', 'top-right', 'bottom-left', 'bottom-right'):
+    POSITIONS[grav] = [gv(x, 0.5, grav) for x in (0.5, col, col * 2)]
 
 #NOTE: For keysyms outside the latin1 and miscellany groups, you must first
 #      call C{Xlib.XK.load_keysym_group()} with the name (minus extension) of
