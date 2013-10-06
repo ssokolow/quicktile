@@ -29,7 +29,7 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
 
 __appname__ = "QuickTile"
 __author__  = "Stephan Sokolow (deitarion/SSokolow)"
-__version__ = "0.1.6"
+__version__ = "0.2.0"
 __license__ = "GNU GPL 2.0 or later"
 
 import errno, operator, logging, os, sys
