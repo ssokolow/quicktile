@@ -43,6 +43,7 @@ pygtk.require('2.0')
 import gtk, gobject, wnck
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+wnck.set_client_type(wnck.CLIENT_TYPE_PAGER)
 
 try:
     from Xlib import X
