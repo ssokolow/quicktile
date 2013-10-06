@@ -63,6 +63,8 @@ object --+
 </pre>
 
 <hr />
+<p>The basic Glib application itself.</p>
+
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
 <table class="summary" border="1" cellpadding="3"
@@ -88,8 +90,9 @@ object --+
         <tr>
           <td><span class="summary-sig"><a href="quicktile.QuickTileApp-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">wm</span>,
-        <span class="summary-sig-arg">keys</span>=<span class="summary-sig-default">None</span>)</span><br />
-      x.__init__(...) initializes x; see help(type(x)) for signature</td>
+        <span class="summary-sig-arg">keys</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">modkeys</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Populate the instance variables.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.__init__">source&nbsp;code</a></span>
             
@@ -106,7 +109,7 @@ object --+
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="_init_dbus"></a><span class="summary-sig-name">_init_dbus</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Setup dbus-python components in the PyGTK event loop</td>
+      Set up dbus-python components in the Glib event loop</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp._init_dbus">source&nbsp;code</a></span>
             
@@ -122,8 +125,8 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="_init_xlib"></a><span class="summary-sig-name">_init_xlib</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Setup python-xlib components in the PyGTK event loop</td>
+          <td><span class="summary-sig"><a href="quicktile.QuickTileApp-class.html#_init_xlib" class="summary-sig-name" onclick="show_private();">_init_xlib</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Set up python-xlib components in the Glib event loop</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp._init_xlib">source&nbsp;code</a></span>
             
@@ -139,7 +142,12 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="run"></a><span class="summary-sig-name">run</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td><span class="summary-sig"><a name="run"></a><span class="summary-sig-name">run</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Call <a href="quicktile.QuickTileApp-class.html#_init_xlib" 
+      class="link" onclick="show_private();">_init_xlib</a> and <a 
+      href="quicktile.QuickTileApp-class.html#_init_dbus" class="link" 
+      onclick="show_private();">_init_dbus</a> if available, then call 
+      <code>gtk.main()</code>.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.run">source&nbsp;code</a></span>
             
@@ -155,11 +163,30 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="handle_xevent"></a><span class="summary-sig-name">handle_xevent</span>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="quicktile.QuickTileApp-class.html#handle_xerror" class="summary-sig-name">handle_xerror</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">err</span>,
+        <span class="summary-sig-arg">req</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Used to identify when attempts to bind keys fail.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.handle_xerror">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.QuickTileApp-class.html#handle_xevent" class="summary-sig-name">handle_xevent</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">src</span>,
         <span class="summary-sig-arg">cond</span>,
         <span class="summary-sig-arg">handle</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Handle pending python-xlib events</td>
+      Handle pending python-xlib events.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.handle_xevent">source&nbsp;code</a></span>
             
@@ -175,7 +202,9 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="showBinds"></a><span class="summary-sig-name">showBinds</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td><span class="summary-sig"><a name="showBinds"></a><span class="summary-sig-name">showBinds</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Print a formatted readout of defined keybindings and the modifier 
+      mask to stdout.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.showBinds">source&nbsp;code</a></span>
             
@@ -201,6 +230,31 @@ object --+
       <code>__str__</code>,
       <code>__subclasshook__</code>
       </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="keybinds_failed"></a><span class="summary-name">keybinds_failed</span> = <code title="False">False</code>
     </td>
   </tr>
 </table>
@@ -256,7 +310,8 @@ object --+
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">wm</span>,
-        <span class="sig-arg">keys</span>=<span class="sig-default">None</span>)</span>
+        <span class="sig-arg">keys</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">modkeys</span>=<span class="sig-default">None</span>)</span>
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
@@ -264,12 +319,91 @@ object --+
     </td>
   </tr></table>
   
-  <p>x.__init__(...) initializes x; see help(type(x)) for signature</p>
+  <p>Populate the instance variables.</p>
   <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>keys</code></strong> (<code>dict</code>) - A dict mapping X11 keysyms to <a 
+          href="quicktile.WindowManager-class.html#doCommand" 
+          class="link">WindowManager.doCommand</a> command strings.</li>
+        <li><strong class="pname"><code>modkeys</code></strong> (<code>str</code>) - A modifier mask to prefix to all keybindings.</li>
+        <li><strong class="pname"><code>wm</code></strong> (The <a href="quicktile.WindowManager-class.html" 
+          class="link">WindowManager</a> instance to use.)</li>
+    </ul></dd>
     <dt>Overrides:
         object.__init__
-        <dd><em class="note">(inherited documentation)</em></dd>
     </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="_init_xlib"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_init_xlib</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp._init_xlib">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Set up python-xlib components in the Glib event loop</p>
+  <p>Source: <a href="http://www.larsen-b.com/Article/184.html" 
+  target="_top">http://www.larsen-b.com/Article/184.html</a></p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="handle_xerror"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_xerror</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">err</span>,
+        <span class="sig-arg">req</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.handle_xerror">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Used to identify when attempts to bind keys fail.</p>
+  <dl class="fields">
+  </dl>
+<div class="fields">      <p><strong>Note:</strong>
+        If you can make python-xlib's <code>CatchError</code> actually work
+        or if you can retrieve more information to show, feel free.
+      </p>
+</div></td></tr></table>
+</div>
+<a name="handle_xevent"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_xevent</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">src</span>,
+        <span class="sig-arg">cond</span>,
+        <span class="sig-arg">handle</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.handle_xevent">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Handle pending python-xlib events.</p>
+  <p>Filters for <code>X.KeyPress</code> events, resolves them to commands,
+  and calls <a href="quicktile.WindowManager-class.html#doCommand" 
+  class="link">WindowManager.doCommand</a> on them.</p>
+  <dl class="fields">
   </dl>
 </td></tr></table>
 </div>
@@ -300,7 +434,7 @@ object --+
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Thu Sep  8 17:34:53 2011
+    Generated by Epydoc 3.0.1 on Sun Oct  6 06:27:40 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

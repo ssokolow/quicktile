@@ -92,7 +92,7 @@ object --+
         <span class="summary-sig-arg">commands</span>,
         <span class="summary-sig-arg">screen</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">ignore_workarea</span>=<span class="summary-sig-default">False</span>)</span><br />
-      Initializes WindowManager.</td>
+      Initializes <code>WindowManager</code>.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.__init__">source&nbsp;code</a></span>
             
@@ -110,9 +110,9 @@ object --+
         <tr>
           <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#cmd_cycleMonitors" class="summary-sig-name">cmd_cycleMonitors</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">window</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Cycle the specified window (the active window if none was explicitly 
-      specified) between monitors while leaving the position within the 
-      monitor unchanged.</td>
+      Cycle the specified window (the active window if 
+      <code>window=None</code> between monitors while leaving the position 
+      within the monitor unchanged.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.cmd_cycleMonitors">source&nbsp;code</a></span>
             
@@ -151,8 +151,7 @@ object --+
           <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#cycleDimensions" class="summary-sig-name">cycleDimensions</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">dimensions</span>,
         <span class="summary-sig-arg">window</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Given a window and a list of 4-tuples containing dimensions as a 
-      decimal percentage of monitor size, cycle through the list, taking 
+      Given a list of shapes and a window, cycle through the list, taking 
       one step each time this function is called.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.cycleDimensions">source&nbsp;code</a></span>
@@ -227,6 +226,26 @@ object --+
       Given a window, return a (border, titlebar) thickness tuple.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_frame_thickness">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>gtk.gdk.Region</code>, <code>gtk.gdk.Rectangle</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#get_workarea" class="summary-sig-name">get_workarea</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">monitor</span>,
+        <span class="summary-sig-arg">ignore_struts</span>=<span class="summary-sig-default">False</span>)</span><br />
+      Retrieve the usable area of the specified monitor using the most 
+      expressive method the window manager supports.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_workarea">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -354,14 +373,14 @@ object --+
     </td>
   </tr></table>
   
-  <p>Initializes WindowManager.</p>
+  <p>Initializes <code>WindowManager</code>.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>screen</code></strong> (<code>gtk.gdk.Screen</code>) - The X11 screen to operate on. If <code>None</code>, the default 
           screen as retrieved by <code>gtk.gdk.screen_get_default</code> 
           will be used.</li>
-        <li><strong class="pname"><code>commands</code></strong> (dict) - A dict of commands for <a 
+        <li><strong class="pname"><code>commands</code></strong> (<code>dict</code>) - A dict of commands for <a 
           href="quicktile.WindowManager-class.html#doCommand" 
           class="link">doCommand</a> to resolve.</li>
     </ul></dd>
@@ -394,17 +413,17 @@ object --+
     </td>
   </tr></table>
   
-  <p>Cycle the specified window (the active window if none was explicitly 
-  specified) between monitors while leaving the position within the monitor
-  unchanged.</p>
+  <p>Cycle the specified window (the active window if 
+  <code>window=None</code> between monitors while leaving the position 
+  within the monitor unchanged.</p>
   <dl class="fields">
     <dt>Returns: <code>int</code> or <code>None</code></dt>
-        <dd>The target monitor ID or None if the current window could not be 
-          found.</dd>
+        <dd>The target monitor ID or <code>None</code> if the current window 
+          could not be found.</dd>
   </dl>
 <div class="fields">      <p><strong>Bug:</strong>
         I may have to hack up my own maximization detector since 
-    win.get_state() seems to be broken.
+    <code>win.get_state()</code> seems to be broken.
       </p>
 </div></td></tr></table>
 </div>
@@ -429,16 +448,16 @@ object --+
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>win</code></strong> (<code>gtk.gdk.Window</code>) - The window on which to operate</li>
-        <li><strong class="pname"><code>state</code></strong> (<code>bool</code> or <code>None</code>) - If this is not None, set a specific maximization state. 
-          Otherwise, toggle maximization.</li>
+        <li><strong class="pname"><code>state</code></strong> (<code>bool</code> or <code>None</code>) - If this is not <code>None</code>, set a specific maximization 
+          state. Otherwise, toggle maximization.</li>
+        <li><strong class="pname"><code>win</code></strong> (<code>gtk.gdk.Window</code>)</li>
     </ul></dd>
     <dt>Returns: <code>bool</code> or <code>None</code></dt>
-        <dd>The target state as a boolean (True = maximized) or None if the 
-          active window could not be retrieved.</dd>
+        <dd>The target state as a boolean (<code>True</code> = maximized) or 
+          <code>None</code> if the active window could not be retrieved.</dd>
   </dl>
 <div class="fields">      <p><strong>Bug:</strong>
-        win.unmaximize() seems to either have no effect or not get called
+        <code>win.unmaximize()</code> seems to have no effect or not get called
       </p>
 </div></td></tr></table>
 </div>
@@ -458,12 +477,17 @@ object --+
     </td>
   </tr></table>
   
-  <p>Given a window and a list of 4-tuples containing dimensions as a 
-  decimal percentage of monitor size, cycle through the list, taking one 
-  step each time this function is called.</p>
-  <p>If the window's dimensions are not in the list, set them to the first 
-  list entry.</p>
+  <p>Given a list of shapes and a window, cycle through the list, taking 
+  one step each time this function is called.</p>
+  <p>If the window's dimensions are not within 100px (by euclidean 
+  distance) of an entry in the list, set them to the first list entry.</p>
   <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>dimensions</code></strong> (<code>[(x, y, w, h), ...]</code>) - A list of tuples representing window geometries as floating-point
+          values between 0 and 1, inclusive.</li>
+        <li><strong class="pname"><code>window</code></strong> (<code>gtk.gdk.Window</code>)</li>
+    </ul></dd>
     <dt>Returns: <code>gtk.gdk.Rectangle</code></dt>
         <dd>The new window dimensions.</dd>
   </dl>
@@ -507,6 +531,18 @@ object --+
   </tr></table>
   
   <p>Resolve a textual positioning command and execute it.</p>
+  <p>Supported command types:</p>
+  <ul>
+    <li>
+      Tuples/Lists of tuples to be fed to <a 
+      href="quicktile.WindowManager-class.html#cycleDimensions" 
+      class="link">cycleDimensions</a>
+    </li>
+    <li>
+      Command names which are valid methods of this class when prepended 
+      with <code>cmd_</code>.
+    </li>
+  </ul>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
@@ -570,6 +606,36 @@ object --+
   </dl>
 </td></tr></table>
 </div>
+<a name="get_workarea"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_workarea</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">monitor</span>,
+        <span class="sig-arg">ignore_struts</span>=<span class="sig-default">False</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_workarea">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Retrieve the usable area of the specified monitor using the most 
+  expressive method the window manager supports.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>monitor</code></strong> (<code>int</code> or <code>gtk.gdk.Rectangle</code>) - The number or dimensions of the desired monitor.</li>
+        <li><strong class="pname"><code>ignore_struts</code></strong> (<code>bool</code>) - If <code>True</code>, just return the size of the whole monitor, 
+          allowing windows to cover or be covered by panels.</li>
+    </ul></dd>
+    <dt>Returns: <code>gtk.gdk.Region</code>, <code>gtk.gdk.Rectangle</code></dt>
+        <dd>The usable area as a region and biggest rectangular subset.</dd>
+  </dl>
+</td></tr></table>
+</div>
 <a name="getGeometries"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -586,11 +652,12 @@ object --+
   </tr></table>
   
   <p>Get the geometry for the given window (including window decorations) 
-  and the monitor it's on. If not window is specified, the active window is
+  and the monitor it's on. If no window is specified, the active window is 
   used.</p>
-  <p>Returns a tuple of the window object, two gtk.gdk.Rectangle objects 
-  containing the monitor and window geometry, respectively, and the monitor
-  ID (for multi-head desktops).</p>
+  <p>Returns a tuple of the window object, a gtk.gdk.Region object 
+  representing the usable portion of the monitor, a gtk.gdk.Rectangle 
+  object containing the window geometry, and the monitor ID (for multi-head
+  desktops).</p>
   <p>Returns (None, None, None, None) if the specified window is a desktop 
   window or if no window was specified and _NET_ACTIVE_WINDOW is 
   unsupported.</p>
@@ -607,12 +674,18 @@ object --+
         Window geometry is relative to the monitor, not the desktop.
         </li>
         <li>
-        Checks for _NET* must remain here here since WMs support --replace
+        Checks for _NET* must remain here since WMs support --replace
         </li>
       </ul>
-      <p><strong>To Do:</strong>
+      <strong>To Do:</strong>
+      <ul class="nomargin-top">
+        <li>
         Confirm that changing WMs doesn't mess up quicktile.
-      </p>
+        </li>
+        <li>
+        Convert this into part of a decorator for command methods.
+        </li>
+      </ul>
 </div></td></tr></table>
 </div>
 <a name="reposition"></a>
@@ -672,7 +745,7 @@ object --+
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Thu Sep  8 17:34:53 2011
+    Generated by Epydoc 3.0.1 on Sun Oct  6 06:27:40 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

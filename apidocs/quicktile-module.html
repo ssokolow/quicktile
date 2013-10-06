@@ -61,28 +61,26 @@
 
 <hr />
 <div class="fields">      <p><strong>Bug:</strong>
-        The toggleMaximize function powering the &quot;maximize&quot; action 
-    can't unmaximize. (Workaround: Use one of the regular tiling actions to
-    unmaximize)
+        The <a href="quicktile.WindowManager-class.html#cmd_toggleMaximize" 
+    class="link">WindowManager.cmd_toggleMaximize</a> method powering 
+    <code>maximize</code> can't unmaximize. (Workaround: Use one of the 
+    regular tiling actions)
       </p>
       <strong>To Do:</strong>
       <ul class="nomargin-top">
         <li>
         <ul>
       <li>
-        Add a config-file equivalent to --no-workarea.
-      </li>
-      <li>
-        Reconsider use of --daemonize. That tends to imply 
+        Reconsider use of <code>--daemonize</code>. That tends to imply 
         self-backgrounding.
       </li>
       <li>
-        Look into supporting xpyb (the Python equivalent to libxcb) for 
-        global keybinding.
+        Try de-duplicating &quot;This temporary hack prevents an Exception 
+        with MPlayer.&quot;
       </li>
       <li>
-        Decide whether to amend the euclidean distance matching so un-tiled
-        windows are guaranteed to start at the beginning of the sequence.
+        Look into supporting XPyB (the Python equivalent to 
+        <code>libxcb</code>) for global keybinding.
       </li>
       <li>
         Clean up the code. It's functional, but an ugly rush-job.
@@ -95,9 +93,9 @@
         process-shape associations, locking/welding window edges, etc.)
       </li>
       <li>
-        Consider rewriting cycleDimensions to allow command-line use to 
-        jump to a specific index without actually flickering the window 
-        through all the intermediate shapes.
+        Consider rewriting <code>cycleDimensions</code> to allow 
+        command-line use to jump to a specific index without actually 
+        flickering the window through all the intermediate shapes.
       </li>
       <li>
         Can I hook into the GNOME and KDE keybinding APIs without using 
@@ -109,37 +107,28 @@
         Merge remaining appropriate portions of:
     <ul>
       <li>
+        <a 
+        href="https://thomas.apestaart.org/thomas/trac/changeset/1123/patches/quicktile/quicktile.py"
         
-        https://thomas.apestaart.org/thomas/trac/changeset/1123/patches/quicktile/quicktile.py
+        target="_top">https://thomas.apestaart.org/thomas/trac/changeset/1123/patches/quicktile/quicktile.py</a>
       </li>
       <li>
+        <a 
+        href="https://thomas.apestaart.org/thomas/trac/changeset/1122/patches/quicktile/quicktile.py"
         
-        https://thomas.apestaart.org/thomas/trac/changeset/1122/patches/quicktile/quicktile.py
+        target="_top">https://thomas.apestaart.org/thomas/trac/changeset/1122/patches/quicktile/quicktile.py</a>
       </li>
       <li>
+        <a 
+        href="https://thomas.apestaart.org/thomas/trac/browser/patches/quicktile/README"
         
-        https://thomas.apestaart.org/thomas/trac/browser/patches/quicktile/README
-      </li>
-    </ul>
-    <p>References and code used:</p>
-    <ul>
-      <li>
-        http://faq.pygtk.org/index.py?req=show&amp;file=faq23.017.htp
-      </li>
-      <li>
-        http://faq.pygtk.org/index.py?req=show&amp;file=faq23.039.htp
-      </li>
-      <li>
-        http://www.larsen-b.com/Article/184.html
-      </li>
-      <li>
-        http://www.pygtk.org/pygtk2tutorial/sec-MonitoringIO.html
+        target="_top">https://thomas.apestaart.org/thomas/trac/browser/patches/quicktile/README</a>
       </li>
     </ul>
         </li>
       </ul>
       <p><strong>Version:</strong>
-        0.1.5
+        0.1.6
       </p>
       <p><strong>Author:</strong>
         Stephan Sokolow (deitarion/SSokolow)
@@ -187,7 +176,43 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="quicktile.QuickTileApp-class.html" class="summary-name">QuickTileApp</a>
+        <a href="quicktile.QuickTileApp-class.html" class="summary-name">QuickTileApp</a><br />
+      The basic Glib application itself.
+    </td>
+  </tr>
+</table>
+<!-- ==================== FUNCTIONS ==================== -->
+<a name="section-Functions"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Functions</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Functions"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="powerset"></a><span class="summary-sig-name">powerset</span>(<span class="summary-sig-arg">iterable</span>)</span><br />
+      powerset([1,2,3]) --&gt; () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#powerset">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
     </td>
   </tr>
 </table>
@@ -257,16 +282,23 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="quicktile-module.html#DEFAULT_KEYS" class="summary-name">DEFAULT_KEYS</a> = <code title="{'C': 'move-to-center',
- 'H': 'horizontal-maximize',
- 'KP_0': 'maximize',
- 'KP_1': 'bottom-left',
- 'KP_2': 'bottom',
- 'KP_3': 'bottom-right',
- 'KP_4': 'left',
- 'KP_5': 'middle',
-..."><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">C</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">move-to-center</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">H</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">horizontal-maximi</code><code class="variable-ellipsis">...</code></code><br />
-      keybinding-to-command mappings
+        <a href="quicktile-module.html#DEFAULTS" class="summary-name">DEFAULTS</a> = <code title="{'general': {'ModMask': 'Control Mod1', 'UseWorkarea': True},
+ 'keys': {'C': 'move-to-center',
+          'H': 'horizontal-maximize',
+          'KP_0': 'maximize',
+          'KP_1': 'bottom-left',
+          'KP_2': 'bottom',
+          'KP_3': 'bottom-right',
+          'KP_4': 'left',
+..."><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">general</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">ModMask</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">Control Mod1</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">UseWorkare</code><code class="variable-ellipsis">...</code></code><br />
+      Default content for the config file
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="quicktile-module.html#KEYLOOKUP" class="summary-name">KEYLOOKUP</a> = <code title="{'+': 'plus', ',': 'comma', '-': 'minus', '.': 'period'}"><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">+</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">plus</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">,</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">comma</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">-</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">minus</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">.</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">pe</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
@@ -321,27 +353,45 @@
   </dl>
 </td></tr></table>
 </div>
-<a name="DEFAULT_KEYS"></a>
+<a name="DEFAULTS"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
-  <h3 class="epydoc">DEFAULT_KEYS</h3>
-  <p>keybinding-to-command mappings</p>
+  <h3 class="epydoc">DEFAULTS</h3>
+  <p>Default content for the config file</p>
   <dl class="fields">
   </dl>
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">C</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">move-to-center</code><code class="variable-quote">'</code><code class="variable-op">,</code>
- <code class="variable-quote">'</code><code class="variable-string">H</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">horizontal-maximize</code><code class="variable-quote">'</code><code class="variable-op">,</code>
- <code class="variable-quote">'</code><code class="variable-string">KP_0</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">maximize</code><code class="variable-quote">'</code><code class="variable-op">,</code>
- <code class="variable-quote">'</code><code class="variable-string">KP_1</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom-left</code><code class="variable-quote">'</code><code class="variable-op">,</code>
- <code class="variable-quote">'</code><code class="variable-string">KP_2</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom</code><code class="variable-quote">'</code><code class="variable-op">,</code>
- <code class="variable-quote">'</code><code class="variable-string">KP_3</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom-right</code><code class="variable-quote">'</code><code class="variable-op">,</code>
- <code class="variable-quote">'</code><code class="variable-string">KP_4</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">left</code><code class="variable-quote">'</code><code class="variable-op">,</code>
- <code class="variable-quote">'</code><code class="variable-string">KP_5</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">middle</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+<code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">general</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">ModMask</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">Control Mod1</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">UseWorkarea</code><code class="variable-quote">'</code><code class="variable-op">: </code>True<code class="variable-group">}</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">keys</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">C</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">move-to-center</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+          <code class="variable-quote">'</code><code class="variable-string">H</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">horizontal-maximize</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+          <code class="variable-quote">'</code><code class="variable-string">KP_0</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">maximize</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+          <code class="variable-quote">'</code><code class="variable-string">KP_1</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom-left</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+          <code class="variable-quote">'</code><code class="variable-string">KP_2</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+          <code class="variable-quote">'</code><code class="variable-string">KP_3</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom-right</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+          <code class="variable-quote">'</code><code class="variable-string">KP_4</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">left</code><code class="variable-quote">'</code><code class="variable-op">,</code>
 <code class="variable-ellipsis">...</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="KEYLOOKUP"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">KEYLOOKUP</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">+</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">plus</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">,</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">comma</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">-</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">minus</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">.</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">period</code><code class="variable-quote">'</code><code class="variable-group">}</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -374,7 +424,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Thu Sep  8 17:34:53 2011
+    Generated by Epydoc 3.0.1 on Sun Oct  6 06:27:40 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
