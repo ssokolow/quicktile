@@ -11,7 +11,7 @@ Keyboard-driven Window Tiling for your existing X11 window manager
  * `dbus-python` (optional, required for D-Bus service)
 
 If you are running an APT-based Linux distribution with Debian-compatible
-package names (like the Ubuntu family of distros), you can install these
+package names (like the Ubuntu or Mint family of distros), you can install these
 dependencies via your package manager by running this command:
 
     sudo apt-get install python python-gtk2 python-xlib python-dbus python-wnck
