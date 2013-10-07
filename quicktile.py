@@ -532,7 +532,7 @@ class QuickTileApp(object):
     def _init_dbus(self):
         """Set up dbus-python components in the Glib event loop
 
-        @todo 1.0.0: Retire the C{doCommand} name. (API-breaking)
+        @todo 1.0.0: Retire the C{doCommand} name. (API-breaking change)
         """
         class QuickTile(dbus.service.Object):
             def __init__(self):
@@ -739,7 +739,11 @@ def cycle_dimensions(wm, win, state, *dimensions):
 @commands.add('monitor-next', 1)
 @commands.add('monitor-prev', -1)
 def cycle_monitors(wm, win, state, step=1):
-    """Cycle the active window between monitors while preserving position."""
+    """Cycle the active window between monitors while preserving position.
+
+    @todo 1.0.0: Remove C{monitor-switch} in favor of C{monitor-next}
+        (API-breaking change)
+    """
     mon_id = state['monitor_id']
 
     if mon_id == 0:
@@ -790,7 +794,7 @@ def toggle_state(wm, win, state, command, check, takes_bool=False):
     @type command: C{str}
     @type check: C{str}
 
-    @todo 1.0: Rename C{vertical-maximize} and C{horizontal-maximize} to
+    @todo 1.0.0: Rename C{vertical-maximize} and C{horizontal-maximize} to
         C{maximize-vertical} and C{maximize-horizontal}. (API-breaking change)
     """
     target = not getattr(win, check)()
