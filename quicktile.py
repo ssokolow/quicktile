@@ -30,7 +30,7 @@ __author__  = "Stephan Sokolow (deitarion/SSokolow)"
 __version__ = "0.2.1"
 __license__ = "GNU GPL 2.0 or later"
 
-import errno, operator, logging, os, sys
+import errno, operator, logging, os, sys, time
 from ConfigParser import RawConfigParser
 from heapq import heappop, heappush
 from itertools import chain, combinations
@@ -468,6 +468,42 @@ class WindowManager(object):
 
         return usableRegion, usableRect
 
+    def get_workspace(self, window=None, direction=None):
+        """Get a workspace relative to either a window or the active one.
+
+        @param window: The point of reference. C{None} for the active workspace
+        @param direction: The direction in which to look, relative to the point
+            of reference. Accepts the following types:
+             - C{wnck.MotionDirection}: Non-cycling direction
+             - C{int}: Relative index in the list of workspaces
+             - C{None}: Just get the workspace object for the point of
+               reference
+
+        @type window: C{wnck.Window} or C{None}
+        @rtype: C{wnck.Workspace} or C{None}
+        @returns: The workspace object or C{None} if no match could be found.
+        """
+        if window:
+            cur = window.get_workspace()
+        else:
+            cur = self.screen.get_active_workspace()
+
+        if not cur:
+            return None  # It's either pinned or on no workspaces
+
+        if isinstance(direction, wnck.MotionDirection):
+            nxt = cur.get_neighbor(direction)
+        elif isinstance(direction, int):
+            nxt = wm.screen.get_workspace((cur.get_number() + direction) %
+                    wm.screen.get_workspace_count())
+        elif direction is None:
+            nxt = cur
+        else:
+            nxt = None
+            logging.warn("Unrecognized direction: %r" % direction)
+
+        return nxt
+
     def reposition(self, win, geom=None, monitor=gtk.gdk.Rectangle(0, 0, 0, 0),
             keep_maximize=False):
         """
@@ -774,6 +810,12 @@ def cmd_moveCenter(wm, win, state):
 
     wm.reposition(win, result, use_rect)
 
+@commands.add('show-desktop')
+def toggle_desktop(wm, win, state):
+    """Toggle "all windows minimized" to view the desktop"""
+    target = not wm.screen.get_showing_desktop()
+    wm.screen.toggle_showing_desktop(target)
+
 @commands.add('all-desktops', 'pin', 'is_pinned')
 @commands.add('fullscreen', 'set_fullscreen', 'is_fullscreen', True)
 @commands.add('vertical-maximize', 'maximize_vertically',
@@ -810,6 +852,33 @@ def toggle_state(wm, win, state, command, check, takes_bool=False):
 def trigger_keyboard_action(wm, win, state, command):
     """Ask the Window Manager to begin a keyboard-driven operation."""
     getattr(win, 'keyboard_' + command)()
+
+@commands.add('workspace-go-next', 1)
+@commands.add('workspace-go-prev', -1)
+@commands.add('workspace-go-up', wnck.MOTION_UP)
+@commands.add('workspace-go-down', wnck.MOTION_DOWN)
+@commands.add('workspace-go-left', wnck.MOTION_LEFT)
+@commands.add('workspace-go-right', wnck.MOTION_RIGHT)
+def workspace_go(wm, win, state, motion):
+    """Switch the active workspace (next/prev wrap around)"""
+    target = wm.get_workspace(None, motion)
+    if not target:
+        return  # It's either pinned, on no workspaces, or there is no match
+    target.activate(int(time.time()))
+
+@commands.add('workspace-send-next', 1)
+@commands.add('workspace-send-prev', -1)
+@commands.add('workspace-send-up', wnck.MOTION_UP)
+@commands.add('workspace-send-down', wnck.MOTION_DOWN)
+@commands.add('workspace-send-left', wnck.MOTION_LEFT)
+@commands.add('workspace-send-right', wnck.MOTION_RIGHT)
+def workspace_send_window(wm, win, state, motion):
+    """Move the active window to another workspace (next/prev wrap around)"""
+    target = wm.get_workspace(win, motion)
+    if not target:
+        return  # It's either pinned, on no workspaces, or there is no match
+
+    win.move_to_workspace(target)
 
 #}
 
