@@ -168,6 +168,66 @@ def powerset(iterable):
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
 
+def fmt_table(rows, headers, group_by=None):
+    """Format a collection as a textual table.
+
+    @param headers: Header labels for the columns
+    @param group_by: Index of the column to group results by.
+    @type rows: C{dict} or iterable of iterables
+    @type headers: C{list(str)}
+    @type group_by: C{int}
+
+    @attention: This uses C{zip()} to combine things. The number of columns
+        displayed will be defined by the narrowest of all rows.
+    """
+    output = []
+
+    if isinstance(rows, dict):
+        rows = list(sorted(rows.items()))
+
+    groups = {}
+    if group_by is not None:
+        headers = list(headers)
+        headers.pop(group_by)
+        rows = [list(row) for row in rows]
+        for row in rows:
+            group = row.pop(group_by)
+            groups.setdefault(group, []).append(row)
+    else:
+        groups[''] = rows
+
+    # Identify how much space needs to be allocated for each column
+    col_maxlens = []
+    for pos, header in enumerate(headers):
+        maxlen = max(len(x[pos]) for x in rows if len(x) > col)
+        col_maxlens.append(max(maxlen, len(header)))
+
+    def fmt_row(row, pad=' ', indent=0, min_width=0):
+        result = []
+        for width, label in zip(col_maxlens, row):
+            result.append('%s%s ' % (' ' * indent, label.ljust(width, pad)))
+
+        _w = sum(len(x) for x in result)
+        if _w < min_width:
+            result[-1] = result[-1][:-1]
+            result.append(pad * (min_width - _w + 1))
+
+        result.append('\n')
+        return result
+
+    # Print the headers and divider
+    group_width = max(len(x) for x in groups)
+    output.extend(fmt_row(headers))
+    output.extend(fmt_row([''] * len(headers), '-', min_width=group_width + 1))
+
+    for group in groups:
+        if group:
+            output.append("\n%s\n" % group)
+        for row in groups[group]:
+            output.extend(fmt_row(row, indent=1))
+
+    return ''.join(output)
+
 #}
 #{ Exceptions
 
@@ -186,10 +246,14 @@ class CommandRegistry(object):
 
     def __init__(self):
         self.commands = {}
+        self.help = {}
 
     def __iter__(self):
         for x in self.commands:
             yield x
+
+    def __str__(self):
+        return fmt_table(self.help, ('Known Commands', 'desc'), group_by=1)
 
     def add(self, name, *p_args, **p_kwargs):
         """Decorator to wrap a function in boilerplate and add it to the
@@ -244,6 +308,9 @@ class CommandRegistry(object):
             if name in self.commands:
                 logging.warn("Overwriting command: %s", name)
             self.commands[name] = wrapper
+
+            helpStr = func.__doc__.strip().split('\n')[0].split('. ')[0]
+            self.help[name] = helpStr.strip('.')
 
             # Return the unwrapped function so decorators can be stacked
             # to define multiple commands using the same code with different
@@ -588,26 +655,18 @@ class QuickTileApp(object):
         """Print a formatted readout of defined keybindings and the modifier
         mask to stdout."""
 
-        maxlen_keys = max(len(x) for x in self._keys.keys())
-        maxlen_vals = max(len(x) for x in self._keys.values())
-
         print "Keybindings defined for use with --daemonize:\n"
-
         print "Modifier: %s\n" % '+'.join(str(x) for x in self._modkeys)
-
-        print "Key".ljust(maxlen_keys), "Action"
-        print "-" * maxlen_keys, "-" * maxlen_vals
-        for row in sorted(self._keys.items(), key=lambda x: x[0]):
-            print row[0].ljust(maxlen_keys), row[1]
+        print fmt_table(self._keys, ('Key', 'Action'))
 
 commands = CommandRegistry()
 #{ Tiling Commands
 
 @commands.addMany(POSITIONS)
 def cycle_dimensions(wm, win, state, *dimensions):
-    """
-    Given a list of shapes and a window, cycle through the list, taking one
-    step each time this function is called.
+    """Cycle through a list of positions and shapes.
+
+    Takes one step each time this function is called.
 
     If the window's dimensions are not within 100px (by euclidean distance)
     of an entry in the list, set them to the first list entry.
@@ -678,11 +737,7 @@ def cycle_dimensions(wm, win, state, *dimensions):
 
 @commands.add('monitor-switch')
 def cycle_monitors(wm, win, state):
-    """
-    Cycle the specified window (the active window if C{window=None}
-    between monitors while leaving the position within the monitor
-    unchanged.
-    """
+    """Cycle the active window between monitors while preserving position."""
     mon_id = state['monitor_id']
 
     if mon_id == 0:
@@ -717,7 +772,7 @@ def cmd_moveCenter(wm, win, state):
 @commands.add('vertical-maximize', 'maximize_vertically')
 @commands.add('horizontal-maximize', 'maximize_horizontally')
 def toggle_state(wm, win, state, command):
-    """Given a window, toggle a state attribute like maximization.
+    """Toggle window state.
 
     @param command: The C{wnck.Window} method name to be conditionally prefixed
         with "un", resolved, and called.
@@ -827,15 +882,14 @@ if __name__ == '__main__':
             validArgs = sorted(commands)
 
             if badArgs:
-                print "Invalid argument(s): %s" % ' '.join(badArgs)
+                print "Invalid argument(s): %s\n" % ' '.join(badArgs)
 
-            print "Valid arguments are: \n\t%s" % '\n\t'.join(validArgs)
+            print commands
 
             if not opts.showArgs:
                 print "\nUse --help for a list of valid options."
                 sys.exit(errno.ENOENT)
         else:
-            #TODO: Fix this properly so I doesn't need to call a private member
             wm.screen.force_update()
 
             for arg in args:
