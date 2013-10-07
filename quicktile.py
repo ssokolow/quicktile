@@ -736,7 +736,9 @@ def cycle_dimensions(wm, win, state, *dimensions):
     return result
 
 @commands.add('monitor-switch')
-def cycle_monitors(wm, win, state):
+@commands.add('monitor-next', 1)
+@commands.add('monitor-prev', -1)
+def cycle_monitors(wm, win, state, step=1):
     """Cycle the active window between monitors while preserving position."""
     mon_id = state['monitor_id']
 
