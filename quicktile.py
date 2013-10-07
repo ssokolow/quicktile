@@ -679,7 +679,7 @@ class QuickTileApp(object):
         Filters for C{X.KeyPress} events, resolves them to commands, and calls
         L{CommandRegistry.call} on them.
 
-        @rtype C{True}
+        @rtype: C{True}
         """
         handle = handle or self.xroot.display
 
