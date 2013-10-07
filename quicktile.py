@@ -27,7 +27,7 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
 
 __appname__ = "QuickTile"
 __author__  = "Stephan Sokolow (deitarion/SSokolow)"
-__version__ = "0.2.0"
+__version__ = "0.2.0.1"
 __license__ = "GNU GPL 2.0 or later"
 
 import errno, operator, logging, os, sys
@@ -186,6 +186,10 @@ class CommandRegistry(object):
 
     def __init__(self):
         self.commands = {}
+
+    def __iter__(self):
+        for x in self.commands:
+            yield x
 
     def add(self, name, *p_args, **p_kwargs):
         """Decorator to wrap a function in boilerplate and add it to the
@@ -818,9 +822,9 @@ if __name__ == '__main__':
             sys.exit(errno.ENOENT)
             #FIXME: What's the proper exit code for "library not found"?
     elif not first_run:
-        badArgs = [x for x in args if x not in wm.commands]
+        badArgs = [x for x in args if x not in commands]
         if not args or badArgs or opts.showArgs:
-            validArgs = sorted(wm.commands)
+            validArgs = sorted(commands)
 
             if badArgs:
                 print "Invalid argument(s): %s" % ' '.join(badArgs)
@@ -830,11 +834,11 @@ if __name__ == '__main__':
             if not opts.showArgs:
                 print "\nUse --help for a list of valid options."
                 sys.exit(errno.ENOENT)
+        else:
+            #TODO: Fix this properly so I doesn't need to call a private member
+            wm.screen.force_update()
 
-        #TODO: Fix this properly so I doesn't need to call a private member
-        wm.screen.force_update()
-
-        for arg in args:
-            commands.call(arg, wm)
-        while gtk.events_pending():
-            gtk.main_iteration()
+            for arg in args:
+                commands.call(arg, wm)
+            while gtk.events_pending():
+                gtk.main_iteration()
