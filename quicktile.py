@@ -770,17 +770,22 @@ def cmd_moveCenter(wm, win, state):
 
     wm.reposition(win, result, use_rect)
 
-@commands.add('maximize', 'maximize')
-@commands.add('vertical-maximize', 'maximize_vertically')
-@commands.add('horizontal-maximize', 'maximize_horizontally')
-def toggle_state(wm, win, state, command):
+@commands.add('maximize', 'maximize', 'is_maximized')
+@commands.add('vertical-maximize', 'maximize_vertically',
+                                   'is_maximized_vertically')
+@commands.add('horizontal-maximize', 'maximize_horizontally',
+                                     'is_maximized_horizontally')
+def toggle_state(wm, win, state, command, check):
     """Toggle window state.
 
     @param command: The C{wnck.Window} method name to be conditionally prefixed
         with "un", resolved, and called.
+    @param command: The C{wnck.Window} method name to be called to check
+        whether C{command} should be prefixed with "un".
     @type command: C{str}
+    @type check: C{str}
     """
-    target = not win.is_maximized()
+    target = not getattr(win, check)()
 
     logging.debug('maximize: %s', target)
     getattr(win, ('' if target else 'un') + command)()
