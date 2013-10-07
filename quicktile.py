@@ -27,7 +27,7 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
 
 __appname__ = "QuickTile"
 __author__  = "Stephan Sokolow (deitarion/SSokolow)"
-__version__ = "0.2.0.1"
+__version__ = "0.2.1"
 __license__ = "GNU GPL 2.0 or later"
 
 import errno, operator, logging, os, sys
@@ -782,6 +782,12 @@ def toggle_state(wm, win, state, command):
 
     logging.debug('maximize: %s', target)
     getattr(win, ('' if target else 'un') + command)()
+
+@commands.add('trigger-move', 'move')
+@commands.add('trigger-resize', 'size')
+def trigger_keyboard_action(wm, win, state, command):
+    """Ask the Window Manager to begin a keyboard-driven operation."""
+    getattr(win, 'keyboard_' + command)()
 
 #}
 
