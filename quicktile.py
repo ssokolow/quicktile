@@ -770,12 +770,17 @@ def cmd_moveCenter(wm, win, state):
 
     wm.reposition(win, result, use_rect)
 
-@commands.add('maximize', 'maximize', 'is_maximized')
+@commands.add('all-desktops', 'pin', 'is_pinned')
+@commands.add('fullscreen', 'set_fullscreen', 'is_fullscreen', True)
 @commands.add('vertical-maximize', 'maximize_vertically',
                                    'is_maximized_vertically')
 @commands.add('horizontal-maximize', 'maximize_horizontally',
                                      'is_maximized_horizontally')
-def toggle_state(wm, win, state, command, check):
+@commands.add('maximize', 'maximize', 'is_maximized')
+@commands.add('always-above', 'make_above', 'is_above')
+@commands.add('always-below', 'make_below', 'is_below')
+@commands.add('shade', 'shade', 'is_shaded')
+def toggle_state(wm, win, state, command, check, takes_bool=False):
     """Toggle window state.
 
     @param command: The C{wnck.Window} method name to be conditionally prefixed
@@ -784,11 +789,17 @@ def toggle_state(wm, win, state, command, check):
         whether C{command} should be prefixed with "un".
     @type command: C{str}
     @type check: C{str}
+
+    @todo 1.0: Rename C{vertical-maximize} and C{horizontal-maximize} to
+        C{maximize-vertical} and C{maximize-horizontal}. (API-breaking change)
     """
     target = not getattr(win, check)()
 
     logging.debug('maximize: %s', target)
-    getattr(win, ('' if target else 'un') + command)()
+    if takes_bool:
+        getattr(win, command)(target)
+    else:
+        getattr(win, ('' if target else 'un') + command)()
 
 @commands.add('trigger-move', 'move')
 @commands.add('trigger-resize', 'size')
