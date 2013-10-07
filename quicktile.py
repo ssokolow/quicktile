@@ -164,7 +164,10 @@ KEYLOOKUP = {
 #{ Helpers
 
 def powerset(iterable):
-    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+    """powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)
+
+    @rtype: iterable
+    """
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
 
@@ -179,6 +182,8 @@ def fmt_table(rows, headers, group_by=None):
 
     @attention: This uses C{zip()} to combine things. The number of columns
         displayed will be defined by the narrowest of all rows.
+
+    @rtype: C{str}
     """
     output = []
 
@@ -220,7 +225,7 @@ def fmt_table(rows, headers, group_by=None):
     output.extend(fmt_row(headers))
     output.extend(fmt_row([''] * len(headers), '-', min_width=group_width + 1))
 
-    for group in groups:
+    for group in sorted(groups):
         if group:
             output.append("\n%s\n" % group)
         for row in groups[group]:
@@ -673,6 +678,8 @@ class QuickTileApp(object):
 
         Filters for C{X.KeyPress} events, resolves them to commands, and calls
         L{CommandRegistry.call} on them.
+
+        @rtype C{True}
         """
         handle = handle or self.xroot.display
 
@@ -700,7 +707,7 @@ commands = CommandRegistry()
 
 @commands.addMany(POSITIONS)
 def cycle_dimensions(wm, win, state, *dimensions):
-    """Cycle through a list of positions and shapes.
+    """Cycle the active window through a list of positions and shapes.
 
     Takes one step each time this function is called.
 
@@ -827,7 +834,7 @@ def toggle_desktop(wm, win, state):
 @commands.add('always-below', 'make_below', 'is_below')
 @commands.add('shade', 'shade', 'is_shaded')
 def toggle_state(wm, win, state, command, check, takes_bool=False):
-    """Toggle window state.
+    """Toggle window state on the active window.
 
     @param command: The C{wnck.Window} method name to be conditionally prefixed
         with "un", resolved, and called.
@@ -974,13 +981,7 @@ if __name__ == '__main__':
             sys.exit(errno.ENOENT)
             #FIXME: What's the proper exit code for "library not found"?
     elif not first_run:
-        badArgs = [x for x in args if x not in commands]
-        if not args or badArgs or opts.showArgs:
-            validArgs = sorted(commands)
-
-            if badArgs:
-                print "Invalid argument(s): %s\n" % ' '.join(badArgs)
-
+        if not args or opts.showArgs:
             print commands
 
             if not opts.showArgs:
