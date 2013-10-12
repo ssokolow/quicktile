@@ -387,8 +387,14 @@ class WindowManager(object):
         """
         # Under non-XQuartz circumstances, just let libwnck do it
         win = self.screen.get_active_window()
-        if win or not self.xquartz:
-            return win
+        if win:
+            if win.get_window_type() == wnck.WINDOW_DESKTOP:
+                logging.debug("Active window is desktop. Skipping.")
+                return None
+            else:
+                return win
+        elif not self.xquartz:
+            return None
 
         logging.debug("Could not retrieve active window. Falling back to "
                       "XQuartz hack with WM: %r",
