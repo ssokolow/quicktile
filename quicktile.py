@@ -541,8 +541,16 @@ class WindowManager(object):
         logging.debug("repositioning to (%d, %d, %d, %d)",
                 new_x, new_y, geom.width, geom.height)
 
-        #XXX: Why is WINDOW_GRAVITY_STATIC behaving as the libwnck docs say
-        #       that WINDOW_GRAVITY_NORTHWEST should?
+        #XXX: I'm not sure whether wnck, Openbox, or both are at fault,
+        #     but window gravities seem to have no effect beyond double-
+        #     compensating for window border thickness unless using
+        #     WINDOW_GRAVITY_STATIC.
+        #
+        #     My best guess is that the gravity modifiers are being applied
+        #     to the window frame rather than the window itself, hence why
+        #     static gravity would position correctly and north-west gravity
+        #     would double-compensate for the titlebar and border dimensions.
+        #     (If
         win.set_geometry(wnck.WINDOW_GRAVITY_STATIC,
                 wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y |
                 wnck.WINDOW_CHANGE_WIDTH | wnck.WINDOW_CHANGE_HEIGHT,
