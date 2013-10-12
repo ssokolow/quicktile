@@ -76,7 +76,9 @@ XDG_CONFIG_DIR = os.environ.get('XDG_CONFIG_HOME',
 
 class GravityLayout(object):
     """Helper for generating L{cycle_dimensions} presets."""
-    #TODO: Normalize these to the GTK or CSS terminology for 1.0
+    #: Possible window alignments relative to the monitor/desktop.
+    #: @todo 1.0.0: Normalize these to X11 or CSS terminology for 1.0
+    #:     (API-breaking change)
     GRAVITIES = {
         'top-left': (0.0, 0.0),
         'top': (0.5, 0.0),
@@ -87,7 +89,7 @@ class GravityLayout(object):
         'bottom-left': (0.0, 1.0),
         'bottom': (0.5, 1.0),
         'bottom-right': (1.0, 1.0),
-    } #: Possible window alignments relative to the monitor/desktop.
+    }
 
     def __call__(self, w, h, gravity='top-left', x=None, y=None):
         """
@@ -427,7 +429,6 @@ class WindowManager(object):
 
         rootWin = self.gdk_screen.get_root_window()
 
-        # TODO: Test and extend to support panels on asymmetric monitors
         struts = []
         if self.gdk_screen.supports_net_wm_hint("_NET_WM_STRUT_PARTIAL"):
             # Gather all struts
@@ -622,9 +623,9 @@ class QuickTileApp(object):
         else:
             self.xdisp.set_error_handler(self.handle_xerror)
 
-            #XXX: Do I need to ignore Scroll lock too?
+            #XXX: Do I need to ignore Scroll Lock too?
             for keycode in self.keys:
-                #Ignore all combinations of Mod2 (NumLock) and Lock (CapsLock)
+                #Ignore Mod2 (NumLock) and Lock (CapsLock) state
                 for ignored in powerset([X.Mod2Mask, X.LockMask, X.Mod5Mask]):
                     ignored = reduce(lambda x, y: x | y, ignored, 0)
                     self.xroot.grab_key(keycode, modmask | ignored, 1,
@@ -680,6 +681,9 @@ class QuickTileApp(object):
         L{CommandRegistry.call} on them.
 
         @rtype: C{True}
+
+        @todo: Make sure uncaught exceptions are prevented from making
+            quicktile unresponsive in the general case.
         """
         handle = handle or self.xroot.display
 
