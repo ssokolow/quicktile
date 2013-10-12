@@ -626,7 +626,7 @@ class QuickTileApp(object):
             #XXX: Do I need to ignore Scroll Lock too?
             for keycode in self.keys:
                 #Ignore Mod2 (NumLock) and Lock (CapsLock) state
-                for ignored in powerset([X.Mod2Mask, X.LockMask, X.Mod5Mask]):
+                for ignored in powerset([X.Mod2Mask, X.LockMask]):
                     ignored = reduce(lambda x, y: x | y, ignored, 0)
                     self.xroot.grab_key(keycode, modmask | ignored, 1,
                                         X.GrabModeAsync, X.GrabModeAsync)
