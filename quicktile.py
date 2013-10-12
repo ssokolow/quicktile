@@ -134,6 +134,7 @@ DEFAULTS = {
         # Use Ctrl+Alt as the default base for key combinations
         'ModMask': 'Control Mod1',
         'UseWorkarea': True,
+        'UseXQuartzHack': False,
     },
     'keys': {
         "KP_0"     : "maximize",
@@ -278,7 +279,7 @@ class CommandRegistry(object):
             def wrapper(wm, window=None, *args, **kwargs):
 
                 # Get Wnck and GDK window objects
-                window = window or wm.screen.get_active_window()
+                window = window or wm.get_active_window()
                 if isinstance(window, gtk.gdk.Window):
                     win = wnck.window_get(window.xid)
                 else:
@@ -347,13 +348,16 @@ class CommandRegistry(object):
 
 class WindowManager(object):
     """A simple API-wrapper class for manipulating window positioning."""
-    def __init__(self, screen=None, ignore_workarea=False):
+    def __init__(self, screen=None, ignore_workarea=False, xquartz=False):
         """
         Initializes C{WindowManager}.
 
         @param screen: The X11 screen to operate on. If C{None}, the default
             screen as retrieved by C{gtk.gdk.screen_get_default} will be used.
+        @param xquartz: If C{True}, apply workarounds for compatibility bugs
+            between the XQuartz X11 server and libwnck.
         @type screen: C{gtk.gdk.Screen}
+        @type xquartz: C{bool}
 
         @todo: Confirm that the root window only changes on X11 server
                restart. (Something which will crash QuickTile anyway since
@@ -365,6 +369,55 @@ class WindowManager(object):
         self.gdk_screen = screen or gtk.gdk.screen_get_default()
         self.screen = wnck.screen_get(self.gdk_screen.get_number())
         self.ignore_workarea = ignore_workarea
+        self.xquartz = xquartz
+
+    def get_active_window(self):
+        """
+        Retrieve the active window with support for working around an
+        incompatibility between libwnck and XQuartz.
+
+        @rtype: C{wnck.Window} or C{None}
+        @returns: The wnck Window object for the active window or C{None} if
+            the C{_NET_ACTIVE_WINDOW} hint isn't supported or the desktop is
+            the active window.
+
+        @note: Checks for C{_NET*} must be done every time since WMs support
+               C{--replace} and I don't yet know whether libwnck's signal
+               for that fires under XQuartz.
+        """
+        # Under non-XQuartz circumstances, just let libwnck do it
+        win = self.screen.get_active_window()
+        if win or not self.xquartz:
+            return win
+
+        logging.debug("Could not retrieve active window. Falling back to "
+                      "XQuartz hack with WM: %r",
+                      self.screen.get_window_manager_name())
+
+        # Under XQuartz, get the root and active window manually
+        if (self.gdk_screen.supports_net_wm_hint("_NET_ACTIVE_WINDOW") and
+                self.gdk_screen.supports_net_wm_hint("_NET_WM_WINDOW_TYPE")):
+            win = self.gdk_screen.get_active_window()
+        else:
+            logging.error("_NET_ACTIVE_WINDOW or _NET_WM_WINDOW_TYPE "
+                          "unsupported by current window manager")
+            return None
+
+        if win is None:
+            logging.debug("No active window")
+            return None
+
+        # Do nothing if the desktop is the active window
+        # (The "not winType" check seems required for fullscreen MPlayer)
+        # Source: http://faq.pygtk.org/index.py?req=show&file=faq23.039.htp
+        winType = win.property_get("_NET_WM_WINDOW_TYPE")
+        logging.debug("NET_WM_WINDOW_TYPE: %r", winType)
+        if winType and winType[-1][0] == '_NET_WM_WINDOW_TYPE_DESKTOP':
+            logging.debug("Active window is desktop. Skipping.")
+            return None
+
+        # Convert to a wnck Window object before returning
+        return wnck.window_get(win.xid)
 
     def get_geometry_rel(self, window, monitor_geom):
         """Get window position relative to the monitor rather than the desktop.
@@ -964,8 +1017,9 @@ if __name__ == '__main__':
 
     ignore_workarea = ((not config.getboolean('general', 'UseWorkarea'))
                        or opts.no_workarea)
+    xquartz = config.getboolean('general', 'UseXQuartzHack')
 
-    wm = WindowManager(ignore_workarea=ignore_workarea)
+    wm = WindowManager(ignore_workarea=ignore_workarea, xquartz=xquartz)
     app = QuickTileApp(wm, commands, keymap, modkeys=modkeys)
 
     if opts.showBinds:
