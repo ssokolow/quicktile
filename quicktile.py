@@ -829,6 +829,12 @@ def cmd_moveCenter(wm, win, state):
 
     wm.reposition(win, result, use_rect)
 
+@commands.add('bordered')
+def toggle_decorated(wm, win, state):
+    """Toggle window state on the active window."""
+    win = gtk.gdk.window_foreign_new(win.get_xid())
+    win.set_decorations(not win.get_decorations())
+
 @commands.add('show-desktop')
 def toggle_desktop(wm, win, state):
     """Toggle "all windows minimized" to view the desktop"""
