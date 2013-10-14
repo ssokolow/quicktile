@@ -30,7 +30,7 @@ __author__  = "Stephan Sokolow (deitarion/SSokolow)"
 __version__ = "0.2.1"
 __license__ = "GNU GPL 2.0 or later"
 
-import errno, operator, logging, os, sys, time
+import errno, logging, os, sys, time
 from ConfigParser import RawConfigParser
 from heapq import heappop, heappush
 from itertools import chain, combinations
@@ -48,7 +48,6 @@ try:
     from Xlib import X
     from Xlib.display import Display
     from Xlib.error import BadAccess
-    from Xlib.XK import string_to_keysym
     XLIB_PRESENT = True  #: Indicates whether python-xlib was found
 except ImportError:
     XLIB_PRESENT = False  #: Indicates whether python-xlib was found
@@ -126,15 +125,10 @@ for grav in ('left', 'right'):
 for grav in ('top-left', 'top-right', 'bottom-left', 'bottom-right'):
     POSITIONS[grav] = [gv(x, 0.5, grav) for x in (0.5, col, col * 2)]
 
-#NOTE: For keysyms outside the latin1 and miscellany groups, you must first
-#      call C{Xlib.XK.load_keysym_group()} with the name (minus extension) of
-#      the appropriate module in site-packages/Xlib/keysymdef/*.py
-#TODO: Migrate to gtk.accelerator_parse() and gtk.accelerator_valid()
-#      Convert using '<%s>' % '><'.join(ModMask.split()))
 DEFAULTS = {
     'general': {
         # Use Ctrl+Alt as the default base for key combinations
-        'ModMask': 'Control Mod1',
+        'ModMask': '<Ctrl><Alt>',
         'UseWorkarea': True,
     },
     'keys': {
@@ -564,20 +558,20 @@ class QuickTileApp(object):
     """The basic Glib application itself."""
     keybinds_failed = False
 
-    def __init__(self, wm, commands, keys=None, modkeys=None):
+    def __init__(self, wm, commands, keys=None, modmask=None):
         """Populate the instance variables.
 
         @param keys: A dict mapping X11 keysyms to L{CommandRegistry}
             command names.
-        @param modkeys: A modifier mask to prefix to all keybindings.
+        @param modmask: A modifier mask to prefix to all keybindings.
         @type wm: The L{WindowManager} instance to use.
         @type keys: C{dict}
-        @type modkeys: C{str}
+        @type modmask: C{GdkModifierType}
         """
         self.wm = wm
         self.commands = commands
         self._keys = keys or {}
-        self._modkeys = modkeys or 0
+        self._modmask = modmask or gtk.gdk.ModifierType(0)
 
     def _init_dbus(self):
         """Set up dbus-python components in the Glib event loop
@@ -608,44 +602,47 @@ class QuickTileApp(object):
         # We want to receive KeyPress events
         self.xroot.change_attributes(event_mask=X.KeyPressMask)
 
-        # unrecognized shortkeys now will be looked up in a hardcoded dict
-        # and replaced by valid names like ',' -> 'comma'
-        # while generating the self.keys dict
+        # Validate all the given keybinds
         self.keys = dict()
         for key in self._keys:
             transKey = key
             if key in KEYLOOKUP:
+                # Look up unrecognized shortkeys in a hardcoded dict and
+                # replace with valid names like ',' -> 'comma'
+                # TODO: Do this in a way that's compatible with per-entry
+                # modifier masks
                 transKey = KEYLOOKUP[key]
-            code = self.xdisp.keysym_to_keycode(string_to_keysym(transKey))
-            self.keys[code] = self._keys[key]
+            keysym, mmask = gtk.accelerator_parse(transKey)
+            modmask = self._modmask | mmask
 
-        # Resolve strings to X11 mask constants for the modifier mask
-        try:
-            modmask = reduce(operator.ior, [getattr(X, "%sMask" % x)
-                             for x in self._modkeys])
-        except Exception, err:
-            logging.error("Error while resolving modifier key mask: %s", err)
-            logging.error("Not binding keys for safety reasons. "
-                          "(eg. What if Ctrl+C got bound?)")
-            modmask = 0
-        else:
-            self.xdisp.set_error_handler(self.handle_xerror)
+            if gtk.accelerator_valid(keysym, modmask):
+                keybind = self.xdisp.keysym_to_keycode(keysym), modmask.real
+                self.keys[keybind] = self._keys[key]
+            else:
+                #FIXME: Process ModMask and transKey the same way.
+                logging.error("Invalid keybinding: %s%s = %s",
+                        gtk.accelerator_get_label(0, self._modmask), transKey,
+                        self._keys[key])
 
-            #XXX: Do I need to ignore Scroll Lock too?
-            for keycode in self.keys:
-                #Ignore Mod2 (NumLock) and Lock (CapsLock) state
-                for ignored in powerset([X.Mod2Mask, X.LockMask]):
-                    ignored = reduce(lambda x, y: x | y, ignored, 0)
-                    self.xroot.grab_key(keycode, modmask | ignored, 1,
-                                        X.GrabModeAsync, X.GrabModeAsync)
+        # Set up a handler to catch XGrabKey() failures
+        self.xdisp.set_error_handler(self.handle_xerror)
+
+        # Actually bind the keys
+        for keycode, modmask in self.keys:
+            # Ignore Mod2 (NumLock) and Lock (CapsLock) state
+            # TODO: Figure out how to set the modifier mask in X11 and use
+            # gtk.accelerator_get_default_mod_mask() to feed said code.
+            for ignored in powerset([X.Mod2Mask, X.LockMask]):
+                ignored = reduce(lambda x, y: x | y, ignored, 0)
+                self.xroot.grab_key(keycode, modmask | ignored,
+                        1, X.GrabModeAsync, X.GrabModeAsync)
 
         # If we don't do this, then nothing works.
         # I assume it flushes the XGrabKey calls to the server.
         self.xdisp.sync()
         if self.keybinds_failed:
             logging.warning("One or more requested keybindings were could not"
-                " be bound. Please check that you are using valid X11 key"
-                " names and that the keys are not already bound.")
+                " be bound. Please check that they are not already in use.")
 
         # Merge python-xlib into the Glib event loop
         # Source: http://www.pygtk.org/pygtk2tutorial/sec-MonitoringIO.html
@@ -698,12 +695,15 @@ class QuickTileApp(object):
         for _ in range(0, handle.pending_events()):
             xevent = handle.next_event()
             if xevent.type == X.KeyPress:
-                keycode = xevent.detail
-                if keycode in self.keys:
-                    self.commands.call(self.keys[keycode], wm)
+                mods = xevent.state & gtk.accelerator_get_default_mod_mask()
+                keybind = xevent.detail, mods
+
+                if keybind in self.keys:
+                    self.commands.call(self.keys[keybind], wm)
                 else:
+                    print self.keys
                     logging.error("Received an event for an unrecognized "
-                                  "keycode: %s" % keycode)
+                                  "keybind: %s" % (keybind,))
         return True
 
     def showBinds(self):
@@ -962,7 +962,18 @@ if __name__ == '__main__':
             config.set('general', key, str(val))
             dirty = True
 
-    modkeys = config.get('general', 'ModMask').split()
+    mk_raw = modkeys = config.get('general', 'ModMask')
+    if ' ' in modkeys.strip() and not '<' in modkeys:
+        modkeys = '<%s>' % '><'.join(modkeys.strip().split())
+        logging.info("Updating modkeys format:\n %r --> %r", mk_raw, modkeys)
+        config.set('general', 'ModMask', modkeys)
+        dirty = True
+
+    # Convert to a GFlags instance and test for validity
+    _, modkeys = gtk.accelerator_parse(modkeys)
+    if not gtk.accelerator_valid(gtk.accelerator_parse('a')[0], modkeys):
+        logging.error("Invalid ModMask value: %s",
+                gtk.accelerator_get_label(_, modkeys))
 
     # Either load the keybindings or use and save the defaults
     if config.has_section('keys'):
@@ -985,7 +996,7 @@ if __name__ == '__main__':
                        or opts.no_workarea)
 
     wm = WindowManager(ignore_workarea=ignore_workarea)
-    app = QuickTileApp(wm, commands, keymap, modkeys=modkeys)
+    app = QuickTileApp(wm, commands, keymap, modmask=modkeys)
 
     if opts.showBinds:
         app.showBinds()
