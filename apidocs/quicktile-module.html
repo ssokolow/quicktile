@@ -115,8 +115,12 @@
     </ul>
         </li>
       </ul>
+      <p><strong>To Do (1.0.0):</strong>
+        Retire <a href="quicktile-module.html#KEYLOOKUP" 
+    class="link">KEYLOOKUP</a>. (API-breaking change)
+      </p>
       <p><strong>Version:</strong>
-        0.2.1
+        0.2.2
       </p>
       <p><strong>Author:</strong>
         Stephan Sokolow (deitarion/SSokolow)
@@ -158,6 +162,14 @@
     </td><td class="summary">
         <a href="quicktile.WindowManager-class.html" class="summary-name">WindowManager</a><br />
       A simple API-wrapper class for manipulating window positioning.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="quicktile.KeyBinder-class.html" class="summary-name">KeyBinder</a><br />
+      A convenience class for wrapping XGrabKey.
     </td>
   </tr>
 <tr>
@@ -317,6 +329,25 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a href="quicktile-module.html#toggle_decorated" class="summary-sig-name">toggle_decorated</a>(<span class="summary-sig-arg">wm</span>,
+        <span class="summary-sig-arg">win</span>,
+        <span class="summary-sig-arg">state</span>)</span><br />
+      Toggle window state on the active window.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#toggle_decorated">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a href="quicktile-module.html#toggle_desktop" class="summary-sig-name">toggle_desktop</a>(<span class="summary-sig-arg">wm</span>,
         <span class="summary-sig-arg">win</span>,
         <span class="summary-sig-arg">state</span>)</span><br />
@@ -443,8 +474,8 @@
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="sessBus"></a><span class="summary-name">sessBus</span> = <code title="SessionBus()">SessionBus()</code><br />
-      Used by <a href="quicktile.QuickTileApp-class.html#_init_dbus" 
-      class="link" onclick="show_private();">QuickTileApp._init_dbus</a>
+      Used by <a href="quicktile.QuickTileApp-class.html#run" 
+      class="link">QuickTileApp.run</a>
     </td>
   </tr>
 <tr>
@@ -494,7 +525,7 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="gv"></a><span class="summary-name">gv</span> = <code title="&lt;quicktile.GravityLayout object at 0x2fae3d0&gt;">&lt;quicktile.GravityLayout object at 0x2fae3d0&gt;</code>
+        <a name="gv"></a><span class="summary-name">gv</span> = <code title="&lt;quicktile.GravityLayout object at 0x2788110&gt;">&lt;quicktile.GravityLayout object at 0x2788110&gt;</code>
     </td>
   </tr>
 <tr>
@@ -529,7 +560,7 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="quicktile-module.html#DEFAULTS" class="summary-name">DEFAULTS</a> = <code title="{'general': {'ModMask': 'Control Mod1', 'UseWorkarea': True},
+        <a href="quicktile-module.html#DEFAULTS" class="summary-name">DEFAULTS</a> = <code title="{'general': {'ModMask': '&lt;Ctrl&gt;&lt;Alt&gt;', 'UseWorkarea': True},
  'keys': {'C': 'move-to-center',
           'H': 'horizontal-maximize',
           'KP_0': 'maximize',
@@ -537,7 +568,7 @@
           'KP_2': 'bottom',
           'KP_3': 'bottom-right',
           'KP_4': 'left',
-..."><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">general</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">ModMask</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">Control Mod1</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">UseWorkare</code><code class="variable-ellipsis">...</code></code><br />
+..."><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">general</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">ModMask</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">&lt;Ctrl&gt;&lt;Alt&gt;</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">UseWorkarea</code><code class="variable-ellipsis">...</code></code><br />
       Default content for the config file
     </td>
   </tr>
@@ -695,6 +726,31 @@
   </dl>
 </td></tr></table>
 </div>
+<a name="toggle_decorated"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">toggle_decorated</span>(<span class="sig-arg">wm</span>,
+        <span class="sig-arg">win</span>,
+        <span class="sig-arg">state</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#toggle_decorated">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Toggle window state on the active window.</p>
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@commands.add('bordered')</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
 <a name="toggle_desktop"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -757,6 +813,7 @@
         <li><code>@commands.add('vertical-maximize', 'maximize_vertically', 'is_maximized_vertically')</code></li>
         <li><code>@commands.add('horizontal-maximize', 'maximize_horizontally', 'is_maximized_horizontally')</code></li>
         <li><code>@commands.add('maximize', 'maximize', 'is_maximized')</code></li>
+        <li><code>@commands.add('minimize', 'minimize', 'is_minimized')</code></li>
         <li><code>@commands.add('always-above', 'make_above', 'is_above')</code></li>
         <li><code>@commands.add('always-below', 'make_below', 'is_below')</code></li>
         <li><code>@commands.add('shade', 'shade', 'is_shaded')</code></li>
@@ -918,7 +975,7 @@
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">general</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">ModMask</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">Control Mod1</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">UseWorkarea</code><code class="variable-quote">'</code><code class="variable-op">: </code>True<code class="variable-group">}</code><code class="variable-op">,</code>
+<code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">general</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">ModMask</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">&lt;Ctrl&gt;&lt;Alt&gt;</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">UseWorkarea</code><code class="variable-quote">'</code><code class="variable-op">: </code>True<code class="variable-group">}</code><code class="variable-op">,</code>
  <code class="variable-quote">'</code><code class="variable-string">keys</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">C</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">move-to-center</code><code class="variable-quote">'</code><code class="variable-op">,</code>
           <code class="variable-quote">'</code><code class="variable-string">H</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">horizontal-maximize</code><code class="variable-quote">'</code><code class="variable-op">,</code>
           <code class="variable-quote">'</code><code class="variable-string">KP_0</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">maximize</code><code class="variable-quote">'</code><code class="variable-op">,</code>
@@ -977,7 +1034,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Mon Oct  7 12:15:23 2013
+    Generated by Epydoc 3.0.1 on Mon Oct 14 18:22:23 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

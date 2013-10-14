@@ -92,44 +92,10 @@ object --+
         <span class="summary-sig-arg">wm</span>,
         <span class="summary-sig-arg">commands</span>,
         <span class="summary-sig-arg">keys</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">modkeys</span>=<span class="summary-sig-default">None</span>)</span><br />
+        <span class="summary-sig-arg">modmask</span>=<span class="summary-sig-default">None</span>)</span><br />
       Populate the instance variables.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.__init__">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile.QuickTileApp-class.html#_init_dbus" class="summary-sig-name" onclick="show_private();">_init_dbus</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Set up dbus-python components in the Glib event loop</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp._init_dbus">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile.QuickTileApp-class.html#_init_xlib" class="summary-sig-name" onclick="show_private();">_init_xlib</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Set up python-xlib components in the Glib event loop</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp._init_xlib">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -143,11 +109,8 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="run"></a><span class="summary-sig-name">run</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Call <a href="quicktile.QuickTileApp-class.html#_init_xlib" 
-      class="link" onclick="show_private();">_init_xlib</a> and <a 
-      href="quicktile.QuickTileApp-class.html#_init_dbus" class="link" 
-      onclick="show_private();">_init_dbus</a> if available, then call 
+          <td><span class="summary-sig"><a href="quicktile.QuickTileApp-class.html#run" class="summary-sig-name">run</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Initialize keybinding and D-Bus if available, then call 
       <code>gtk.main()</code>.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.run">source&nbsp;code</a></span>
@@ -164,46 +127,7 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="quicktile.QuickTileApp-class.html#handle_xerror" class="summary-sig-name">handle_xerror</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">err</span>,
-        <span class="summary-sig-arg">req</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Used to identify when attempts to bind keys fail.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.handle_xerror">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>True</code></span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile.QuickTileApp-class.html#handle_xevent" class="summary-sig-name">handle_xevent</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">src</span>,
-        <span class="summary-sig-arg">cond</span>,
-        <span class="summary-sig-arg">handle</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Handle pending python-xlib events.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.handle_xevent">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="showBinds"></a><span class="summary-sig-name">showBinds</span>(<span class="summary-sig-arg">self</span>)</span><br />
+          <td><span class="summary-sig"><a href="quicktile.QuickTileApp-class.html#showBinds" class="summary-sig-name">showBinds</a>(<span class="summary-sig-arg">self</span>)</span><br />
       Print a formatted readout of defined keybindings and the modifier 
       mask to stdout.</td>
           <td align="right" valign="top">
@@ -231,31 +155,6 @@ object --+
       <code>__str__</code>,
       <code>__subclasshook__</code>
       </p>
-    </td>
-  </tr>
-</table>
-<!-- ==================== CLASS VARIABLES ==================== -->
-<a name="section-ClassVariables"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Class Variables</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-ClassVariables"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="keybinds_failed"></a><span class="summary-name">keybinds_failed</span> = <code title="False">False</code>
     </td>
   </tr>
 </table>
@@ -313,7 +212,7 @@ object --+
         <span class="sig-arg">wm</span>,
         <span class="sig-arg">commands</span>,
         <span class="sig-arg">keys</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">modkeys</span>=<span class="sig-default">None</span>)</span>
+        <span class="sig-arg">modmask</span>=<span class="sig-default">None</span>)</span>
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
@@ -328,7 +227,7 @@ object --+
         <li><strong class="pname"><code>keys</code></strong> (<code>dict</code>) - A dict mapping X11 keysyms to <a 
           href="quicktile.CommandRegistry-class.html" 
           class="link">CommandRegistry</a> command names.</li>
-        <li><strong class="pname"><code>modkeys</code></strong> (<code>str</code>) - A modifier mask to prefix to all keybindings.</li>
+        <li><strong class="pname"><code>modmask</code></strong> (<code>GdkModifierType</code>) - A modifier mask to prefix to all keybindings.</li>
         <li><strong class="pname"><code>wm</code></strong> (The <a href="quicktile.WindowManager-class.html" 
           class="link">WindowManager</a> instance to use.)</li>
     </ul></dd>
@@ -338,21 +237,22 @@ object --+
   </dl>
 </td></tr></table>
 </div>
-<a name="_init_dbus"></a>
-<div class="private">
+<a name="run"></a>
+<div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">_init_dbus</span>(<span class="sig-arg">self</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">run</span>(<span class="sig-arg">self</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp._init_dbus">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.run">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
-  <p>Set up dbus-python components in the Glib event loop</p>
+  <p>Initialize keybinding and D-Bus if available, then call 
+  <code>gtk.main()</code>.</p>
   <dl class="fields">
   </dl>
 <div class="fields">      <p><strong>To Do (1.0.0):</strong>
@@ -360,77 +260,29 @@ object --+
       </p>
 </div></td></tr></table>
 </div>
-<a name="_init_xlib"></a>
-<div class="private">
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">_init_xlib</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp._init_xlib">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Set up python-xlib components in the Glib event loop</p>
-  <p>Source: <a href="http://www.larsen-b.com/Article/184.html" 
-  target="_top">http://www.larsen-b.com/Article/184.html</a></p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="handle_xerror"></a>
+<a name="showBinds"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_xerror</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">err</span>,
-        <span class="sig-arg">req</span>=<span class="sig-default">None</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">showBinds</span>(<span class="sig-arg">self</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.handle_xerror">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.showBinds">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
-  <p>Used to identify when attempts to bind keys fail.</p>
+  <p>Print a formatted readout of defined keybindings and the modifier mask
+  to stdout.</p>
   <dl class="fields">
   </dl>
-<div class="fields">      <p><strong>Note:</strong>
-        If you can make python-xlib's <code>CatchError</code> actually work
-        or if you can retrieve more information to show, feel free.
+<div class="fields">      <p><strong>To Do:</strong>
+        Look into moving this into <a href="quicktile.KeyBinder-class.html" 
+    class="link">KeyBinder</a>
       </p>
 </div></td></tr></table>
-</div>
-<a name="handle_xevent"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_xevent</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">src</span>,
-        <span class="sig-arg">cond</span>,
-        <span class="sig-arg">handle</span>=<span class="sig-default">None</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.handle_xevent">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Handle pending python-xlib events.</p>
-  <p>Filters for <code>X.KeyPress</code> events, resolves them to commands,
-  and calls <a href="quicktile.CommandRegistry-class.html#call" 
-  class="link">CommandRegistry.call</a> on them.</p>
-  <dl class="fields">
-    <dt>Returns: <code>True</code></dt>
-  </dl>
-</td></tr></table>
 </div>
 <br />
 <!-- ==================== NAVIGATION BAR ==================== -->
@@ -459,7 +311,7 @@ object --+
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Mon Oct  7 12:15:23 2013
+    Generated by Epydoc 3.0.1 on Mon Oct 14 18:22:23 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
