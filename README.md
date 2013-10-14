@@ -88,7 +88,7 @@ The important things to keep in mind for using it are:
 
 ### Valid Key Names
 
-GTK+ key names are just X11 key symbols so the simplest way to identify the name for for a key is to use the `xev` command. Just run it in a terminal and press the key you want. It will print out something like this:
+GTK+ key names are just X11 key symbols so the simplest way to identify the name for a key is to use the `xev` command. Just run it in a terminal and press the key you want. It will print out something like this:
 
 > KeyPress event, serial 41, synthetic NO, window 0x8400001,<br>
 > &nbsp;&nbsp;&nbsp;root 0x291, subw 0x0, time 2976251798, (149,-352), root:(192,460),<br>
@@ -145,7 +145,7 @@ see `--help`.
   `Unhandled action type _OB_WM_ACTION_UNDECORATE` messages to the logging
   output. This is
   [a bug](https://icculus.org/pipermail/openbox/2009-January/006025.html) in
-  libwnck, which I depend on for reliable window management  and is outside
+  libwnck, the library which I depend on for reliable window management, and is outside
   my control.
 
 Thanks to Thomas Vander Stichele for some of the documentation cleanups.
