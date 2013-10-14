@@ -842,6 +842,7 @@ def toggle_desktop(wm, win, state):
 @commands.add('horizontal-maximize', 'maximize_horizontally',
                                      'is_maximized_horizontally')
 @commands.add('maximize', 'maximize', 'is_maximized')
+@commands.add('minimize', 'minimize', 'is_minimized')
 @commands.add('always-above', 'make_above', 'is_above')
 @commands.add('always-below', 'make_below', 'is_below')
 @commands.add('shade', 'shade', 'is_shaded')
