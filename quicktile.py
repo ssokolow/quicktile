@@ -507,7 +507,9 @@ class WindowManager(object):
         return nxt
 
     def reposition(self, win, geom=None, monitor=gtk.gdk.Rectangle(0, 0, 0, 0),
-            keep_maximize=False):
+            keep_maximize=False, geometry_mask=
+                wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y |
+                wnck.WINDOW_CHANGE_WIDTH | wnck.WINDOW_CHANGE_HEIGHT):
         """
         Position and size a window, decorations inclusive, according to the
         provided target window and monitor geometry rectangles.
@@ -515,14 +517,23 @@ class WindowManager(object):
         If no monitor rectangle is specified, position relative to the desktop
         as a whole.
 
+        @param win: The C{wnck.Window} to operate on.
+        @param geom: The new geometry for the window. Can be left unspecified
+            if the intent is to move the window to another monitor without
+            repositioning it.
         @param monitor: The frame relative to which C{geom} should be
-            interpreted. Leave at the default for the whole desktop.
+            interpreted. The whole desktop if unspecified.
         @param keep_maximize: Whether to re-maximize a maximized window after
             un-maximizing it to move it.
+        @param geometry_mask: A set of flags determining which aspects of the
+            requested geometry should actually be applied to the window.
+            (Allows the same geometry definition to easily be shared between
+            operations like move and resize.)
         @type win: C{gtk.gdk.Window}
         @type geom: C{gtk.gdk.Rectangle}
         @type monitor: C{gtk.gdk.Rectangle}
         @type keep_maximize: C{bool}
+        @type geometry_mask: U{WnckWindowMoveResizeMask<https://developer.gnome.org/libwnck/2.30/WnckWindow.html#WnckWindowMoveResizeMask>}
         """
 
         geom = geom or wm.get_geometry_rel(win, wm.get_monitor(win)[1])
@@ -547,9 +558,7 @@ class WindowManager(object):
         #     static gravity would position correctly and north-west gravity
         #     would double-compensate for the titlebar and border dimensions.
         #     (If
-        win.set_geometry(wnck.WINDOW_GRAVITY_STATIC,
-                wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y |
-                wnck.WINDOW_CHANGE_WIDTH | wnck.WINDOW_CHANGE_HEIGHT,
+        win.set_geometry(wnck.WINDOW_GRAVITY_STATIC, geometry_mask,
                 new_x, new_y, geom.width, geom.height)
 
         if maxed and keep_maximize:
