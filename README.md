@@ -70,6 +70,61 @@ This works best when combined with functionality your existing window manager
 provides (eg. `Alt+Tab`) to minimize the need to switch your hand between your
 keyboard and your mouse.
 
+## Keybinding Syntax
+
+Both the `ModMask` field and the `[keys]` section use GTK+ accelerator syntax
+and you can use modifier keys in both places. (`ModMask` is a keybinding string where the modifiers are prepended to each `[keys]` value and the non-modifier part is ignored.)
+
+GTK+ modifier syntax looks like this:
+
+    <Ctrl><Alt>Delete
+
+The important things to keep in mind for using it are:
+
+1. **Do not** put any spaces inside your keybind string.
+3. Modifier names and non-modifier key names are not the same thing.
+4. Modifier names are case-insensitive.
+5. Key names like `Down` are case-sensitive. (Don't like the letter keys fool you. Those work the way they do because `A` and `a` are two separate names for the same key.)
+
+### Valid Key Names
+
+GTK+ key names are just X11 key symbols so the simplest way to identify the name for for a key is to use the `xev` command. Just run it in a terminal and press the key you want. It will print out something like this:
+
+> KeyPress event, serial 41, synthetic NO, window 0x8400001,<br>
+> &nbsp;&nbsp;&nbsp;root 0x291, subw 0x0, time 2976251798, (149,-352), root:(192,460),<br>
+> &nbsp;&nbsp;&nbsp;state 0x10, keycode 116 (keysym 0xff54, **Down**), same_screen YES,<br>
+> &nbsp;&nbsp;&nbsp;XLookupString gives 0 bytes:<br>
+> &nbsp;&nbsp;&nbsp;XmbLookupString gives 0 bytes:<br>
+> &nbsp;&nbsp;&nbsp;XFilterEvent returns: False<br>
+
+The part I've bolded is the name QuickTile expects.
+
+**Troubleshooting xev:**
+
+* If nothing happens, make sure the `xev` window (and not the terminal) has focus.
+* If pressing the key triggers some messages but you do not see one which says `KeyPress event`, it's likely that some other program has already grabbed that key combination.
+
+Also, in my testing, QuickTile currently fails to bind keys like `Super_L` (left Windows key) when they've been configured as modifiers. I'll look into this as time permits.
+
+### Valid Modifier Names
+
+I haven't found a comprehensive document listing the modifier names `gtk.accelerator_parse()` accepts, but here are the names I'm aware of with consistent mappings:
+
+* Mappings that should be consistent across pretty much any system:
+  * **Control:** `<Control>`, `<Ctrl>`, `<Ctl>`, `<Primary>`
+  * **Shift:** `<Shift>`, `<Shft>`
+  * **Alt:** `<Alt>`, `<Mod1>`
+* Mappings which worked for me but I can't make any guarantees for:
+  * **Windows Key:** `<Mod4>`
+  * **AltGr:** `<Mod5>`
+* Mappings which are possible but need to be manually set up using `setxkbmap` and `xmodmap`:
+  * `<Mod3>` (I redefined Caps Lock as `Hyper_L` and bound it to this)
+* Modifiers which cause QuickTile to error out deep in `python-xlib` because GTK+ maps them to integers beyond the limits of the X11 wire protocol:
+  * `<Meta>`
+  * `<Super>`
+  * `<Hyper>`
+
+
 ## Advanced Uses
 
  * If you want to trigger QuickTile from another application in an efficient

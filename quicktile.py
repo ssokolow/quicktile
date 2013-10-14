@@ -22,6 +22,8 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
  - U{https://thomas.apestaart.org/thomas/trac/changeset/1122/patches/quicktile/quicktile.py}
  - U{https://thomas.apestaart.org/thomas/trac/browser/patches/quicktile/README}
 
+@todo 1.0.0: Retire L{KEYLOOKUP}. (API-breaking change)
+
 @newfield appname: Application Name
 """
 
@@ -63,7 +65,7 @@ except ImportError:
 else:
     try:
         DBusGMainLoop(set_as_default=True)
-        sessBus = SessionBus()  #: Used by L{QuickTileApp._init_dbus}
+        sessBus = SessionBus()  #: Used by L{QuickTileApp.run}
     except DBusException:
         pass
     else:
@@ -554,9 +556,150 @@ class WindowManager(object):
             for mt in maxed:
                 getattr(win, 'maximize' + mt)()
 
+class KeyBinder(object):
+    """A convenience class for wrapping XGrabKey."""
+
+    #: @todo: Figure out how to set the modifier mask in X11 and use
+    #:        C{gtk.accelerator_get_default_mod_mask()} to feed said code.
+    ignored_modifiers = ['Mod2Mask', 'LockMask']
+
+    #: Used to pass state from L{handle_xerror}
+    keybind_failed = False
+
+    def __init__(self, xdisplay=None):
+        """Connect to X11 and the Glib event loop.
+
+        @param xdisplay: A C{python-xlib} display handle.
+        @type xdisplay: C{Xlib.display.Display}
+        """
+        self.xdisp = xdisplay or Display()
+        self.xroot = self.xdisp.screen().root
+        self._keys = {}
+
+        # Resolve these at runtime to avoid NameErrors
+        self.ignored_modifiers = [getattr(X, name) for name in
+                self.ignored_modifiers]
+
+        # We want to receive KeyPress events
+        self.xroot.change_attributes(event_mask=X.KeyPressMask)
+
+        # Set up a handler to catch XGrabKey() failures
+        self.xdisp.set_error_handler(self.handle_xerror)
+
+        # Merge python-xlib into the Glib event loop
+        # Source: http://www.pygtk.org/pygtk2tutorial/sec-MonitoringIO.html
+        gobject.io_add_watch(self.xroot.display,
+                             gobject.IO_IN, self.handle_xevent)
+
+    def bind(self, accel, callback):
+        """Bind a global key combination to a callback.
+
+        @param accel: An accelerator as either a string to be parsed by
+            C{gtk.accelerator_parse()} or a tuple as returned by it.)
+        @param callback: The function to call when the key is pressed.
+
+        @type accel: C{str} or C{(int, gtk.gdk.ModifierType)} or C{(int, int)}
+        @type callback: C{function}
+
+        @returns: A boolean indicating whether the provided keybinding was
+            parsed successfully. (But not whether it was registered
+            successfully due to the asynchronous nature of the C{XGrabKey}
+            request.)
+        @rtype: C{bool}
+        """
+        if isinstance(accel, basestring):
+            keysym, modmask = gtk.accelerator_parse(accel)
+        else:
+            keysym, modmask = accel
+
+        if not gtk.accelerator_valid(keysym, modmask):
+            logging.error("Invalid keybinding: %s", accel)
+            return False
+
+        # Convert to what XGrabKey expects
+        keycode = self.xdisp.keysym_to_keycode(keysym)
+        if isinstance(modmask, gtk.gdk.ModifierType):
+            modmask = modmask.real
+
+        # Ignore modifiers like Mod2 (NumLock) and Lock (CapsLock)
+        for mmask in self._vary_modmask(modmask, self.ignored_modifiers):
+            self._keys.setdefault(keycode, []).append((mmask, callback))
+            self.xroot.grab_key(keycode, mmask,
+                    1, X.GrabModeAsync, X.GrabModeAsync)
+
+        # If we don't do this, then nothing works.
+        # I assume it flushes the XGrabKey calls to the server.
+        self.xdisp.sync()
+
+        if self.keybind_failed:
+            self.keybind_failed = False
+            logging.warning("Failed to bind key. It may already be in use: %s"
+                % accel)
+
+    def handle_xerror(self, err, req=None):
+        """Used to identify when attempts to bind keys fail.
+        @note: If you can make python-xlib's C{CatchError} actually work or if
+               you can retrieve more information to show, feel free.
+        """
+        if isinstance(err, BadAccess):
+            self.keybind_failed = True
+        else:
+            self.xdisp.display.default_error_handler(err)
+
+    def handle_xevent(self, src, cond, handle=None):
+        """Dispatch C{XKeyPress} events to their callbacks.
+
+        @rtype: C{True}
+
+        @todo: Make sure uncaught exceptions are prevented from making
+            quicktile unresponsive in the general case.
+        """
+        handle = handle or self.xroot.display
+
+        for _ in range(0, handle.pending_events()):
+            xevent = handle.next_event()
+            if xevent.type == X.KeyPress:
+                if xevent.detail in self._keys:
+                    for mmask, cb in self._keys[xevent.detail]:
+                        if mmask == xevent.state:
+                            cb()
+                            break
+                        elif mmask == 0:
+                            logging.debug("X11 returned null modifier!")
+                            cb()
+                            break
+                    else:
+                        logging.error("Received an event for a recognized key "
+                                  "with unrecognized modifiers: %s, %s" %
+                                  (xevent.detail, xevent.state))
+
+                else:
+                    logging.error("Received an event for an unrecognized "
+                                  "keybind: %s" % (xevent.detail, mmask))
+
+        # Necessary for proper function
+        return True
+
+    def _vary_modmask(self, modmask, ignored):
+        """Generate all possible variations on C{modmask} that need to be
+        taken into consideration if we can't properly ignore the modifiers in
+        C{ignored}. (Typically NumLock and CapsLock)
+
+        @param modmask: A bitfield to be combinatorically grown.
+        @param ignored: Modifiers to be combined with C{modmask}.
+
+        @type modmask: C{int} or C{gtk.gdk.ModifierType}
+        @type ignored: C{list(int)}
+
+        @rtype: generator of C{type(modmask)}
+        """
+
+        for ignored in powerset(ignored):
+            imask = reduce(lambda x, y: x | y, ignored, 0)
+            yield modmask | imask
+
 class QuickTileApp(object):
     """The basic Glib application itself."""
-    keybinds_failed = False
 
     def __init__(self, wm, commands, keys=None, modmask=None):
         """Populate the instance variables.
@@ -573,93 +716,35 @@ class QuickTileApp(object):
         self._keys = keys or {}
         self._modmask = modmask or gtk.gdk.ModifierType(0)
 
-    def _init_dbus(self):
-        """Set up dbus-python components in the Glib event loop
+    def run(self):
+        """Initialize keybinding and D-Bus if available, then call
+        C{gtk.main()}.
 
         @todo 1.0.0: Retire the C{doCommand} name. (API-breaking change)
         """
-        class QuickTile(dbus.service.Object):
-            def __init__(self):
-                dbus.service.Object.__init__(self, sessBus,
-                                             '/com/ssokolow/QuickTile')
-
-            @dbus.service.method(dbus_interface='com.ssokolow.QuickTile',
-                     in_signature='s', out_signature='b')
-            def doCommand(self, command):
-                return self.commands.call(command, wm)
-
-        self.dbusName = dbus.service.BusName("com.ssokolow.QuickTile", sessBus)
-        self.dbusObj = QuickTile()
-
-    def _init_xlib(self):
-        """Set up python-xlib components in the Glib event loop
-
-        Source: U{http://www.larsen-b.com/Article/184.html}
-        """
-        self.xdisp = Display()
-        self.xroot = self.xdisp.screen().root
-
-        # We want to receive KeyPress events
-        self.xroot.change_attributes(event_mask=X.KeyPressMask)
-
-        # Validate all the given keybinds
-        self.keys = dict()
-        for key in self._keys:
-            transKey = key
-            if key in KEYLOOKUP:
-                # Look up unrecognized shortkeys in a hardcoded dict and
-                # replace with valid names like ',' -> 'comma'
-                # TODO: Do this in a way that's compatible with per-entry
-                # modifier masks
-                transKey = KEYLOOKUP[key]
-            keysym, mmask = gtk.accelerator_parse(transKey)
-            modmask = self._modmask | mmask
-
-            if gtk.accelerator_valid(keysym, modmask):
-                keybind = self.xdisp.keysym_to_keycode(keysym), modmask.real
-                self.keys[keybind] = self._keys[key]
-            else:
-                #FIXME: Process ModMask and transKey the same way.
-                logging.error("Invalid keybinding: %s%s = %s",
-                        gtk.accelerator_get_label(0, self._modmask), transKey,
-                        self._keys[key])
-
-        # Set up a handler to catch XGrabKey() failures
-        self.xdisp.set_error_handler(self.handle_xerror)
-
-        # Actually bind the keys
-        for keycode, modmask in self.keys:
-            # Ignore Mod2 (NumLock) and Lock (CapsLock) state
-            # TODO: Figure out how to set the modifier mask in X11 and use
-            # gtk.accelerator_get_default_mod_mask() to feed said code.
-            for ignored in powerset([X.Mod2Mask, X.LockMask]):
-                ignored = reduce(lambda x, y: x | y, ignored, 0)
-                self.xroot.grab_key(keycode, modmask | ignored,
-                        1, X.GrabModeAsync, X.GrabModeAsync)
-
-        # If we don't do this, then nothing works.
-        # I assume it flushes the XGrabKey calls to the server.
-        self.xdisp.sync()
-        if self.keybinds_failed:
-            logging.warning("One or more requested keybindings were could not"
-                " be bound. Please check that they are not already in use.")
-
-        # Merge python-xlib into the Glib event loop
-        # Source: http://www.pygtk.org/pygtk2tutorial/sec-MonitoringIO.html
-        gobject.io_add_watch(self.xroot.display,
-                             gobject.IO_IN, self.handle_xevent)
-
-    def run(self):
-        """Call L{_init_xlib} and L{_init_dbus} if available, then
-        call C{gtk.main()}."""
 
         if XLIB_PRESENT:
-            self._init_xlib()
+            self.keybinder = KeyBinder()
+            for key, func in self._keys.items():
+                self.keybinder.bind(self._modmask + key,
+                        lambda func=func: self.commands.call(func, wm))
         else:
             logging.error("Could not find python-xlib. Cannot bind keys.")
 
         if DBUS_PRESENT:
-            self._init_dbus()
+            class QuickTile(dbus.service.Object):
+                def __init__(self):
+                    dbus.service.Object.__init__(self, sessBus,
+                                                 '/com/ssokolow/QuickTile')
+
+                @dbus.service.method(dbus_interface='com.ssokolow.QuickTile',
+                         in_signature='s', out_signature='b')
+                def doCommand(self, command):
+                    return self.commands.call(command, wm)
+
+            self.dbusName = dbus.service.BusName("com.ssokolow.QuickTile",
+                                                 sessBus)
+            self.dbusObj = QuickTile()
         else:
             logging.warn("Could not connect to the D-Bus Session Bus.")
 
@@ -669,49 +754,16 @@ class QuickTileApp(object):
 
         gtk.main()
 
-    def handle_xerror(self, err, req=None):
-        """Used to identify when attempts to bind keys fail.
-        @note: If you can make python-xlib's C{CatchError} actually work or if
-               you can retrieve more information to show, feel free.
-        """
-        if isinstance(err, BadAccess):
-            self.keybinds_failed = True
-        else:
-            self.xdisp.display.default_error_handler(err)
-
-    def handle_xevent(self, src, cond, handle=None):
-        """Handle pending python-xlib events.
-
-        Filters for C{X.KeyPress} events, resolves them to commands, and calls
-        L{CommandRegistry.call} on them.
-
-        @rtype: C{True}
-
-        @todo: Make sure uncaught exceptions are prevented from making
-            quicktile unresponsive in the general case.
-        """
-        handle = handle or self.xroot.display
-
-        for _ in range(0, handle.pending_events()):
-            xevent = handle.next_event()
-            if xevent.type == X.KeyPress:
-                mods = xevent.state & gtk.accelerator_get_default_mod_mask()
-                keybind = xevent.detail, mods
-
-                if keybind in self.keys:
-                    self.commands.call(self.keys[keybind], wm)
-                else:
-                    print self.keys
-                    logging.error("Received an event for an unrecognized "
-                                  "keybind: %s" % (keybind,))
-        return True
 
     def showBinds(self):
         """Print a formatted readout of defined keybindings and the modifier
-        mask to stdout."""
+        mask to stdout.
+
+        @todo: Look into moving this into L{KeyBinder}
+        """
 
         print "Keybindings defined for use with --daemonize:\n"
-        print "Modifier: %s\n" % '+'.join(str(x) for x in self._modkeys)
+        print "Modifier: %s\n" % self._modmask
         print fmt_table(self._keys, ('Key', 'Action'))
 
 commands = CommandRegistry()
@@ -969,12 +1021,6 @@ if __name__ == '__main__':
         config.set('general', 'ModMask', modkeys)
         dirty = True
 
-    # Convert to a GFlags instance and test for validity
-    _, modkeys = gtk.accelerator_parse(modkeys)
-    if not gtk.accelerator_valid(gtk.accelerator_parse('a')[0], modkeys):
-        logging.error("Invalid ModMask value: %s",
-                gtk.accelerator_get_label(_, modkeys))
-
     # Either load the keybindings or use and save the defaults
     if config.has_section('keys'):
         keymap = dict(config.items('keys'))
@@ -984,6 +1030,17 @@ if __name__ == '__main__':
         for row in keymap.items():
             config.set('keys', row[0], row[1])
         dirty = True
+
+    # Migrate from the deprecated syntax for punctuation keysyms
+    for key in keymap:
+        # Look up unrecognized shortkeys in a hardcoded dict and
+        # replace with valid names like ',' -> 'comma'
+        transKey = key
+        if key in KEYLOOKUP:
+            logging.warn("Updating config file from deprecated keybind syntax:"
+                    "\n\t%r --> %r", key, KEYLOOKUP[key])
+            transKey = KEYLOOKUP[key]
+            dirty = True
 
     if dirty:
         cfg_file = file(cfg_path, 'wb')
