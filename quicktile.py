@@ -29,7 +29,7 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
 
 __appname__ = "QuickTile"
 __author__  = "Stephan Sokolow (deitarion/SSokolow)"
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 __license__ = "GNU GPL 2.0 or later"
 
 import errno, logging, os, sys, time
@@ -753,7 +753,6 @@ class QuickTileApp(object):
                                   "were available.")
 
         gtk.main()
-
 
     def showBinds(self):
         """Print a formatted readout of defined keybindings and the modifier
