@@ -73,7 +73,7 @@ keyboard and your mouse.
 ## Keybinding Syntax
 
 Both the `ModMask` field and the `[keys]` section use GTK+ accelerator syntax
-and you can use modifier keys in both places. (`ModMask` is a keybinding string where the modifiers are prepended to each `[keys]` value and the non-modifier part is ignored.)
+and you can use modifier keys in both places. (`ModMask` is prepended to each `[keys]` value before parsing it.)
 
 GTK+ modifier syntax looks like this:
 
