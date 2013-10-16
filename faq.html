@@ -6,6 +6,21 @@ title: FAQ
 <h2>Frequently/Potentially Asked Questions</h2>
 
 <dl class="big">
+    <dt>QuickTile complains about <code>WINDOW_CHANGE_X</code> and doesn't work. How do I fix this?</dt>
+    <dd><p>Do the errors you see look like this?</p>
+        <pre>** (quicktile.py:1855): WARNING **: Trying to register gtype 'WnckWindowState' as enum when in fact it is of type 'GFlags'
+
+** (quicktile.py:1855): WARNING **: Trying to register gtype 'WnckWindowActions' as enum when in fact it is of type 'GFlags'
+
+** (quicktile.py:1855): WARNING **: Trying to register gtype 'WnckWindowMoveResizeMask' as enum when in fact it is of type 'GFlags'
+<i>[some other stuff]</i>
+AttributeError: 'module' object has no attribute 'WINDOW_CHANGE_X'
+</pre>
+    <p>If so, then your Python bindings for libwnck are broken and you need to report the problem on your distro's issue tracker.</p>
+    <p>(Specifically, the bindings were built against a copy of libwnck with a different ABI than the one you're trying to use them with.)</p>
+    <p> While you wait for them to fix it, you should be able to solve the issue yourself by rebuilding the bindings from <a href="http://ftp.gnome.org/pub/GNOME/sources/gnome-python-desktop/">source</a>.</p>
+    </dd>
+
     <dt>I set <code>ModMask = Control Shift Mod1</code> but QuickTile isn't responding. Help?</dt>
     <dd>This usually happens when the Compiz Grid plugin is still consuming keystrokes. Make sure you've disabled the Grid plugin in <acronym title="CompizConfig Settings Manager"><a href="http://wiki.compiz.org/CCSM">CCSM</a></acronym> and then restart Compiz (eg. log out and back in) to make sure it's let go of the keybindings.</dd>
 
@@ -23,9 +38,13 @@ title: FAQ
         {% highlight bash %}gconftool-2 --set "/apps/metacity/general/disable_workarounds" false --type bool{% endhighlight %}
     </dd>
 
+    <dt>Does QuickTile run on MacOS X?</dt>
+    <dd><p>It's not a primary target, since I don't have a Mac to test with, but if <a href="https://opensource.conformal.com/wiki/spectrwm">SpectrWM</a> can run via X11.app, QuickTile isn't out of the question.</p>
+        <p>libwnck fails to retrieve the active window but a workaround is currently being developed in <a href="https://github.com/ssokolow/quicktile/issues/28">issue 28</a> and the <a href="https://github.com/ssokolow/quicktile/tree/xquartz">xquartz</a> branch.</p>
+        <p> A list of shareware alternatives with official OSX support is also available on <a href="http://stackoverflow.com/questions/273242/is-there-anything-like-winsplit-revolution-for-mac-os-x">StackOverflow</a>.</p>
+    </dd>
     <dt>QuickTile doesn't meet my needs. What can I do?</dt>
     <dd>
         <p>Assuming you don't feel like either contributing code or <a href="https://github.com/ssokolow/quicktile/issues">filing a feature request</a> and waiting, the Wikipedia <a href="https://secure.wikimedia.org/wikipedia/en/wiki/Tiling_window_manager">Tiling window manager</a> page does contain a section listing tiling utilities for X11 desktops. (Windows too, for that matter)</p>
-        <p>QuickTile does not officially support MacOS but, if <a href="https://opensource.conformal.com/wiki/spectrwm">SpectrWM</a> can run via X11.app, QuickTile isn't out of the question. A list of shareware alternatives with official OSX support is also available on <a href="http://stackoverflow.com/questions/273242/is-there-anything-like-winsplit-revolution-for-mac-os-x">StackOverflow</a>.</p>
     </dd>
 </dl>

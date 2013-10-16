@@ -70,6 +70,7 @@ pre {
     border-radius: 1ex;
     background: black;
     color: white;
+    overflow-y: auto;
 
     -moz-border-radius: 1ex;
     -webkit-border-radius: 1ex;
