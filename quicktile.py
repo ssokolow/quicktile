@@ -345,6 +345,33 @@ class CommandRegistry(object):
 
 class WindowManager(object):
     """A simple API-wrapper class for manipulating window positioning."""
+
+    #: Lookup table for internal window gravity support.
+    #: (libwnck's support is either unreliable or broken)
+    gravities = {
+        'NORTH_WEST': (0.0, 0.0),
+        'NORTH': (0.5, 0.0),
+        'NORTH_EAST': (1.0, 0.0),
+        'WEST': (0.0, 0.5),
+        'CENTER': (0.5, 0.5),
+        'EAST': (1.0, 0.5),
+        'SOUTH_WEST': (0.0, 1.0),
+        'SOUTH': (0.5, 1.0),
+        'SOUTH_EAST': (1.0, 1.0),
+    }
+    for key, val in gravities.items():
+        del gravities[key]
+
+        # Support GDK gravity constants
+        gravities[getattr(gtk.gdk, 'GRAVITY_%s' % key)] = val
+
+        # Support libwnck gravity constants
+        _name = 'WINDOW_GRAVITY_%s' % key.replace('_', '')
+        gravities[getattr(wnck, _name)] = val
+
+    # Prevent these temporary variables from showing up in the apidocs
+    del _name, key, val
+
     def __init__(self, screen=None, ignore_workarea=False):
         """
         Initializes C{WindowManager}.
@@ -363,6 +390,25 @@ class WindowManager(object):
         self.gdk_screen = screen or gtk.gdk.screen_get_default()
         self.screen = wnck.screen_get(self.gdk_screen.get_number())
         self.ignore_workarea = ignore_workarea
+
+    def calc_win_gravity(self, geom, gravity):
+        """Calculate the X and Y coordinates necessary to simulate non-topleft
+        gravity on a window.
+
+        @param geom: The window geometry to which to apply the corrections.
+        @param gravity: A desired gravity chosen from L{gravities}.
+        @type geom: C{gtk.gdk.Rectangle}
+        @type gravity: C{wnck.WINDOW_GRAVITY_*} or C{gtk.gdk.GRAVITY_*}
+
+        @returns: The coordinates to be used to achieve the desired position.
+        @rtype: C{(x, y)}
+        """
+        grav_x, grav_y = self.gravities[gravity]
+
+        return (
+            int(geom.x - (geom.width * grav_x)),
+            int(geom.y - (geom.height * grav_y))
+        )
 
     def get_geometry_rel(self, window, monitor_geom):
         """Get window position relative to the monitor rather than the desktop.
@@ -507,8 +553,8 @@ class WindowManager(object):
         return nxt
 
     def reposition(self, win, geom=None, monitor=gtk.gdk.Rectangle(0, 0, 0, 0),
-            keep_maximize=False, geometry_mask=
-                wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y |
+            keep_maximize=False, gravity=wnck.WINDOW_GRAVITY_NORTHWEST,
+            geometry_mask= wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y |
                 wnck.WINDOW_CHANGE_WIDTH | wnck.WINDOW_CHANGE_HEIGHT):
         """
         Position and size a window, decorations inclusive, according to the
@@ -525,6 +571,8 @@ class WindowManager(object):
             interpreted. The whole desktop if unspecified.
         @param keep_maximize: Whether to re-maximize a maximized window after
             un-maximizing it to move it.
+        @param gravity: A constant specifying which point on the window is
+            referred to by the X and Y coordinates in C{geom}.
         @param geometry_mask: A set of flags determining which aspects of the
             requested geometry should actually be applied to the window.
             (Allows the same geometry definition to easily be shared between
@@ -533,18 +581,36 @@ class WindowManager(object):
         @type geom: C{gtk.gdk.Rectangle}
         @type monitor: C{gtk.gdk.Rectangle}
         @type keep_maximize: C{bool}
+        @type gravity: U{WnckWindowGravity<https://developer.gnome.org/libwnck/stable/WnckWindow.html#WnckWindowGravity>} or U{GDK Gravity Constant<http://www.pygtk.org/docs/pygtk/gdk-constants.html#gdk-gravity-constants>}
         @type geometry_mask: U{WnckWindowMoveResizeMask<https://developer.gnome.org/libwnck/2.30/WnckWindow.html#WnckWindowMoveResizeMask>}
+
+        @todo 1.0.0: Look for a way to accomplish this with a cleaner method
+            signature. This is getting a little hairy. (API-breaking change)
         """
 
-        geom = geom or wm.get_geometry_rel(win, wm.get_monitor(win)[1])
+        # We need to ensure that ignored values are still present for
+        # gravity calculations.
+        old_geom = wm.get_geometry_rel(win, wm.get_monitor(win)[1])
+        if geom:
+            for attr in ('x', 'y', 'width', 'height'):
+                if not geometry_mask & getattr(wnck,
+                        'WINDOW_CHANGE_%s' % attr.upper()):
+                    setattr(geom, attr, getattr(old_geom, attr))
+        else:
+            geom = old_geom
 
+        # Unmaximize and record the types we may need to restore
         max_types, maxed = ['', '_horizontally', '_vertically'], []
         for mt in max_types:
             if getattr(win, 'is_maximized' + mt)():
                 maxed.append(mt)
                 getattr(win, 'unmaximize' + mt)()
 
-        new_x, new_y = geom.x + monitor.x, geom.y + monitor.y
+        # Apply gravity and resolve to absolute desktop coordinates.
+        new_x, new_y = self.calc_win_gravity(geom, gravity)
+        new_x += monitor.x
+        new_y += monitor.y
+
         logging.debug("repositioning to (%d, %d, %d, %d)",
                 new_x, new_y, geom.width, geom.height)
 
@@ -561,6 +627,7 @@ class WindowManager(object):
         win.set_geometry(wnck.WINDOW_GRAVITY_STATIC, geometry_mask,
                 new_x, new_y, geom.width, geom.height)
 
+        # Restore maximization if asked
         if maxed and keep_maximize:
             for mt in maxed:
                 getattr(win, 'maximize' + mt)()
