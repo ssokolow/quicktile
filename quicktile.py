@@ -39,6 +39,17 @@ from itertools import chain, combinations
 from functools import wraps
 from UserDict import DictMixin
 
+#: Used to filter spurious libwnck error messages from stderr since PyGTK
+#: doesn't expose g_log_set_handler() to allow proper filtering.
+if __name__ == '__main__':
+    import subprocess
+    glib_log_filter = subprocess.Popen(
+            ['grep', '-v', 'Unhandled action type _OB_WM'],
+            stdin=subprocess.PIPE)
+
+    # Redirect stderr through grep
+    os.dup2(glib_log_filter.stdin.fileno(), sys.stderr.fileno())
+
 import pygtk
 pygtk.require('2.0')
 

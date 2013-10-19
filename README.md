@@ -141,11 +141,11 @@ see `--help`.
 
 ## Known Bugs
 
-* Under Openbox, QuickTile sends many
-  `Unhandled action type _OB_WM_ACTION_UNDECORATE` messages to the logging
-  output. This is
-  [a bug](https://icculus.org/pipermail/openbox/2009-January/006025.html) in
-  libwnck, the library which I depend on for reliable window management, and is outside
-  my control.
+* libwnck tries to flood the logging output with
+  `Unhandled action type _OB_WM_ACTION_UNDECORATE\n\n` messages, which is
+  [a bug](https://icculus.org/pipermail/openbox/2009-January/006025.html),
+  and PyGTK doesn't expose the function needed to filter them away. As a
+  result, the best QuickTile can do is pipe its output through grep, leaving a
+  flood of blank lines since grep is finicky about matching them.
 
 Thanks to Thomas Vander Stichele for some of the documentation cleanups.
