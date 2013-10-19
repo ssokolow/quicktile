@@ -300,13 +300,6 @@ class EnumSafeDict(DictMixin):
         return list(self)
 
 #}
-#{ Exceptions
-
-class DependencyError(Exception):
-    """Raised when a required dependency is missing."""
-    pass
-
-#}
 
 class CommandRegistry(object):
     """Handles lookup and boilerplate for window management commands.
@@ -864,6 +857,9 @@ class QuickTileApp(object):
         """Initialize keybinding and D-Bus if available, then call
         C{gtk.main()}.
 
+        @returns: C{False} if none of the supported backends were available.
+        @rtype: C{bool}
+
         @todo 1.0.0: Retire the C{doCommand} name. (API-breaking change)
         """
 
@@ -892,11 +888,11 @@ class QuickTileApp(object):
         else:
             logging.warn("Could not connect to the D-Bus Session Bus.")
 
-        if not (XLIB_PRESENT or DBUS_PRESENT):
-            raise DependencyError("Neither the Xlib nor the D-Bus backends "
-                                  "were available.")
-
-        gtk.main()
+        if (XLIB_PRESENT or DBUS_PRESENT):
+            gtk.main()
+            return True
+        else:
+            return False
 
     def showBinds(self):
         """Print a formatted readout of defined keybindings and the modifier
@@ -1200,13 +1196,12 @@ if __name__ == '__main__':
         sys.exit()
 
     if opts.daemonize:
-        try:
-            #TODO: Do this properly
-            app.run()
-        except DependencyError, err:
-            logging.critical(err)
+        if not app.run():
+            logging.critical("Neither the Xlib nor the D-Bus backends were "
+                             "available")
             sys.exit(errno.ENOENT)
             #FIXME: What's the proper exit code for "library not found"?
+
     elif not first_run:
         if not args or opts.showArgs:
             print commands
