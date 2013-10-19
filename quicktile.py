@@ -942,19 +942,15 @@ def cycle_monitors(wm, win, state, step=1):
 def cmd_moveCenter(wm, win, state):
     """Center the window in the monitor it currently occupies."""
     use_rect = state['usable_rect']
-    win_geom = wm.get_geometry_rel(win, state['monitor_geom'])
 
-    #FIXME: Just use use_rect/2 and libwnck's gravity support.
-    dims = (int((use_rect.width - win_geom.width) / 2),
-            int((use_rect.height - win_geom.height) / 2),
-            int(win_geom.width),
-            int(win_geom.height))
-
+    dims = (int(use_rect.width / 2), int(use_rect.height / 2), 0, 0)
     logging.debug("dims %r", dims)
+
     result = gtk.gdk.Rectangle(*dims)
     logging.debug("result %r", tuple(result))
 
-    wm.reposition(win, result, use_rect)
+    wm.reposition(win, result, use_rect, gravity=wnck.WINDOW_GRAVITY_CENTER,
+           geometry_mask= wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y)
 
 @commands.add('bordered')
 def toggle_decorated(wm, win, state):
