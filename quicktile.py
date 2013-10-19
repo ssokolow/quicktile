@@ -37,6 +37,7 @@ from ConfigParser import RawConfigParser
 from heapq import heappop, heappush
 from itertools import chain, combinations
 from functools import wraps
+from UserDict import DictMixin
 
 import pygtk
 pygtk.require('2.0')
@@ -231,6 +232,58 @@ def fmt_table(rows, headers, group_by=None):
 
     return ''.join(output)
 
+class EnumSafeDict(DictMixin):
+    """A dict-like object which avoids comparing objects of different types
+    to avoid triggering spurious Glib "comparing different enum types"
+    warnings.
+    """
+
+    def __init__(self, *args):
+        self._contents = {}
+
+        for inDict in args:
+            for key, val in inDict.items():
+                self[key] = val
+
+    def __contains__(self, key):
+        ktype = type(key)
+        return ktype in self._contents and key in self._contents[ktype]
+
+    def __delitem__(self, key):
+        if key in self:
+            ktype = type(key)
+            section = self._contents[ktype]
+            del section[key]
+            if not section:
+                del self._contents[ktype]
+        else:
+            return KeyError(key)
+
+    def __getitem__(self, key):
+        if key in self:
+            return self._contents[type(key)][key]
+        else:
+            return KeyError(key)
+
+    def __iter__(self):
+        for section in self._contents.values():
+            for key in section.keys():
+                yield key
+
+    def __repr__(self):
+        return "%s(%s)" % (self.__class__.__name__,
+            ', '.join(repr(x) for x in self._contents.values()))
+
+    def __setitem__(self, key, value):
+        ktype = type(key)
+        self._contents.setdefault(ktype, {})[key] = value
+
+    def iteritems(self):
+        return [(key, self[key]) for key in self]
+
+    def keys(self):
+        return list(self)
+
 #}
 #{ Exceptions
 
@@ -348,7 +401,7 @@ class WindowManager(object):
 
     #: Lookup table for internal window gravity support.
     #: (libwnck's support is either unreliable or broken)
-    gravities = {
+    gravities = EnumSafeDict({
         'NORTH_WEST': (0.0, 0.0),
         'NORTH': (0.5, 0.0),
         'NORTH_EAST': (1.0, 0.0),
@@ -358,7 +411,7 @@ class WindowManager(object):
         'SOUTH_WEST': (0.0, 1.0),
         'SOUTH': (0.5, 1.0),
         'SOUTH_EAST': (1.0, 1.0),
-    }
+    })
     for key, val in gravities.items():
         del gravities[key]
 
