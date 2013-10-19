@@ -62,11 +62,11 @@ try:
     from Xlib import X
     from Xlib.display import Display
     from Xlib.error import BadAccess
-    XLIB_PRESENT = True  #: Indicates whether python-xlib was found
+    XLIB_PRESENT = True  #: Indicates presence of python-xlib (runtime check)
 except ImportError:
-    XLIB_PRESENT = False  #: Indicates whether python-xlib was found
+    XLIB_PRESENT = False  #: Indicates presence of python-xlib (runtime check)
 
-DBUS_PRESENT = False  #: Indicates whether python-dbus was found
+DBUS_PRESENT = False  #: Indicates availability of D-Bus (runtime check)
 try:
     import dbus.service
     from dbus import SessionBus
@@ -77,12 +77,13 @@ except ImportError:
 else:
     try:
         DBusGMainLoop(set_as_default=True)
-        sessBus = SessionBus()  #: Used by L{QuickTileApp.run}
+        sessBus = SessionBus()  #: D-Bus Session Bus for L{QuickTileApp.run}
     except DBusException:
         pass
     else:
-        DBUS_PRESENT = True  #: Indicates whether python-dbus was found
+        DBUS_PRESENT = True  #: Indicates availability of D-Bus (runtime check)
 
+#: Location for config files (determined at runtime).
 XDG_CONFIG_DIR = os.environ.get('XDG_CONFIG_HOME',
                                 os.path.expanduser('~/.config'))
 #{ Settings
@@ -139,6 +140,9 @@ for grav in ('left', 'right'):
 for grav in ('top-left', 'top-right', 'bottom-left', 'bottom-right'):
     POSITIONS[grav] = [gv(x, 0.5, grav) for x in (0.5, col, col * 2)]
 
+# Keep these temporary variables out of the API docs
+del col, grav, gv, x
+
 DEFAULTS = {
     'general': {
         # Use Ctrl+Alt as the default base for key combinations
@@ -174,7 +178,7 @@ KEYLOOKUP = {
 #{ Helpers
 
 def powerset(iterable):
-    """powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)
+    """C{powerset([1,2,3])} --> C{() (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)}
 
     @rtype: iterable
     """
@@ -697,7 +701,7 @@ class WindowManager(object):
                 getattr(win, 'maximize' + mt)()
 
 class KeyBinder(object):
-    """A convenience class for wrapping XGrabKey."""
+    """A convenience class for wrapping C{XGrabKey}."""
 
     #: @todo: Figure out how to set the modifier mask in X11 and use
     #:        C{gtk.accelerator_get_default_mod_mask()} to feed said code.
@@ -905,6 +909,7 @@ class QuickTileApp(object):
         print "Modifier: %s\n" % self._modmask
         print fmt_table(self._keys, ('Key', 'Action'))
 
+#: The instance of L{CommandRegistry} to be used in 99.9% of use cases.
 commands = CommandRegistry()
 #{ Tiling Commands
 
