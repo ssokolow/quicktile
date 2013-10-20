@@ -218,7 +218,7 @@ def fmt_table(rows, headers, group_by=None):
     # Identify how much space needs to be allocated for each column
     col_maxlens = []
     for pos, header in enumerate(headers):
-        maxlen = max(len(x[pos]) for x in rows if len(x) > col)
+        maxlen = max(len(x[pos]) for x in rows if len(x) > pos)
         col_maxlens.append(max(maxlen, len(header)))
 
     def fmt_row(row, pad=' ', indent=0, min_width=0):
