@@ -452,7 +452,8 @@ class WindowManager(object):
         self.screen = wnck.screen_get(self.gdk_screen.get_number())
         self.ignore_workarea = ignore_workarea
 
-    def calc_win_gravity(self, geom, gravity):
+    @classmethod
+    def calc_win_gravity(cls, geom, gravity):
         """Calculate the X and Y coordinates necessary to simulate non-topleft
         gravity on a window.
 
@@ -464,14 +465,15 @@ class WindowManager(object):
         @returns: The coordinates to be used to achieve the desired position.
         @rtype: C{(x, y)}
         """
-        grav_x, grav_y = self.gravities[gravity]
+        grav_x, grav_y = cls.gravities[gravity]
 
         return (
             int(geom.x - (geom.width * grav_x)),
             int(geom.y - (geom.height * grav_y))
         )
 
-    def get_geometry_rel(self, window, monitor_geom):
+    @staticmethod
+    def get_geometry_rel(window, monitor_geom):
         """Get window position relative to the monitor rather than the desktop.
 
         @param monitor_geom: The rectangle returned by
@@ -487,7 +489,8 @@ class WindowManager(object):
 
         return win_geom
 
-    def get_monitor(self, win):
+    @staticmethod
+    def get_monitor(win):
         """Given a Window (Wnck or GDK), retrieve the monitor ID and geometry.
 
         @type win: C{wnck.Window} or C{gtk.gdk.Window}
@@ -613,7 +616,8 @@ class WindowManager(object):
 
         return nxt
 
-    def reposition(self, win, geom=None, monitor=gtk.gdk.Rectangle(0, 0, 0, 0),
+    @classmethod
+    def reposition(cls, win, geom=None, monitor=gtk.gdk.Rectangle(0, 0, 0, 0),
             keep_maximize=False, gravity=wnck.WINDOW_GRAVITY_NORTHWEST,
             geometry_mask= wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y |
                 wnck.WINDOW_CHANGE_WIDTH | wnck.WINDOW_CHANGE_HEIGHT):
@@ -668,7 +672,7 @@ class WindowManager(object):
                 getattr(win, 'unmaximize' + mt)()
 
         # Apply gravity and resolve to absolute desktop coordinates.
-        new_x, new_y = self.calc_win_gravity(geom, gravity)
+        new_x, new_y = cls.calc_win_gravity(geom, gravity)
         new_x += monitor.x
         new_y += monitor.y
 
@@ -817,7 +821,8 @@ class KeyBinder(object):
         # Necessary for proper function
         return True
 
-    def _vary_modmask(self, modmask, ignored):
+    @staticmethod
+    def _vary_modmask(modmask, ignored):
         """Generate all possible variations on C{modmask} that need to be
         taken into consideration if we can't properly ignore the modifiers in
         C{ignored}. (Typically NumLock and CapsLock)
