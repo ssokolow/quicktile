@@ -688,7 +688,9 @@ class WindowManager(object):
         #     to the window frame rather than the window itself, hence why
         #     static gravity would position correctly and north-west gravity
         #     would double-compensate for the titlebar and border dimensions.
-        #     (If
+        #
+        #     ...however, that still doesn't explain why the non-topleft
+        #     gravities have no effect. I'm guessing something's just broken.
         win.set_geometry(wnck.WINDOW_GRAVITY_STATIC, geometry_mask,
                 new_x, new_y, geom.width, geom.height)
 
