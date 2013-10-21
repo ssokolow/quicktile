@@ -103,43 +103,6 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>gtk.gdk.Rectangle</code></span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#get_geometry_rel" class="summary-sig-name">get_geometry_rel</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">window</span>,
-        <span class="summary-sig-arg">monitor_geom</span>)</span><br />
-      Get window position relative to the monitor rather than the desktop.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_geometry_rel">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>(int, gtk.gdk.Rectangle)</code></span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#get_monitor" class="summary-sig-name">get_monitor</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">win</span>)</span><br />
-      Given a Window (Wnck or GDK), retrieve the monitor ID and geometry.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_monitor">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type"><code>gtk.gdk.Region</code>, <code>gtk.gdk.Rectangle</code></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -177,29 +140,6 @@ object --+
       
     </td>
   </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#reposition" class="summary-sig-name">reposition</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">win</span>,
-        <span class="summary-sig-arg">geom</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">monitor</span>=<span class="summary-sig-default">gtk.gdk.Rectangle(0, 0, 0, 0)</span>,
-        <span class="summary-sig-arg">keep_maximize</span>=<span class="summary-sig-default">False</span>,
-        <span class="summary-sig-arg">geometry_mask</span>=<span class="summary-sig-default">&lt;flags WNCK_WINDOW_CHANGE_X | WNCK_WINDOW_CHANGE_Y | WNCK_WIND<code class="variable-ellipsis">...</code></span>)</span><br />
-      Position and size a window, decorations inclusive, according to the 
-      provided target window and monitor geometry rectangles.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.reposition">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
   <tr>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
@@ -216,6 +156,155 @@ object --+
       <code>__str__</code>,
       <code>__subclasshook__</code>
       </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS METHODS ==================== -->
+<a name="section-ClassMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>(x, y)</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#calc_win_gravity" class="summary-sig-name">calc_win_gravity</a>(<span class="summary-sig-arg">cls</span>,
+        <span class="summary-sig-arg">geom</span>,
+        <span class="summary-sig-arg">gravity</span>)</span><br />
+      Calculate the X and Y coordinates necessary to simulate non-topleft 
+      gravity on a window.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.calc_win_gravity">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#reposition" class="summary-sig-name">reposition</a>(<span class="summary-sig-arg">cls</span>,
+        <span class="summary-sig-arg">win</span>,
+        <span class="summary-sig-arg">geom</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">monitor</span>=<span class="summary-sig-default">gtk.gdk.Rectangle(0, 0, 0, 0)</span>,
+        <span class="summary-sig-arg">keep_maximize</span>=<span class="summary-sig-default">False</span>,
+        <span class="summary-sig-arg">gravity</span>=<span class="summary-sig-default">&lt;enum WNCK_WINDOW_GRAVITY_NORTHWEST of type WnckWindowGravity&gt;</span>,
+        <span class="summary-sig-arg">geometry_mask</span>=<span class="summary-sig-default">&lt;flags WNCK_WINDOW_CHANGE_X | WNCK_WINDOW_CHANGE_Y | WNCK_WIND<code class="variable-ellipsis">...</code></span>)</span><br />
+      Position and size a window, decorations inclusive, according to the 
+      provided target window and monitor geometry rectangles.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.reposition">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+</table>
+<!-- ==================== STATIC METHODS ==================== -->
+<a name="section-StaticMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Static Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-StaticMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>gtk.gdk.Rectangle</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#get_geometry_rel" class="summary-sig-name">get_geometry_rel</a>(<span class="summary-sig-arg">window</span>,
+        <span class="summary-sig-arg">monitor_geom</span>)</span><br />
+      Get window position relative to the monitor rather than the desktop.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_geometry_rel">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>(int, gtk.gdk.Rectangle)</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.WindowManager-class.html#get_monitor" class="summary-sig-name">get_monitor</a>(<span class="summary-sig-arg">win</span>)</span><br />
+      Given a Window (Wnck or GDK), retrieve the monitor ID and geometry.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_monitor">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="quicktile.WindowManager-class.html#gravities" class="summary-name">gravities</a> = <code title="EnumSafeDict({&lt;enum GDK_GRAVITY_NORTH_WEST of type GdkGravity&gt;: (0.0, \
+0.0), &lt;enum GDK_GRAVITY_NORTH of type GdkGravity&gt;: (0.5, 0.0), &lt;enum G\
+DK_GRAVITY_NORTH_EAST of type GdkGravity&gt;: (1.0, 0.0), &lt;enum GDK_GRAVI\
+TY_WEST of type GdkGravity&gt;: (0.0, 0.5), &lt;enum GDK_GRAVITY_CENTER of t\
+ype GdkGravity&gt;: (0.5, 0.5), &lt;enum GDK_GRAVITY_EAST of type GdkGravity\
+&gt;: (1.0, 0.5), &lt;enum GDK_GRAVITY_SOUTH_WEST of type GdkGravity&gt;: (0.0,\
+ 1.0), &lt;enum GDK_GRAVITY_SOUTH of type GdkGravity&gt;: (0.5, 1.0), &lt;enum \
+GDK_GRAVITY_SOUTH_EAST of type GdkGravity&gt;: (1.0, 1.0)}, {&lt;enum WNCK_W\
+...">EnumSafeDict({&lt;enum GDK_GRAVITY_NORTH_WEST of type<code class="variable-ellipsis">...</code></code><br />
+      Lookup table for internal window gravity support.
     </td>
   </tr>
 </table>
@@ -301,6 +390,39 @@ object --+
       </p>
 </div></td></tr></table>
 </div>
+<a name="calc_win_gravity"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">calc_win_gravity</span>(<span class="sig-arg">cls</span>,
+        <span class="sig-arg">geom</span>,
+        <span class="sig-arg">gravity</span>)</span>
+    <br /><em class="fname">Class Method</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.calc_win_gravity">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Calculate the X and Y coordinates necessary to simulate non-topleft 
+  gravity on a window.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>geom</code></strong> (<code>gtk.gdk.Rectangle</code>) - The window geometry to which to apply the corrections.</li>
+        <li><strong class="pname"><code>gravity</code></strong> (<code>wnck.WINDOW_GRAVITY_*</code> or 
+          <code>gtk.gdk.GRAVITY_*</code>) - A desired gravity chosen from <a 
+          href="quicktile.WindowManager-class.html#gravities" 
+          class="link">gravities</a>.</li>
+    </ul></dd>
+    <dt>Returns: <code>(x, y)</code></dt>
+        <dd>The coordinates to be used to achieve the desired position.</dd>
+  </dl>
+</td></tr></table>
+</div>
 <a name="get_geometry_rel"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -308,9 +430,9 @@ object --+
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_geometry_rel</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">window</span>,
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_geometry_rel</span>(<span class="sig-arg">window</span>,
         <span class="sig-arg">monitor_geom</span>)</span>
+    <br /><em class="fname">Static Method</em>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_geometry_rel">source&nbsp;code</a></span>&nbsp;
@@ -337,8 +459,8 @@ object --+
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_monitor</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">win</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_monitor</span>(<span class="sig-arg">win</span>)</span>
+    <br /><em class="fname">Static Method</em>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.get_monitor">source&nbsp;code</a></span>&nbsp;
@@ -437,12 +559,14 @@ object --+
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">reposition</span>(<span class="sig-arg">self</span>,
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">reposition</span>(<span class="sig-arg">cls</span>,
         <span class="sig-arg">win</span>,
         <span class="sig-arg">geom</span>=<span class="sig-default">None</span>,
         <span class="sig-arg">monitor</span>=<span class="sig-default">gtk.gdk.Rectangle(0, 0, 0, 0)</span>,
         <span class="sig-arg">keep_maximize</span>=<span class="sig-default">False</span>,
+        <span class="sig-arg">gravity</span>=<span class="sig-default">&lt;enum WNCK_WINDOW_GRAVITY_NORTHWEST of type WnckWindowGravity&gt;</span>,
         <span class="sig-arg">geometry_mask</span>=<span class="sig-default">&lt;flags WNCK_WINDOW_CHANGE_X | WNCK_WINDOW_CHANGE_Y | WNCK_WIND<code class="variable-ellipsis">...</code></span>)</span>
+    <br /><em class="fname">Class Method</em>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="quicktile-pysrc.html#WindowManager.reposition">source&nbsp;code</a></span>&nbsp;
@@ -464,6 +588,12 @@ object --+
           interpreted. The whole desktop if unspecified.</li>
         <li><strong class="pname"><code>keep_maximize</code></strong> (<code>bool</code>) - Whether to re-maximize a maximized window after un-maximizing it 
           to move it.</li>
+        <li><strong class="pname"><code>gravity</code></strong> (<a 
+          href="https://developer.gnome.org/libwnck/stable/WnckWindow.html#WnckWindowGravity"
+          target="_top">WnckWindowGravity</a> or <a 
+          href="http://www.pygtk.org/docs/pygtk/gdk-constants.html#gdk-gravity-constants"
+          target="_top">GDK Gravity Constant</a>) - A constant specifying which point on the window is referred to by
+          the X and Y coordinates in <code>geom</code>.</li>
         <li><strong class="pname"><code>geometry_mask</code></strong> (<a 
           href="https://developer.gnome.org/libwnck/2.30/WnckWindow.html#WnckWindowMoveResizeMask"
           target="_top">WnckWindowMoveResizeMask</a>) - A set of flags determining which aspects of the requested 
@@ -471,6 +601,56 @@ object --+
           same geometry definition to easily be shared between operations 
           like move and resize.)</li>
     </ul></dd>
+  </dl>
+<div class="fields">      <p><strong>To Do (1.0.0):</strong>
+        Look for a way to accomplish this with a cleaner method signature. This
+    is getting a little hairy. (API-breaking change)
+      </p>
+</div></td></tr></table>
+</div>
+<br />
+<!-- ==================== CLASS VARIABLE DETAILS ==================== -->
+<a name="section-ClassVariableDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variable Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariableDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="gravities"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">gravities</h3>
+  <p>Lookup table for internal window gravity support. (libwnck's support 
+  is either unreliable or broken)</p>
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+EnumSafeDict({&lt;enum GDK_GRAVITY_NORTH_WEST of type GdkGravity&gt;: (0.0, <span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+0.0), &lt;enum GDK_GRAVITY_NORTH of type GdkGravity&gt;: (0.5, 0.0), &lt;enum G<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+DK_GRAVITY_NORTH_EAST of type GdkGravity&gt;: (1.0, 0.0), &lt;enum GDK_GRAVI<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+TY_WEST of type GdkGravity&gt;: (0.0, 0.5), &lt;enum GDK_GRAVITY_CENTER of t<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+ype GdkGravity&gt;: (0.5, 0.5), &lt;enum GDK_GRAVITY_EAST of type GdkGravity<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+&gt;: (1.0, 0.5), &lt;enum GDK_GRAVITY_SOUTH_WEST of type GdkGravity&gt;: (0.0,<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+ 1.0), &lt;enum GDK_GRAVITY_SOUTH of type GdkGravity&gt;: (0.5, 1.0), &lt;enum <span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+GDK_GRAVITY_SOUTH_EAST of type GdkGravity&gt;: (1.0, 1.0)}, {&lt;enum WNCK_W<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-ellipsis">...</code>
+</pre></td></tr></table>
+</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -501,7 +681,7 @@ object --+
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Mon Oct 14 18:22:23 2013
+    Generated by Epydoc 3.0.1 on Mon Oct 21 01:13:01 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

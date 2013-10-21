@@ -1,5 +1,4 @@
 quicktile	quicktile-module.html
-quicktile.gv	quicktile-module.html#gv
 quicktile.workspace_send_window	quicktile-module.html#workspace_send_window
 quicktile.POSITIONS	quicktile-module.html#POSITIONS
 quicktile.DBUS_PRESENT	quicktile-module.html#DBUS_PRESENT
@@ -15,14 +14,11 @@ quicktile.toggle_decorated	quicktile-module.html#toggle_decorated
 quicktile.KEYLOOKUP	quicktile-module.html#KEYLOOKUP
 quicktile.cycle_monitors	quicktile-module.html#cycle_monitors
 quicktile.cmd_moveCenter	quicktile-module.html#cmd_moveCenter
-quicktile.x	quicktile-module.html#x
 quicktile.XLIB_PRESENT	quicktile-module.html#XLIB_PRESENT
 quicktile.workspace_go	quicktile-module.html#workspace_go
 quicktile.commands	quicktile-module.html#commands
 quicktile.XDG_CONFIG_DIR	quicktile-module.html#XDG_CONFIG_DIR
-quicktile.grav	quicktile-module.html#grav
 quicktile.toggle_desktop	quicktile-module.html#toggle_desktop
-quicktile.col	quicktile-module.html#col
 quicktile.CommandRegistry	quicktile.CommandRegistry-class.html
 quicktile.CommandRegistry.addMany	quicktile.CommandRegistry-class.html#addMany
 quicktile.CommandRegistry.__str__	quicktile.CommandRegistry-class.html#__str__
@@ -30,7 +26,16 @@ quicktile.CommandRegistry.add	quicktile.CommandRegistry-class.html#add
 quicktile.CommandRegistry.__iter__	quicktile.CommandRegistry-class.html#__iter__
 quicktile.CommandRegistry.call	quicktile.CommandRegistry-class.html#call
 quicktile.CommandRegistry.__init__	quicktile.CommandRegistry-class.html#__init__
-quicktile.DependencyError	quicktile.DependencyError-class.html
+quicktile.EnumSafeDict	quicktile.EnumSafeDict-class.html
+quicktile.EnumSafeDict.iteritems	quicktile.EnumSafeDict-class.html#iteritems
+quicktile.EnumSafeDict.__init__	quicktile.EnumSafeDict-class.html#__init__
+quicktile.EnumSafeDict.__contains__	quicktile.EnumSafeDict-class.html#__contains__
+quicktile.EnumSafeDict.__getitem__	quicktile.EnumSafeDict-class.html#__getitem__
+quicktile.EnumSafeDict.keys	quicktile.EnumSafeDict-class.html#keys
+quicktile.EnumSafeDict.__iter__	quicktile.EnumSafeDict-class.html#__iter__
+quicktile.EnumSafeDict.__delitem__	quicktile.EnumSafeDict-class.html#__delitem__
+quicktile.EnumSafeDict.__setitem__	quicktile.EnumSafeDict-class.html#__setitem__
+quicktile.EnumSafeDict.__repr__	quicktile.EnumSafeDict-class.html#__repr__
 quicktile.GravityLayout	quicktile.GravityLayout-class.html
 quicktile.GravityLayout.__call__	quicktile.GravityLayout-class.html#__call__
 quicktile.GravityLayout.GRAVITIES	quicktile.GravityLayout-class.html#GRAVITIES
@@ -50,6 +55,8 @@ quicktile.WindowManager	quicktile.WindowManager-class.html
 quicktile.WindowManager.reposition	quicktile.WindowManager-class.html#reposition
 quicktile.WindowManager.get_monitor	quicktile.WindowManager-class.html#get_monitor
 quicktile.WindowManager.get_workarea	quicktile.WindowManager-class.html#get_workarea
+quicktile.WindowManager.calc_win_gravity	quicktile.WindowManager-class.html#calc_win_gravity
 quicktile.WindowManager.get_workspace	quicktile.WindowManager-class.html#get_workspace
+quicktile.WindowManager.gravities	quicktile.WindowManager-class.html#gravities
 quicktile.WindowManager.__init__	quicktile.WindowManager-class.html#__init__
 quicktile.WindowManager.get_geometry_rel	quicktile.WindowManager-class.html#get_geometry_rel

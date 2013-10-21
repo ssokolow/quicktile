@@ -169,7 +169,7 @@
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="quicktile.KeyBinder-class.html" class="summary-name">KeyBinder</a><br />
-      A convenience class for wrapping XGrabKey.
+      A convenience class for wrapping <code>XGrabKey</code>.
     </td>
   </tr>
 <tr>
@@ -195,13 +195,15 @@
   </tr>
 <tr bgcolor="#e8f0f8" >
   <th colspan="2" class="group-header"
-    >&nbsp;&nbsp;&nbsp;&nbsp;Exceptions</th></tr>
+    >&nbsp;&nbsp;&nbsp;&nbsp;Helpers</th></tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="quicktile.DependencyError-class.html" class="summary-name">DependencyError</a><br />
-      Raised when a required dependency is missing.
+        <a href="quicktile.EnumSafeDict-class.html" class="summary-name">EnumSafeDict</a><br />
+      A dict-like object which avoids comparing objects of different 
+        types to avoid triggering spurious Glib &quot;comparing different 
+        enum types&quot; warnings.
     </td>
   </tr>
 </table>
@@ -232,7 +234,8 @@
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="powerset"></a><span class="summary-sig-name">powerset</span>(<span class="summary-sig-arg">iterable</span>)</span><br />
-      powerset([1,2,3]) --&gt; () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)</td>
+      <code>powerset([1,2,3])</code> --&gt; <code>() (1,) (2,) (3,) (1,2) 
+      (1,3) (2,3) (1,2,3)</code></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="quicktile-pysrc.html#powerset">source&nbsp;code</a></span>
             
@@ -466,7 +469,7 @@
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="XLIB_PRESENT"></a><span class="summary-name">XLIB_PRESENT</span> = <code title="True">True</code><br />
-      Indicates whether python-xlib was found
+      Indicates presence of python-xlib (runtime check)
     </td>
   </tr>
 <tr>
@@ -474,7 +477,7 @@
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="sessBus"></a><span class="summary-name">sessBus</span> = <code title="SessionBus()">SessionBus()</code><br />
-      Used by <a href="quicktile.QuickTileApp-class.html#run" 
+      D-Bus Session Bus for <a href="quicktile.QuickTileApp-class.html#run"
       class="link">QuickTileApp.run</a>
     </td>
   </tr>
@@ -483,21 +486,24 @@
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="DBUS_PRESENT"></a><span class="summary-name">DBUS_PRESENT</span> = <code title="True">True</code><br />
-      Indicates whether python-dbus was found
+      Indicates availability of D-Bus (runtime check)
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="XDG_CONFIG_DIR"></a><span class="summary-name">XDG_CONFIG_DIR</span> = <code title="'/home/ssokolow/.config'"><code class="variable-quote">'</code><code class="variable-string">/home/ssokolow/.config</code><code class="variable-quote">'</code></code>
+        <a name="XDG_CONFIG_DIR"></a><span class="summary-name">XDG_CONFIG_DIR</span> = <code title="'/home/ssokolow/.config'"><code class="variable-quote">'</code><code class="variable-string">/home/ssokolow/.config</code><code class="variable-quote">'</code></code><br />
+      Location for config files (determined at runtime).
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="commands"></a><span class="summary-name">commands</span> = <code title="CommandRegistry()">CommandRegistry()</code>
+        <a name="commands"></a><span class="summary-name">commands</span> = <code title="CommandRegistry()">CommandRegistry()</code><br />
+      The instance of <a href="quicktile.CommandRegistry-class.html" 
+      class="link">CommandRegistry</a> to be used in 99.9% of use cases.
     </td>
   </tr>
 <tr>
@@ -505,34 +511,6 @@
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="None">None</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="col"></a><span class="summary-name">col</span> = <code title="0.333333333333">0.333333333333</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="grav"></a><span class="summary-name">grav</span> = <code title="'bottom-right'"><code class="variable-quote">'</code><code class="variable-string">bottom-right</code><code class="variable-quote">'</code></code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="gv"></a><span class="summary-name">gv</span> = <code title="&lt;quicktile.GravityLayout object at 0x2788110&gt;">&lt;quicktile.GravityLayout object at 0x2788110&gt;</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="x"></a><span class="summary-name">x</span> = <code title="0.666666666667">0.666666666667</code>
     </td>
   </tr>
 <tr bgcolor="#e8f0f8" >
@@ -1034,7 +1012,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Mon Oct 14 18:22:23 2013
+    Generated by Epydoc 3.0.1 on Mon Oct 21 01:13:01 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
