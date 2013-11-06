@@ -273,13 +273,13 @@ class EnumSafeDict(DictMixin):
             if not section:
                 del self._contents[ktype]
         else:
-            return KeyError(key)
+            raise KeyError(key)
 
     def __getitem__(self, key):
         if key in self:
             return self._contents[type(key)][key]
         else:
-            return KeyError(key)
+            raise KeyError(key)
 
     def __iter__(self):
         for section in self._contents.values():
