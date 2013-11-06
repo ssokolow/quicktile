@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>quicktile.QuickTileApp</title>
+  <title>exceptions.AssertionError</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -34,8 +34,9 @@
   <tr valign="top">
     <td width="100%">
       <span class="breadcrumbs">
-        <a href="quicktile-module.html">Module&nbsp;quicktile</a> ::
-        Class&nbsp;QuickTileApp
+        exceptions ::
+        AssertionError ::
+        Class&nbsp;AssertionError
       </span>
     </td>
     <td>
@@ -45,22 +46,28 @@
     onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="quicktile.QuickTileApp-class.html"
+            >]&nbsp;|&nbsp;<a href="exceptions.AssertionError-class.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class QuickTileApp</h1><p class="nomargin-top"><span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp">source&nbsp;code</a></span></p>
+<h1 class="epydoc">Class AssertionError</h1><p class="nomargin-top"></p>
 <pre class="base-tree">
-object --+
-         |
-        <strong class="uidshort">QuickTileApp</strong>
+   object --+            
+            |            
+BaseException --+        
+                |        
+        Exception --+    
+                    |    
+        StandardError --+
+                        |
+                       <strong class="uidshort">AssertionError</strong>
 </pre>
 
 <hr />
-<p>The basic Glib application itself.</p>
+<p>Assertion failed.</p>
 
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
@@ -85,14 +92,10 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="quicktile.QuickTileApp-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">wm</span>,
-        <span class="summary-sig-arg">commands</span>,
-        <span class="summary-sig-arg">keys</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">modmask</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Populate the instance variables.</td>
+          <td><span class="summary-sig"><a href="exceptions.AssertionError-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">...</span>)</span><br />
+      x.__init__(...) initializes x; see help(type(x)) for signature</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.__init__">source&nbsp;code</a></span>
+            
             
           </td>
         </tr>
@@ -102,33 +105,15 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>bool</code></span>
+      <span class="summary-type">a new object with type S, a subtype of T</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="quicktile.QuickTileApp-class.html#run" class="summary-sig-name">run</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Initialize keybinding and D-Bus if available, then call 
-      <code>gtk.main()</code>.</td>
+          <td><span class="summary-sig"><a href="exceptions.AssertionError-class.html#__new__" class="summary-sig-name">__new__</a>(<span class="summary-sig-arg">T</span>,
+        <span class="summary-sig-arg">S</span>,
+        <span class="summary-sig-arg">...</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.run">source&nbsp;code</a></span>
             
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile.QuickTileApp-class.html#showBinds" class="summary-sig-name">showBinds</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Print a formatted readout of defined keybindings and the modifier 
-      mask to stdout.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.showBinds">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -138,18 +123,23 @@ object --+
   </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+    <p class="indent-wrapped-lines"><b>Inherited from <code>BaseException</code></b>:
       <code>__delattr__</code>,
-      <code>__format__</code>,
       <code>__getattribute__</code>,
-      <code>__hash__</code>,
-      <code>__new__</code>,
+      <code>__getitem__</code>,
+      <code>__getslice__</code>,
       <code>__reduce__</code>,
-      <code>__reduce_ex__</code>,
       <code>__repr__</code>,
       <code>__setattr__</code>,
-      <code>__sizeof__</code>,
+      <code>__setstate__</code>,
       <code>__str__</code>,
+      <code>__unicode__</code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__format__</code>,
+      <code>__hash__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__sizeof__</code>,
       <code>__subclasshook__</code>
       </p>
     </td>
@@ -174,6 +164,10 @@ object --+
 </tr>
   <tr>
     <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>BaseException</code></b>:
+      <code>args</code>,
+      <code>message</code>
+      </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__class__</code>
       </p>
@@ -205,84 +199,46 @@ object --+
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">wm</span>,
-        <span class="sig-arg">commands</span>,
-        <span class="sig-arg">keys</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">modmask</span>=<span class="sig-default">None</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">...</span>)</span>
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.__init__">source&nbsp;code</a></span>&nbsp;
+    >&nbsp;
     </td>
   </tr></table>
   
-  <p>Populate the instance variables.</p>
+  <p>x.__init__(...) initializes x; see help(type(x)) for signature</p>
   <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>keys</code></strong> (<code>dict</code>) - A dict mapping X11 keysyms to <a 
-          href="quicktile.CommandRegistry-class.html" 
-          class="link">CommandRegistry</a> command names.</li>
-        <li><strong class="pname"><code>modmask</code></strong> (<code>GdkModifierType</code>) - A modifier mask to prefix to all keybindings.</li>
-        <li><strong class="pname"><code>wm</code></strong> (The <a href="quicktile.WindowManager-class.html" 
-          class="link">WindowManager</a> instance to use.)</li>
-    </ul></dd>
     <dt>Overrides:
         object.__init__
     </dt>
   </dl>
 </td></tr></table>
 </div>
-<a name="run"></a>
+<a name="__new__"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">run</span>(<span class="sig-arg">self</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__new__</span>(<span class="sig-arg">T</span>,
+        <span class="sig-arg">S</span>,
+        <span class="sig-arg">...</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.run">source&nbsp;code</a></span>&nbsp;
+    >&nbsp;
     </td>
   </tr></table>
   
-  <p>Initialize keybinding and D-Bus if available, then call 
-  <code>gtk.main()</code>.</p>
-  <dl class="fields">
-    <dt>Returns: <code>bool</code></dt>
-        <dd><code>False</code> if none of the supported backends were 
-          available.</dd>
-  </dl>
-<div class="fields">      <p><strong>To Do (1.0.0):</strong>
-        Retire the <code>doCommand</code> name. (API-breaking change)
-      </p>
-</div></td></tr></table>
-</div>
-<a name="showBinds"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">showBinds</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#QuickTileApp.showBinds">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
   
-  <p>Print a formatted readout of defined keybindings and the modifier mask
-  to stdout.</p>
   <dl class="fields">
+    <dt>Returns: a new object with type S, a subtype of T</dt>
+    <dt>Overrides:
+        object.__new__
+    </dt>
   </dl>
-<div class="fields">      <p><strong>To Do:</strong>
-        Look into moving this into <a href="quicktile.KeyBinder-class.html" 
-    class="link">KeyBinder</a>
-      </p>
-</div></td></tr></table>
+</td></tr></table>
 </div>
 <br />
 <!-- ==================== NAVIGATION BAR ==================== -->
