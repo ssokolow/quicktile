@@ -39,9 +39,10 @@ from itertools import chain, combinations
 from functools import wraps
 from UserDict import DictMixin
 
+# TODO: Decide on a way to test this since Nose can't.
 #: Used to filter spurious libwnck error messages from stderr since PyGTK
 #: doesn't expose g_log_set_handler() to allow proper filtering.
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: nocover
     import subprocess
     glib_log_filter = subprocess.Popen(
             ['grep', '-v', 'Unhandled action type _OB_WM'],
