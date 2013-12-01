@@ -1027,13 +1027,13 @@ def cmd_moveCenter(wm, win, state):
            geometry_mask= wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y)
 
 @commands.add('bordered')
-def toggle_decorated(wm, win, state):
+def toggle_decorated(wm, win, state):  # pylint: disable=W0613
     """Toggle window state on the active window."""
     win = gtk.gdk.window_foreign_new(win.get_xid())
     win.set_decorations(not win.get_decorations())
 
 @commands.add('show-desktop')
-def toggle_desktop(wm, win, state):
+def toggle_desktop(wm, win, state):  # pylint: disable=W0613
     """Toggle "all windows minimized" to view the desktop"""
     target = not wm.screen.get_showing_desktop()
     wm.screen.toggle_showing_desktop(target)
@@ -1072,7 +1072,7 @@ def toggle_state(wm, win, state, command, check, takes_bool=False):
 
 @commands.add('trigger-move', 'move')
 @commands.add('trigger-resize', 'size')
-def trigger_keyboard_action(wm, win, state, command):
+def trigger_keyboard_action(wm, win, state, command):  # pylint: disable=W0613
     """Ask the Window Manager to begin a keyboard-driven operation."""
     getattr(win, 'keyboard_' + command)()
 
@@ -1082,7 +1082,7 @@ def trigger_keyboard_action(wm, win, state, command):
 @commands.add('workspace-go-down', wnck.MOTION_DOWN)
 @commands.add('workspace-go-left', wnck.MOTION_LEFT)
 @commands.add('workspace-go-right', wnck.MOTION_RIGHT)
-def workspace_go(wm, win, state, motion):
+def workspace_go(wm, win, state, motion):  # pylint: disable=W0613
     """Switch the active workspace (next/prev wrap around)"""
     target = wm.get_workspace(None, motion)
     if not target:
@@ -1095,7 +1095,7 @@ def workspace_go(wm, win, state, motion):
 @commands.add('workspace-send-down', wnck.MOTION_DOWN)
 @commands.add('workspace-send-left', wnck.MOTION_LEFT)
 @commands.add('workspace-send-right', wnck.MOTION_RIGHT)
-def workspace_send_window(wm, win, state, motion):
+def workspace_send_window(wm, win, state, motion):  # pylint: disable=W0613
     """Move the active window to another workspace (next/prev wrap around)"""
     target = wm.get_workspace(win, motion)
     if not target:
