@@ -819,7 +819,7 @@ class KeyBinder(object):
 
                 else:
                     logging.error("Received an event for an unrecognized "
-                                  "keybind: %s" % (xevent.detail, mmask))
+                                  "keybind: %s, %s" % (xevent.detail, mmask))
 
         # Necessary for proper function
         return True
@@ -881,9 +881,10 @@ class QuickTileApp(object):
 
         if DBUS_PRESENT:
             class QuickTile(dbus.service.Object):
-                def __init__(self):
+                def __init__(self, commands):
                     dbus.service.Object.__init__(self, sessBus,
                                                  '/com/ssokolow/QuickTile')
+                    self.commands = commands
 
                 @dbus.service.method(dbus_interface='com.ssokolow.QuickTile',
                          in_signature='s', out_signature='b')
@@ -892,7 +893,7 @@ class QuickTileApp(object):
 
             self.dbusName = dbus.service.BusName("com.ssokolow.QuickTile",
                                                  sessBus)
-            self.dbusObj = QuickTile()
+            self.dbusObj = QuickTile(self.commands)
         else:
             logging.warn("Could not connect to the D-Bus Session Bus.")
 
