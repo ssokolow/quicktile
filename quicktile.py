@@ -542,8 +542,8 @@ class WindowManager(object):
             struts.append(rootWin.property_get("_NET_WM_STRUT_PARTIAL"))
             if (self.gdk_screen.supports_net_wm_hint("_NET_CLIENT_LIST")):
                 # Source: http://stackoverflow.com/a/11332614/435253
-                for id in rootWin.property_get('_NET_CLIENT_LIST')[2]:
-                    w = gtk.gdk.window_foreign_new(id)
+                for wid in rootWin.property_get('_NET_CLIENT_LIST')[2]:
+                    w = gtk.gdk.window_foreign_new(wid)
                     struts.append(w.property_get("_NET_WM_STRUT_PARTIAL"))
             struts = [x[2] for x in struts if x]
 
@@ -613,7 +613,7 @@ class WindowManager(object):
             nxt = cur
         else:
             nxt = None
-            logging.warn("Unrecognized direction: %r" % direction)
+            logging.warn("Unrecognized direction: %r", direction)
 
         return nxt
 
@@ -777,8 +777,8 @@ class KeyBinder(object):
 
         if self.keybind_failed:
             self.keybind_failed = False
-            logging.warning("Failed to bind key. It may already be in use: %s"
-                % accel)
+            logging.warning("Failed to bind key. It may already be in use: %s",
+                accel)
 
     def handle_xerror(self, err, req=None):
         """Used to identify when attempts to bind keys fail.
