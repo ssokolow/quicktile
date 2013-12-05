@@ -780,7 +780,7 @@ class KeyBinder(object):
             logging.warning("Failed to bind key. It may already be in use: %s",
                 accel)
 
-    def handle_xerror(self, err, req=None):
+    def handle_xerror(self, err, req=None):  # pylint: disable=W0613
         """Used to identify when attempts to bind keys fail.
         @note: If you can make python-xlib's C{CatchError} actually work or if
                you can retrieve more information to show, feel free.
@@ -790,7 +790,7 @@ class KeyBinder(object):
         else:
             self.xdisp.display.default_error_handler(err)
 
-    def handle_xevent(self, src, cond, handle=None):
+    def handle_xevent(self, src, cond, handle=None):  # pylint: disable=W0613
         """Dispatch C{XKeyPress} events to their callbacks.
 
         @rtype: C{True}
@@ -1049,6 +1049,7 @@ def toggle_desktop(wm, win, state):  # pylint: disable=W0613
 @commands.add('always-above', 'make_above', 'is_above')
 @commands.add('always-below', 'make_below', 'is_below')
 @commands.add('shade', 'shade', 'is_shaded')
+# pylint: disable=W0613
 def toggle_state(wm, win, state, command, check, takes_bool=False):
     """Toggle window state on the active window.
 
