@@ -1,4 +1,6 @@
 # QuickTile
+[![Code Health](https://landscape.io/github/ssokolow/quicktile/master/landscape.png)](https://landscape.io/github/ssokolow/quicktile/master)
+
 Keyboard-driven Window Tiling for your existing X11 window manager
 
 ## Requirements:
