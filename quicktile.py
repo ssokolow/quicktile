@@ -1051,10 +1051,13 @@ def toggle_state(wm, win, state, command, check, takes_bool=False):
 
     @param command: The C{wnck.Window} method name to be conditionally prefixed
         with "un", resolved, and called.
-    @param command: The C{wnck.Window} method name to be called to check
+    @param check: The C{wnck.Window} method name to be called to check
         whether C{command} should be prefixed with "un".
+    @param takes_bool: If C{True}, pass C{True} or C{False} to C{check} rather
+        thank conditionally prefixing it with C{un} before resolving.
     @type command: C{str}
     @type check: C{str}
+    @type takes_bool: C{bool}
 
     @todo 1.0.0: Rename C{vertical-maximize} and C{horizontal-maximize} to
         C{maximize-vertical} and C{maximize-horizontal}. (API-breaking change)
