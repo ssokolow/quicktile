@@ -421,6 +421,7 @@ class WindowManager(object):
         'SOUTH': (0.5, 1.0),
         'SOUTH_EAST': (1.0, 1.0),
     })
+    key, val = None, None  # Safety cushion for the "del" line.
     for key, val in gravities.items():
         del gravities[key]
 
