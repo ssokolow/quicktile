@@ -814,12 +814,12 @@ class KeyBinder(object):
                             break
                     else:
                         logging.error("Received an event for a recognized key "
-                                  "with unrecognized modifiers: %s, %s" %
-                                  (xevent.detail, xevent.state))
+                                  "with unrecognized modifiers: %s, %s",
+                                  xevent.detail, xevent.state)
 
                 else:
                     logging.error("Received an event for an unrecognized "
-                                  "keybind: %s, %s" % (xevent.detail, mmask))
+                                  "keybind: %s, %s", xevent.detail, mmask)
 
         # Necessary for proper function
         return True
