@@ -1001,11 +1001,7 @@ def cycle_monitors(wm, win, state, step=1):
         (API-breaking change)
     """
     mon_id = state['monitor_id']
-
-    if mon_id == 0:
-        new_mon_id = 1
-    else:
-        new_mon_id = (mon_id + 1) % wm.gdk_screen.get_n_monitors()
+    new_mon_id = (mon_id + step) % wm.gdk_screen.get_n_monitors()
 
     new_mon_geom = wm.gdk_screen.get_monitor_geometry(new_mon_id)
     logging.debug("Moving window to monitor %s", new_mon_id)
