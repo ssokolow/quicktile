@@ -541,7 +541,7 @@ class WindowManager(object):
         if self.gdk_screen.supports_net_wm_hint("_NET_WM_STRUT_PARTIAL"):
             # Gather all struts
             struts.append(rootWin.property_get("_NET_WM_STRUT_PARTIAL"))
-            if (self.gdk_screen.supports_net_wm_hint("_NET_CLIENT_LIST")):
+            if self.gdk_screen.supports_net_wm_hint("_NET_CLIENT_LIST"):
                 # Source: http://stackoverflow.com/a/11332614/435253
                 for wid in rootWin.property_get('_NET_CLIENT_LIST')[2]:
                     w = gtk.gdk.window_foreign_new(wid)
@@ -875,8 +875,10 @@ class QuickTileApp(object):
         if XLIB_PRESENT:
             self.keybinder = KeyBinder()
             for key, func in self._keys.items():
-                self.keybinder.bind(self._modmask + key,
-                        lambda func=func: self.commands.call(func, wm))
+                def call(func=func):
+                    self.commands.call(func, wm)
+
+                self.keybinder.bind(self._modmask + key, call)
         else:
             logging.error("Could not find python-xlib. Cannot bind keys.")
 
@@ -898,7 +900,7 @@ class QuickTileApp(object):
         else:
             logging.warn("Could not connect to the D-Bus Session Bus.")
 
-        if (XLIB_PRESENT or DBUS_PRESENT):
+        if XLIB_PRESENT or DBUS_PRESENT:
             gtk.main()
             return True
         else:
