@@ -3,7 +3,7 @@ lsi: false
 pygments: true
 
 # Stuff for _includes/contrib_box.html
-bitcoin_uri: bitcoin:1J1wJPPshc7NsY8Dq89NzTqBoEUGhBphUK?label=QuickTile%20Tip%20Jar
+bitcoin_uri: bitcoin:1Kp1i3nahunzzFs5a3mMF46uzca4oANH5C?label=QuickTile%20Donations
 flattr_id: 674146
 github_proj: ssokolow/quicktile
 gittip_user: ssokolow
