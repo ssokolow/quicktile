@@ -345,7 +345,7 @@ class CommandRegistry(object):
                     win = window
 
                 logging.debug("window: %s", win)
-                if not win:
+                if not win or win.get_window_type() == wnck.WINDOW_DESKTOP:
                     return None
 
                 monitor_id, monitor_geom = wm.get_monitor(window)
