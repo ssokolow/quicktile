@@ -104,6 +104,15 @@ class GravityLayout(object):
         'bottom-left': (0.0, 1.0),
         'bottom': (0.5, 1.0),
         'bottom-right': (1.0, 1.0),
+        'sixth-top-left': (0.0, 0.0),
+        'sixth-top': (0.5, 0.0),
+        'sixth-top-right': (1.0, 0.0),
+        'sixth-bottom-left': (0.0, 1.0),
+        'sixth-bottom': (0.5, 1.0),
+        'sixth-bottom-right': (1.0, 1.0),
+        'sixth-left': (0.0, 0.0),
+        'sixth-middle': (0.5, 0.0),
+        'sixth-right': (1.0, 0.0),
     }
 
     def __call__(self, w, h, gravity='top-left', x=None, y=None):
@@ -140,6 +149,14 @@ for grav in ('left', 'right'):
     POSITIONS[grav] = [gv(x, 1, grav) for x in (0.5, col, col * 2)]
 for grav in ('top-left', 'top-right', 'bottom-left', 'bottom-right'):
     POSITIONS[grav] = [gv(x, 0.5, grav) for x in (0.5, col, col * 2)]
+for grav in ('sixth-top-left', 'sixth-top', 'sixth-top-right'):
+    POSITIONS[grav] = [gv(x, 0.5, grav) for x in (1.0 / 3, col, col * 2)]
+for grav in ('sixth-bottom-left', 'sixth-bottom', 'sixth-bottom-right'):
+    POSITIONS[grav] = [gv(x, 0.5, grav) for x in (1.0 / 3, col, col * 2)]
+for grav in ('sixth-left', 'sixth-middle', 'sixth-right'):
+    POSITIONS[grav] = [gv(x, 1.0, grav) for x in (1.0 / 3, col, col * 2)]
+
+
 
 # Keep these temporary variables out of the API docs
 del col, grav, gv, x

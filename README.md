@@ -136,6 +136,20 @@ I haven't found a comprehensive document listing the modifier names `gtk.acceler
  * If, for some reason, you want scripted tiling without D-Bus, you can also
    run commands like `quicktile.py top-left` but it may be slower as quicktile
    has to start, perform an action, and then quit every time you call it.
+ * If you have a large desktop and want to split your desktop into sixths, you 
+   can use the sixth bindings such as in the example configuration below.
+
+```
+KP_1 = sixth-bottom-left
+KP_2 = sixth-bottom
+KP_3 = sixth-bottom-right
+KP_4 = sixth-left
+KP_5 = sixth-middle
+KP_6 = sixth-right
+KP_7 = sixth-top-left
+KP_8 = sixth-top
+KP_9 = sixth-top-right
+```
 
 As with the built-in keybinding, requesting the same action more than once
 in a row will cycle through the available window sizes. For further details,
