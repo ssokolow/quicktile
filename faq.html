@@ -38,6 +38,9 @@ AttributeError: 'module' object has no attribute 'WINDOW_CHANGE_X'
         {% highlight bash %}gconftool-2 --set "/apps/metacity/general/disable_workarounds" false --type bool{% endhighlight %}
     </dd>
 
+    <dt>How do I stop Terminator from animating to a zero-width/height window under Xfce?</dt>
+    <dd>This is a bug in Terminator that QuickTile can't work around and, in rare circumstances, can also be seen with Xfwm's more limited built-in tiling support. <a href="http://gnometerminator.blogspot.ro/p/introduction.html">Report it</a> to Terminator's author.</dd>
+
     <dt>Does QuickTile run on MacOS X?</dt>
     <dd><p>It's not a primary target, since I don't have a Mac to test with, but if <a href="https://opensource.conformal.com/wiki/spectrwm">SpectrWM</a> can run via X11.app, QuickTile isn't out of the question.</p>
         <p>libwnck fails to retrieve the active window but a workaround is currently being developed in <a href="https://github.com/ssokolow/quicktile/issues/28">issue 28</a> and the <a href="https://github.com/ssokolow/quicktile/tree/xquartz">xquartz</a> branch.</p>
