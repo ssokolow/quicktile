@@ -344,9 +344,19 @@ class CommandRegistry(object):
                 else:
                     win = window
 
-                logging.debug("window: %s", win)
-                if not win or win.get_window_type() == wnck.WINDOW_DESKTOP:
+                if not win:
+                    logging.debug("Received no window object to manipulate.")
                     return None
+                elif win.get_window_type() == wnck.WINDOW_DESKTOP:
+                    logging.debug("Received desktop window object. Ignoring.")
+                    return None
+                else:
+                    # FIXME: Make calls to win.get_* lazy in case --debug
+                    #        wasn't passed.
+                    logging.debug("Operating on window 0x%x with title \"%s\" "
+                                  "and geometry %r",
+                                  win.get_xid(), win.get_name(),
+                                  win.get_geometry())
 
                 monitor_id, monitor_geom = wm.get_monitor(window)
 
@@ -356,7 +366,9 @@ class CommandRegistry(object):
                 # TODO: Replace this MPlayer safety hack with a properly
                 #       comprehensive exception catcher.
                 if not use_rect:
-                    logging.debug("use_rect: %s", use_rect)
+                    logging.debug("Received a worthless value for largest "
+                                  "rectangular subset of desktop (%r). Doing "
+                                  "nothing.", use_rect)
                     return None
 
                 state = {
@@ -371,7 +383,7 @@ class CommandRegistry(object):
                 func(wm, win, state, *args, **kwargs)
 
             if name in self.commands:
-                logging.warn("Overwriting command: %s", name)
+                logging.warn("Redefining existing command: %s", name)
             self.commands[name] = wrapper
 
             help_str = func.__doc__.strip().split('\n')[0].split('. ')[0]
@@ -401,6 +413,8 @@ class CommandRegistry(object):
         cmd = self.commands.get(command, None)
 
         if cmd:
+            logging.debug("Executing command '%s' with arguments %r, %r",
+                          command, args, kwargs)
             cmd(wm, *args, **kwargs)
         else:
             logging.error("Unrecognized command: %s", command)
@@ -508,7 +522,8 @@ class WindowManager(object):
         monitor_id = wm.gdk_screen.get_monitor_at_window(win)
         monitor_geom = wm.gdk_screen.get_monitor_geometry(monitor_id)
 
-        logging.debug("Monitor: %s, %s", monitor_id, monitor_geom)
+        logging.debug(" Window is on monitor %s, which has geometry %s",
+                      monitor_id, monitor_geom)
         return monitor_id, monitor_geom
 
     def get_workarea(self, monitor, ignore_struts=False):
@@ -678,7 +693,7 @@ class WindowManager(object):
         new_x += monitor.x
         new_y += monitor.y
 
-        logging.debug("repositioning to (%d, %d, %d, %d)",
+        logging.debug(" Repositioning to (%d, %d, %d, %d)\n",
                 new_x, new_y, geom.width, geom.height)
 
         # XXX: I'm not sure whether wnck, Openbox, or both are at fault,
@@ -807,6 +822,11 @@ class KeyBinder(object):
                 if xevent.detail in self._keys:
                     for mmask, cb in self._keys[xevent.detail]:
                         if mmask == xevent.state:
+                            # FIXME: Only call accelerator_name if --debug
+                            # FIXME: Proper "index" arg for keycode_to_keysym
+                            ks = self.xdisp.keycode_to_keysym(xevent.detail, 0)
+                            kb_str = gtk.accelerator_name(ks, xevent.state)
+                            logging.debug("Received keybind: %s", kb_str)
                             cb()
                             break
                         elif mmask == 0:
@@ -962,7 +982,8 @@ def cycle_dimensions(wm, win, state, *dimensions):
     if not dims:
         return None
 
-    logging.debug("dims %r", dims)
+    logging.debug("Selected preset sequence resolves to these absolute pixel "
+                  "dimensions:\n\t%r", dims)
 
     # Calculate euclidean distances between the window's current geometry
     # and all presets and store them in a min heap.
@@ -980,6 +1001,9 @@ def cycle_dimensions(wm, win, state, *dimensions):
     else:
         pos = 0
     result = gtk.gdk.Rectangle(*dims[pos])
+
+    logging.debug("Target preset is %s relative to monitor %s",
+                  result, clip_box)
     result.x += clip_box.x
     result.y += clip_box.y
 
@@ -987,10 +1011,14 @@ def cycle_dimensions(wm, win, state, *dimensions):
     # analogue to _NET_WORKAREA to prevent overlapping any panels and
     # risking the WM potentially meddling with the result of resposition()
     if not usable_region.rect_in(result) == gtk.gdk.OVERLAP_RECTANGLE_IN:
-        logging.debug("Result overlaps panel. Falling back to usableRect.")
         result = result.intersect(state['usable_rect'])
+        logging.debug("Result exceeds usable (non-rectangular) region of "
+                      "desktop. (overlapped a non-fullwidth panel?) Reducing "
+                      "to within largest usable rectangle: %s",
+                      state['usable_rect'])
 
-    logging.debug("result %r", tuple(result))
+    logging.debug("Calling reposition() with default gravity and dimensions "
+                  "%r", tuple(result))
     wm.reposition(win, result)
     return result
 
@@ -1007,7 +1035,8 @@ def cycle_monitors(wm, win, state, step=1):
     new_mon_id = (mon_id + step) % wm.gdk_screen.get_n_monitors()
 
     new_mon_geom = wm.gdk_screen.get_monitor_geometry(new_mon_id)
-    logging.debug("Moving window to monitor %s", new_mon_id)
+    logging.debug("Moving window to monitor %s, which has geometry %s",
+                  new_mon_id, new_mon_geom)
 
     wm.reposition(win, None, new_mon_geom, keep_maximize=True)
 
@@ -1017,10 +1046,11 @@ def cmd_moveCenter(wm, win, state):
     use_rect = state['usable_rect']
 
     dims = (int(use_rect.width / 2), int(use_rect.height / 2), 0, 0)
-    logging.debug("dims %r", dims)
+    logging.debug("Calculated center point of monitor: %r", dims)
 
     result = gtk.gdk.Rectangle(*dims)
-    logging.debug("result %r", tuple(result))
+    logging.debug("Calling reposition() with center gravity and dimensions %r",
+                  tuple(result))
 
     wm.reposition(win, result, use_rect, gravity=wnck.WINDOW_GRAVITY_CENTER,
            geometry_mask=wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y)
@@ -1067,7 +1097,7 @@ def toggle_state(wm, win, state, command, check, takes_bool=False):
     """
     target = not getattr(win, check)()
 
-    logging.debug('maximize: %s', target)
+    logging.debug("Calling action '%s' with state '%s'", command, target)
     if takes_bool:
         getattr(win, command)(target)
     else:
