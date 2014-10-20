@@ -129,7 +129,7 @@ class GravityLayout(object):
 
 col, gv = 1.0 / 3, GravityLayout()
 
-#TODO: Figure out how best to put this in the config file.
+# TODO: Figure out how best to put this in the config file.
 POSITIONS = {
     'middle': [gv(x, 1, 'middle') for x in (1.0, col, col * 2)],
 }  #: command-to-position mappings for L{cycle_dimensions}
@@ -151,20 +151,20 @@ DEFAULTS = {
         'UseWorkarea': True,
     },
     'keys': {
-        "KP_0"     : "maximize",
-        "KP_1"     : "bottom-left",
-        "KP_2"     : "bottom",
-        "KP_3"     : "bottom-right",
-        "KP_4"     : "left",
-        "KP_5"     : "middle",
-        "KP_6"     : "right",
-        "KP_7"     : "top-left",
-        "KP_8"     : "top",
-        "KP_9"     : "top-right",
-        "KP_Enter" : "monitor-switch",
-        "V"        : "vertical-maximize",
-        "H"        : "horizontal-maximize",
-        "C"        : "move-to-center",
+        "KP_0"    : "maximize",
+        "KP_1"    : "bottom-left",
+        "KP_2"    : "bottom",
+        "KP_3"    : "bottom-right",
+        "KP_4"    : "left",
+        "KP_5"    : "middle",
+        "KP_6"    : "right",
+        "KP_7"    : "top-left",
+        "KP_8"    : "top",
+        "KP_9"    : "top-right",
+        "KP_Enter": "monitor-switch",
+        "V"       : "vertical-maximize",
+        "H"       : "horizontal-maximize",
+        "C"       : "move-to-center",
     }
 }  #: Default content for the config file
 
@@ -374,8 +374,8 @@ class CommandRegistry(object):
                 logging.warn("Overwriting command: %s", name)
             self.commands[name] = wrapper
 
-            helpStr = func.__doc__.strip().split('\n')[0].split('. ')[0]
-            self.help[name] = helpStr.strip('.')
+            help_str = func.__doc__.strip().split('\n')[0].split('. ')[0]
+            self.help[name] = help_str.strip('.')
 
             # Return the unwrapped function so decorators can be stacked
             # to define multiple commands using the same code with different
@@ -383,7 +383,7 @@ class CommandRegistry(object):
             return func
         return decorate
 
-    def addMany(self, command_map):
+    def add_many(self, command_map):
         """Convenience decorator to allow many commands to be defined from
            the same function with different arguments.
 
@@ -499,12 +499,12 @@ class WindowManager(object):
         @returns: A tuple containing the monitor ID and geometry.
         @rtype: C{(int, gtk.gdk.Rectangle)}
         """
-        #TODO: Look for a way to get the monitor ID without having
-        #      to instantiate a gtk.gdk.Window
+        # TODO: Look for a way to get the monitor ID without having
+        #       to instantiate a gtk.gdk.Window
         if not isinstance(win, gtk.gdk.Window):
             win = gtk.gdk.window_foreign_new(win.get_xid())
 
-        #TODO: How do I retrieve the root window from a given one?
+        # TODO: How do I retrieve the root window from a given one?
         monitor_id = wm.gdk_screen.get_monitor_at_window(win)
         monitor_geom = wm.gdk_screen.get_monitor_geometry(monitor_id)
 
@@ -525,15 +525,15 @@ class WindowManager(object):
         @rtype: C{gtk.gdk.Region}, C{gtk.gdk.Rectangle}
         """
         if isinstance(monitor, int):
-            usableRect = self.gdk_screen.get_monitor_geometry(monitor)
+            usable_rect = self.gdk_screen.get_monitor_geometry(monitor)
         elif not isinstance(monitor, gtk.gdk.Rectangle):
-            usableRect = gtk.gdk.Rectangle(monitor)
+            usable_rect = gtk.gdk.Rectangle(monitor)
         else:
-            usableRect = monitor
-        usableRegion = gtk.gdk.region_rectangle(usableRect)
+            usable_rect = monitor
+        usable_region = gtk.gdk.region_rectangle(usable_rect)
 
         if ignore_struts:
-            return usableRegion, usableRect
+            return usable_region, usable_rect
 
         rootWin = self.gdk_screen.get_root_window()
 
@@ -549,7 +549,7 @@ class WindowManager(object):
             struts = [x[2] for x in struts if x]
 
             # Subtract the struts from the usable region
-            _Su = lambda *g: usableRegion.subtract(gtk.gdk.region_rectangle(g))
+            _Su = lambda *g: usable_region.subtract(gtk.gdk.region_rectangle(g))
             _w, _h = self.gdk_screen.get_width(), self.gdk_screen.get_height()
             for g in struts:
                 # http://standards.freedesktop.org/wm-spec/1.5/ar01s05.html
@@ -560,8 +560,8 @@ class WindowManager(object):
                 _Su(g[10], _h - g[3], g[11] - g[10] + 1, g[3])  # bottom
 
             # Generate a more restrictive version used as a fallback
-            usableRect = usableRegion.copy()
-            _Su = lambda *g: usableRect.subtract(gtk.gdk.region_rectangle(g))
+            usable_rect = usable_region.copy()
+            _Su = lambda *g: usable_rect.subtract(gtk.gdk.region_rectangle(g))
             for g in struts:
                 # http://standards.freedesktop.org/wm-spec/1.5/ar01s05.html
                 # XXX: Must not cache unless watching for notify events.
@@ -573,14 +573,14 @@ class WindowManager(object):
                 #       going to need unit tests which actually check that the
                 #       WM's code for constraining windows to the usable area
                 #       doesn't cause off-by-one bugs.
-                #TODO: Share this on http://stackoverflow.com/q/2598580/435253
-            usableRect = usableRect.get_clipbox()
+                # TODO: Share this on http://stackoverflow.com/q/2598580/435253
+            usable_rect = usable_rect.get_clipbox()
         elif self.gdk_screen.supports_net_wm_hint("_NET_WORKAREA"):
-            desktopGeo = tuple(rootWin.property_get('_NET_WORKAREA')[2][0:4])
-            usableRegion.intersect(gtk.gdk.region_rectangle(desktopGeo))
-            usableRect = usableRegion.get_clipbox()
+            desktop_geo = tuple(rootWin.property_get('_NET_WORKAREA')[2][0:4])
+            usable_region.intersect(gtk.gdk.region_rectangle(desktop_geo))
+            usable_rect = usable_region.get_clipbox()
 
-        return usableRegion, usableRect
+        return usable_region, usable_rect
 
     def get_workspace(self, window=None, direction=None):
         """Get a workspace relative to either a window or the active one.
@@ -621,7 +621,7 @@ class WindowManager(object):
     @classmethod
     def reposition(cls, win, geom=None, monitor=gtk.gdk.Rectangle(0, 0, 0, 0),
             keep_maximize=False, gravity=wnck.WINDOW_GRAVITY_NORTHWEST,
-            geometry_mask= wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y |
+            geometry_mask=wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y |
                 wnck.WINDOW_CHANGE_WIDTH | wnck.WINDOW_CHANGE_HEIGHT):
         """
         Position and size a window, decorations inclusive, according to the
@@ -681,18 +681,18 @@ class WindowManager(object):
         logging.debug("repositioning to (%d, %d, %d, %d)",
                 new_x, new_y, geom.width, geom.height)
 
-        #XXX: I'm not sure whether wnck, Openbox, or both are at fault,
-        #     but window gravities seem to have no effect beyond double-
-        #     compensating for window border thickness unless using
-        #     WINDOW_GRAVITY_STATIC.
+        # XXX: I'm not sure whether wnck, Openbox, or both are at fault,
+        #      but window gravities seem to have no effect beyond double-
+        #      compensating for window border thickness unless using
+        #      WINDOW_GRAVITY_STATIC.
         #
-        #     My best guess is that the gravity modifiers are being applied
-        #     to the window frame rather than the window itself, hence why
-        #     static gravity would position correctly and north-west gravity
-        #     would double-compensate for the titlebar and border dimensions.
+        #      My best guess is that the gravity modifiers are being applied
+        #      to the window frame rather than the window itself, hence why
+        #      static gravity would position correctly and north-west gravity
+        #      would double-compensate for the titlebar and border dimensions.
         #
-        #     ...however, that still doesn't explain why the non-topleft
-        #     gravities have no effect. I'm guessing something's just broken.
+        #      ...however, that still doesn't explain why the non-topleft
+        #      gravities have no effect. I'm guessing something's just broken.
         win.set_geometry(wnck.WINDOW_GRAVITY_STATIC, geometry_mask,
                 new_x, new_y, geom.width, geom.height)
 
@@ -906,7 +906,7 @@ class QuickTileApp(object):
         else:
             return False
 
-    def showBinds(self):
+    def show_binds(self):
         """Print a formatted readout of defined keybindings and the modifier
         mask to stdout.
 
@@ -921,7 +921,7 @@ class QuickTileApp(object):
 commands = CommandRegistry()
 #{ Tiling Commands
 
-@commands.addMany(POSITIONS)
+@commands.add_many(POSITIONS)
 def cycle_dimensions(wm, win, state, *dimensions):
     """Cycle the active window through a list of positions and shapes.
 
@@ -943,7 +943,7 @@ def cycle_dimensions(wm, win, state, *dimensions):
 
     # Get the bounding box for the usable region (overlaps panels which
     # don't fill 100% of their edge of the screen)
-    clipBox = usable_region.get_clipbox()
+    clip_box = usable_region.get_clipbox()
 
     # Resolve proportional (eg. 0.5) and preserved (None) coordinates
     dims = []
@@ -954,8 +954,8 @@ def cycle_dimensions(wm, win, state, *dimensions):
                 current_dim.append(tuple(win_geom)[pos])
             else:
                 # FIXME: This is a bit of an ugly way to get (w, h, w, h)
-                # from clipBox.
-                current_dim.append(int(val * tuple(clipBox)[2 + pos % 2]))
+                # from clip_box.
+                current_dim.append(int(val * tuple(clip_box)[2 + pos % 2]))
 
         dims.append(current_dim)
 
@@ -980,8 +980,8 @@ def cycle_dimensions(wm, win, state, *dimensions):
     else:
         pos = 0
     result = gtk.gdk.Rectangle(*dims[pos])
-    result.x += clipBox.x
-    result.y += clipBox.y
+    result.x += clip_box.x
+    result.y += clip_box.y
 
     # If we're overlapping a panel, fall back to a monitor-specific
     # analogue to _NET_WORKAREA to prevent overlapping any panels and
@@ -1023,7 +1023,7 @@ def cmd_moveCenter(wm, win, state):
     logging.debug("result %r", tuple(result))
 
     wm.reposition(win, result, use_rect, gravity=wnck.WINDOW_GRAVITY_CENTER,
-           geometry_mask= wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y)
+           geometry_mask=wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y)
 
 @commands.add('bordered')
 def toggle_decorated(wm, win, state):  # pylint: disable=W0613
@@ -1127,7 +1127,7 @@ if __name__ == '__main__':
 
     help_group = OptionGroup(parser, "Additional Help")
     help_group.add_option('--show-bindings', action="store_true",
-        dest="showBinds", default=False, help="List all configured keybinds")
+        dest="show_binds", default=False, help="List all configured keybinds")
     help_group.add_option('--show-actions', action="store_true",
         dest="showArgs", default=False, help="List valid arguments for use "
         "without --daemonize")
@@ -1145,8 +1145,8 @@ if __name__ == '__main__':
 
     config = RawConfigParser()
     config.optionxform = str  # Make keys case-sensitive
-    #TODO: Maybe switch to two config files so I can have only the keys in the
-    #      keymap case-sensitive?
+    # TODO: Maybe switch to two config files so I can have only the keys in the
+    #       keymap case-sensitive?
     config.read(cfg_path)
     dirty = False
 
@@ -1163,7 +1163,7 @@ if __name__ == '__main__':
             dirty = True
 
     mk_raw = modkeys = config.get('general', 'ModMask')
-    if ' ' in modkeys.strip() and not '<' in modkeys:
+    if ' ' in modkeys.strip() and '<' not in modkeys:
         modkeys = '<%s>' % '><'.join(modkeys.strip().split())
         logging.info("Updating modkeys format:\n %r --> %r", mk_raw, modkeys)
         config.set('general', 'ModMask', modkeys)
@@ -1203,8 +1203,8 @@ if __name__ == '__main__':
     wm = WindowManager(ignore_workarea=ignore_workarea)
     app = QuickTileApp(wm, commands, keymap, modmask=modkeys)
 
-    if opts.showBinds:
-        app.showBinds()
+    if opts.show_binds:
+        app.show_binds()
         sys.exit()
 
     if opts.daemonize:
@@ -1212,7 +1212,7 @@ if __name__ == '__main__':
             logging.critical("Neither the Xlib nor the D-Bus backends were "
                              "available")
             sys.exit(errno.ENOENT)
-            #FIXME: What's the proper exit code for "library not found"?
+            # FIXME: What's the proper exit code for "library not found"?
 
     elif not first_run:
         if not args or opts.showArgs:
