@@ -992,8 +992,8 @@ def cycle_dimensions(wm, win, state, *dimensions):
     if not dims:
         return None
 
-    logging.debug("Selected preset sequence resolves to these absolute pixel "
-                  "dimensions:\n\t%r", dims)
+    logging.debug("Selected preset sequence resolves to these monitor-relative"
+                  " pixel dimensions:\n\t%r", dims)
 
     # Calculate euclidean distances between the window's current geometry
     # and all presets and store them in a min heap.
