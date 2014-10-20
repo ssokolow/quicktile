@@ -1159,7 +1159,7 @@ if __name__ == '__main__':
     help_group.add_option('--show-bindings', action="store_true",
         dest="show_binds", default=False, help="List all configured keybinds")
     help_group.add_option('--show-actions', action="store_true",
-        dest="showArgs", default=False, help="List valid arguments for use "
+        dest="show_args", default=False, help="List valid arguments for use "
         "without --daemonize")
     parser.add_option_group(help_group)
 
@@ -1235,7 +1235,8 @@ if __name__ == '__main__':
 
     if opts.show_binds:
         app.show_binds()
-        sys.exit()
+    if opts.show_args:
+        print commands
 
     if opts.daemonize:
         if not app.run():
@@ -1243,18 +1244,15 @@ if __name__ == '__main__':
                              "available")
             sys.exit(errno.ENOENT)
             # FIXME: What's the proper exit code for "library not found"?
-
     elif not first_run:
-        if not args or opts.showArgs:
-            print commands
-
-            if not opts.showArgs:
-                print "\nUse --help for a list of valid options."
-                sys.exit(errno.ENOENT)
-        else:
+        if args:
             wm.screen.force_update()
 
             for arg in args:
                 commands.call(arg, wm)
             while gtk.events_pending():
                 gtk.main_iteration()
+        elif not opts.show_args and not opts.show_binds:
+                print commands
+                print "\nUse --help for a list of valid options."
+                sys.exit(errno.ENOENT)
