@@ -548,6 +548,10 @@ class WindowManager(object):
         usable_region = gtk.gdk.region_rectangle(usable_rect)
 
         if ignore_struts:
+            # FIXME: Only call get_rectangles if --debug
+            logging.debug("Panels ignored. Reported desktop geometry is:\n"
+                          "\tRegion: %r\n\tRectangle: %r",
+                          usable_region.get_rectangles(), usable_rect)
             return usable_region, usable_rect
 
         rootWin = self.gdk_screen.get_root_window()
@@ -595,6 +599,10 @@ class WindowManager(object):
             usable_region.intersect(gtk.gdk.region_rectangle(desktop_geo))
             usable_rect = usable_region.get_clipbox()
 
+        # FIXME: Only call get_rectangles if --debug
+        logging.debug("Desktop reports usable region of monitor as:\n"
+                      "\tRegion: %r\n\tRectangle: %r",
+                      usable_region.get_rectangles(), usable_rect)
         return usable_region, usable_rect
 
     def get_workspace(self, window=None, direction=None):
@@ -964,6 +972,8 @@ def cycle_dimensions(wm, win, state, *dimensions):
     # Get the bounding box for the usable region (overlaps panels which
     # don't fill 100% of their edge of the screen)
     clip_box = usable_region.get_clipbox()
+
+    logging.debug("Selected preset sequence:\n\t%r", dimensions)
 
     # Resolve proportional (eg. 0.5) and preserved (None) coordinates
     dims = []
