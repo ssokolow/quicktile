@@ -1275,3 +1275,5 @@ if __name__ == '__main__':
                 print commands
                 print "\nUse --help for a list of valid options."
                 sys.exit(errno.ENOENT)
+
+# vim: set sw=4 sts=4 :
