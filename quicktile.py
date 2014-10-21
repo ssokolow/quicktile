@@ -541,17 +541,22 @@ class WindowManager(object):
         """
         if isinstance(monitor, int):
             usable_rect = self.gdk_screen.get_monitor_geometry(monitor)
+            logging.debug("Retrieved geometry %s for monitor #%s",
+                          usable_rect, monitor)
         elif not isinstance(monitor, gtk.gdk.Rectangle):
+            logging.debug("Converting geometry %s to gtk.gdk.Rectangle",
+                          monitor)
             usable_rect = gtk.gdk.Rectangle(monitor)
         else:
             usable_rect = monitor
+
         usable_region = gtk.gdk.region_rectangle(usable_rect)
+        if not usable_region.get_rectangles():
+            logging.error("get_workarea received an empty monitor region!")
 
         if ignore_struts:
-            # FIXME: Only call get_rectangles if --debug
-            logging.debug("Panels ignored. Reported desktop geometry is:\n"
-                          "\tRegion: %r\n\tRectangle: %r",
-                          usable_region.get_rectangles(), usable_rect)
+            logging.debug("Panels ignored. Reported monitor geometry is:\n%s",
+                          usable_rect)
             return usable_region, usable_rect
 
         rootWin = self.gdk_screen.get_root_window()
@@ -566,6 +571,9 @@ class WindowManager(object):
                     w = gtk.gdk.window_foreign_new(wid)
                     struts.append(w.property_get("_NET_WM_STRUT_PARTIAL"))
             struts = [x[2] for x in struts if x]
+
+            logging.debug("Gathered _NET_WM_STRUT_PARTIAL values:\n\t%s",
+                          struts)
 
             # Subtract the struts from the usable region
             _Su = lambda *g: usable_region.subtract(gtk.gdk.region_rectangle(g))
@@ -596,11 +604,12 @@ class WindowManager(object):
             usable_rect = usable_rect.get_clipbox()
         elif self.gdk_screen.supports_net_wm_hint("_NET_WORKAREA"):
             desktop_geo = tuple(rootWin.property_get('_NET_WORKAREA')[2][0:4])
+            logging.debug("Falling back to _NET_WORKAREA: %s", desktop_geo)
             usable_region.intersect(gtk.gdk.region_rectangle(desktop_geo))
             usable_rect = usable_region.get_clipbox()
 
         # FIXME: Only call get_rectangles if --debug
-        logging.debug("Desktop reports usable region of monitor as:\n"
+        logging.debug("Usable region of monitor calculated as:\n"
                       "\tRegion: %r\n\tRectangle: %r",
                       usable_region.get_rectangles(), usable_rect)
         return usable_region, usable_rect
