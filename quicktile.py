@@ -793,6 +793,12 @@ class KeyBinder(object):
             logging.error("Invalid keybinding: %s", accel)
             return False
 
+        if modmask > 2**16 - 1:
+            logging.error("Modifier out of range for XGrabKey "
+                          "(int(modmask) > 65535). "
+                          "Did you use <Super> instead of <Mod4>?")
+            return False
+
         # Convert to what XGrabKey expects
         keycode = self.xdisp.keysym_to_keycode(keysym)
         if isinstance(modmask, gtk.gdk.ModifierType):
