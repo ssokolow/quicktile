@@ -581,6 +581,9 @@ class WindowManager(object):
             for g in struts:
                 # http://standards.freedesktop.org/wm-spec/1.5/ar01s05.html
                 # XXX: Must not cache unless watching for notify events.
+
+		# a hack to eliminate the offset from the top bar
+		g[2] = 0
                 _Su(0, g[4], g[0], g[5] - g[4] + 1)             # left
                 _Su(_w - g[1], g[6], g[1], g[7] - g[6] + 1)     # right
                 _Su(g[8], 0, g[9] - g[8] + 1, g[2])             # top
@@ -727,11 +730,14 @@ class WindowManager(object):
         #      gravities have no effect. I'm guessing something's just broken.
         #win.set_geometry(wnck.WINDOW_GRAVITY_STATIC, geometry_mask,
         #        new_x, new_y, geom.width, geom.height)
+
+	# a hack to eliminate the gap at the top for windows
 	gdk_window = gtk.gdk.window_foreign_new(win.get_xid())	
 	if new_y == 0:
 	    logging.debug("RESIZING")
 	    gdk_window.resize(800, 900)
 	    gdk_window.move(new_x, new_y) 
+	    # the -40 is to adjust for the window menu bar size for terminal windows.
 	    gdk_window.resize(geom.width, geom.height - 40) 
 	else:
 	    win.set_geometry(wnck.WINDOW_GRAVITY_STATIC, geometry_mask,
