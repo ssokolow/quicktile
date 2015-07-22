@@ -725,7 +725,16 @@ class WindowManager(object):
         #
         #      ...however, that still doesn't explain why the non-topleft
         #      gravities have no effect. I'm guessing something's just broken.
-        win.set_geometry(wnck.WINDOW_GRAVITY_STATIC, geometry_mask,
+        #win.set_geometry(wnck.WINDOW_GRAVITY_STATIC, geometry_mask,
+        #        new_x, new_y, geom.width, geom.height)
+	gdk_window = gtk.gdk.window_foreign_new(win.get_xid())	
+	if new_y == 0:
+	    logging.debug("RESIZING")
+	    gdk_window.resize(800, 900)
+	    gdk_window.move(new_x, new_y) 
+	    gdk_window.resize(geom.width, geom.height - 40) 
+	else:
+	    win.set_geometry(wnck.WINDOW_GRAVITY_STATIC, geometry_mask,
                 new_x, new_y, geom.width, geom.height)
 
         # Restore maximization if asked
