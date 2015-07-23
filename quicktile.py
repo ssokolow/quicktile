@@ -531,7 +531,7 @@ class WindowManager(object):
         the most expressive method the window manager supports.
 
         @param monitor: The number or dimensions of the desired monitor.
-        @param ignore_ststrutruts: If C{True}, just return the size of the whole
+        @param ignore_struts: If C{True}, just return the size of the whole
             monitor, allowing windows to overlap panels.
         @type monitor: C{int} or C{gtk.gdk.Rectangle}
         @type ignore_struts: C{bool}
