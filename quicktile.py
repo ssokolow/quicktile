@@ -1182,7 +1182,6 @@ def workspace_send_window(wm, win, state, motion):  # pylint: disable=W0613
 #}
 
 if __name__ == '__main__':
-    travis_var = True
     from optparse import OptionParser, OptionGroup
     parser = OptionParser(usage="%prog [options] [action] ...",
             version="%%prog v%s" % __version__)
