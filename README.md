@@ -12,14 +12,23 @@ Keyboard-driven Window Tiling for your existing X11 window manager
  * `python-xlib` (optional, required for key-binding)
  * `dbus-python` (optional, required for D-Bus service)
 
-If you are running an APT-based Linux distribution with Debian-compatible
-package names (like the Ubuntu or Mint family of distros), you can install these
-dependencies via your package manager by running this command:
+Due to changes in how GTK+ and X11 are accessed, support for Python 3 is
+non-trivial and has been delayed by the author's courseload.
+
+Depending on the distro you are using, you may be able to use one of the
+following commands to easily install them:
+
+**Debian and derivatives (Ubuntu, Mint, etc.):**
 
     sudo apt-get install python python-gtk2 python-xlib python-dbus python-wnck
 
-Due to changes in how GTK+ and X11 are accessed, support for Python 3 is
-non-trivial and has been delayed by the author's courseload.
+**Fedora 22 and above:**
+
+    sudo dnf install python pygtk2 pygobject2 dbus-python gnome-python2-libwnck
+
+**Fedora 21 and below:**
+
+    sudo yum install python pygtk2 pygobject2 dbus-python gnome-python2-libwnck
 
 ## Installation (Typical Use)
 
