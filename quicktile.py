@@ -863,7 +863,7 @@ class KeyBinder(object):
 
                 else:
                     logging.error("Received an event for an unrecognized "
-                                  "keybind: %s, %s", xevent.detail, mmask)
+                                  "keybind: %s, %s", xevent.detail, xevent.state)
 
         # Necessary for proper function
         return True
