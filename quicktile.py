@@ -62,7 +62,7 @@ wnck.set_client_type(wnck.CLIENT_TYPE_PAGER)
 try:
     from Xlib import X
     from Xlib.display import Display
-    from Xlib.error import BadAccess
+    from Xlib.error import BadAccess, DisplayConnectionError
     XLIB_PRESENT = True  #: Indicates presence of python-xlib (runtime check)
 except ImportError:
     XLIB_PRESENT = False  #: Indicates presence of python-xlib (runtime check)
@@ -311,6 +311,12 @@ class EnumSafeDict(DictMixin):
     def keys(self):
         return list(self)
 
+class XInitError(Exception):
+    """Raised when something outside our causes the X11 connection to fail."""
+
+    def __str__(self):
+        return ("%s\n\t(The cause of this error lies outside of QuickTile)" %
+                Exception.__str__(self))
 #}
 
 class CommandRegistry(object):
@@ -476,6 +482,10 @@ class WindowManager(object):
                in KDE 3.x. (Not sure what would be equivalent elsewhere)
         """
         self.gdk_screen = screen or gtk.gdk.screen_get_default()
+        if self.gdk_screen is None:
+            raise XInitError("GTK+ could not open a connection to the X server"
+                             " (bad DISPLAY value?)")
+
         self.screen = wnck.screen_get(self.gdk_screen.get_number())
         self.ignore_workarea = ignore_workarea
 
@@ -760,7 +770,16 @@ class KeyBinder(object):
         @param xdisplay: A C{python-xlib} display handle.
         @type xdisplay: C{Xlib.display.Display}
         """
-        self.xdisp = xdisplay or Display()
+        try:
+            self.xdisp = xdisplay or Display()
+        except (UnicodeDecodeError, DisplayConnectionError), err:
+            raise XInitError("python-xlib failed with %s when asked to open"
+                             " a connection to the X server. Cannot bind keys."
+                             "\n\tIt's unclear why this happens, but it is"
+                             " usually fixed by deleting your ~/.Xauthority"
+                             " file and rebooting."
+                             % err.__class__.__name__)
+
         self.xroot = self.xdisp.screen().root
         self._keys = {}
 
@@ -927,12 +946,16 @@ class QuickTileApp(object):
         """
 
         if XLIB_PRESENT:
-            self.keybinder = KeyBinder()
-            for key, func in self._keys.items():
-                def call(func=func):
-                    self.commands.call(func, wm)
+            try:
+                self.keybinder = KeyBinder()
+            except XInitError as err:
+                logging.error(err)
+            else:
+                for key, func in self._keys.items():
+                    def call(func=func):
+                        self.commands.call(func, wm)
 
-                self.keybinder.bind(self._modmask + key, call)
+                    self.keybinder.bind(self._modmask + key, call)
         else:
             logging.error("Could not find python-xlib. Cannot bind keys.")
 
@@ -1266,7 +1289,11 @@ if __name__ == '__main__':
     ignore_workarea = ((not config.getboolean('general', 'UseWorkarea'))
                        or opts.no_workarea)
 
-    wm = WindowManager(ignore_workarea=ignore_workarea)
+    try:
+        wm = WindowManager(ignore_workarea=ignore_workarea)
+    except XInitError as err:
+        logging.critical(err)
+        sys.exit(1)
     app = QuickTileApp(wm, commands, keymap, modmask=modkeys)
 
     if opts.show_binds:
