@@ -127,22 +127,33 @@ class GravityLayout(object):
                 y - offset_y,
                 w, h)
 
-col, gv = 1.0 / 3, GravityLayout()
+gv = GravityLayout()
+
+# Calculate the window widths to cycle through
+# TODO: Store COLUMN_COUNT in quicktile.cfg for easy editing
+COLUMN_COUNT = 3
+col_width = 1.0 / COLUMN_COUNT
+cycle_steps = tuple(col_width * x for x in range(1, COLUMN_COUNT))
+
+edge_steps = (1.0,) + cycle_steps
+corner_steps = (0.5,) + cycle_steps
 
 # TODO: Figure out how best to put this in the config file.
 POSITIONS = {
-    'middle': [gv(x, 1, 'middle') for x in (1.0, col, col * 2)],
+    'middle': [gv(width, 1, 'middle') for width in edge_steps],
 }  #: command-to-position mappings for L{cycle_dimensions}
 
+# Generate the classic bindings with one step for each possible column-aligned
+# width
 for grav in ('top', 'bottom'):
-    POSITIONS[grav] = [gv(x, 0.5, grav) for x in (1.0, col, col * 2)]
+    POSITIONS[grav] = [gv(width, 0.5, grav) for width in edge_steps]
 for grav in ('left', 'right'):
-    POSITIONS[grav] = [gv(x, 1, grav) for x in (0.5, col, col * 2)]
+    POSITIONS[grav] = [gv(width, 1, grav) for width in corner_steps]
 for grav in ('top-left', 'top-right', 'bottom-left', 'bottom-right'):
-    POSITIONS[grav] = [gv(x, 0.5, grav) for x in (0.5, col, col * 2)]
+    POSITIONS[grav] = [gv(width, 0.5, grav) for width in corner_steps]
 
 # Keep these temporary variables out of the API docs
-del col, grav, gv, x
+del col_width, corner_steps, cycle_steps, edge_steps, grav, gv, width
 
 DEFAULTS = {
     'general': {
