@@ -312,7 +312,9 @@ class EnumSafeDict(DictMixin):
         return list(self)
 
 class XInitError(Exception):
-    """Raised when something outside our causes the X11 connection to fail."""
+    """Raised when something outside our control causes the X11 connection to
+       fail.
+    """
 
     def __str__(self):
         return ("%s\n\t(The cause of this error lies outside of QuickTile)" %
