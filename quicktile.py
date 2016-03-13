@@ -673,9 +673,29 @@ class WindowManager(object):
 
         return nxt
 
-    @classmethod
-    def reposition(cls, win, geom=None, monitor=gtk.gdk.Rectangle(0, 0, 0, 0),
-            keep_maximize=False, gravity=wnck.WINDOW_GRAVITY_NORTHWEST,
+    @staticmethod
+    def get_cursor_offset(win):
+        """Get the relative pointer position in coordinates useful to libwnck.
+
+        @param win: The window to use as a frame of reference.
+        @type win: C{wnck.Window}
+        """
+        # Get the cursor position relative to the window's top-left corner
+        gdk_win = gtk.gdk.window_foreign_new(win.get_xid())
+        cursor_x_rel, cursor_y_rel, _ = gdk_win.get_pointer()
+
+        # Compensate for get_pointer() ignoring the window frame
+        # while libwnck always takes it into account
+        win_x, win_y, _, _ = win.get_geometry()
+        client_x, client_y, _, _ = win.get_client_window_geometry()
+        left_thickness = client_x - win_x
+        top_thickness = client_y - win_y
+
+        return cursor_x_rel + left_thickness, cursor_y_rel + top_thickness
+
+    def reposition(self, win, geom=None, monitor=gtk.gdk.Rectangle(0, 0, 0, 0),
+            keep_maximize=False, keep_cursor_position=True,
+            gravity=wnck.WINDOW_GRAVITY_NORTHWEST,
             geometry_mask=wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y |
                 wnck.WINDOW_CHANGE_WIDTH | wnck.WINDOW_CHANGE_HEIGHT):
         """
@@ -693,13 +713,16 @@ class WindowManager(object):
             interpreted. The whole desktop if unspecified.
         @param keep_maximize: Whether to re-maximize a maximized window after
             un-maximizing it to move it.
+        @param keep_cursor_position: Whether to warp the pointer so that
+            moving the window plays nicely with "focus follows mouse".
+            un-maximizing it to move it.
         @param gravity: A constant specifying which point on the window is
             referred to by the X and Y coordinates in C{geom}.
         @param geometry_mask: A set of flags determining which aspects of the
             requested geometry should actually be applied to the window.
             (Allows the same geometry definition to easily be shared between
             operations like move and resize.)
-        @type win: C{gtk.gdk.Window}
+        @type win: C{wnck.Window}
         @type geom: C{gtk.gdk.Rectangle}
         @type monitor: C{gtk.gdk.Rectangle}
         @type keep_maximize: C{bool}
@@ -709,6 +732,9 @@ class WindowManager(object):
         @todo 1.0.0: Look for a way to accomplish this with a cleaner method
             signature. This is getting a little hairy. (API-breaking change)
         """
+
+        if keep_cursor_position:
+            cursor_x_rel, cursor_y_rel = self.get_cursor_offset(win)
 
         # We need to ensure that ignored values are still present for
         # gravity calculations.
@@ -729,7 +755,7 @@ class WindowManager(object):
                 getattr(win, 'unmaximize' + mt)()
 
         # Apply gravity and resolve to absolute desktop coordinates.
-        new_x, new_y = cls.calc_win_gravity(geom, gravity)
+        new_x, new_y = self.calc_win_gravity(geom, gravity)
         new_x += monitor.x
         new_y += monitor.y
 
@@ -755,6 +781,15 @@ class WindowManager(object):
         if maxed and keep_maximize:
             for mt in maxed:
                 getattr(win, 'maximize' + mt)()
+
+
+        # If we're keeping the pointer and it's within the window...
+        if (keep_cursor_position and
+                0 < cursor_x_rel < geom.width and
+                0 < cursor_y_rel < geom.height):
+            # Translate into absolute coordinates and reposition pointer
+            x, y = new_x + cursor_x_rel, new_y + cursor_y_rel
+            self.gdk_screen.get_display().warp_pointer(self.gdk_screen, x, y)
 
 class KeyBinder(object):
     """A convenience class for wrapping C{XGrabKey}."""
