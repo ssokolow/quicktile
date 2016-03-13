@@ -260,17 +260,18 @@ def fmt_table(rows, headers, group_by=None):
 
     return ''.join(output)
     
-def get_xdisplay(xdisplay=None):
+def get_xdisplay_xroot(xdisplay=None):
     """
-    Initializes C{WindowManager}.
+    Get a C{python-xlib} display handle with its Screen root.
 
     @param xdisplay: A C{python-xlib} display handle.
     @type xdisplay: C{Xlib.display.Display}
-    @rtype: Xlib.display.Display
+    @rtype: C{(Xlib.display.Display, Xlib.display.Display.Screen.root)}
     """
     try:
         xdisp = xdisplay or Display()
-	return xdisp
+        xroot = xdisp.screen().root
+        return xdisp, xroot
     except (UnicodeDecodeError, DisplayConnectionError), err:
         raise XInitError("python-xlib failed with %s when asked to open"
                          " a connection to the X server. Cannot bind keys."
@@ -486,12 +487,10 @@ class WindowManager(object):
     # Prevent these temporary variables from showing up in the apidocs
     del _name, key, val
 
-    def __init__(self, xdisplay=None, screen=None, ignore_workarea=False, sticky_pointer=False):
+    def __init__(self, screen=None, ignore_workarea=False, sticky_pointer=False):
         """
         Initializes C{WindowManager}.
 
-        @param xdisplay: A C{python-xlib} display handle.
-        @type xdisplay: C{Xlib.display.Display}
         @param screen: The X11 screen to operate on. If C{None}, the default
             screen as retrieved by C{gtk.gdk.screen_get_default} will be used.
         @type screen: C{gtk.gdk.Screen}
@@ -503,9 +502,8 @@ class WindowManager(object):
                It could possibly change while toggling "allow desktop icons"
                in KDE 3.x. (Not sure what would be equivalent elsewhere)
         """
-		
-        self.xdisp = get_xdisplay(xdisplay)
-        self.xroot = self.xdisp.screen().root
+
+        self.xdisp, self.xroot = get_xdisplay_xroot()
 
         self.gdk_screen = screen or gtk.gdk.screen_get_default()
         if self.gdk_screen is None:
@@ -834,8 +832,7 @@ class KeyBinder(object):
         @type xdisplay: C{Xlib.display.Display}
         """
 
-        self.xdisp = get_xdisplay(xdisplay)
-        self.xroot = self.xdisp.screen().root
+        self.xdisp, self.xroot = get_xdisplay_xroot(xdisplay)
         self._keys = {}
 
         # Resolve these at runtime to avoid NameErrors
@@ -1350,7 +1347,7 @@ if __name__ == '__main__':
     sticky_pointer = (config.getboolean('general', 'StickyPointer') or opts.sticky_pointer)
     
     try:
-        wm = WindowManager(xdisplay=get_xdisplay(), ignore_workarea=ignore_workarea, sticky_pointer=sticky_pointer)
+        wm = WindowManager(ignore_workarea=ignore_workarea, sticky_pointer=sticky_pointer)
     except XInitError as err:
         logging.critical(err)
         sys.exit(1)
