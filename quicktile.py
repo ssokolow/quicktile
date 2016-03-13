@@ -160,7 +160,6 @@ DEFAULTS = {
         # Use Ctrl+Alt as the default base for key combinations
         'ModMask': '<Ctrl><Alt>',
         'UseWorkarea': True,
-        'StickyPointer': False,
     },
     'keys': {
         "KP_0"    : "maximize",
@@ -177,6 +176,12 @@ DEFAULTS = {
         "V"       : "vertical-maximize",
         "H"       : "horizontal-maximize",
         "C"       : "move-to-center",
+    },
+    'misc': {
+        # Keep mouse pointer within currently handled window
+        'StickyPointer': False,
+        # Keep currently handled window above the others
+        'KeepAbove': False,
     }
 }  #: Default content for the config file
 
@@ -1294,33 +1299,31 @@ if __name__ == '__main__':
     config.read(cfg_path)
     dirty = False
 
-    if not config.has_section('general'):
-        config.add_section('general')
-        # Change this if you make backwards-incompatible changes to the
-        # section and key naming in the config file.
-        config.set('general', 'cfg_schema', 1)
-        dirty = True
-
-    for key, val in DEFAULTS['general'].items():
-        if not config.has_option('general', key):
-            config.set('general', key, str(val))
+    for key, val in sorted(DEFAULTS.items()):
+        if config.has_section(key):
+            # Either load the keybindings or use and save the defaults
+            if key == 'keys':
+                keymap = dict(config.items('keys'))
+        else:
+            config.add_section(key)
             dirty = True
+            if key == 'general':
+                # Change this if you make backwards-incompatible changes to the
+                # section and key naming in the config file.
+                config.set('general', 'cfg_schema', 1)
+            elif key == 'keys':
+                keymap = DEFAULTS['keys']
+
+        for k, v in DEFAULTS[key].items():
+            if not config.has_option(key, k):
+                config.set(key, k, str(v))
+                dirty = True
 
     mk_raw = modkeys = config.get('general', 'ModMask')
     if ' ' in modkeys.strip() and '<' not in modkeys:
         modkeys = '<%s>' % '><'.join(modkeys.strip().split())
         logging.info("Updating modkeys format:\n %r --> %r", mk_raw, modkeys)
         config.set('general', 'ModMask', modkeys)
-        dirty = True
-
-    # Either load the keybindings or use and save the defaults
-    if config.has_section('keys'):
-        keymap = dict(config.items('keys'))
-    else:
-        keymap = DEFAULTS['keys']
-        config.add_section('keys')
-        for row in keymap.items():
-            config.set('keys', row[0], row[1])
         dirty = True
 
     # Migrate from the deprecated syntax for punctuation keysyms
@@ -1344,7 +1347,7 @@ if __name__ == '__main__':
     ignore_workarea = ((not config.getboolean('general', 'UseWorkarea'))
                        or opts.no_workarea)
                        
-    sticky_pointer = (config.getboolean('general', 'StickyPointer') or opts.sticky_pointer)
+    sticky_pointer = (config.getboolean('misc', 'StickyPointer') or opts.sticky_pointer)
     
     try:
         wm = WindowManager(ignore_workarea=ignore_workarea, sticky_pointer=sticky_pointer)
