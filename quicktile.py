@@ -160,6 +160,7 @@ DEFAULTS = {
         # Use Ctrl+Alt as the default base for key combinations
         'ModMask': '<Ctrl><Alt>',
         'UseWorkarea': True,
+        'StickyPointer': False,
     },
     'keys': {
         "KP_0"    : "maximize",
@@ -466,7 +467,7 @@ class WindowManager(object):
     # Prevent these temporary variables from showing up in the apidocs
     del _name, key, val
 
-    def __init__(self, screen=None, ignore_workarea=False):
+    def __init__(self, screen=None, ignore_workarea=False, sticky_pointer=False):
         """
         Initializes C{WindowManager}.
 
@@ -488,6 +489,7 @@ class WindowManager(object):
 
         self.screen = wnck.screen_get(self.gdk_screen.get_number())
         self.ignore_workarea = ignore_workarea
+        self.sticky_pointer = sticky_pointer
 
     @classmethod
     def calc_win_gravity(cls, geom, gravity):
@@ -671,6 +673,35 @@ class WindowManager(object):
 
         return nxt
 
+    @staticmethod
+    def pointer_follow(win_geom, center=True):
+        """Position the mouse pointer at topleft or center of the current manipulated window
+
+        @param win_geom: The window geometry to which calculate pointer coordinates.
+        @param center: Center or not the pointer relative to window.
+        @type win_geom: C{gtk.gdk.Rectangle}
+        @type center: C{bool}
+
+        @returns: Nothing.
+        @rtype: void
+        """
+        
+        if center:
+	        # position pointer at center of the window
+        	new_x = win_geom.x + (win_geom.width / 2)
+        	new_y = win_geom.y + (win_geom.height / 2)
+        else:
+        	# add some space (here 10px) from TopLeft of window to ensure pointer is really inside of it
+        	new_x = win_geom.x + 10
+        	new_y = win_geom.y + 10
+
+        logging.debug(" Stick mouse pointer to current window at: x=%d, y=%d\n",
+                new_x, new_y)
+
+        xdisp = Display()
+        xdisp.screen().root.warp_pointer(int(new_x), int(new_y))
+        xdisp.sync()        
+
     @classmethod
     def reposition(cls, win, geom=None, monitor=gtk.gdk.Rectangle(0, 0, 0, 0),
             keep_maximize=False, gravity=wnck.WINDOW_GRAVITY_NORTHWEST,
@@ -748,6 +779,11 @@ class WindowManager(object):
         #      gravities have no effect. I'm guessing something's just broken.
         win.set_geometry(wnck.WINDOW_GRAVITY_STATIC, geometry_mask,
                 new_x, new_y, geom.width, geom.height)
+                
+        if wm.sticky_pointer:
+		    geom.x = new_x
+		    geom.y = new_y
+		    wm.pointer_follow(geom)
 
         # Restore maximization if asked
         if maxed and keep_maximize:
@@ -1213,6 +1249,9 @@ if __name__ == '__main__':
     parser.add_option('--no-workarea', action="store_true", dest="no_workarea",
         default=False, help="Overlap panels but work better with "
         "non-rectangular desktops")
+    parser.add_option('--sticky-pointer', action="store_true", dest="sticky_pointer",
+        default=False, help="Make mouse pointer following the "
+        "currently manipulated window")
 
     help_group = OptionGroup(parser, "Additional Help")
     help_group.add_option('--show-bindings', action="store_true",
@@ -1288,9 +1327,11 @@ if __name__ == '__main__':
 
     ignore_workarea = ((not config.getboolean('general', 'UseWorkarea'))
                        or opts.no_workarea)
+                       
+    sticky_pointer = (config.getboolean('general', 'StickyPointer') or opts.sticky_pointer)
 
     try:
-        wm = WindowManager(ignore_workarea=ignore_workarea)
+        wm = WindowManager(ignore_workarea=ignore_workarea, sticky_pointer=sticky_pointer)
     except XInitError as err:
         logging.critical(err)
         sys.exit(1)
