@@ -259,6 +259,25 @@ def fmt_table(rows, headers, group_by=None):
             output.extend(fmt_row(row, indent=1))
 
     return ''.join(output)
+    
+def get_xdisplay(xdisplay=None):
+    """
+    Initializes C{WindowManager}.
+
+    @param xdisplay: A C{python-xlib} display handle.
+    @type xdisplay: C{Xlib.display.Display}
+    @rtype: Xlib.display.Display
+    """
+    try:
+        xdisp = xdisplay or Display()
+	return xdisp
+    except (UnicodeDecodeError, DisplayConnectionError), err:
+        raise XInitError("python-xlib failed with %s when asked to open"
+                         " a connection to the X server. Cannot bind keys."
+                         "\n\tIt's unclear why this happens, but it is"
+                         " usually fixed by deleting your ~/.Xauthority"
+                         " file and rebooting."
+                         % err.__class__.__name__)
 
 class EnumSafeDict(DictMixin):
     """A dict-like object which avoids comparing objects of different types
@@ -467,10 +486,12 @@ class WindowManager(object):
     # Prevent these temporary variables from showing up in the apidocs
     del _name, key, val
 
-    def __init__(self, screen=None, ignore_workarea=False, sticky_pointer=False):
+    def __init__(self, xdisplay=None, screen=None, ignore_workarea=False, sticky_pointer=False):
         """
         Initializes C{WindowManager}.
 
+        @param xdisplay: A C{python-xlib} display handle.
+        @type xdisplay: C{Xlib.display.Display}
         @param screen: The X11 screen to operate on. If C{None}, the default
             screen as retrieved by C{gtk.gdk.screen_get_default} will be used.
         @type screen: C{gtk.gdk.Screen}
@@ -482,6 +503,10 @@ class WindowManager(object):
                It could possibly change while toggling "allow desktop icons"
                in KDE 3.x. (Not sure what would be equivalent elsewhere)
         """
+		
+        self.xdisp = get_xdisplay(xdisplay)
+        self.xroot = self.xdisp.screen().root
+
         self.gdk_screen = screen or gtk.gdk.screen_get_default()
         if self.gdk_screen is None:
             raise XInitError("GTK+ could not open a connection to the X server"
@@ -673,8 +698,7 @@ class WindowManager(object):
 
         return nxt
 
-    @staticmethod
-    def pointer_follow(win_geom, center=True):
+    def pointer_follow(self, win_geom, center=True):
         """Position the mouse pointer at topleft or center of the current manipulated window
 
         @param win_geom: The window geometry to which calculate pointer coordinates.
@@ -698,9 +722,12 @@ class WindowManager(object):
         logging.debug(" Stick mouse pointer to current window at: x=%d, y=%d\n",
                 new_x, new_y)
 
-        xdisp = Display()
-        xdisp.screen().root.warp_pointer(int(new_x), int(new_y))
-        xdisp.sync()        
+        #xdisp = Display()
+        #xdisp.screen().root.warp_pointer(int(new_x), int(new_y))
+        #xdisp.sync()        
+
+        self.xroot.warp_pointer(int(new_x), int(new_y))
+        self.xdisp.sync()        
 
     @classmethod
     def reposition(cls, win, geom=None, monitor=gtk.gdk.Rectangle(0, 0, 0, 0),
@@ -806,16 +833,8 @@ class KeyBinder(object):
         @param xdisplay: A C{python-xlib} display handle.
         @type xdisplay: C{Xlib.display.Display}
         """
-        try:
-            self.xdisp = xdisplay or Display()
-        except (UnicodeDecodeError, DisplayConnectionError), err:
-            raise XInitError("python-xlib failed with %s when asked to open"
-                             " a connection to the X server. Cannot bind keys."
-                             "\n\tIt's unclear why this happens, but it is"
-                             " usually fixed by deleting your ~/.Xauthority"
-                             " file and rebooting."
-                             % err.__class__.__name__)
 
+        self.xdisp = get_xdisplay(xdisplay)
         self.xroot = self.xdisp.screen().root
         self._keys = {}
 
@@ -983,7 +1002,7 @@ class QuickTileApp(object):
 
         if XLIB_PRESENT:
             try:
-                self.keybinder = KeyBinder()
+                self.keybinder = KeyBinder(xdisplay=wm.xdisp)
             except XInitError as err:
                 logging.error(err)
             else:
@@ -1329,9 +1348,9 @@ if __name__ == '__main__':
                        or opts.no_workarea)
                        
     sticky_pointer = (config.getboolean('general', 'StickyPointer') or opts.sticky_pointer)
-
+    
     try:
-        wm = WindowManager(ignore_workarea=ignore_workarea, sticky_pointer=sticky_pointer)
+        wm = WindowManager(xdisplay=get_xdisplay(), ignore_workarea=ignore_workarea, sticky_pointer=sticky_pointer)
     except XInitError as err:
         logging.critical(err)
         sys.exit(1)
