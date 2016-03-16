@@ -625,8 +625,8 @@ class WindowManager(object):
             for g in struts:
                 # http://standards.freedesktop.org/wm-spec/1.5/ar01s05.html
                 # XXX: Must not cache unless watching for notify events.
-                _Su(0, g[4], g[0], _h)          # left
-                _Su(_w - g[1], g[6], g[1], _h)  # right
+                _Su(0, 0, g[0], _h)          # left
+                _Su(_w - g[1], 0, g[1], _h)  # right
                 _Su(0, 0, _w, g[2])             # top
                 _Su(0, _h - g[3], _w, g[3])     # bottom
                 # TODO: The required "+ 1" in certain spots confirms that we're
