@@ -570,6 +570,8 @@ class WindowManager(object):
             usable_rect = gtk.gdk.Rectangle(monitor)
         else:
             usable_rect = monitor
+            logging.debug("Using directly monitor as usable_rect %s",
+                          usable_rect)
 
         usable_region = gtk.gdk.region_rectangle(usable_rect)
         if not usable_region.get_rectangles():
@@ -596,9 +598,16 @@ class WindowManager(object):
             logging.debug("Gathered _NET_WM_STRUT_PARTIAL values:\n\t%s",
                           struts)
 
+            # _NET_WM_STRUT_PARTIAL field indexes
+            # left, right, top, bottom, left_start_y, left_end_y, right_start_y, right_end_y, top_start_x, top_end_x, bottom_start_x, bottom_end_x
+            # 0     1      2    3       4             5           6              7            8            9          10              11
+
             # Subtract the struts from the usable region
-            _Su = lambda *g: usable_region.subtract(gtk.gdk.region_rectangle(g))
+            _Su = lambda *g: (
+                logging.debug("Substracting from region %s the rectangle %s", usable_region.get_rectangles(), g),
+                usable_region.subtract(gtk.gdk.region_rectangle(g)))
             _w, _h = self.gdk_screen.get_width(), self.gdk_screen.get_height()
+            logging.debug("Screen width,height is %s,%s", _w, _h)
             for g in struts:
                 # http://standards.freedesktop.org/wm-spec/1.5/ar01s05.html
                 # XXX: Must not cache unless watching for notify events.
@@ -609,7 +618,10 @@ class WindowManager(object):
 
             # Generate a more restrictive version used as a fallback
             usable_rect = usable_region.copy()
-            _Su = lambda *g: usable_rect.subtract(gtk.gdk.region_rectangle(g))
+            logging.debug("usable_rect copied from usable_region %s", usable_rect.get_rectangles())
+            _Su = lambda *g: (
+                logging.debug("Substracting from rect %s the rectangle %s", usable_rect.get_rectangles(), g),
+                usable_rect.subtract(gtk.gdk.region_rectangle(g)))
             for g in struts:
                 # http://standards.freedesktop.org/wm-spec/1.5/ar01s05.html
                 # XXX: Must not cache unless watching for notify events.
