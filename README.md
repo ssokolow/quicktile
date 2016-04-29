@@ -24,7 +24,7 @@ following commands to easily install them:
 
 **Fedora 22 and above:**
 
-    sudo dnf install python pygtk2 pygobject2 dbus-python gnome-python2-libwnck
+    sudo dnf install python pygtk2 pygobject2 dbus-python gnome-python2-libwnck python-xlib
 
 **Fedora 21 and below:**
 
