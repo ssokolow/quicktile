@@ -50,6 +50,11 @@ me know if you experience any troubles.
 
 ### Important Notes:
 
+ * If you are running a desktop which uses Compiz (such as Ubuntu's Unity),
+   make sure you've used CCSM to disable the grid plugin or the fight between
+   it and QuickTile for the same type of functionality may cause unpredictable
+   problems.
+
  * Some systems may not provide a Python 2.x binary under the name `python2`.
    If this is the case on yours, you must edit the first line in `quicktile.py`
    accordingly.
