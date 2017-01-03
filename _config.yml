@@ -1,6 +1,6 @@
 safe: true
 lsi: false
-pygments: true
+highlighter: rouge
 
 # Stuff for _includes/contrib_box.html
 bitcoin_uri: bitcoin:1Kp1i3nahunzzFs5a3mMF46uzca4oANH5C?label=QuickTile%20Donations
