@@ -21,6 +21,9 @@ AttributeError: 'module' object has no attribute 'WINDOW_CHANGE_X'
     <p> While you wait for them to fix it, you should be able to solve the issue yourself by rebuilding the bindings from <a href="http://ftp.gnome.org/pub/GNOME/sources/gnome-python-desktop/">source</a>.</p>
     </dd>
 
+    <dt>I'm on Ubuntu's Unity desktop and tiled windows are misaligned. How do I fix this?</dt>
+    <dd>This is apparently caused by bad interactions between QuickTile and the Compiz Grid plugin, which provides similar functionality. Make sure you've disabled the Grid plugin in <acronym title="CompizConfig Settings Manager"><a href="http://wiki.compiz.org/CCSM">CCSM</a></acronym> and then restart Compiz (eg. log out and back in) if the problem persists.</dd>
+
     <dt>I set <code>ModMask = Control Shift Mod1</code> but QuickTile isn't responding. Help?</dt>
     <dd>This usually happens when the Compiz Grid plugin is still consuming keystrokes. Make sure you've disabled the Grid plugin in <acronym title="CompizConfig Settings Manager"><a href="http://wiki.compiz.org/CCSM">CCSM</a></acronym> and then restart Compiz (eg. log out and back in) to make sure it's let go of the keybindings.</dd>
 
