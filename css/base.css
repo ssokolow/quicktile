@@ -64,6 +64,7 @@ dt {
 }
 dl.big dt { margin-top: 2em; }
 dd > ul { padding-left: 1em; }
+dd > ol > li { margin-bottom: 0.7ex; }
 
 pre {
     padding: 15px;
