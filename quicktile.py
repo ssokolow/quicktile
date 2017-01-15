@@ -188,6 +188,12 @@ DEFAULTS = {
         "V"       : "vertical-maximize",
         "H"       : "horizontal-maximize",
         "C"       : "move-to-center",
+    },
+    'misc': {
+        # Keep mouse pointer within currently handled window
+        'StickyPointer': False,
+        # Keep currently handled window above the others
+        'KeepAbove': False,
     }
 }  #: Default content for the config file
 
@@ -270,6 +276,26 @@ def fmt_table(rows, headers, group_by=None):
             output.extend(fmt_row(row, indent=1))
 
     return ''.join(output)
+    
+def get_xdisplay_xroot(xdisplay=None):
+    """
+    Get a C{python-xlib} display handle with its Screen root.
+
+    @param xdisplay: A C{python-xlib} display handle.
+    @type xdisplay: C{Xlib.display.Display}
+    @rtype: C{(Xlib.display.Display, Xlib.display.Display.Screen.root)}
+    """
+    try:
+        xdisp = xdisplay or Display()
+        xroot = xdisp.screen().root
+        return xdisp, xroot
+    except (UnicodeDecodeError, DisplayConnectionError), err:
+        raise XInitError("python-xlib failed with %s when asked to open"
+                         " a connection to the X server. Cannot bind keys."
+                         "\n\tIt's unclear why this happens, but it is"
+                         " usually fixed by deleting your ~/.Xauthority"
+                         " file and rebooting."
+                         % err.__class__.__name__)
 
 class EnumSafeDict(DictMixin):
     """A dict-like object which avoids comparing objects of different types
@@ -480,7 +506,7 @@ class WindowManager(object):
     # Prevent these temporary variables from showing up in the apidocs
     del _name, key, val
 
-    def __init__(self, screen=None, ignore_workarea=False):
+    def __init__(self, screen=None, ignore_workarea=False, sticky_pointer=False):
         """
         Initializes C{WindowManager}.
 
@@ -495,6 +521,9 @@ class WindowManager(object):
                It could possibly change while toggling "allow desktop icons"
                in KDE 3.x. (Not sure what would be equivalent elsewhere)
         """
+
+        self.xdisp, self.xroot = get_xdisplay_xroot()
+
         self.gdk_screen = screen or gtk.gdk.screen_get_default()
         if self.gdk_screen is None:
             raise XInitError("GTK+ could not open a connection to the X server"
@@ -502,6 +531,7 @@ class WindowManager(object):
 
         self.screen = wnck.screen_get(self.gdk_screen.get_number())
         self.ignore_workarea = ignore_workarea
+        self.sticky_pointer = sticky_pointer
 
     @classmethod
     def calc_win_gravity(cls, geom, gravity):
@@ -685,6 +715,37 @@ class WindowManager(object):
 
         return nxt
 
+    def pointer_follow(self, win_geom, center=True):
+        """Position the mouse pointer at topleft or center of the current manipulated window
+
+        @param win_geom: The window geometry to which calculate pointer coordinates.
+        @param center: Center or not the pointer relative to window.
+        @type win_geom: C{gtk.gdk.Rectangle}
+        @type center: C{bool}
+
+        @returns: Nothing.
+        @rtype: void
+        """
+        
+        if center:
+	        # position pointer at center of the window
+        	new_x = win_geom.x + (win_geom.width / 2)
+        	new_y = win_geom.y + (win_geom.height / 2)
+        else:
+        	# add some space (here 10px) from TopLeft of window to ensure pointer is really inside of it
+        	new_x = win_geom.x + 10
+        	new_y = win_geom.y + 10
+
+        logging.debug(" Stick mouse pointer to current window at: x=%d, y=%d\n",
+                new_x, new_y)
+
+        #xdisp = Display()
+        #xdisp.screen().root.warp_pointer(int(new_x), int(new_y))
+        #xdisp.sync()        
+
+        self.xroot.warp_pointer(int(new_x), int(new_y))
+        self.xdisp.sync()        
+
     @classmethod
     def reposition(cls, win, geom=None, monitor=gtk.gdk.Rectangle(0, 0, 0, 0),
             keep_maximize=False, gravity=wnck.WINDOW_GRAVITY_NORTHWEST,
@@ -762,6 +823,11 @@ class WindowManager(object):
         #      gravities have no effect. I'm guessing something's just broken.
         win.set_geometry(wnck.WINDOW_GRAVITY_STATIC, geometry_mask,
                 new_x, new_y, geom.width, geom.height)
+                
+        if wm.sticky_pointer:
+		    geom.x = new_x
+		    geom.y = new_y
+		    wm.pointer_follow(geom)
 
         # Restore maximization if asked
         if maxed and keep_maximize:
@@ -784,17 +850,8 @@ class KeyBinder(object):
         @param xdisplay: A C{python-xlib} display handle.
         @type xdisplay: C{Xlib.display.Display}
         """
-        try:
-            self.xdisp = xdisplay or Display()
-        except (UnicodeDecodeError, DisplayConnectionError), err:
-            raise XInitError("python-xlib failed with %s when asked to open"
-                             " a connection to the X server. Cannot bind keys."
-                             "\n\tIt's unclear why this happens, but it is"
-                             " usually fixed by deleting your ~/.Xauthority"
-                             " file and rebooting."
-                             % err.__class__.__name__)
 
-        self.xroot = self.xdisp.screen().root
+        self.xdisp, self.xroot = get_xdisplay_xroot(xdisplay)
         self._keys = {}
 
         # Resolve these at runtime to avoid NameErrors
@@ -961,7 +1018,7 @@ class QuickTileApp(object):
 
         if XLIB_PRESENT:
             try:
-                self.keybinder = KeyBinder()
+                self.keybinder = KeyBinder(xdisplay=wm.xdisp)
             except XInitError as err:
                 logging.error(err)
             else:
@@ -1227,6 +1284,9 @@ if __name__ == '__main__':
     parser.add_option('--no-workarea', action="store_true", dest="no_workarea",
         default=False, help="Overlap panels but work better with "
         "non-rectangular desktops")
+    parser.add_option('--sticky-pointer', action="store_true", dest="sticky_pointer",
+        default=False, help="Make mouse pointer following the "
+        "currently manipulated window")
 
     help_group = OptionGroup(parser, "Additional Help")
     help_group.add_option('--show-bindings', action="store_true",
@@ -1253,33 +1313,31 @@ if __name__ == '__main__':
     config.read(cfg_path)
     dirty = False
 
-    if not config.has_section('general'):
-        config.add_section('general')
-        # Change this if you make backwards-incompatible changes to the
-        # section and key naming in the config file.
-        config.set('general', 'cfg_schema', 1)
-        dirty = True
-
-    for key, val in DEFAULTS['general'].items():
-        if not config.has_option('general', key):
-            config.set('general', key, str(val))
+    for key, val in sorted(DEFAULTS.items()):
+        if config.has_section(key):
+            # Either load the keybindings or use and save the defaults
+            if key == 'keys':
+                keymap = dict(config.items('keys'))
+        else:
+            config.add_section(key)
             dirty = True
+            if key == 'general':
+                # Change this if you make backwards-incompatible changes to the
+                # section and key naming in the config file.
+                config.set('general', 'cfg_schema', 1)
+            elif key == 'keys':
+                keymap = DEFAULTS['keys']
+
+        for k, v in DEFAULTS[key].items():
+            if not config.has_option(key, k):
+                config.set(key, k, str(v))
+                dirty = True
 
     mk_raw = modkeys = config.get('general', 'ModMask')
     if ' ' in modkeys.strip() and '<' not in modkeys:
         modkeys = '<%s>' % '><'.join(modkeys.strip().split())
         logging.info("Updating modkeys format:\n %r --> %r", mk_raw, modkeys)
         config.set('general', 'ModMask', modkeys)
-        dirty = True
-
-    # Either load the keybindings or use and save the defaults
-    if config.has_section('keys'):
-        keymap = dict(config.items('keys'))
-    else:
-        keymap = DEFAULTS['keys']
-        config.add_section('keys')
-        for row in keymap.items():
-            config.set('keys', row[0], row[1])
         dirty = True
 
     # Migrate from the deprecated syntax for punctuation keysyms
@@ -1302,9 +1360,11 @@ if __name__ == '__main__':
 
     ignore_workarea = ((not config.getboolean('general', 'UseWorkarea'))
                        or opts.no_workarea)
-
+                       
+    sticky_pointer = (config.getboolean('misc', 'StickyPointer') or opts.sticky_pointer)
+    
     try:
-        wm = WindowManager(ignore_workarea=ignore_workarea)
+        wm = WindowManager(ignore_workarea=ignore_workarea, sticky_pointer=sticky_pointer)
     except XInitError as err:
         logging.critical(err)
         sys.exit(1)
