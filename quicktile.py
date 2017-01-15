@@ -106,6 +106,16 @@ class GravityLayout(object):
         'bottom-right': (1.0, 1.0),
     }
 
+    def __init__(self, margin_x=0, margin_y=0):
+        """
+        @param margin_x: Horizontal margin to apply when calculating window
+            positions, as decimal percentage of screen width.
+        @param margin_y: Vertical margin to apply when calculating window
+            positions, as decimal percentage of screen height.
+        """
+        self.margin_x = margin_x
+        self.margin_y = margin_y
+
     def __call__(self, w, h, gravity='top-left', x=None, y=None):
         """
         @param w: Desired width
@@ -123,10 +133,12 @@ class GravityLayout(object):
         offset_x = w * self.GRAVITIES[gravity][0]
         offset_y = h * self.GRAVITIES[gravity][1]
 
-        return (x - offset_x,
-                y - offset_y,
-                w, h)
+        return (x - offset_x + self.margin_x,
+                y - offset_y + self.margin_y,
+                w - (self.margin_x * 2),
+                h - (self.margin_y * 2))
 
+# TODO: Plumb GravityLayout.__init__'s arguments into the config file
 gv = GravityLayout()
 
 # Calculate the window widths to cycle through
