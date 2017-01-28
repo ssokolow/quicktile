@@ -2,22 +2,21 @@
 # -*- coding: utf-8 -*-
 """Unit Test Suite for QuickTile using Nose test discovery"""
 
-__author__  = "Stephan Sokolow (deitarion/SSokolow)"
+__author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
 import logging, operator, sys
-import wnck, gtk.gdk
 import quicktile
 
 log = logging.getLogger(__name__)
 
 if sys.version_info[0] == 2 and sys.version_info[1] < 7:  # pragma: no cover
     import unittest2 as unittest
-    unittest  # Silence erroneous PyFlakes warning
 else:                                                     # pragma: no cover
     import unittest
 
 #{ Test Mocks
+# pylint: disable=too-few-public-methods
 
 class ComplainingEnum(object):
     """A parent class for classes which should raise C{TypeError} when compared
@@ -33,7 +32,7 @@ class ComplainingEnum(object):
         @returns: C{id(self) == id(other)}
         @rtype: C{bool}
         """
-        if type(self) != type(other):
+        if type(self) != type(other):  # pylint: disable=unidiomatic-typecheck
             raise TypeError("Should not be comparing heterogeneous enums: "
                     "%s != %s" % (type(self), type(other)))
         else:
@@ -75,6 +74,7 @@ class TestHelpers(unittest.TestCase):
         self.fail("TODO: Test fmt_table")
 
 class TestEnumSafeDict(unittest.TestCase):
+    """Tests to ensure EnumSafeDict never compares enums of different types"""
     def setUp(self):
         self.thing1 = Thing1(self)
         self.thing2 = Thing2(self)
@@ -92,10 +92,10 @@ class TestEnumSafeDict(unittest.TestCase):
 
     def test_testing_shims(self):
         """EnumSafeDict: Testing shims function correctly"""
-        for op in ('lt', 'le', 'eq', 'ne', 'ge', 'gt'):
+        for oper in ('lt', 'le', 'eq', 'ne', 'ge', 'gt'):
             with self.assertRaises(TypeError):
-                print "Testing %s..." % op
-                getattr(operator, op)(self.thing1, self.thing2)
+                print "Testing %s..." % oper
+                getattr(operator, oper)(self.thing1, self.thing2)
 
     def test_init_with_content(self):
         """EnumSafeDict: Initialization with content"""
@@ -105,8 +105,8 @@ class TestEnumSafeDict(unittest.TestCase):
         while test_map:
             key, val = test_map.pop()
             self.assertEqual(self.full[key], val,
-                    "All things in the input must make it into EnumSafeDict: "
-                    + str(key))
+                "All things in the input must make it into EnumSafeDict: " +
+                 str(key))
 
         self.assertFalse(test_map, "EnumSafeDict must contain ONLY things from"
                 " the input.")
@@ -116,7 +116,7 @@ class TestEnumSafeDict(unittest.TestCase):
 
         # Test the "no matching key" branch of __getitem__
         with self.assertRaises(KeyError):
-            self.empty['nonexist']
+            self.empty['nonexist']  # pylint: disable=pointless-statement
 
         # Let Thing1 and Thing2 error out if they're compared in __setitem__
         for key, val in self.test_mappings:
@@ -124,10 +124,10 @@ class TestEnumSafeDict(unittest.TestCase):
 
         # Test the "matching key" branch of __getitem__ and __delitem__
         for key, val in self.test_mappings:
-            self.empty[key] == val
+            assert self.empty[key] == val
             del self.empty[key]
             with self.assertRaises(KeyError):
-                self.empty[key]
+                self.empty[key]  # pylint: disable=pointless-statement
 
     def test_todo(self):
         self.fail("TODO: Implement more tests for EnumSafeDict")
@@ -146,7 +146,7 @@ class TestWindowManagerDetached(unittest.TestCase):
 
     def setUp(self):
         # Shorthand
-        self.WM = quicktile.WindowManager
+        self.WM = quicktile.WindowManager  # pylint: disable=invalid-name
 
         # Set up a nice, oddly-shaped fake desktop made from screens
         # I actually have access to (though not all on the same PC)
