@@ -90,7 +90,12 @@ XDG_CONFIG_DIR = os.environ.get('XDG_CONFIG_HOME',
 #{ Settings
 
 class GravityLayout(object):
-    """Helper for generating L{cycle_dimensions} presets."""
+    """Helper for translating top-left relative dimensions to other corners.
+
+    Used to generate L{cycle_dimensions} presets.
+
+    Expects to operate on decimal percentage values. (0 <= x <= 1)
+    """
     #: Possible window alignments relative to the monitor/desktop.
     #: @todo 1.0.0: Normalize these to X11 or CSS terminology for 1.0
     #:     (API-breaking change)
@@ -117,12 +122,29 @@ class GravityLayout(object):
         self.margin_y = margin_y
 
     def __call__(self, w, h, gravity='top-left', x=None, y=None):
-        """
+        """Return an C{(x, y, w, h)} tuple relative to C{gravity}.
+
+        This function takes and returns percentages, represented as decimals
+        in the range 0 <= x <= 1, which can be multiplied by width and height
+        values in actual units to produce actual window geometry.
+
+        It can be used in two ways:
+
+          1. If called B{without} C{x} and C{y} values, it will compute a
+          geometry tuple which will align a window C{w} wide and C{h} tall
+          according to C{geometry}.
+
+          2. If called B{with} C{x} and C{y} values, it will translate a
+          geometry tuple which is relative to the top-left corner so that it is
+          instead relative to another corner.
+
         @param w: Desired width
         @param h: Desired height
         @param gravity: Desired window alignment from L{GRAVITIES}
         @param x: Desired horizontal position if not the same as C{gravity}
         @param y: Desired vertical position if not the same as C{gravity}
+
+        @returns: C{(x, y, w, h)}
 
         @note: All parameters except C{gravity} are decimal values in the range
         C{0 <= x <= 1}.
