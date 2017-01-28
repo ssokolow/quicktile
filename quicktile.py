@@ -160,34 +160,39 @@ class GravityLayout(object):
                 w - (self.margin_x * 2),
                 h - (self.margin_y * 2))
 
-# TODO: Plumb GravityLayout.__init__'s arguments into the config file
-gv = GravityLayout()
-
-# Calculate the window widths to cycle through
-# TODO: Store COLUMN_COUNT in quicktile.cfg for easy editing
+#: Number of columns to base generated L{POSITIONS} presets on
+#: @todo: Store COLUMN_COUNT in quicktile.cfg for easy editing
 COLUMN_COUNT = 3
-col_width = 1.0 / COLUMN_COUNT
-cycle_steps = tuple(col_width * x for x in range(1, COLUMN_COUNT))
 
-edge_steps = (1.0,) + cycle_steps
-corner_steps = (0.5,) + cycle_steps
+def _make_positions():
+    """Generate the classic WinSplit Revolution tiling presets
 
-# TODO: Figure out how best to put this in the config file.
-POSITIONS = {
-    'middle': [gv(width, 1, 'middle') for width in edge_steps],
-}  #: command-to-position mappings for L{cycle_dimensions}
+    @todo: Figure out how best to put this in the config file.
+    """
 
-# Generate the classic bindings with one step for each possible column-aligned
-# width
-for grav in ('top', 'bottom'):
-    POSITIONS[grav] = [gv(width, 0.5, grav) for width in edge_steps]
-for grav in ('left', 'right'):
-    POSITIONS[grav] = [gv(width, 1, grav) for width in corner_steps]
-for grav in ('top-left', 'top-right', 'bottom-left', 'bottom-right'):
-    POSITIONS[grav] = [gv(width, 0.5, grav) for width in corner_steps]
+    # TODO: Plumb GravityLayout.__init__'s arguments into the config file
+    gv = GravityLayout()
+    col_width = 1.0 / COLUMN_COUNT
+    cycle_steps = tuple(col_width * x for x in range(1, COLUMN_COUNT))
 
-# Keep these temporary variables out of the API docs
-del col_width, corner_steps, cycle_steps, edge_steps, grav, gv, width
+    edge_steps = (1.0,) + cycle_steps
+    corner_steps = (0.5,) + cycle_steps
+
+    positions = {
+        'middle': [gv(width, 1, 'middle') for width in edge_steps],
+    }
+
+    for grav in ('top', 'bottom'):
+        positions[grav] = [gv(width, 0.5, grav) for width in edge_steps]
+    for grav in ('left', 'right'):
+        positions[grav] = [gv(width, 1, grav) for width in corner_steps]
+    for grav in ('top-left', 'top-right', 'bottom-left', 'bottom-right'):
+        positions[grav] = [gv(width, 0.5, grav) for width in corner_steps]
+
+    return positions
+
+#: command-to-position mappings for L{cycle_dimensions}
+POSITIONS = _make_positions()
 
 DEFAULTS = {
     'general': {
