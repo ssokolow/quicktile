@@ -133,11 +133,11 @@ name for a key is to use the ``xev`` command. Just run it in a terminal and
 press the key you want. It will print out something like this:
 
 | KeyPress event, serial 41, synthetic NO, window 0x8400001,
-|    root 0x291, subw 0x0, time 2976251798, (149,-352), root:(192,460),
-|    state 0x10, keycode 116 (keysym 0xff54, **Down**), same_screen YES,
-|    XLookupString gives 0 bytes:
-|    XmbLookupString gives 0 bytes:
-|    XFilterEvent returns: False
+|    root 0x291, subw 0x0, time 2976251798, (149,-352), root:(192,460),
+|    state 0x10, keycode 116 (keysym 0xff54, **Down**), same_screen YES,
+|    XLookupString gives 0 bytes:
+|    XmbLookupString gives 0 bytes:
+|    XFilterEvent returns: False
 
 The part I've bolded is the name QuickTile expects.
 
