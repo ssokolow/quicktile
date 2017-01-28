@@ -138,6 +138,7 @@ press the key you want. It will print out something like this:
 |    XLookupString gives 0 bytes:
 |    XmbLookupString gives 0 bytes:
 |    XFilterEvent returns: False
+|
 
 The part I've bolded is the name QuickTile expects.
 
