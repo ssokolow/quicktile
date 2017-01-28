@@ -12,12 +12,12 @@ Keyboard-driven Window Tiling for your existing X11 window manager
 Requirements:
 -------------
 
- * An X11-based desktop (The code expects NETWM hints and X11-style window decorations)
- * Python 2.x (Tested with 2.5 on 2011-09-10. Developed on 2.7)
- * PyGTK 2.2 (assuming ``get_active_window()`` isn't newer than that)
- * ``python-wnck``
- * ``python-xlib`` (optional, required for key-binding)
- * ``dbus-python`` (optional, required for D-Bus service)
+* An X11-based desktop (The code expects NETWM hints and X11-style window decorations)
+* Python 2.x (Tested with 2.5 on 2011-09-10. Developed on 2.7)
+* PyGTK 2.2 (assuming ``get_active_window()`` isn't newer than that)
+* ``python-wnck``
+* ``python-xlib`` (optional, required for key-binding)
+* ``dbus-python`` (optional, required for D-Bus service)
 
 As PyGTK was never ported to Python 3.x and porting to GTK+ 3.x wouldn't bring
 any significant benefits for a utility that is fundamentally incompatible with
@@ -48,12 +48,12 @@ following commands to easily install them:
 Installation (Typical Use)
 --------------------------
 
- 1. Make sure the requirements above are satisfied (including ``python-xlib``)
- 2. Extract ``quicktile.py`` to wherever you want to keep it
- 3. Set ``quicktile.py`` to be executable if it isn't already
- 4. Run ``quicktile.py`` once to generate your configuration file
- 5. Edit ``~/.config/quicktile.cfg`` to customize your keybinds
- 6. Set your desktop to run ``quicktile.py --daemonize``
+1. Make sure the requirements above are satisfied (including ``python-xlib``)
+2. Extract ``quicktile.py`` to wherever you want to keep it
+3. Set ``quicktile.py`` to be executable if it isn't already
+4. Run ``quicktile.py`` once to generate your configuration file
+5. Edit ``~/.config/quicktile.cfg`` to customize your keybinds
+6. Set your desktop to run ``quicktile.py --daemonize``
 
 **Note:** Customizing the available window shapes currently requires editing
 the source code (though it's quite simple). This will be remedied when the
@@ -67,39 +67,39 @@ let me know if you experience any troubles.
 Important Notes:
 ================
 
- * If you are running a desktop which uses Compiz (such as Ubuntu's Unity),
-   make sure you've used CCSM to disable the grid plugin or the fight between
-   it and QuickTile for the same type of functionality may cause unpredictable
-   problems.
- * Some systems may not provide a Python 2.x binary under the name ``python2``.
-   If this is the case on yours, you must edit the first line in
-   ``quicktile.py`` accordingly.
- * If you are running quicktile from a folder that isn't in your ``PATH``,
-   you will need to specify a path like ``./quicktile.py`` to run
-   ``quicktile.py`` directly.
- * If you don't mark ``quicktile.py`` as executable, you must run
-   ``python2 quicktile.py`` rather than ``quicktile.py``.
- * You can list your current keybindings by running
-   ``quicktile.py --show-bindings``
- * You can get a list of valid actions for the configuration file by running
-   ``quicktile.py --show-actions``
+* If you are running a desktop which uses Compiz (such as Ubuntu's Unity),
+  make sure you've used CCSM to disable the grid plugin or the fight between
+  it and QuickTile for the same type of functionality may cause unpredictable
+  problems.
+* Some systems may not provide a Python 2.x binary under the name ``python2``.
+  If this is the case on yours, you must edit the first line in
+  ``quicktile.py`` accordingly.
+* If you are running quicktile from a folder that isn't in your ``PATH``,
+  you will need to specify a path like ``./quicktile.py`` to run
+  ``quicktile.py`` directly.
+* If you don't mark ``quicktile.py`` as executable, you must run
+  ``python2 quicktile.py`` rather than ``quicktile.py``.
+* You can list your current keybindings by running
+  ``quicktile.py --show-bindings``
+* You can get a list of valid actions for the configuration file by running
+  ``quicktile.py --show-actions``
 
 -------------------
 Usage (Typical Use)
 -------------------
 
- 1. Focus the window you want to tile
- 2. Hold the modifiers defined in ``ModMask`` (``Ctrl+Alt`` by default).
- 3. Repeatedly press one of the defined keybindings to cycle through window
-    sizes available at the desired location on the screen.
+1. Focus the window you want to tile
+2. Hold the modifiers defined in ``ModMask`` (``Ctrl+Alt`` by default).
+3. Repeatedly press one of the defined keybindings to cycle through window
+   sizes available at the desired location on the screen.
 
 The default keybindings are:
 
- * ``1`` through ``9`` on the numeric keypad represent regions of your screen
- * ``0`` on the numeric keypad will fully maximize the active window.
- * ``H`` and ``V`` will maximize a window horizontally or vertically.
- * ``Enter`` on the numeric keypad will cycle the active window to the next
-   monitor.
+* ``1`` through ``9`` on the numeric keypad represent regions of your screen
+* ``0`` on the numeric keypad will fully maximize the active window.
+* ``H`` and ``V`` will maximize a window horizontally or vertically.
+* ``Enter`` on the numeric keypad will cycle the active window to the next
+  monitor.
 
 This works best when combined with functionality your existing window manager
 provides (eg. ``Alt+Tab``) to minimize the need to switch your hand between your
@@ -118,12 +118,12 @@ GTK+ modifier syntax looks like this::
 
 The important things to keep in mind for using it are:
 
- 1. **Do not** put any spaces inside your keybind string.
- 2. Modifier names and non-modifier key names are not the same thing.
- 3. Modifier names are case-insensitive.
- 4. Key names like ``Down`` are case-sensitive. (Don't let the letter keys fool
-    you. Those work the way they do because ``A`` and ``a`` are two separate
-    names for the same key.)
+1. **Do not** put any spaces inside your keybind string.
+2. Modifier names and non-modifier key names are not the same thing.
+3. Modifier names are case-insensitive.
+4. Key names like ``Down`` are case-sensitive. (Don't let the letter keys fool
+   you. Those work the way they do because ``A`` and ``a`` are two separate
+   names for the same key.)
 
 Valid Key Names
 ---------------
@@ -184,14 +184,14 @@ consistent mappings:
 Advanced Uses
 -------------
 
- * If you want to trigger QuickTile from another application in an efficient
-   manner, make sure you have ``dbus-python`` installed and read up on how to
-   send D-Bus messages using either your language's D-Bus bindings or the
-   ``dbus-send`` command.
- * If, for some reason, you want scripted tiling without D-Bus, you can also
-   run commands like ``quicktile.py top-left`` but it may be slower as
-   quicktile has to start, perform an action, and then quit every time you call
-   it.
+* If you want to trigger QuickTile from another application in an efficient
+  manner, make sure you have ``dbus-python`` installed and read up on how to
+  send D-Bus messages using either your language's D-Bus bindings or the
+  ``dbus-send`` command.
+* If, for some reason, you want scripted tiling without D-Bus, you can also
+  run commands like ``quicktile.py top-left`` but it may be slower as
+  quicktile has to start, perform an action, and then quit every time you call
+  it.
 
 As with the built-in keybinding, requesting the same action more than once
 in a row will cycle through the available window sizes. For further details,
