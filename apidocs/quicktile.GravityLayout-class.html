@@ -60,8 +60,12 @@ object --+
 </pre>
 
 <hr />
-<p>Helper for generating <a href="quicktile-module.html#cycle_dimensions"
+<p>Helper for translating top-left relative dimensions to other 
+  corners.</p>
+  <p>Used to generate <a href="quicktile-module.html#cycle_dimensions" 
   class="link">cycle_dimensions</a> presets.</p>
+  <p>Expects to operate on decimal percentage values. (0 &lt;= x &lt;= 
+  1)</p>
 
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
@@ -86,12 +90,33 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a href="quicktile.GravityLayout-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">margin_x</span>=<span class="summary-sig-default">0</span>,
+        <span class="summary-sig-arg">margin_y</span>=<span class="summary-sig-default">0</span>)</span><br />
+      x.__init__(...) initializes x; see help(type(x)) for signature</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#GravityLayout.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a href="quicktile.GravityLayout-class.html#__call__" class="summary-sig-name">__call__</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">w</span>,
         <span class="summary-sig-arg">h</span>,
         <span class="summary-sig-arg">gravity</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">top-left</code><code class="variable-quote">'</code></span>,
         <span class="summary-sig-arg">x</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">y</span>=<span class="summary-sig-default">None</span>)</span></td>
+        <span class="summary-sig-arg">y</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Return an <code>(x, y, w, h)</code> tuple relative to 
+      <code>gravity</code>.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="quicktile-pysrc.html#GravityLayout.__call__">source&nbsp;code</a></span>
             
@@ -108,7 +133,6 @@ object --+
       <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
-      <code>__init__</code>,
       <code>__new__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
@@ -198,6 +222,38 @@ object --+
   </td>
 </tr>
 </table>
+<a name="__init__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">margin_x</span>=<span class="sig-default">0</span>,
+        <span class="sig-arg">margin_y</span>=<span class="sig-default">0</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#GravityLayout.__init__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>x.__init__(...) initializes x; see help(type(x)) for signature</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>margin_x</code></strong> - Horizontal margin to apply when calculating window positions, as 
+          decimal percentage of screen width.</li>
+        <li><strong class="pname"><code>margin_y</code></strong> - Vertical margin to apply when calculating window positions, as 
+          decimal percentage of screen height.</li>
+    </ul></dd>
+    <dt>Overrides:
+        object.__init__
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
 <a name="__call__"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -218,7 +274,25 @@ object --+
     </td>
   </tr></table>
   
-  
+  <p>Return an <code>(x, y, w, h)</code> tuple relative to 
+  <code>gravity</code>.</p>
+  <p>This function takes and returns percentages, represented as decimals 
+  in the range 0 &lt;= x &lt;= 1, which can be multiplied by width and 
+  height values in actual units to produce actual window geometry.</p>
+  <p>It can be used in two ways:</p>
+  <ol start="1">
+    <li>
+      If called <b>without</b> <code>x</code> and <code>y</code> values, it
+      will compute a geometry tuple which will align a window 
+      <code>w</code> wide and <code>h</code> tall according to 
+      <code>geometry</code>.
+    </li>
+    <li>
+      If called <b>with</b> <code>x</code> and <code>y</code> values, it 
+      will translate a geometry tuple which is relative to the top-left 
+      corner so that it is instead relative to another corner.
+    </li>
+  </ol>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
@@ -231,6 +305,8 @@ object --+
           <code>gravity</code></li>
         <li><strong class="pname"><code>y</code></strong> - Desired vertical position if not the same as <code>gravity</code></li>
     </ul></dd>
+    <dt>Returns:</dt>
+        <dd><code>(x, y, w, h)</code></dd>
   </dl>
 <div class="fields">      <p><strong>Note:</strong>
         All parameters except <code>gravity</code> are decimal values in 
@@ -310,7 +386,7 @@ object --+
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Wed Dec  4 19:18:47 2013
+    Generated by Epydoc 3.0.1 on Sat Jan 28 10:47:35 2017
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

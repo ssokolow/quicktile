@@ -1,6 +1,7 @@
 quicktile	quicktile-module.html
 quicktile.workspace_send_window	quicktile-module.html#workspace_send_window
 quicktile.POSITIONS	quicktile-module.html#POSITIONS
+quicktile._make_positions	quicktile-module.html#_make_positions
 quicktile.DBUS_PRESENT	quicktile-module.html#DBUS_PRESENT
 quicktile.cycle_dimensions	quicktile-module.html#cycle_dimensions
 quicktile.trigger_keyboard_action	quicktile-module.html#trigger_keyboard_action
@@ -9,12 +10,13 @@ quicktile.powerset	quicktile-module.html#powerset
 quicktile.toggle_state	quicktile-module.html#toggle_state
 quicktile.sessBus	quicktile-module.html#sessBus
 quicktile.fmt_table	quicktile-module.html#fmt_table
+quicktile.XLIB_PRESENT	quicktile-module.html#XLIB_PRESENT
 quicktile.DEFAULTS	quicktile-module.html#DEFAULTS
+quicktile.COLUMN_COUNT	quicktile-module.html#COLUMN_COUNT
 quicktile.toggle_decorated	quicktile-module.html#toggle_decorated
 quicktile.KEYLOOKUP	quicktile-module.html#KEYLOOKUP
 quicktile.cycle_monitors	quicktile-module.html#cycle_monitors
 quicktile.cmd_moveCenter	quicktile-module.html#cmd_moveCenter
-quicktile.XLIB_PRESENT	quicktile-module.html#XLIB_PRESENT
 quicktile.workspace_go	quicktile-module.html#workspace_go
 quicktile.commands	quicktile-module.html#commands
 quicktile.XDG_CONFIG_DIR	quicktile-module.html#XDG_CONFIG_DIR
@@ -26,9 +28,9 @@ exceptions.AssertionError	exceptions.AssertionError-class.html
 exceptions.AssertionError.__init__	exceptions.AssertionError-class.html#__init__
 exceptions.AssertionError.__new__	exceptions.AssertionError-class.html#__new__
 quicktile.CommandRegistry	quicktile.CommandRegistry-class.html
-quicktile.CommandRegistry.addMany	quicktile.CommandRegistry-class.html#addMany
 quicktile.CommandRegistry.__str__	quicktile.CommandRegistry-class.html#__str__
 quicktile.CommandRegistry.add	quicktile.CommandRegistry-class.html#add
+quicktile.CommandRegistry.add_many	quicktile.CommandRegistry-class.html#add_many
 quicktile.CommandRegistry.__iter__	quicktile.CommandRegistry-class.html#__iter__
 quicktile.CommandRegistry.call	quicktile.CommandRegistry-class.html#call
 quicktile.CommandRegistry.__init__	quicktile.CommandRegistry-class.html#__init__
@@ -45,6 +47,7 @@ quicktile.EnumSafeDict.__repr__	quicktile.EnumSafeDict-class.html#__repr__
 quicktile.GravityLayout	quicktile.GravityLayout-class.html
 quicktile.GravityLayout.__call__	quicktile.GravityLayout-class.html#__call__
 quicktile.GravityLayout.GRAVITIES	quicktile.GravityLayout-class.html#GRAVITIES
+quicktile.GravityLayout.__init__	quicktile.GravityLayout-class.html#__init__
 quicktile.KeyBinder	quicktile.KeyBinder-class.html
 quicktile.KeyBinder.keybind_failed	quicktile.KeyBinder-class.html#keybind_failed
 quicktile.KeyBinder.bind	quicktile.KeyBinder-class.html#bind
@@ -55,7 +58,7 @@ quicktile.KeyBinder.ignored_modifiers	quicktile.KeyBinder-class.html#ignored_mod
 quicktile.KeyBinder.__init__	quicktile.KeyBinder-class.html#__init__
 quicktile.QuickTileApp	quicktile.QuickTileApp-class.html
 quicktile.QuickTileApp.run	quicktile.QuickTileApp-class.html#run
-quicktile.QuickTileApp.showBinds	quicktile.QuickTileApp-class.html#showBinds
+quicktile.QuickTileApp.show_binds	quicktile.QuickTileApp-class.html#show_binds
 quicktile.QuickTileApp.__init__	quicktile.QuickTileApp-class.html#__init__
 quicktile.WindowManager	quicktile.WindowManager-class.html
 quicktile.WindowManager.reposition	quicktile.WindowManager-class.html#reposition
@@ -66,6 +69,8 @@ quicktile.WindowManager.get_workspace	quicktile.WindowManager-class.html#get_wor
 quicktile.WindowManager.gravities	quicktile.WindowManager-class.html#gravities
 quicktile.WindowManager.__init__	quicktile.WindowManager-class.html#__init__
 quicktile.WindowManager.get_geometry_rel	quicktile.WindowManager-class.html#get_geometry_rel
+quicktile.XInitError	quicktile.XInitError-class.html
+quicktile.XInitError.__str__	quicktile.XInitError-class.html#__str__
 test_quicktile.ComplainingEnum	test_quicktile.ComplainingEnum-class.html
 test_quicktile.ComplainingEnum.__cmp__	test_quicktile.ComplainingEnum-class.html#__cmp__
 test_quicktile.ComplainingEnum.__init__	test_quicktile.ComplainingEnum-class.html#__init__

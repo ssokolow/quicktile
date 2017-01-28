@@ -57,7 +57,11 @@
   cleanups.</p>
 
 <hr />
-<div class="fields">      <strong>To Do:</strong>
+<div class="fields">      <p><strong>To Do (1.0.0):</strong>
+        Retire <a href="quicktile-module.html#KEYLOOKUP" 
+    class="link">KEYLOOKUP</a>. (API-breaking change)
+      </p>
+      <strong>To Do:</strong>
       <ul class="nomargin-top">
         <li>
         <ul>
@@ -112,10 +116,6 @@
     </ul>
         </li>
       </ul>
-      <p><strong>To Do (1.0.0):</strong>
-        Retire <a href="quicktile-module.html#KEYLOOKUP" 
-    class="link">KEYLOOKUP</a>. (API-breaking change)
-      </p>
       <p><strong>Version:</strong>
         0.2.2
       </p>
@@ -185,9 +185,8 @@
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="quicktile.GravityLayout-class.html" class="summary-name">GravityLayout</a><br />
-      Helper for generating <a 
-        href="quicktile-module.html#cycle_dimensions" 
-        class="link">cycle_dimensions</a> presets.
+      Helper for translating top-left relative dimensions to other 
+        corners.
     </td>
   </tr>
 <tr bgcolor="#e8f0f8" >
@@ -201,6 +200,15 @@
       A dict-like object which avoids comparing objects of different 
         types to avoid triggering spurious Glib &quot;comparing different 
         enum types&quot; warnings.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="quicktile.XInitError-class.html" class="summary-name">XInitError</a><br />
+      Raised when something outside our control causes the X11 connection
+        to fail.
     </td>
   </tr>
 </table>
@@ -221,6 +229,26 @@
     </table>
   </td>
 </tr>
+<tr bgcolor="#e8f0f8"  class="private">
+  <th colspan="2" class="group-header"
+    >&nbsp;&nbsp;&nbsp;&nbsp;Settings</th></tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile-module.html#_make_positions" class="summary-sig-name" onclick="show_private();">_make_positions</a>()</span><br />
+      Generate the classic WinSplit Revolution tiling presets</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile-pysrc.html#_make_positions">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
 <tr bgcolor="#e8f0f8" >
   <th colspan="2" class="group-header"
     >&nbsp;&nbsp;&nbsp;&nbsp;Helpers</th></tr>
@@ -517,6 +545,16 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a href="quicktile-module.html#COLUMN_COUNT" class="summary-name">COLUMN_COUNT</a> = <code title="3">3</code><br />
+      Number of columns to base generated <a 
+      href="quicktile-module.html#POSITIONS" class="link">POSITIONS</a> 
+      presets on
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a href="quicktile-module.html#POSITIONS" class="summary-name">POSITIONS</a> = <code title="{'bottom': [(0.0, 0.5, 1.0, 0.5),
             (0.333333333333, 0.5, 0.333333333333, 0.5),
             (0.166666666667, 0.5, 0.666666666667, 0.5)],
@@ -574,6 +612,28 @@
   </td>
 </tr>
 </table>
+<a name="_make_positions"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_make_positions</span>()</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile-pysrc.html#_make_positions">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Generate the classic WinSplit Revolution tiling presets</p>
+  <dl class="fields">
+  </dl>
+<div class="fields">      <p><strong>To Do:</strong>
+        Figure out how best to put this in the config file.
+      </p>
+</div></td></tr></table>
+</div>
 <a name="fmt_table"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -638,7 +698,7 @@
         <dd>The new window dimensions.</dd>
     <dt>Decorators:</dt>
     <dd><ul class="nomargin-top">
-        <li><code>@commands.addMany(POSITIONS)</code></li>
+        <li><code>@commands.add_many(POSITIONS)</code></li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -912,6 +972,29 @@
   </td>
 </tr>
 </table>
+<a name="COLUMN_COUNT"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">COLUMN_COUNT</h3>
+  <p>Number of columns to base generated <a 
+  href="quicktile-module.html#POSITIONS" class="link">POSITIONS</a> presets
+  on</p>
+  <dl class="fields">
+  </dl>
+<div class="fields">      <p><strong>To Do:</strong>
+        Store COLUMN_COUNT in quicktile.cfg for easy editing
+      </p>
+</div>  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+3
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
 <a name="POSITIONS"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -1008,7 +1091,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Wed Dec  4 19:18:47 2013
+    Generated by Epydoc 3.0.1 on Sat Jan 28 10:47:35 2017
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
