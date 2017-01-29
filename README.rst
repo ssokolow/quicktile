@@ -6,6 +6,10 @@ QuickTile
    :target: https://landscape.io/github/ssokolow/quicktile/master
    :alt: Code Health
 
+.. image:: https://api.codacy.com/project/badge/Grade/5a3450aa0d2e429796a836580b1fef32
+   :target: https://www.codacy.com/app/from_github/quicktile
+   :alt: Codacy
+
 Keyboard-driven Window Tiling for your existing X11 window manager
 
 -------------
