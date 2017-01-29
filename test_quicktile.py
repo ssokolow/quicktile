@@ -186,3 +186,5 @@ class TestWindowManagerDetached(unittest.TestCase):
     def test_win_gravity_results(self):
         """WindowManager.calc_window_gravity: proper results"""
         self.fail("TODO: Test the output, assuming self.gravities is right")
+
+# vim: set sw=4 sts=4 expandtab :

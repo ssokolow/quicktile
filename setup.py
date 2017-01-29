@@ -55,3 +55,5 @@ if __name__ == '__main__':
             ('/etc/xdg/autostart', ['quicktile.desktop']),
         ]
     )
+
+# vim: set sw=4 sts=4 expandtab :
