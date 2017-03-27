@@ -1160,22 +1160,33 @@ def cycle_monitors(winman, win, state, step=1):
 
     winman.reposition(win, None, new_mon_geom, keep_maximize=True)
 
-@commands.add('move-to-center')
-def cmd_moveCenter(winman, win, state):
-    """Center the window in the monitor it currently occupies."""
+# pylint: disable=no-member
+MOVE_TO_COMMANDS = {
+    'move-to-top-left': [wnck.WINDOW_GRAVITY_NORTHWEST, wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+    'move-to-top': [wnck.WINDOW_GRAVITY_NORTH, wnck.WINDOW_CHANGE_Y],
+    'move-to-top-right': [wnck.WINDOW_GRAVITY_NORTHEAST, wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+    'move-to-left': [wnck.WINDOW_GRAVITY_WEST, wnck.WINDOW_CHANGE_X],
+    'move-to-center': [wnck.WINDOW_GRAVITY_CENTER, wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+    'move-to-right': [wnck.WINDOW_GRAVITY_EAST, wnck.WINDOW_CHANGE_X],
+    'move-to-bottom-left': [wnck.WINDOW_GRAVITY_SOUTHWEST, wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+    'move-to-bottom': [wnck.WINDOW_GRAVITY_SOUTH, wnck.WINDOW_CHANGE_Y],
+    'move-to-bottom-right': [wnck.WINDOW_GRAVITY_SOUTHEAST, wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+}
+
+@commands.add_many(MOVE_TO_COMMANDS)
+def move_to_position(winman, win, state, gravity, gravity_mask):
+    """Move window to a position on the screen, preserving its dimensions."""
     use_rect = state['usable_rect']
 
-    dims = (int(use_rect.width / 2), int(use_rect.height / 2), 0, 0)
-    logging.debug("Calculated center point of monitor: %r", dims)
-
+    grav_x, grav_y = winman.gravities[gravity]
+    dims = (int(use_rect.width * grav_x), int(use_rect.height * grav_y), 0, 0)
     result = gtk.gdk.Rectangle(*dims)
-    logging.debug("Calling reposition() with center gravity and dimensions %r",
-                  tuple(result))
+    logging.debug("Calling reposition() with %r gravity and dimensions %r",
+                  gravity, tuple(result))
 
     # pylint: disable=no-member
-    winman.reposition(win, result, use_rect,
-           gravity=wnck.WINDOW_GRAVITY_CENTER,
-           geometry_mask=wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y)
+    winman.reposition(win, result, use_rect, gravity=gravity,
+            geometry_mask=gravity_mask)
 
 @commands.add('bordered')
 def toggle_decorated(winman, win, state):  # pylint: disable=unused-argument
