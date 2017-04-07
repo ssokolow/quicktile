@@ -69,8 +69,8 @@ author has time to decide between extending the standard Python rcfile parser
 and replacing ``quicktile.cfg`` with ``quicktile.json``.
 
 **Note:** If you want to install QuickTile system-wide and have it auto-start,
-the standard ``sudo ./setup.py install`` command should do the trick. Please
-let me know if you experience any troubles.
+running the ``install.sh`` script should do the trick. Please let me know if
+you experience any troubles.
 
 Important Notes:
 ================
