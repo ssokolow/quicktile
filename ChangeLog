@@ -1,12 +1,52 @@
-0.1.5 (git HEAD):
+0.2.2 (git HEAD):
+- Added move-to{,-top,-bottom}{,-left,-right} (David Stygstra)
+- Implement window gravity support in reposition()
+- Allow reposition() to take a custom geometry mask
+- Begin implementing the basics of a unit test suite
+- Actually make cycle_monitors() obey the step argument
+- Don't allow selection of the desktop window
+- Added a safety check for the use of <Super> in modmask
+- Extend GravityLayout to support margins
+- More helpful --debug messages
+- Rewrite README in ReStructuredText
+- Add static analysis hooks to repo
+- Various code cleanups
+- Modernize setup.py and remove absolute install path blocking packaging
+
+0.2.1:
+- Added monitor-next and monitor-previous
+- Added all-desktops, pin, fullscreen, always-above, always-below, and shade
+- Added workspace-{go,send}-{next,prev,up,down,left,right}
+- Added minimize and bordered commands
+- Added commands for triggering keyboard-driven move/resize
+- Switch to gtk.accelerator_parse() for keycode lookup
+- Removed AltGr from the list of ignored modifiers
+- Fix detection for partial maximization
+
+0.2.0.1:
+- Bugfix for a mistake introduced while refactoring the command-line help
+
+0.2.0:
+- Switch to programmatic generation of the presets table
+- Rely more fully on libwnck to minimize NIH-related bugs
+
+0.1.6:
+- Use libwnck for various operations to avoid bugs
+- Audited and fixed up the API documentation
+
+0.1.5:
 - Keybindings and base modifier key can now be set via ~/.config/quicktile.cfg
 - Added a setup.py capable of installing and setting up autostart behaviour.
 - Added a --no-workarea flag and config file key for non-rectangular desktops
 - Added a --show-bindings option to list keybindings
 - Added horizontal-maximize, vertical-maximize, and move-to-center (crantok)
+- Also tile windows which don't implement _NET_WM_WINDOW_TYPE
+- Relax cycleDimensions matching to avoid edge cases (Yuting Xiao)
+- Switch the shebang to use "python2" for more compatibility
 - Improved the error handling with more helpful messages
-- More internal restructuring
+- More internal restructuring and code clean-ups
 - Tidied up the --help output a bit
+- Write a proper README in Markdown
 
 0.1.4:
 - Much internal restructuring
