@@ -5,7 +5,9 @@ pngs := $(patsubst svg/%.svg,png/%.png,$(svgs))
 all: $(pngs)
 
 png/%.png: svg/%.svg | png
-	convert -background none $< $@
+	inkscape $< --export-png=$@
+	optipng $@
+	advpng -z4 $@
 
 png:
 	mkdir -p $@
