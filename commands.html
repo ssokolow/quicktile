@@ -1,0 +1,172 @@
+---
+layout: default
+title: Command Reference
+---
+<h2>Command Reference</h2>
+<!-- TODO: Move the descriptions into the source code and then make this file
+     programmatically generated. -->
+
+<strong>NOTE:</strong> All commands may have keybindings added, changed, or removed and this listing represents default values.
+
+<h3>Window Tiling</h3>
+<dl class="big reference">
+    <dt><code>top-left</code> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Keypad 7</kbd>)</dt>
+    <dd>Tile the active window to span the top-left quarter of the screen. Press the hotkey multiple times to cycle through different width presets.</dd>
+    <dd><img class="diagram" src="diagrams/png/top-left.png" alt="diagram" /></dd>
+    <dt><code>top</code> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Keypad 8</kbd>)</dt>
+    <dd>Tile the active window to span the top half of the screen. Press the hotkey multiple times to cycle through different width presets.</dd>
+    <dd><img class="diagram" src="diagrams/png/top.png" alt="diagram" /></dd>
+    <dt><code>top-right</code> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Keypad 9</kbd>)</dt>
+    <dd>Tile the active window to span the top-right quarter of the screen. Press the hotkey multiple times to cycle through different width presets.</dd>
+    <dd><img class="diagram" src="diagrams/png/top-right.png" alt="diagram" /></dd>
+    <dt><code>left</code> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Keypad 4</kbd>)</dt>
+    <dd>Tile the active window to span the left half of the screen. Press the hotkey multiple times to cycle through different width presets.</dd>
+    <dd><img class="diagram" src="diagrams/png/left.png" alt="diagram" /></dd>
+    <dt><code>middle</code> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Keypad 5</kbd>)</dt>
+    <dd>Tile the active window to fill the screen. Press the hotkey multiple times to cycle through different width presets.</dd>
+    <dd><img class="diagram" src="diagrams/png/middle.png" alt="diagram" /></dd>
+    <dt><code>right</code> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Keypad 6</kbd>)</dt>
+    <dd>Tile the active window to span the right half of the screen. Press the hotkey multiple times to cycle through different width presets.</dd>
+    <dd><img class="diagram" src="diagrams/png/right.png" alt="diagram" /></dd>
+    <dt><code>bottom-left</code> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Keypad 1</kbd>)</dt>
+    <dd>Tile the active window to span the bottom-left quarter of the screen. Press the hotkey multiple times to cycle through different width presets.</dd>
+    <dd><img class="diagram" src="diagrams/png/bottom-left.png" alt="diagram" /></dd>
+    <dt><code>bottom</code> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Keypad 2</kbd>)</dt>
+    <dd>Tile the active window to span the bottom half of the screen. Press the hotkey multiple times to cycle through different width presets.</dd>
+    <dd><img class="diagram" src="diagrams/png/bottom.png" alt="diagram" /></dd>
+    <dt><code>bottom-right</code> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Keypad 3</kbd>)</dt>
+    <dd>Tile the active window to span the bottom-right quarter of the screen. Press the hotkey multiple times to cycle through different width presets.</dd>
+    <dd><img class="diagram" src="diagrams/png/bottom-right.png" alt="diagram" /></dd>
+
+
+</dl>
+
+<h3>Window Movement</h3>
+<dl class="big reference">
+    <dt><code>move-to-top-left</code></dt>
+    <dd>Move the active window to the top-left corner of the screen without altering its shape.</dd>
+    <dd><img class="diagram" src="diagrams/png/move-to-top-left.png" alt="diagram" /></dd>
+
+    <dt><code>move-to-top</code></dt>
+    <dd>Move the active window to the top edge of the screen without altering its shape.</dd>
+    <dd><img class="diagram" src="diagrams/png/move-to-top.png" alt="diagram" /></dd>
+
+    <dt><code>move-to-top-right</code></dt>
+    <dd>Move the active window to the top-right corner of the screen without altering its shape.</dd>
+    <dd><img class="diagram" src="diagrams/png/move-to-top-right.png" alt="diagram" /></dd>
+
+    <dt><code>move-to-left</code></dt>
+    <dd>Move the active window to the left edge of the screen without altering its shape.</dd>
+    <dd><img class="diagram" src="diagrams/png/move-to-left.png" alt="diagram" /></dd>
+
+    <dt><code>move-to-center</code> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>C</kbd>)</dt>
+    <dd>Move the active window to the center of the screen without altering its shape.</dd>
+    <dd><img class="diagram" src="diagrams/png/move-to-center.png" alt="diagram" /></dd>
+
+    <dt><code>move-to-right</code></dt>
+    <dd>Move the active window to the right edge of the screen without altering its shape.</dd>
+    <dd><img class="diagram" src="diagrams/png/move-to-right.png" alt="diagram" /></dd>
+
+    <dt><code>move-to-bottom-left</code></dt>
+    <dd>Move the active window to the bottom-left corner of the screen without altering its shape.</dd>
+    <dd><img class="diagram" src="diagrams/png/move-to-bottom-left.png" alt="diagram" /></dd>
+
+    <dt><code>move-to-bottom</code></dt>
+    <dd>Move the active window to the bottom edge of the screen without altering its shape.</dd>
+    <dd><img class="diagram" src="diagrams/png/move-to-bottom.png" alt="diagram" /></dd>
+
+    <dt><code>move-to-bottom-right</code></dt>
+    <dd>Move the active window to the top-right corner of the screen without altering its shape.</dd>
+    <dd><img class="diagram" src="diagrams/png/move-to-bottom-right.png" alt="diagram" /></dd>
+</dl>
+
+<h3>Window State</h3>
+<p>Toggling whether the active window is rendered...</p>
+<dl class="big reference">
+    <dt><code>always-above</code></dt>
+    <dd>...on a layer above normal windows.</dd>
+    <dt><code>always-below</code></dt>
+    <dd>on a layer below normal windows.</dd>
+    <dt><code>bordered</code></dt>
+    <dd>...without a titlebar and borders.</dd>
+    <dt><code>fullscreen</code></dt>
+    <dd>...fullscreen, covering desktop panels and, on many compositors, with un-redirected rendering for improved performance.</dd>
+    <dt><code>horizontal-maximize</code> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>H</kbd>)</dt>
+    <dd>...maximized horizontally, but with its height and vertical position unchanged.</dd>
+    <dt><code>maximize</code> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Keypad 0</kbd>)</dt>
+    <dd>...maximized to fill the "work area" of the monitor. (ie. not covering panels unless they're set to allow it.)</dd>
+    <dt><code>minimize</code></dt>
+    <dd>...minimized to the taskbar or equivalent.</dd>
+    <dt><code>shade</code></dt>
+    <dd>...as only a titlebar (like a rolled-up windowshade).</dd>
+    <dt><code>vertical-maximize</code> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd>)</dt>
+    <dd>...maximized vertically, but with its width and horizontal position unchanged.</dd>
+</dl>
+
+<h3>Multi-Monitor Operations</h3>
+<dl class="big reference">
+    <dt><code>monitor-switch</code> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Keypad Enter</kbd>)</dt>
+    <dt><code>monitor-next</code></dt>
+    <dd>Move the window to the next monitor, according to the <abbr title="Window Manager">WM</abbr>'s internal numbering. Do not move the window's position within the monitor beyond what the WM may do to adjust for differently-sized monitors.</dd>
+    <dd><code>monitor-switch</code> is a legacy alias for <code>monitor-next</code> retained for compatibility purposes.</dd>
+    <dt><code>monitor-prev</code></dt>
+    <dd>Move the window to the previous monitor, according to the <abbr title="Window Manager">WM</abbr>'s internal numbering. Do not move the window's position within the monitor beyond what the WM may do to adjust for differently-sized monitors.</dd>
+</dl>
+
+<h3>Workspace-wise Navigation</h3>
+<dl class="big reference">
+    <dt><code>workspace-go-next</code></dt>
+    <dd>Switch focus to the next workspace, by the <abbr title="Window Manager">WM</abbr>'s internal numbering. Do not move any windows.</dd>
+    <dt><code>workspace-go-prev</code></dt>
+    <dd>Switch focus to the previous workspace, by the <abbr title="Window Manager">WM</abbr>'s internal numbering. Do not move any windows.</dd>
+    <dt><code>workspace-go-left</code></dt>
+    <dd>Switch focus to the left in the grid of workspaces. Do not move any windows.</dd>
+    <dd>For users who have laid out their workspaces in a row, this is equivalent to <code>workspace-go-prev</code> with the possible exception of wrap-around behaviour.</dd>
+    <dt><code>workspace-go-right</code></dt>
+    <dd>Switch focus to the right in the grid of workspaces. Do not move any windows.</dd>
+    <dd>For users who have laid out their workspaces in a row, this is equivalent to <code>workspace-go-next</code> with the possible exception of wrap-around behaviour.</dd>
+    <dt><code>workspace-go-up</code></dt>
+    <dd>Switch focus upward in the grid of workspaces. Do not move any windows.</dd>
+    <dd>For users who have laid out their workspaces in a column, this is equivalent to <code>workspace-go-prev</code> with the possible exception of wrap-around behaviour.</dd>
+    <dt><code>workspace-go-down</code></dt>
+    <dd>Switch focus downward in the grid of workspaces. Do not move any windows.</dd>
+    <dd>For users who have laid out their workspaces in a column, this is equivalent to <code>workspace-go-next</code> with the possible exception of wrap-around behaviour.</dd>
+</dl>
+
+<h3>Workspace-wise Window Manipulation</h3>
+<dl class="big reference">
+    <dt><code>all-desktops</code></dt>
+    <dd>Toggle whether the active window appears on all desktop/workspaces</dd>
+    <dt><code>workspace-send-next</code></dt>
+    <dd>Ask the <abbr title="Window Manager">WM</abbr> to move the active window to the next workspace, according to its internal numbering.</dd>
+    <dt><code>workspace-send-prev</code></dt>
+    <dd>Ask the <abbr title="Window Manager">WM</abbr> to move the active window to the previous workspace, according to its internal numbering.</dd>
+    <dt><code>workspace-send-left</code></dt>
+    <dd>Ask the <abbr title="Window Manager">WM</abbr> to move the active window to the left in the grid of workspaces.</dd>
+    <dd>For users who have laid out their workspaces in a row, this is equivalent to <code>workspace-send-prev</code> with the possible exception of wrap-around behaviour.</dd>
+    <dt><code>workspace-send-right</code></dt>
+    <dd>Ask the <abbr title="Window Manager">WM</abbr> to move the active window to the right in the grid of workspaces.</dd>
+    <dd>For users who have laid out their workspaces in a row, this is equivalent to <code>workspace-send-next</code> with the possible exception of wrap-around behaviour.</dd>
+    <dt><code>workspace-send-up</code></dt>
+    <dd>Ask the <abbr title="Window Manager">WM</abbr> to move the active window upward in the grid of workspaces.</dd>
+    <dd>For users who have laid out their workspaces in a column, this is equivalent to <code>workspace-send-prev</code> with the possible exception of wrap-around behaviour.</dd>
+    <dt><code>workspace-send-down</code></dt>
+    <dd>Ask the <abbr title="Window Manager">WM</abbr> to move the active window downward in the grid of workspaces.</dd>
+    <dd>For users who have laid out their workspaces in a column, this is equivalent to <code>workspace-send-next</code> with the possible exception of wrap-around behaviour.</dd>
+</dl>
+
+<h3>Miscellaneous Functionality</h3>
+<dl class="big reference">
+    <dt><code>show-desktop</code></dt>
+    <dd>Ask the <abbr title="Window Manager">WM</abbr> to toggle the visibility of all windows.</dd>
+    <dd>Be warned that some WMs will forget about this (it will degenerate into a normal "everything manually minimized" state) if you re-show your windows through any means other than triggering this behaviour a second time.</dd>
+
+    <dt><code>trigger-move</code></dt>
+    <dd>Ask the <abbr title="Window Manager">WM</abbr> to begin a "keyboard-driven move" operation on the active window.</dd>
+    <dd>Typically, this is handled via the arrow keys.</dd>
+    <dt><code>trigger-resize</code></dt>
+    <dd>Ask the <abbr title="Window Manager">WM</abbr> to begin a "keyboard-driven resize" operation on the active window.</dd>
+    <dd>Typically, this is handled via the arrow keys.</dd>
+</dl>
+<hr>
+<p>Special thanks to <a href="https://github.com/stygstra">David Stygstra</a> for the diagrams.</p>
