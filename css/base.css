@@ -29,7 +29,7 @@ h1 a { text-decoration: none; color: black; }
 h1:hover a { text-decoration: underline; }
 h2 { font-size: 1.5em; color: #000000; }
 
-kbd {
+dl.reference kbd {
   padding: 0.2ex;
   border: 1px solid lightgray;
   border-radius: 0.5ex;
