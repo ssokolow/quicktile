@@ -8,6 +8,8 @@ __license__ = "GNU GPL 2.0 or later"
 import logging, operator, sys
 import quicktile
 
+import gtk.gdk
+
 log = logging.getLogger(__name__)
 
 if sys.version_info[0] == 2 and sys.version_info[1] < 7:  # pragma: no cover
