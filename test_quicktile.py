@@ -8,7 +8,7 @@ __license__ = "GNU GPL 2.0 or later"
 import logging, operator, sys
 import quicktile
 
-import gtk.gdk
+import gtk.gdk, wnck  # pylint: disable=import-error
 
 log = logging.getLogger(__name__)
 
@@ -17,7 +17,6 @@ if sys.version_info[0] == 2 and sys.version_info[1] < 7:  # pragma: no cover
 else:                                                     # pragma: no cover
     import unittest
 
-#{ Test Mocks
 # pylint: disable=too-few-public-methods
 
 class ComplainingEnum(object):
@@ -45,35 +44,22 @@ class Thing1(ComplainingEnum):
 class Thing2(ComplainingEnum):
     """See L{ComplainingEnum}"""
 
-#{ Test Cases
+class TestCommandRegistry(unittest.TestCase):
+    """Tests for the CommandRegistry class"""
+    def setUp(self):
+        self.registry = quicktile.CommandRegistry()
 
-class TestHelpers(unittest.TestCase):
-    """
-    @todo: Figure out how to get the assertEqual readout in bare functions.
-    """
-    def test_powerset(self):
-        """Test that powerset() behaves as expected"""
-        src_set = (1, 2, 3)
-        expected = [(), (1,), (2,), (3,), (1, 2), (1, 3), (2, 3), (1, 2, 3)]
+    # TODO: Implement tests for CommandRegistry
 
-        for test_set in (tuple(src_set), list(src_set), set(src_set)):
-            result = list(quicktile.powerset(test_set))
-
-            # Obvious requirements
-            self.assertIn(tuple(), result)
-            self.assertIn(tuple(test_set), result)
-
-            # Check that only subsets are returned
-            for subset in expected:
-                for item in subset:
-                    self.assertIn(item, test_set)
-
-            # Check that ALL subsets are returned
-            # FIXME: This shouldn't enforce an ordering constraint.
-            self.assertEqual(list(quicktile.powerset([1, 2, 3])), expected)
-
-    def test_todo(self):
-        self.fail("TODO: Test fmt_table")
+# TODO: Implement tests for cycle_dimensions
+# TODO: Implement tests for cycle_monitors
+# TODO: Implement tests for move_to_position
+# TODO: Implement tests for toggle_decorated
+# TODO: Implement tests for toggle_desktop
+# TODO: Implement tests for toggle_state
+# TODO: Implement tests for trigger_keyboard_action
+# TODO: Implement tests for workspace_go
+# TODO: Implement tests for workspace_send_window
 
 class TestEnumSafeDict(unittest.TestCase):
     """Tests to ensure EnumSafeDict never compares enums of different types"""
@@ -131,17 +117,49 @@ class TestEnumSafeDict(unittest.TestCase):
             with self.assertRaises(KeyError):
                 self.empty[key]  # pylint: disable=pointless-statement
 
-    def test_todo(self):
-        self.fail("TODO: Implement more tests for EnumSafeDict")
-        # TODO: Complete set of tests which try to trick EnumSafeDict into
-        #       comparing thing1 and thing2.
+    # TODO: Complete set of tests which try to trick EnumSafeDict into
+    #       comparing thing1 and thing2.
 
-class TestCommandRegistry(unittest.TestCase):
-    def setUp(self):
-        self.registry = quicktile.CommandRegistry()
 
-    def test_todo(self):
-        self.fail("TODO: Implement tests for CommandRegistry")
+# TODO: Implement tests for GravityLayout
+
+# TODO: Implement tests for KeyBinder
+
+# TODO: Implement tests for QuickTileApp
+
+class TestHelpers(unittest.TestCase):
+    """
+    @todo: Switch to pytest to get the assertEqual readout from assert in
+           bare functions.
+    """
+    def test_powerset(self):
+        """Test that powerset() behaves as expected"""
+        src_set = (1, 2, 3)
+        expected = [(), (1,), (2,), (3,), (1, 2), (1, 3), (2, 3), (1, 2, 3)]
+
+        for test_set in (tuple(src_set), list(src_set), set(src_set)):
+            result = list(quicktile.powerset(test_set))
+
+            # Obvious requirements
+            self.assertIn(tuple(), result)
+            self.assertIn(tuple(test_set), result)
+
+            # Check that only subsets are returned
+            for subset in expected:
+                for item in subset:
+                    self.assertIn(item, test_set)
+
+            # Check that ALL subsets are returned
+            # FIXME: This shouldn't enforce an ordering constraint.
+            self.assertEqual(list(quicktile.powerset([1, 2, 3])), expected)
+
+    # TODO: Test fmt_table
+
+    # TODO: Test _make_positions
+
+    def test_xiniterror_str(self):
+        """XInitError.__str__ output contains provided text"""
+        self.assertIn("Testing 123", quicktile.XInitError("Testing 123"))
 
 class TestWindowManagerDetached(unittest.TestCase):
     """Tests which exercise L{quicktile.WindowManager} without needing X11."""
@@ -166,14 +184,24 @@ class TestWindowManagerDetached(unittest.TestCase):
 
     def test_gravity_equivalence(self):
         """Gravity Lookup Table: GDK and WNCK constants are equivalent"""
-        self.fail("TODO: Test equivalence of GDK and WNCK constants in "
-                "WindowManager.gravities")
+        for alignment in ('CENTER', 'NORTH', 'NORTH_WEST', 'SOUTH_EAST',
+                          'EAST', 'NORTH_EAST', 'SOUTH', 'SOUTH_WEST', 'WEST'):
+            self.assertEqual(
+                self.WM.gravities[getattr(wnck, 'WINDOW_GRAVITY_{}'.format(
+                    alignment.replace('_', '')))],
+                self.WM.gravities[getattr(gtk.gdk, 'GRAVITY_{}'.format(
+                    alignment))])
 
     def test_gravity_correctness(self):
         """Gravity Lookup Table: Constants have correct percentage values"""
-        self.fail("TODO: Test that each constant in WindowManager.gravities "
-                "maps to the correct position on the screen as a value "
-                "between 0.0 and 1.0 on the X and Y axis.")
+        for alignment, coords in (
+                ('NORTH_WEST', (0, 0)), ('NORTH', (0.5, 0)),
+                ('NORTH_EAST', (1.0, 0.0)), ('WEST', (0.0, 0.5)),
+                ('CENTER', (0.5, 0.5)), ('EAST', (1, 0.5)),
+                ('SOUTH_WEST', (0.0, 1.0)), ('SOUTH', (0.5, 1.0)),
+                ('SOUTH_EAST', (1.0, 1.0))):
+            self.assertEqual(self.WM.gravities[
+                getattr(gtk.gdk, 'GRAVITY_%s' % alignment)], coords)
 
     def test_win_gravity_noop(self):
         """WindowManager.calc_win_gravity: north-west should be a no-op
@@ -186,7 +214,20 @@ class TestWindowManagerDetached(unittest.TestCase):
                 "NORTHWEST gravity should be a no-op.")
 
     def test_win_gravity_results(self):
-        """WindowManager.calc_window_gravity: proper results"""
-        self.fail("TODO: Test the output, assuming self.gravities is right")
+        """WindowManager.calc_win_gravity: proper results"""
+        for edge in (100, 200):
+            ehalf = edge / 2
+            for gravity, expect in (
+                    ('NORTH_WEST', (0, 0)), ('NORTH', (-ehalf, 0)),
+                    ('NORTH_EAST', (-edge, 0)), ('WEST', (0, -ehalf)),
+                    ('CENTER', (-ehalf, -ehalf)), ('EAST', (-edge, -ehalf)),
+                    ('SOUTH_WEST', (0, -edge)), ('SOUTH', (-ehalf, -edge)),
+                    ('SOUTH_EAST', (-edge, -edge))):
+                rect = gtk.gdk.Rectangle(0, 0, edge, edge)
+                grav = getattr(gtk.gdk, 'GRAVITY_%s' % gravity)
+
+                self.assertEqual(self.WM.calc_win_gravity(rect, grav), expect)
+
+    # TODO: Test the rest of the functionality
 
 # vim: set sw=4 sts=4 expandtab :

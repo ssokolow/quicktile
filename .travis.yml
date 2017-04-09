@@ -1,0 +1,15 @@
+language: python
+python:
+  - "2.6"
+  - "2.7"
+  - "pypy"
+matrix:
+    allow_failures:
+        - python: "2.6"
+install:
+- sudo apt-get update -qq
+- sudo apt-get install -qq python-gtk2 python-xlib python-dbus python-wnck --no-install-recommends
+- pip install coveralls --use-mirrors
+script: nosetests
+# TODO: Also run epydoc
+after_success: coveralls
