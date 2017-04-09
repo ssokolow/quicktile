@@ -1,0 +1,20 @@
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - python
+    exclude_fingerprints:
+    - defa796682f05173a02dd24ce05faff8
+  fixme:
+    enabled: true
+  # TODO: Figure out whether this is the correct syntax. They don't document it
+  #pep8:
+  #  enabled: true
+  #  ignore: N802,E126,E128,E221,E302,E401,E402
+  radon:
+    enabled: true
+ratings:
+  paths:
+  - "**.py"
+exclude_paths: []
