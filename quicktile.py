@@ -52,8 +52,11 @@ if __name__ == '__main__':  # pragma: nocover
     # Redirect stderr through grep
     os.dup2(glib_log_filter.stdin.fileno(), sys.stderr.fileno())
 
-import pygtk
-pygtk.require('2.0')
+try:
+    import pygtk
+    pygtk.require('2.0')
+except ImportError:
+    pass  # Apparently Travis-CI's build environment doesn't add this
 
 import gtk, gobject, wnck
 
