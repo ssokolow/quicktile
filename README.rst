@@ -14,6 +14,18 @@ QuickTile
    :target: https://www.codacy.com/app/from_github/quicktile
    :alt: Codacy
 
+.. image:: https://codeclimate.com/github/ssokolow/quicktile/badges/gpa.svg
+   :target: https://codeclimate.com/github/ssokolow/quicktile
+   :alt: Code Climate
+
+.. image:: https://travis-ci.org/ssokolow/quicktile.svg?branch=master
+   :target: https://travis-ci.org/ssokolow/quicktile
+   :alt: Travis-CI
+
+.. image:: https://coveralls.io/repos/github/ssokolow/quicktile/badge.svg?branch=master
+   :target: https://coveralls.io/github/ssokolow/quicktile?branch=master
+   :alt: Coveralls
+
 Keyboard-driven Window Tiling for your existing X11 window manager
 
 -------------
