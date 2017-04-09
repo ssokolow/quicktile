@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long,too-many-lines
 """QuickTile, a WinSplit clone for X11 desktops
 
 Thanks to Thomas Vander Stichele for some of the documentation cleanups.
@@ -1165,15 +1165,20 @@ def cycle_monitors(winman, win, state, step=1):
 
 # pylint: disable=no-member
 MOVE_TO_COMMANDS = {
-    'move-to-top-left': [wnck.WINDOW_GRAVITY_NORTHWEST, wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+    'move-to-top-left': [wnck.WINDOW_GRAVITY_NORTHWEST,
+                         wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
     'move-to-top': [wnck.WINDOW_GRAVITY_NORTH, wnck.WINDOW_CHANGE_Y],
-    'move-to-top-right': [wnck.WINDOW_GRAVITY_NORTHEAST, wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+    'move-to-top-right': [wnck.WINDOW_GRAVITY_NORTHEAST,
+                          wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
     'move-to-left': [wnck.WINDOW_GRAVITY_WEST, wnck.WINDOW_CHANGE_X],
-    'move-to-center': [wnck.WINDOW_GRAVITY_CENTER, wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+    'move-to-center': [wnck.WINDOW_GRAVITY_CENTER,
+                       wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
     'move-to-right': [wnck.WINDOW_GRAVITY_EAST, wnck.WINDOW_CHANGE_X],
-    'move-to-bottom-left': [wnck.WINDOW_GRAVITY_SOUTHWEST, wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+    'move-to-bottom-left': [wnck.WINDOW_GRAVITY_SOUTHWEST,
+                            wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
     'move-to-bottom': [wnck.WINDOW_GRAVITY_SOUTH, wnck.WINDOW_CHANGE_Y],
-    'move-to-bottom-right': [wnck.WINDOW_GRAVITY_SOUTHEAST, wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+    'move-to-bottom-right': [wnck.WINDOW_GRAVITY_SOUTHEAST,
+                             wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
 }
 
 @commands.add_many(MOVE_TO_COMMANDS)
