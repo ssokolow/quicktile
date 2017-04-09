@@ -7,10 +7,12 @@ addons:
   apt:
     packages:
     - python-dbus
+    - python-epydoc
     - python-gtk2
     - python-wnck
     - python-xlib
 install: "pip install coveralls"
-script: nosetests
-# TODO: Also run epydoc
+script:
+  - epydoc --config setup.cfg *.py
+  - nosetests
 after_success: coveralls
