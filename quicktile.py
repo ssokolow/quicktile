@@ -1119,7 +1119,7 @@ def cycle_dimensions(winman, win, state, *dimensions):
     # If the window is already on one of the configured geometries, advance
     # to the next configuration. Otherwise, use the first configuration.
     min_distance = heappop(euclid_distance)
-    if min_distance[0] < 100:
+    if float(min_distance[0]) / tuple(clip_box)[2] < 0.1:
         pos = (min_distance[1] + 1) % len(dims)
     else:
         pos = 0
