@@ -231,3 +231,8 @@ Known Bugs
 
 Thanks to Thomas Vander Stichele for some of the documentation cleanups.
 
+
+
+.. image:: https://api.codacy.com/project/badge/Grade/5a3450aa0d2e429796a836580b1fef32
+   :alt: Codacy Badge
+   :target: https://www.codacy.com/app/from_github/quicktile?utm_source=github.com&utm_medium=referral&utm_content=ssokolow/quicktile&utm_campaign=badger
