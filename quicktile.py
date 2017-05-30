@@ -190,7 +190,7 @@ def _make_positions():
     for grav in ('top', 'bottom'):
         positions[grav] = [gvlay(width, 0.5, grav) for width in edge_steps]
     for grav in ('left', 'right'):
-        positions[grav] = [gvlay(width, 1, grav) for width in corner_steps]
+        positions[grav] = [gvlay(width, 1, grav) for width in edge_steps]
     for grav in ('top-left', 'top-right', 'bottom-left', 'bottom-right'):
         positions[grav] = [gvlay(width, 0.5, grav) for width in corner_steps]
 
