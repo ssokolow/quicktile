@@ -166,10 +166,7 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
                 h - (self.margin_y * 2))
 
 #: Number of columns to base generated L{POSITIONS} presets on
-#: @todo: Store COLUMN_COUNT in quicktile.cfg for easy editing
-COLUMN_COUNT = 3
-
-def _make_positions():
+def make_positions(column_count):
     """Generate the classic WinSplit Revolution tiling presets
 
     @todo: Figure out how best to put this in the config file.
@@ -177,8 +174,8 @@ def _make_positions():
 
     # TODO: Plumb GravityLayout.__init__'s arguments into the config file
     gvlay = GravityLayout()
-    col_width = 1.0 / COLUMN_COUNT
-    cycle_steps = tuple(col_width * x for x in range(1, COLUMN_COUNT))
+    col_width = 1.0 / column_count
+    cycle_steps = tuple(col_width * x for x in range(1, column_count))
 
     edge_steps = (1.0,) + cycle_steps
     corner_steps = (0.5,) + cycle_steps
@@ -196,12 +193,10 @@ def _make_positions():
 
     return positions
 
-#: command-to-position mappings for L{cycle_dimensions}
-POSITIONS = _make_positions()
-
 #: Default content for the config file
 DEFAULTS = {
     'general': {
+        'ColumnCount': 3,
         # Use Ctrl+Alt as the default base for key combinations
         'ModMask': '<Ctrl><Alt>',
         'UseWorkarea': True,
@@ -1058,229 +1053,235 @@ class QuickTileApp(object):
         print "Modifier: %s\n" % self._modmask
         print fmt_table(self._keys, ('Key', 'Action'))
 
-#: The instance of L{CommandRegistry} to be used in 99.9% of use cases.
-commands = CommandRegistry()
-#{ Tiling Commands
+def create_commands(column_count):
+    #: command-to-position mappings for L{cycle_dimensions}
+    POSITIONS = make_positions(column_count)
 
-@commands.add_many(POSITIONS)
-def cycle_dimensions(winman, win, state, *dimensions):
-    """Cycle the active window through a list of positions and shapes.
+    #: The instance of L{CommandRegistry} to be used in 99.9% of use cases.
+    commands = CommandRegistry()
+    #{ Tiling Commands
 
-    Takes one step each time this function is called.
+    @commands.add_many(POSITIONS)
+    def cycle_dimensions(winman, win, state, *dimensions):
+        """Cycle the active window through a list of positions and shapes.
 
-    If the window's dimensions are not within 100px (by euclidean distance)
-    of an entry in the list, set them to the first list entry.
+        Takes one step each time this function is called.
 
-    @param dimensions: A list of tuples representing window geometries as
-        floating-point values between 0 and 1, inclusive.
-    @type dimensions: C{[(x, y, w, h), ...]}
-    @type win: C{gtk.gdk.Window}
+        If the window's dimensions are not within 100px (by euclidean distance)
+        of an entry in the list, set them to the first list entry.
 
-    @returns: The new window dimensions.
-    @rtype: C{gtk.gdk.Rectangle}
-    """
-    win_geom = winman.get_geometry_rel(win, state['monitor_geom'])
-    usable_region = state['usable_region']
+        @param dimensions: A list of tuples representing window geometries as
+            floating-point values between 0 and 1, inclusive.
+        @type dimensions: C{[(x, y, w, h), ...]}
+        @type win: C{gtk.gdk.Window}
 
-    # Get the bounding box for the usable region (overlaps panels which
-    # don't fill 100% of their edge of the screen)
-    clip_box = usable_region.get_clipbox()
+        @returns: The new window dimensions.
+        @rtype: C{gtk.gdk.Rectangle}
+        """
+        win_geom = winman.get_geometry_rel(win, state['monitor_geom'])
+        usable_region = state['usable_region']
 
-    logging.debug("Selected preset sequence:\n\t%r", dimensions)
+        # Get the bounding box for the usable region (overlaps panels which
+        # don't fill 100% of their edge of the screen)
+        clip_box = usable_region.get_clipbox()
 
-    # Resolve proportional (eg. 0.5) and preserved (None) coordinates
-    dims = []
-    for tup in dimensions:
-        current_dim = []
-        for pos, val in enumerate(tup):
-            if val is None:
-                current_dim.append(tuple(win_geom)[pos])
-            else:
-                # FIXME: This is a bit of an ugly way to get (w, h, w, h)
-                # from clip_box.
-                current_dim.append(int(val * tuple(clip_box)[2 + pos % 2]))
+        logging.debug("Selected preset sequence:\n\t%r", dimensions)
 
-        dims.append(current_dim)
+        # Resolve proportional (eg. 0.5) and preserved (None) coordinates
+        dims = []
+        for tup in dimensions:
+            current_dim = []
+            for pos, val in enumerate(tup):
+                if val is None:
+                    current_dim.append(tuple(win_geom)[pos])
+                else:
+                    # FIXME: This is a bit of an ugly way to get (w, h, w, h)
+                    # from clip_box.
+                    current_dim.append(int(val * tuple(clip_box)[2 + pos % 2]))
 
-    if not dims:
-        return None
+            dims.append(current_dim)
 
-    logging.debug("Selected preset sequence resolves to these monitor-relative"
-                  " pixel dimensions:\n\t%r", dims)
+        if not dims:
+            return None
 
-    # Calculate euclidean distances between the window's current geometry
-    # and all presets and store them in a min heap.
-    euclid_distance = []
-    for pos, val in enumerate(dims):
-        distance = sum([(wg - vv) ** 2 for (wg, vv)
-                        in zip(tuple(win_geom), tuple(val))]) ** 0.5
-        heappush(euclid_distance, (distance, pos))
+        logging.debug("Selected preset sequence resolves to these monitor-relative"
+                      " pixel dimensions:\n\t%r", dims)
 
-    # If the window is already on one of the configured geometries, advance
-    # to the next configuration. Otherwise, use the first configuration.
-    min_distance = heappop(euclid_distance)
-    if float(min_distance[0]) / tuple(clip_box)[2] < 0.1:
-        pos = (min_distance[1] + 1) % len(dims)
-    else:
-        pos = 0
-    result = gtk.gdk.Rectangle(*dims[pos])
+        # Calculate euclidean distances between the window's current geometry
+        # and all presets and store them in a min heap.
+        euclid_distance = []
+        for pos, val in enumerate(dims):
+            distance = sum([(wg - vv) ** 2 for (wg, vv)
+                            in zip(tuple(win_geom), tuple(val))]) ** 0.5
+            heappush(euclid_distance, (distance, pos))
 
-    logging.debug("Target preset is %s relative to monitor %s",
-                  result, clip_box)
-    result.x += clip_box.x
-    result.y += clip_box.y
+        # If the window is already on one of the configured geometries, advance
+        # to the next configuration. Otherwise, use the first configuration.
+        min_distance = heappop(euclid_distance)
+        if float(min_distance[0]) / tuple(clip_box)[2] < 0.1:
+            pos = (min_distance[1] + 1) % len(dims)
+        else:
+            pos = 0
+        result = gtk.gdk.Rectangle(*dims[pos])
 
-    # If we're overlapping a panel, fall back to a monitor-specific
-    # analogue to _NET_WORKAREA to prevent overlapping any panels and
-    # risking the WM potentially meddling with the result of resposition()
-    if not usable_region.rect_in(result) == gtk.gdk.OVERLAP_RECTANGLE_IN:
-        result = result.intersect(state['usable_rect'])
-        logging.debug("Result exceeds usable (non-rectangular) region of "
-                      "desktop. (overlapped a non-fullwidth panel?) Reducing "
-                      "to within largest usable rectangle: %s",
-                      state['usable_rect'])
+        logging.debug("Target preset is %s relative to monitor %s",
+                      result, clip_box)
+        result.x += clip_box.x
+        result.y += clip_box.y
 
-    logging.debug("Calling reposition() with default gravity and dimensions "
-                  "%r", tuple(result))
-    winman.reposition(win, result)
-    return result
+        # If we're overlapping a panel, fall back to a monitor-specific
+        # analogue to _NET_WORKAREA to prevent overlapping any panels and
+        # risking the WM potentially meddling with the result of resposition()
+        if not usable_region.rect_in(result) == gtk.gdk.OVERLAP_RECTANGLE_IN:
+            result = result.intersect(state['usable_rect'])
+            logging.debug("Result exceeds usable (non-rectangular) region of "
+                          "desktop. (overlapped a non-fullwidth panel?) Reducing "
+                          "to within largest usable rectangle: %s",
+                          state['usable_rect'])
 
-@commands.add('monitor-switch')
-@commands.add('monitor-next', 1)
-@commands.add('monitor-prev', -1)
-def cycle_monitors(winman, win, state, step=1):
-    """Cycle the active window between monitors while preserving position.
+        logging.debug("Calling reposition() with default gravity and dimensions "
+                      "%r", tuple(result))
+        winman.reposition(win, result)
+        return result
 
-    @todo 1.0.0: Remove C{monitor-switch} in favor of C{monitor-next}
-        (API-breaking change)
-    """
-    mon_id = state['monitor_id']
-    new_mon_id = (mon_id + step) % winman.gdk_screen.get_n_monitors()
+    @commands.add('monitor-switch')
+    @commands.add('monitor-next', 1)
+    @commands.add('monitor-prev', -1)
+    def cycle_monitors(winman, win, state, step=1):
+        """Cycle the active window between monitors while preserving position.
 
-    new_mon_geom = winman.gdk_screen.get_monitor_geometry(new_mon_id)
-    logging.debug("Moving window to monitor %s, which has geometry %s",
-                  new_mon_id, new_mon_geom)
+        @todo 1.0.0: Remove C{monitor-switch} in favor of C{monitor-next}
+            (API-breaking change)
+        """
+        mon_id = state['monitor_id']
+        new_mon_id = (mon_id + step) % winman.gdk_screen.get_n_monitors()
 
-    winman.reposition(win, None, new_mon_geom, keep_maximize=True)
+        new_mon_geom = winman.gdk_screen.get_monitor_geometry(new_mon_id)
+        logging.debug("Moving window to monitor %s, which has geometry %s",
+                      new_mon_id, new_mon_geom)
 
-# pylint: disable=no-member
-MOVE_TO_COMMANDS = {
-    'move-to-top-left': [wnck.WINDOW_GRAVITY_NORTHWEST,
-                         wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
-    'move-to-top': [wnck.WINDOW_GRAVITY_NORTH, wnck.WINDOW_CHANGE_Y],
-    'move-to-top-right': [wnck.WINDOW_GRAVITY_NORTHEAST,
-                          wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
-    'move-to-left': [wnck.WINDOW_GRAVITY_WEST, wnck.WINDOW_CHANGE_X],
-    'move-to-center': [wnck.WINDOW_GRAVITY_CENTER,
-                       wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
-    'move-to-right': [wnck.WINDOW_GRAVITY_EAST, wnck.WINDOW_CHANGE_X],
-    'move-to-bottom-left': [wnck.WINDOW_GRAVITY_SOUTHWEST,
-                            wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
-    'move-to-bottom': [wnck.WINDOW_GRAVITY_SOUTH, wnck.WINDOW_CHANGE_Y],
-    'move-to-bottom-right': [wnck.WINDOW_GRAVITY_SOUTHEAST,
-                             wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
-}
-
-@commands.add_many(MOVE_TO_COMMANDS)
-def move_to_position(winman, win, state, gravity, gravity_mask):
-    """Move window to a position on the screen, preserving its dimensions."""
-    use_rect = state['usable_rect']
-
-    grav_x, grav_y = winman.gravities[gravity]
-    dims = (int(use_rect.width * grav_x), int(use_rect.height * grav_y), 0, 0)
-    result = gtk.gdk.Rectangle(*dims)
-    logging.debug("Calling reposition() with %r gravity and dimensions %r",
-                  gravity, tuple(result))
+        winman.reposition(win, None, new_mon_geom, keep_maximize=True)
 
     # pylint: disable=no-member
-    winman.reposition(win, result, use_rect, gravity=gravity,
-            geometry_mask=gravity_mask)
+    MOVE_TO_COMMANDS = {
+        'move-to-top-left': [wnck.WINDOW_GRAVITY_NORTHWEST,
+                             wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+        'move-to-top': [wnck.WINDOW_GRAVITY_NORTH, wnck.WINDOW_CHANGE_Y],
+        'move-to-top-right': [wnck.WINDOW_GRAVITY_NORTHEAST,
+                              wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+        'move-to-left': [wnck.WINDOW_GRAVITY_WEST, wnck.WINDOW_CHANGE_X],
+        'move-to-center': [wnck.WINDOW_GRAVITY_CENTER,
+                           wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+        'move-to-right': [wnck.WINDOW_GRAVITY_EAST, wnck.WINDOW_CHANGE_X],
+        'move-to-bottom-left': [wnck.WINDOW_GRAVITY_SOUTHWEST,
+                                wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+        'move-to-bottom': [wnck.WINDOW_GRAVITY_SOUTH, wnck.WINDOW_CHANGE_Y],
+        'move-to-bottom-right': [wnck.WINDOW_GRAVITY_SOUTHEAST,
+                                 wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+    }
 
-@commands.add('bordered')
-def toggle_decorated(winman, win, state):  # pylint: disable=unused-argument
-    """Toggle window state on the active window."""
-    win = gtk.gdk.window_foreign_new(win.get_xid())
-    win.set_decorations(not win.get_decorations())
+    @commands.add_many(MOVE_TO_COMMANDS)
+    def move_to_position(winman, win, state, gravity, gravity_mask):
+        """Move window to a position on the screen, preserving its dimensions."""
+        use_rect = state['usable_rect']
 
-@commands.add('show-desktop')
-def toggle_desktop(winman, win, state):  # pylint: disable=unused-argument
-    """Toggle "all windows minimized" to view the desktop"""
-    target = not winman.screen.get_showing_desktop()
-    winman.screen.toggle_showing_desktop(target)
+        grav_x, grav_y = winman.gravities[gravity]
+        dims = (int(use_rect.width * grav_x), int(use_rect.height * grav_y), 0, 0)
+        result = gtk.gdk.Rectangle(*dims)
+        logging.debug("Calling reposition() with %r gravity and dimensions %r",
+                      gravity, tuple(result))
 
-@commands.add('all-desktops', 'pin', 'is_pinned')
-@commands.add('fullscreen', 'set_fullscreen', 'is_fullscreen', True)
-@commands.add('vertical-maximize', 'maximize_vertically',
-                                   'is_maximized_vertically')
-@commands.add('horizontal-maximize', 'maximize_horizontally',
-                                     'is_maximized_horizontally')
-@commands.add('maximize', 'maximize', 'is_maximized')
-@commands.add('minimize', 'minimize', 'is_minimized')
-@commands.add('always-above', 'make_above', 'is_above')
-@commands.add('always-below', 'make_below', 'is_below')
-@commands.add('shade', 'shade', 'is_shaded')
-# pylint: disable=unused-argument,too-many-arguments
-def toggle_state(winman, win, state, command, check, takes_bool=False):
-    """Toggle window state on the active window.
+        # pylint: disable=no-member
+        winman.reposition(win, result, use_rect, gravity=gravity,
+                geometry_mask=gravity_mask)
 
-    @param command: The C{wnck.Window} method name to be conditionally prefixed
-        with "un", resolved, and called.
-    @param check: The C{wnck.Window} method name to be called to check
-        whether C{command} should be prefixed with "un".
-    @param takes_bool: If C{True}, pass C{True} or C{False} to C{check} rather
-        thank conditionally prefixing it with C{un} before resolving.
-    @type command: C{str}
-    @type check: C{str}
-    @type takes_bool: C{bool}
+    @commands.add('bordered')
+    def toggle_decorated(winman, win, state):  # pylint: disable=unused-argument
+        """Toggle window state on the active window."""
+        win = gtk.gdk.window_foreign_new(win.get_xid())
+        win.set_decorations(not win.get_decorations())
 
-    @todo 1.0.0: Rename C{vertical-maximize} and C{horizontal-maximize} to
-        C{maximize-vertical} and C{maximize-horizontal}. (API-breaking change)
-    """
-    target = not getattr(win, check)()
+    @commands.add('show-desktop')
+    def toggle_desktop(winman, win, state):  # pylint: disable=unused-argument
+        """Toggle "all windows minimized" to view the desktop"""
+        target = not winman.screen.get_showing_desktop()
+        winman.screen.toggle_showing_desktop(target)
 
-    logging.debug("Calling action '%s' with state '%s'", command, target)
-    if takes_bool:
-        getattr(win, command)(target)
-    else:
-        getattr(win, ('' if target else 'un') + command)()
+    @commands.add('all-desktops', 'pin', 'is_pinned')
+    @commands.add('fullscreen', 'set_fullscreen', 'is_fullscreen', True)
+    @commands.add('vertical-maximize', 'maximize_vertically',
+                                       'is_maximized_vertically')
+    @commands.add('horizontal-maximize', 'maximize_horizontally',
+                                         'is_maximized_horizontally')
+    @commands.add('maximize', 'maximize', 'is_maximized')
+    @commands.add('minimize', 'minimize', 'is_minimized')
+    @commands.add('always-above', 'make_above', 'is_above')
+    @commands.add('always-below', 'make_below', 'is_below')
+    @commands.add('shade', 'shade', 'is_shaded')
+    # pylint: disable=unused-argument,too-many-arguments
+    def toggle_state(winman, win, state, command, check, takes_bool=False):
+        """Toggle window state on the active window.
 
-@commands.add('trigger-move', 'move')
-@commands.add('trigger-resize', 'size')
-# pylint: disable=unused-argument
-def trigger_keyboard_action(winman, win, state, command):
-    """Ask the Window Manager to begin a keyboard-driven operation."""
-    getattr(win, 'keyboard_' + command)()
+        @param command: The C{wnck.Window} method name to be conditionally prefixed
+            with "un", resolved, and called.
+        @param check: The C{wnck.Window} method name to be called to check
+            whether C{command} should be prefixed with "un".
+        @param takes_bool: If C{True}, pass C{True} or C{False} to C{check} rather
+            thank conditionally prefixing it with C{un} before resolving.
+        @type command: C{str}
+        @type check: C{str}
+        @type takes_bool: C{bool}
 
-@commands.add('workspace-go-next', 1)
-@commands.add('workspace-go-prev', -1)
-@commands.add('workspace-go-up', wnck.MOTION_UP)        # pylint: disable=E1101
-@commands.add('workspace-go-down', wnck.MOTION_DOWN)    # pylint: disable=E1101
-@commands.add('workspace-go-left', wnck.MOTION_LEFT)    # pylint: disable=E1101
-@commands.add('workspace-go-right', wnck.MOTION_RIGHT)  # pylint: disable=E1101
-def workspace_go(winman, win, state, motion):  # pylint: disable=W0613
-    """Switch the active workspace (next/prev wrap around)"""
-    target = winman.get_workspace(None, motion)
-    if not target:
-        return  # It's either pinned, on no workspaces, or there is no match
-    target.activate(int(time.time()))
+        @todo 1.0.0: Rename C{vertical-maximize} and C{horizontal-maximize} to
+            C{maximize-vertical} and C{maximize-horizontal}. (API-breaking change)
+        """
+        target = not getattr(win, check)()
 
-@commands.add('workspace-send-next', 1)
-@commands.add('workspace-send-prev', -1)
-@commands.add('workspace-send-up', wnck.MOTION_UP)      # pylint: disable=E1101
-@commands.add('workspace-send-down', wnck.MOTION_DOWN)  # pylint: disable=E1101
-@commands.add('workspace-send-left', wnck.MOTION_LEFT)  # pylint: disable=E1101
-# pylint: disable=E1101
-@commands.add('workspace-send-right', wnck.MOTION_RIGHT)
-# pylint: disable=unused-argument
-def workspace_send_window(winman, win, state, motion):
-    """Move the active window to another workspace (next/prev wrap around)"""
-    target = winman.get_workspace(win, motion)
-    if not target:
-        return  # It's either pinned, on no workspaces, or there is no match
+        logging.debug("Calling action '%s' with state '%s'", command, target)
+        if takes_bool:
+            getattr(win, command)(target)
+        else:
+            getattr(win, ('' if target else 'un') + command)()
 
-    win.move_to_workspace(target)
+    @commands.add('trigger-move', 'move')
+    @commands.add('trigger-resize', 'size')
+    # pylint: disable=unused-argument
+    def trigger_keyboard_action(winman, win, state, command):
+        """Ask the Window Manager to begin a keyboard-driven operation."""
+        getattr(win, 'keyboard_' + command)()
 
-#}
+    @commands.add('workspace-go-next', 1)
+    @commands.add('workspace-go-prev', -1)
+    @commands.add('workspace-go-up', wnck.MOTION_UP)        # pylint: disable=E1101
+    @commands.add('workspace-go-down', wnck.MOTION_DOWN)    # pylint: disable=E1101
+    @commands.add('workspace-go-left', wnck.MOTION_LEFT)    # pylint: disable=E1101
+    @commands.add('workspace-go-right', wnck.MOTION_RIGHT)  # pylint: disable=E1101
+    def workspace_go(winman, win, state, motion):  # pylint: disable=W0613
+        """Switch the active workspace (next/prev wrap around)"""
+        target = winman.get_workspace(None, motion)
+        if not target:
+            return  # It's either pinned, on no workspaces, or there is no match
+        target.activate(int(time.time()))
+
+    @commands.add('workspace-send-next', 1)
+    @commands.add('workspace-send-prev', -1)
+    @commands.add('workspace-send-up', wnck.MOTION_UP)      # pylint: disable=E1101
+    @commands.add('workspace-send-down', wnck.MOTION_DOWN)  # pylint: disable=E1101
+    @commands.add('workspace-send-left', wnck.MOTION_LEFT)  # pylint: disable=E1101
+    # pylint: disable=E1101
+    @commands.add('workspace-send-right', wnck.MOTION_RIGHT)
+    # pylint: disable=unused-argument
+    def workspace_send_window(winman, win, state, motion):
+        """Move the active window to another workspace (next/prev wrap around)"""
+        target = winman.get_workspace(win, motion)
+        if not target:
+            return  # It's either pinned, on no workspaces, or there is no match
+
+        win.move_to_workspace(target)
+
+    #}
+
+    return commands
 
 if __name__ == '__main__':
     from optparse import OptionParser, OptionGroup
@@ -1343,6 +1344,8 @@ if __name__ == '__main__':
         config.set('general', 'ModMask', modkeys)
         dirty = True
 
+    column_count = config.getint('general', 'ColumnCount')
+
     # Either load the keybindings or use and save the defaults
     if config.has_section('keys'):
         keymap = dict(config.items('keys'))
@@ -1379,6 +1382,9 @@ if __name__ == '__main__':
     except XInitError as err:
         logging.critical(err)
         sys.exit(1)
+
+    commands = create_commands(column_count)
+
     app = QuickTileApp(winman, commands, keymap, modmask=modkeys)
 
     if opts.show_binds:
