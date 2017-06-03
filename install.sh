@@ -1,5 +1,7 @@
 #!/bin/sh
 
+cd "$(dirname "$(readlink -f "$0")")"
+
 if [ "$(id -u)" != 0 ]; then
     echo "* Building without elevated privileges"
     python2 setup.py build
