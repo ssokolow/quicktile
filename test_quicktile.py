@@ -12,7 +12,10 @@ except ImportError:
     # Apparently Travis-CI's build environment doesn't add this
     import subprocess, sys
     print("Import Path: {}".format(sys.path))
+    print("---")
+    subprocess.call(['echo', repr(sys.path)])
     subprocess.call(['find', '/usr/lib/python2.7/', '-path', '*gtk*'])
+    sys.path.append('/usr/lib/python2.7/dist-packages')
 
 import logging, operator, sys
 
