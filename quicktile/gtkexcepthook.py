@@ -2,7 +2,7 @@
 
 (c) 2003 Gustavo J A M Carneiro gjc at inescporto.pt
 (c) 2004-2005 Filip Van Raemdonck
-(c) 2009, 2011 Stephan Sokolow
+(c) 2009, 2011, 2017 Stephan Sokolow
 
 http://www.daa.com.au/pipermail/pygtk/2003-August/005775.html
 Message-ID: <1062087716.1196.5.camel@emperor.homelinux.net>
@@ -14,6 +14,7 @@ Changes from Van Raemdonck version:
  - Switched from auto-enable to gtkexcepthook.enable() to silence PyFlakes
    false positives. (Borrowed naming convention from cgitb)
  - Split out traceback import to silence PyFlakes warning.
+ - Started to resolve PyLint complaints
 
 @todo: Polish this up to meet my code formatting and clarity standards.
 @todo: Clean up the SMTP support. It's a mess.
@@ -27,7 +28,7 @@ __author__ = "Filip Van Daemdonck"
 __license__ = "whatever you want"
 
 import inspect, linecache, pydoc, sys
-#import traceback
+# import traceback
 from cStringIO import StringIO
 from gettext import gettext as _
 from pprint import pformat
@@ -37,10 +38,11 @@ import pygtk
 pygtk.require('2.0')
 import gtk, pango
 
-#def analyse(exctyp, value, tb):
-#    trace = StringIO()
-#    traceback.print_exception(exctyp, value, tb, None, trace)
-#    return trace
+# TODO: Decide what to do with this
+# def analyse(exctyp, value, tback):
+#     trace = StringIO()
+#     traceback.print_exception(exctyp, value, tback, None, trace)
+#     return trace
 
 def lookup(name, frame, lcls):
     '''Find the value for a given name in the given frame'''
@@ -50,7 +52,7 @@ def lookup(name, frame, lcls):
         return 'global', frame.f_globals[name]
     elif '__builtins__' in frame.f_globals:
         builtins = frame.f_globals['__builtins__']
-        if type(builtins) is dict:
+        if isinstance(builtins, dict):
             if name in builtins:
                 return 'builtin', builtins[name]
         else:
@@ -58,13 +60,14 @@ def lookup(name, frame, lcls):
                 return 'builtin', getattr(builtins, name)
     return None, []
 
-def analyse(exctyp, value, tb):
+def analyse(exctyp, value, tback):
     import tokenize, keyword
 
     trace = StringIO()
     nlines = 3
-    frecs = inspect.getinnerframes(tb, nlines)
+    frecs = inspect.getinnerframes(tback, nlines)
     trace.write('Traceback (most recent call last):\n')
+    # pylint: disable=unused-variable
     for frame, fname, lineno, funcname, context, cindex in frecs:
         trace.write('  File "%s", line %d, ' % (fname, lineno))
         args, varargs, varkw, lcls = inspect.getargvalues(frame)
@@ -76,8 +79,8 @@ def analyse(exctyp, value, tb):
                 return linecache.getline(fname, lno[0])
             finally:
                 lno[0] += 1
-        all, prev, name, scope = {}, None, '', None
-        for ttype, tstr, stup, etup, line in tokenize.generate_tokens(readline):
+        _all, prev, name, scope = {}, None, '', None
+        for ttype, tstr, stup, etup, lin in tokenize.generate_tokens(readline):
             if ttype == tokenize.NAME and tstr not in keyword.kwlist:
                 if name:
                     if name[-1] == '.':
@@ -96,50 +99,61 @@ def analyse(exctyp, value, tb):
                         prev = val
                 except:
                     pass
-                #print '  found', scope, 'name', name, 'val', val, 'in', prev, 'for token', tstr
+                # TODO
+                # print('  found', scope, 'name', name, 'val', val, 'in',
+                #       prev, 'for token', tstr)
             elif tstr == '.':
                 if prev:
                     name += '.'
             else:
                 if name:
-                    all[name] = (scope, prev)
+                    _all[name] = (scope, prev)
                 prev, name, scope = None, '', None
                 if ttype == tokenize.NEWLINE:
                     break
 
         trace.write(funcname +
-          inspect.formatargvalues(args, varargs, varkw, lcls, formatvalue=lambda v: '=' + pydoc.text.repr(v)) + '\n')
-        trace.write(''.join(['    ' + x.replace('\t', '  ') for x in filter(lambda a: a.strip(), context)]))
-        if len(all):
-            trace.write('  variables: %s\n' % pformat(all, indent=3))
+          inspect.formatargvalues(args, varargs, varkw, lcls,
+            formatvalue=lambda v: '=' + pydoc.text.repr(v)) + '\n')
+        trace.write(''.join(['    ' + x.replace('\t', '  ')
+                             for x in context if x.strip()]))
+        if len(_all):
+            trace.write('  variables: %s\n' % pformat(_all, indent=3))
 
     trace.write('%s: %s' % (exctyp.__name__, value))
     return trace
 
-def _info(exctyp, value, tb):
+def _info(exctyp, value, tback):
+    # pylint: disable=no-member
     trace = None
-    dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_NONE)
+    dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_WARNING,
+                               buttons=gtk.BUTTONS_NONE)
     dialog.set_title(_("Bug Detected"))
     if gtk.check_version(2, 4, 0) is not None:
         dialog.set_has_separator(False)
 
-    primary = _("<big><b>A programming error has been detected during the execution of this program.</b></big>")
-    secondary = _("It probably isn't fatal, but should be reported to the developers nonetheless.")
+    primary = _("<big><b>A programming error has been detected during the "
+                "execution of this program.</b></big>")
+    secondary = _("It probably isn't fatal, but should be reported to the "
+                  "developers nonetheless.")
 
     try:
-        email = feedback
+        # TODO: Refactor to not use a try/except
+        email = feedback  # pylint: disable=undefined-variable
         dialog.add_button(_("Report..."), 3)
     except NameError:
-        secondary += _("\n\nPlease remember to include the contents of the Details dialog.")
+        secondary += _("\n\nPlease remember to include the contents of the "
+                       "Details dialog.")
         # could ask for an email address instead...
-        pass
 
     try:
         setsec = dialog.format_secondary_text
     except AttributeError:
         raise
-        dialog.vbox.get_children()[0].get_children()[1].set_markup('%s\n\n%s' % (primary, secondary))
-        #lbl.set_property("use-markup", True)
+        # TODO
+        # dialog.vbox.get_children()[0].get_children()[1].set_markup(
+        #    '%s\n\n%s' % (primary, secondary))
+        # lbl.set_property("use-markup", True)
     else:
         del setsec
         dialog.set_markup(primary)
@@ -153,25 +167,27 @@ def _info(exctyp, value, tb):
         resp = dialog.run()
         if resp == 3:
             if trace is None:
-                trace = analyse(exctyp, value, tb)
+                trace = analyse(exctyp, value, tback)
 
             # TODO: prettyprint, deal with problems in sending feedback, &tc
+            # TODO: Refactor to not use a try/except
             try:
-                server = smtphost
+                server = smtphost  # pylint: disable=undefined-variable
             except NameError:
                 server = 'localhost'
 
-            message = 'From: buggy_application"\nTo: bad_programmer\nSubject: Exception feedback\n\n%s' % trace.getvalue()
+            message = ('From: buggy_application"\nTo: bad_programmer\n'
+                'Subject: Exception feedback\n\n%s' % trace.getvalue())
 
-            s = SMTP()
-            s.connect(server)
-            s.sendmail(email, (email,), message)
-            s.quit()
+            smtp = SMTP()
+            smtp.connect(server)
+            smtp.sendmail(email, (email,), message)
+            smtp.quit()
             break
 
         elif resp == 2:
             if trace is None:
-                trace = analyse(exctyp, value, tb)
+                trace = analyse(exctyp, value, tback)
 
             # Show details...
             details = gtk.Dialog(_("Bug Details"), dialog,
@@ -184,15 +200,16 @@ def _info(exctyp, value, tb):
             textview.set_editable(False)
             textview.modify_font(pango.FontDescription("Monospace"))
 
-            sw = gtk.ScrolledWindow()
-            sw.show()
-            sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-            sw.add(textview)
-            details.vbox.add(sw)
+            swin = gtk.ScrolledWindow()
+            swin.show()
+            swin.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+            swin.add(textview)
+            details.vbox.add(swin)
             textbuffer = textview.get_buffer()
             textbuffer.set_text(trace.getvalue())
 
-            monitor = gtk.gdk.screen_get_default().get_monitor_at_window(dialog.window)
+            monitor = gtk.gdk.screen_get_default().get_monitor_at_window(
+                dialog.window)
             area = gtk.gdk.screen_get_default().get_monitor_geometry(monitor)
             try:
                 w = area.width // 1.6
@@ -215,16 +232,20 @@ def _info(exctyp, value, tb):
     dialog.destroy()
 
 def enable():
+    """Call this to set gtkexcepthook as the default exception handler"""
     sys.excepthook = _info
 
+
 if __name__ == '__main__':
+    # pylint: disable=W0201,C0103,R0903,C0111
     class X(object):
         pass
     x = X()
     x.y = 'Test'
     x.z = x
     w = ' e'
-    #feedback = 'developer@bigcorp.comp'
-    #smtphost = 'mx.bigcorp.comp'
-    #1, x.z.y, f, w
+    # TODO: Refactor this
+    # feedback = 'developer@bigcorp.comp'
+    # smtphost = 'mx.bigcorp.comp'
+    # 1, x.z.y, f, w
     raise Exception(x.z.y + w)
