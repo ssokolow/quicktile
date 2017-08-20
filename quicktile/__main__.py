@@ -15,6 +15,9 @@ except ImportError:
 
 import gtk, wnck
 
+import gtkexcepthook
+gtkexcepthook.enable()
+
 from . import commands, layout
 from .util import fmt_table, XInitError
 from .version import __version__
@@ -116,7 +119,10 @@ class QuickTileApp(object):
 
         # If either persistent backend loaded, start the GTK main loop.
         if self.keybinder or self.dbus_obj:
-            gtk.main()  # pylint: disable=no-member
+            try:
+                gtk.main()  # pylint: disable=no-member
+            except KeyboardInterrupt:
+                pass
             return True
         else:
             return False
