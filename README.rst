@@ -86,12 +86,16 @@ A. If you have ``pip2`` installed, just run this:
 
  .. code:: sh
 
-     sudo pip install https://github.com/ssokolow/quicktile/archive/master.zip
+     sudo pip2 install https://github.com/ssokolow/quicktile/archive/master.zip
 
  **NOTE:** If you attempt to use the ``--upgrade`` option and it fails to
- properly ignore system-provided dependencies, simply uninstall the current
- version of QuickTile with ``sudo pip2 uninstall quicktile`` and then
- install the new version without ``--upgrade``.
+ properly ignore system-provided dependencies, just use these commands instead:
+
+ .. code:: sh
+
+     sudo pip2 uninstall quicktile
+     sudo rm /usr/local/bin/quicktile /usr/local/bin/quicktile.py
+     sudo pip2 install https://github.com/ssokolow/quicktile/archive/master.zip
 
 B. Without ``pip2``, download and unpack the zip file and run the following:
 
@@ -123,9 +127,10 @@ C. Without ``pip2``, if you don't want a system-wide install:
 
 1. Run ``quicktile`` once to generate your configuration file
 
-   **NOTE:** On some systems, the ``quicktile`` command that gets installed by
-   the first two options is broken for reasons I'm still trying to identify. In
-   such a case, you should still be able to run QuickTile as
+   **NOTE:** If the ``quicktile`` command dies with a
+   ``No module named __main__`` error, you probably have an old
+   ``quicktile.py`` file in ``/usr/local/bin`` that needs to be deleted. If
+   that doesn't fix the problem, you should still be able to run QuickTile as
    ``python2 -m quicktile`` instead.
 2. Edit ``~/.config/quicktile.cfg`` to customize your keybinds
 
@@ -276,6 +281,9 @@ Known Bugs
   and PyGTK doesn't expose the function needed to filter them away. As a
   result, the best QuickTile can do is pipe its output through grep, leaving a
   flood of blank lines since grep is finicky about matching them.
+* ``pip2 uninstall`` doesn't remove the ``quicktile`` and/or ``quicktile.py``
+  files from ``/usr/local/bin``, which can cause subsequent installs to
+  break.
 
 Thanks to Thomas Vander Stichele for some of the documentation cleanups.
 

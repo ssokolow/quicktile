@@ -11,7 +11,7 @@ if [ "$(id -u)" != 0 ]; then
 fi
 
 echo "* Running setup.py install"
-python2 setup.py install
+python2 setup.py install && rm -f /usr/local/bin/quicktile.py
 
 echo "* Copying quicktile.desktop to /etc/xdg/autostart/"
 sudo cp quicktile.desktop /etc/xdg/autostart/
