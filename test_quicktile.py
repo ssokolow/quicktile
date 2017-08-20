@@ -16,7 +16,7 @@ import logging, operator, sys
 import gtk.gdk, wnck  # pylint: disable=import-error
 
 import quicktile
-from quicktile import wm
+from quicktile import wm, __main__
 from quicktile.util import powerset, EnumSafeDict, XInitError
 
 log = logging.getLogger(__name__)
