@@ -15,9 +15,14 @@ import logging, operator, sys
 
 import gtk.gdk, wnck  # pylint: disable=import-error
 
-import quicktile
-from quicktile import wm, __main__
+from quicktile import commands, wm
 from quicktile.util import powerset, EnumSafeDict, XInitError
+
+# Ensure code coverage is accurate
+from quicktile import __main__  # pylint: disable=unused-import
+
+# Silence flake8 since PyLint already took the line comment spot
+__main__  # pylint: disable=pointless-statement
 
 log = logging.getLogger(__name__)
 
@@ -56,7 +61,7 @@ class Thing2(ComplainingEnum):
 class TestCommandRegistry(unittest.TestCase):
     """Tests for the CommandRegistry class"""
     def setUp(self):
-        self.registry = quicktile.CommandRegistry()
+        self.registry = commands.CommandRegistry()
 
     # TODO: Implement tests for CommandRegistry
 
