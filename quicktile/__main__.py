@@ -33,6 +33,7 @@ DEFAULTS = {
         # Use Ctrl+Alt as the default base for key combinations
         'ModMask': '<Ctrl><Alt>',
         'UseWorkarea': True,
+        'ColumnCount': 3
     },
     'keys': {
         "KP_Enter": "monitor-switch",
@@ -59,10 +60,6 @@ KEYLOOKUP = {
     '-': 'minus',
 }  #: Used for resolving certain keysyms
 
-
-# TODO: Rearchitect so this hack isn't needed
-commands.cycle_dimensions = commands.commands.add_many(
-    layout.make_winsplit_positions())(commands.cycle_dimensions)
 
 wnck.set_client_type(wnck.CLIENT_TYPE_PAGER)  # pylint: disable=no-member
 
@@ -241,6 +238,11 @@ def main():
 
     ignore_workarea = ((not config.getboolean('general', 'UseWorkarea')) or
                        opts.no_workarea)
+
+    # TODO: Rearchitect so this hack isn't needed
+    commands.cycle_dimensions = commands.commands.add_many(
+        layout.make_winsplit_positions(config.getint('general', 'ColumnCount'))
+    )(commands.cycle_dimensions)
 
     try:
         winman = WindowManager(ignore_workarea=ignore_workarea)

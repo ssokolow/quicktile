@@ -1,6 +1,7 @@
 0.3.0 (git HEAD):
 - Split QuickTile up into multiple files for easier refactoring and improvement
 - Fix a few latent WindowManager bugs revealed by the split-up.
+- Add a `ColumnCount` field to the config file
 - Add gtkexcepthook for more convenient handling of unexpected errors
 - Work around PyGTK's incompatibilty with tox
 
