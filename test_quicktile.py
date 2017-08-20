@@ -10,10 +10,8 @@ try:
     pygtk.require('2.0')
 except ImportError as err:
     # Apparently Travis-CI's build environment doesn't add this
-    import subprocess, sys
-    subprocess.call(['echo', str(err)])
-    subprocess.call(['echo', repr(err)])
-    subprocess.call(['echo', repr(sys.path)])
+    import sys
+    sys.path.append('/usr/lib/python2.7/dist-packages')
     sys.path.append('/usr/lib/python2.7/dist-packages/gtk-2.0')
 
 import logging, operator, sys
