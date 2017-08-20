@@ -3,5 +3,6 @@ build
 dist
 html
 _site
+.tox
 QuickTile.egg-info
 *.py[co]
