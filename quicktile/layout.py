@@ -6,7 +6,7 @@ __license__ = "GNU GPL 2.0 or later"
 class GravityLayout(object):  # pylint: disable=too-few-public-methods
     """Helper for translating top-left relative dimensions to other corners.
 
-    Used to generate L{cycle_dimensions} presets.
+    Used to generate L{commands.cycle_dimensions} presets.
 
     Expects to operate on decimal percentage values. (0 <= x <= 1)
     """

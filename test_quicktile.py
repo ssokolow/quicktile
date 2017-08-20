@@ -171,7 +171,7 @@ class TestHelpers(unittest.TestCase):
         self.assertIn("Testing 123", XInitError("Testing 123"))
 
 class TestWindowManagerDetached(unittest.TestCase):
-    """Tests which exercise L{quicktile.WindowManager} without needing X11."""
+    """Tests which exercise L{wm.WindowManager} without needing X11."""
 
     def setUp(self):
         # Shorthand

@@ -1,18 +1,19 @@
-"""
+"""Graphical exception handler for PyGTK applications
+
 (c) 2003 Gustavo J A M Carneiro gjc at inescporto.pt
-    2004-2005 Filip Van Raemdonck
-    2009, 2011 Stephan Sokolow
+(c) 2004-2005 Filip Van Raemdonck
+(c) 2009, 2011 Stephan Sokolow
 
 http://www.daa.com.au/pipermail/pygtk/2003-August/005775.html
 Message-ID: <1062087716.1196.5.camel@emperor.homelinux.net>
-    "The license is whatever you want."
+"The license is whatever you want."
 
 Instructions: import gtkexcepthook; gtkexcepthook.enable()
 
 Changes from Van Raemdonck version:
-- Switched from auto-enable to gtkexcepthook.enable() to silence PyFlakes false
-  positives. (Borrowed naming convention from cgitb)
-- Split out traceback import to silence PyFlakes warning.
+ - Switched from auto-enable to gtkexcepthook.enable() to silence PyFlakes
+   false positives. (Borrowed naming convention from cgitb)
+ - Split out traceback import to silence PyFlakes warning.
 
 @todo: Polish this up to meet my code formatting and clarity standards.
 @todo: Clean up the SMTP support. It's a mess.
@@ -22,6 +23,8 @@ Changes from Van Raemdonck version:
        app-specific debugging information to be registered for inclusion.
 """
 
+__author__ = "Filip Van Daemdonck"
+__license__ = "whatever you want"
 
 import inspect, linecache, pydoc, sys
 #import traceback

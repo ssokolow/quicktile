@@ -12,7 +12,7 @@ Thanks to Thomas Vander Stichele for some of the documentation cleanups.
  - Clean up the code. It's functional, but an ugly rush-job.
  - Implement the secondary major features of WinSplit Revolution (eg.
    process-shape associations, locking/welding window edges, etc.)
- - Consider rewriting L{cycle_dimensions} to allow command-line use to jump to
+ - Consider rewriting L{commands.cycle_dimensions} to allow command-line use to jump to
    a specific index without actually flickering the window through all the
    intermediate shapes.
  - Can I hook into the GNOME and KDE keybinding APIs without using PyKDE or

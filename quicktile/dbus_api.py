@@ -13,6 +13,10 @@ from dbus.mainloop.glib import DBusGMainLoop
 class QuickTile(dbus.service.Object):
     """D-Bus endpoint definition"""
     def __init__(self, bus, commands, winman):
+        """
+        @param bus: The connection on which to export this object.
+            See the C{dbus.service.Object} documentation for details.
+        """
         dbus.service.Object.__init__(self, bus,
                                      '/com/ssokolow/QuickTile')
         self.commands = commands

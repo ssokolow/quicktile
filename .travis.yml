@@ -14,6 +14,6 @@ addons:
     - python-xlib
 install: "pip install coveralls"
 script:
-  - epydoc --config setup.cfg *.py
+  - epydoc --config setup.cfg quicktile *.py
   - nosetests
 after_success: coveralls
