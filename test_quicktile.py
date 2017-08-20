@@ -13,6 +13,7 @@ except ImportError:
 
 import logging, operator, sys
 
+import gtk
 import gtk.gdk, wnck  # pylint: disable=import-error
 
 from quicktile import commands, wm
