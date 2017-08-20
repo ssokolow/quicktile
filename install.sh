@@ -10,8 +10,12 @@ if [ "$(id -u)" != 0 ]; then
     exec sudo "$0" "$@"
 fi
 
+echo "* Attempting to remove old QuickTile installs"
+pip2 uninstall quicktile -y
+rm -f /usr/local/bin/quicktile{,.py}
+
 echo "* Running setup.py install"
-python2 setup.py install && rm -f /usr/local/bin/quicktile.py
+python2 setup.py install
 
 echo "* Copying quicktile.desktop to /etc/xdg/autostart/"
 sudo cp quicktile.desktop /etc/xdg/autostart/

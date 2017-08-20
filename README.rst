@@ -105,23 +105,25 @@ B. Without ``pip2``, download and unpack the zip file and run the following:
      ./install.sh
 
  Technically speaking, an ordinary ``sudo python2 setup.py install`` will also
- work, but ``install.sh`` has two advantages:
+ work, but ``install.sh`` has three advantages:
 
  1. It runs the ``setup.py build`` step without root privileges to avoid
     leaving root-owned cruft around.
- 2. It saves you the trouble of setting QuickTile to run on startup.
+ 2. It will attempt to remove old QuickTile files which might cause a newer
+    install to break.
+ 3. It saves you the trouble of setting QuickTile to run on startup.
     (``setup.py`` can't do this because it has no mechanism for adding files
     to ``/etc``.)
 
 C. Without ``pip2``, if you don't want a system-wide install:
 
- 1. Download an unpack the zip file.
+ 1. Download and unpack the zip file.
  2. Copy the ``quicktile`` folder and the ``quicktile.sh`` script into a folder
     of your choice.
  3. Make sure ``quicktile.sh`` is marked executable.
 
- **NOTE:** If you'd rather roll your own, the shell script is just three simple
- lines.
+ **NOTE:** If you'd rather roll your own, the ``quicktile.sh`` shell script is
+ just three simple lines.
 
 **AFTER INSTALLING:**
 
