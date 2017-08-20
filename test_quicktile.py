@@ -9,7 +9,10 @@ try:
     import pygtk
     pygtk.require('2.0')
 except ImportError:
-    pass  # Apparently Travis-CI's build environment doesn't add this
+    # Apparently Travis-CI's build environment doesn't add this
+    import subprocess, sys
+    print("Import Path: {}".format(sys.path))
+    subprocess.call(['find', '/usr/lib/python2.7/', '-path', '*gtk*'])
 
 import logging, operator, sys
 
