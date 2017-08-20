@@ -17,6 +17,35 @@ from setuptools import setup
 # Requirements adapter for packages which may not be PyPI-installable
 REQUIRES = ['python-xlib', ]
 
+# Look outside the virtualenv for PyGTK
+# Source: https://stackoverflow.com/a/27471354/435253
+try:
+    import gtk
+except ImportError:
+    print('--------------')
+    import subprocess
+    instdir = subprocess.check_output([
+        '/usr/bin/python',
+        '-c',
+        'import os, pygtk; print os.path.dirname(pygtk.__file__)',
+    ]).strip()
+    for dst_base in sys.path:
+        if dst_base.strip():
+            break
+    for d in [
+        'pygtk.pth',
+        'pygtk.py',
+        'gtk-2.0',
+        'gobject',
+        'glib',
+        'cairo',
+        ]:
+        src = os.path.join(instdir, d)
+        dst = os.path.join(dst_base, d)
+        if os.path.exists(src) and not os.path.exists(dst):
+            print('linking', d, 'to', dst_base)
+            os.symlink(src, dst)
+
 def test_for_imports(choices, package_name, human_package_name):
     """Detect packages without requiring egg metadata
 
@@ -68,7 +97,7 @@ def find_version(*file_paths):
 if __name__ == '__main__':
     setup(
         name='QuickTile',
-        version=find_version("quicktile.py"),
+        version=find_version("quicktile/__init__.py"),
         author='Stephan Sokolow (deitarion/SSokolow)',
         author_email='http://ssokolow.com/ContactMe',
         description='Add keyboard-driven window-tiling to any X11 window '
