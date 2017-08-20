@@ -5,5 +5,5 @@ Version=1.0
 Name=QuickTile
 GenericName=Window-Tiling Helper
 Type=Application
-Exec=quicktile.py --daemonize
+Exec=quicktile --daemonize
 Categories=Utility;

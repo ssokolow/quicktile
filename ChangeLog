@@ -1,4 +1,9 @@
-0.2.2 (git HEAD):
+0.3.0 (git HEAD):
+- Split QuickTile up into multiple files for easier refactoring and improvement
+- Fix a few latent WindowManager bugs revealed by the split-up.
+- Work around PyGTK's incompatibilty with tox
+
+0.2.2:
 - Added move-to{,-top,-bottom}{,-left,-right} (David Stygstra)
 - Implement window gravity support in reposition()
 - Allow reposition() to take a custom geometry mask
@@ -12,6 +17,9 @@
 - Add static analysis hooks to repo
 - Various code cleanups
 - Modernize setup.py and remove absolute install path blocking packaging
+- Fix install.sh to ensure it's operating on the correct path
+- Use round for pixel numbers calculations
+- Fix left-right size cycling for large monitors
 
 0.2.1:
 - Added monitor-next and monitor-previous

@@ -5,10 +5,19 @@
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
+try:
+    import pygtk
+    pygtk.require('2.0')
+except ImportError:
+    pass  # Apparently Travis-CI's build environment doesn't add this
+
 import logging, operator, sys
-import quicktile
 
 import gtk.gdk, wnck  # pylint: disable=import-error
+
+import quicktile
+from quicktile import wm
+from quicktile.util import powerset, EnumSafeDict, XInitError
 
 log = logging.getLogger(__name__)
 
@@ -74,8 +83,8 @@ class TestEnumSafeDict(unittest.TestCase):
             (2, self.thing2)
         ]
 
-        self.empty = quicktile.EnumSafeDict()
-        self.full = quicktile.EnumSafeDict(
+        self.empty = EnumSafeDict()
+        self.full = EnumSafeDict(
                 *[dict([x]) for x in self.test_mappings])
 
     def test_testing_shims(self):
@@ -138,7 +147,7 @@ class TestHelpers(unittest.TestCase):
         expected = [(), (1,), (2,), (3,), (1, 2), (1, 3), (2, 3), (1, 2, 3)]
 
         for test_set in (tuple(src_set), list(src_set), set(src_set)):
-            result = list(quicktile.powerset(test_set))
+            result = list(powerset(test_set))
 
             # Obvious requirements
             self.assertIn(tuple(), result)
@@ -151,7 +160,7 @@ class TestHelpers(unittest.TestCase):
 
             # Check that ALL subsets are returned
             # FIXME: This shouldn't enforce an ordering constraint.
-            self.assertEqual(list(quicktile.powerset([1, 2, 3])), expected)
+            self.assertEqual(list(powerset([1, 2, 3])), expected)
 
     # TODO: Test fmt_table
 
@@ -159,14 +168,14 @@ class TestHelpers(unittest.TestCase):
 
     def test_xiniterror_str(self):
         """XInitError.__str__ output contains provided text"""
-        self.assertIn("Testing 123", quicktile.XInitError("Testing 123"))
+        self.assertIn("Testing 123", XInitError("Testing 123"))
 
 class TestWindowManagerDetached(unittest.TestCase):
     """Tests which exercise L{quicktile.WindowManager} without needing X11."""
 
     def setUp(self):
         # Shorthand
-        self.WM = quicktile.WindowManager  # pylint: disable=invalid-name
+        self.WM = wm.WindowManager  # pylint: disable=invalid-name
 
         # Set up a nice, oddly-shaped fake desktop made from screens
         # I actually have access to (though not all on the same PC)

@@ -28,13 +28,23 @@ QuickTile
 
 Keyboard-driven Window Tiling for your existing X11 window manager
 
+------------------------------------
+Important Message For Existing Users
+------------------------------------
+
+As of QuickTile 0.3.0, the installation process has changed.
+
+This was necessary to allow QuickTile to be split across multiple files so I
+could get past some mental blocks and start to clean up the code and implement
+new features.
+
 -------------
 Requirements:
 -------------
 
 * An X11-based desktop (The code expects NETWM hints and X11-style window decorations)
-* Python 2.x (Tested with 2.5 on 2011-09-10. Developed on 2.7)
-* PyGTK 2.2 (assuming ``get_active_window()`` isn't newer than that)
+* Python 2.7
+* PyGTK
 * ``python-wnck``
 * ``python-xlib`` (optional, required for key-binding)
 * ``dbus-python`` (optional, required for D-Bus service)
@@ -68,41 +78,79 @@ following commands to easily install them:
 Installation (Typical Use)
 --------------------------
 
-1. Make sure the requirements above are satisfied (including ``python-xlib``)
-2. Extract ``quicktile.py`` to wherever you want to keep it
-3. Set ``quicktile.py`` to be executable if it isn't already
-4. Run ``quicktile.py`` once to generate your configuration file
-5. Edit ``~/.config/quicktile.cfg`` to customize your keybinds
-6. Set your desktop to run ``quicktile.py --daemonize``
+After you have installed the above requirements (including ``python-xlib``)
+via your system package manager, you can install QuickTile using either of the
+following methods:
 
-**Note:** Customizing the available window shapes currently requires editing
-the source code (though it's quite simple). This will be remedied when the
-author has time to decide between extending the standard Python rcfile parser
-and replacing ``quicktile.cfg`` with ``quicktile.json``.
+A. If you have ``pip2`` installed, just run this:
 
-**Note:** If you want to install QuickTile system-wide and have it auto-start,
-running the ``install.sh`` script should do the trick. Please let me know if
-you experience any troubles.
+ .. code:: sh
+
+     sudo pip install https://github.com/ssokolow/quicktile/archive/master.zip
+
+ **NOTE:** If you attempt to use the ``--upgrade`` option and it fails to
+ properly ignore system-provided dependencies, simply uninstall the current
+ version of QuickTile with ``sudo pip2 uninstall quicktile`` and then
+ install the new version without ``--upgrade``.
+
+B. Without ``pip2``, download and unpack the zip file and run the following:
+
+ .. code:: sh
+
+     cd /path/to/local/copy
+     ./install.sh
+
+ Technically speaking, an ordinary ``sudo python2 setup.py install`` will also
+ work, but ``install.sh`` has two advantages:
+
+ 1. It runs the ``setup.py build`` step without root privileges to avoid
+    leaving root-owned cruft around.
+ 2. It saves you the trouble of setting QuickTile to run on startup.
+    (``setup.py`` can't do this because it has no mechanism for adding files
+    to ``/etc``.)
+
+C. Without ``pip2``, if you don't want a system-wide install:
+
+ 1. Download an unpack the zip file.
+ 2. Copy the ``quicktile`` folder and the ``quicktile.sh`` script into a folder
+    of your choice.
+ 3. Make sure ``quicktile.sh`` is marked executable.
+
+ **NOTE:** If you'd rather roll your own, the shell script is just three simple
+ lines.
+
+**AFTER INSTALLING:**
+
+1. Run ``quicktile`` once to generate your configuration file
+
+   **NOTE:** On some systems, the ``quicktile`` command that gets installed by
+   the first two options is broken for reasons I'm still trying to identify. In
+   such a case, you should still be able to run QuickTile as
+   ``python2 -m quicktile`` instead.
+2. Edit ``~/.config/quicktile.cfg`` to customize your keybinds
+
+   **Note:** Customizing the available window shapes currently requires editing
+   the source code (though it's quite simple). This will be remedied when I
+   have time to decide between extending the standard Python rcfile
+   parser and replacing ``quicktile.cfg`` with ``quicktile.json``.
+3. Set your desktop to run ``quicktile --daemonize`` if you didn't use
+   ``install.sh``.
+
 
 Important Notes:
 ================
 
-* If you are running a desktop which uses Compiz (such as Ubuntu's Unity),
+* If you are running a desktop which uses Compiz (such as Unity),
   make sure you've used CCSM to disable the grid plugin or the fight between
   it and QuickTile for the same type of functionality may cause unpredictable
   problems.
 * Some systems may not provide a Python 2.x binary under the name ``python2``.
-  If this is the case on yours, you must edit the first line in
-  ``quicktile.py`` accordingly.
-* If you are running quicktile from a folder that isn't in your ``PATH``,
-  you will need to specify a path like ``./quicktile.py`` to run
-  ``quicktile.py`` directly.
-* If you don't mark ``quicktile.py`` as executable, you must run
-  ``python2 quicktile.py`` rather than ``quicktile.py``.
+  If this is the case on yours, ``install.sh`` must be edited if you choose
+  to use it.
 * You can list your current keybindings by running
-  ``quicktile.py --show-bindings``
+  ``quicktile --show-bindings``
 * You can get a list of valid actions for the configuration file by running
-  ``quicktile.py --show-actions``
+  ``quicktile --show-actions``
 
 -------------------
 Usage (Typical Use)
@@ -208,9 +256,9 @@ Advanced Uses
 * If you want to trigger QuickTile from another application in an efficient
   manner, make sure you have ``dbus-python`` installed and read up on how to
   send D-Bus messages using either your language's D-Bus bindings or the
-  ``dbus-send`` command.
+  ``dbus-send`` or ``qdbus`` commands.
 * If, for some reason, you want scripted tiling without D-Bus, you can also
-  run commands like ``quicktile.py top-left`` but it may be slower as
+  run commands like ``quicktile top-left`` but it may be slower as
   quicktile has to start, perform an action, and then quit every time you call
   it.
 
