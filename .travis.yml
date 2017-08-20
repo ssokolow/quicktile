@@ -12,6 +12,7 @@ addons:
     - python-gtk2
     - python-wnck
     - python-xlib
+    - python-docutils
 install: "pip install coveralls"
 script:
   - epydoc --config setup.cfg quicktile *.py
