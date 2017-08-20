@@ -15,8 +15,10 @@ import io, os, re, sys
 from setuptools import setup
 
 # Requirements adapter for packages which may not be PyPI-installable
+REQUIRES = []
+
 # TODO: Look up how to make this a setuptools feature
-REQUIRES = ['python-xlib', ]
+# REQUIRES = ['python-xlib',]
 
 # Look outside the virtualenv for PyGTK
 # Source: https://stackoverflow.com/a/27471354/435253
@@ -71,7 +73,10 @@ def test_for_imports(choices, package_name, human_package_name):
                 sys.exit(1)
 
 test_for_imports("gtk", "pygtk", "PyGTK")
-test_for_imports("dbus", "dbus-python", "python-dbus")
+test_for_imports("wnck", "python-wnck", "python-wnck")
+
+# TODO: Look up how to make this a setuptools feature
+# test_for_imports("dbus", "dbus-python", "python-dbus")
 
 # Get the version from the program rather than duplicating it here
 # Source: https://packaging.python.org/en/latest/single_source_version.html
