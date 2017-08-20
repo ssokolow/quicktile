@@ -8,14 +8,13 @@ __license__ = "GNU GPL 2.0 or later"
 try:
     import pygtk
     pygtk.require('2.0')
-except ImportError:
+except ImportError as err:
     # Apparently Travis-CI's build environment doesn't add this
     import subprocess, sys
-    print("Import Path: {}".format(sys.path))
-    print("---")
+    subprocess.call(['echo', str(err)])
+    subprocess.call(['echo', repr(err)])
     subprocess.call(['echo', repr(sys.path)])
-    subprocess.call(['find', '/usr/lib/python2.7/', '-path', '*gtk*'])
-    sys.path.append('/usr/lib/python2.7/dist-packages')
+    sys.path.append('/usr/lib/python2.7/dist-packages/gtk-2.0')
 
 import logging, operator, sys
 
