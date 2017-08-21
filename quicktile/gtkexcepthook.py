@@ -237,15 +237,21 @@ def enable():
 
 
 if __name__ == '__main__':
-    # pylint: disable=W0201,C0103,R0903,C0111
-    class X(object):
-        pass
-    x = X()
-    x.y = 'Test'
-    x.z = x
+    class TestFodder(object):  # pylint: disable=too-few-public-methods
+        """Just something interesting to show in the augmented traceback"""
+        y = 'Test'
+
+        def __init__(self):
+            self.z = self  # pylint: disable=invalid-name
+    x = TestFodder()
     w = ' e'
+
     # TODO: Refactor this
     # feedback = 'developer@bigcorp.comp'
     # smtphost = 'mx.bigcorp.comp'
     # 1, x.z.y, f, w
+
+    enable()
     raise Exception(x.z.y + w)
+
+# vim: set sw=4 sts=4 :
