@@ -236,6 +236,40 @@ def cycle_monitors(winman, win, state, step=1):
 
     winman.reposition(win, None, new_mon_geom, keep_maximize=True)
 
+@commands.add('monitor-prev-all', -1)
+@commands.add('monitor-next-all', 1)
+def cycle_monitors_all(winman, win, state, step=1):
+    """Cycle all windows between monitors while preserving position."""
+    n_monitors = winman.gdk_screen.get_n_monitors()
+    curr_workspace = win.get_workspace()
+
+    if not curr_workspace:
+        logging.debug("get_workspace() returned None")
+        return
+
+    for window in winman.screen.get_windows():
+        # Skip windows on other virtual desktops for intuitiveness
+        if not window.is_on_workspace(curr_workspace):
+            logging.debug("Skipping window on other workspace")
+            continue
+
+        # Don't cycle elements of the desktop
+        if window.get_window_type() in [
+              wnck.WINDOW_DESKTOP, wnck.WINDOW_DOCK]:  # pylint: disable=E1101
+            logging.debug("Skipping desktop/dock window")
+            continue
+
+        gdkwin = gtk.gdk.window_foreign_new(window.get_xid())
+        mon_id = winman.gdk_screen.get_monitor_at_window(gdkwin)
+        new_mon_id = (mon_id + step) % n_monitors
+
+        new_mon_geom = winman.gdk_screen.get_monitor_geometry(new_mon_id)
+        logging.debug(
+            "Moving window %s to monitor 0x%d, which has geometry %s",
+            hex(window.get_xid()), new_mon_id, new_mon_geom)
+
+        winman.reposition(window, None, new_mon_geom, keep_maximize=True)
+
 # pylint: disable=no-member
 MOVE_TO_COMMANDS = {
     'move-to-top-left': [wnck.WINDOW_GRAVITY_NORTHWEST,
