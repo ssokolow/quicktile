@@ -9,35 +9,35 @@ import gtk.gdk, wnck  # pylint: disable=import-error
 
 from .util import EnumSafeDict, XInitError
 
+#: Lookup table for internal window gravity support.
+#: (libwnck's support is either unreliable or broken)
+GRAVITY = EnumSafeDict({
+    'NORTH_WEST': (0.0, 0.0),
+    'NORTH': (0.5, 0.0),
+    'NORTH_EAST': (1.0, 0.0),
+    'WEST': (0.0, 0.5),
+    'CENTER': (0.5, 0.5),
+    'EAST': (1.0, 0.5),
+    'SOUTH_WEST': (0.0, 1.0),
+    'SOUTH': (0.5, 1.0),
+    'SOUTH_EAST': (1.0, 1.0),
+})
+key, val = None, None  # Safety cushion for the "del" line.
+for key, val in GRAVITY.items():
+    # Support GDK gravity constants
+    GRAVITY[getattr(gtk.gdk, 'GRAVITY_%s' % key)] = val
+
+    # Support libwnck gravity constants
+    _name = 'WINDOW_GRAVITY_%s' % key.replace('_', '')
+    GRAVITY[getattr(wnck, _name)] = val
+
+# Prevent these temporary variables from showing up in the apidocs
+del _name, key, val
+
+# ---
+
 class WindowManager(object):
     """A simple API-wrapper class for manipulating window positioning."""
-
-    #: Lookup table for internal window gravity support.
-    #: (libwnck's support is either unreliable or broken)
-    gravities = EnumSafeDict({
-        'NORTH_WEST': (0.0, 0.0),
-        'NORTH': (0.5, 0.0),
-        'NORTH_EAST': (1.0, 0.0),
-        'WEST': (0.0, 0.5),
-        'CENTER': (0.5, 0.5),
-        'EAST': (1.0, 0.5),
-        'SOUTH_WEST': (0.0, 1.0),
-        'SOUTH': (0.5, 1.0),
-        'SOUTH_EAST': (1.0, 1.0),
-    })
-    key, val = None, None  # Safety cushion for the "del" line.
-    for key, val in gravities.items():
-        del gravities[key]
-
-        # Support GDK gravity constants
-        gravities[getattr(gtk.gdk, 'GRAVITY_%s' % key)] = val
-
-        # Support libwnck gravity constants
-        _name = 'WINDOW_GRAVITY_%s' % key.replace('_', '')
-        gravities[getattr(wnck, _name)] = val
-
-    # Prevent these temporary variables from showing up in the apidocs
-    del _name, key, val
 
     def __init__(self, screen=None, ignore_workarea=False):
         """
@@ -69,14 +69,14 @@ class WindowManager(object):
         gravity on a window.
 
         @param geom: The window geometry to which to apply the corrections.
-        @param gravity: A desired gravity chosen from L{gravities}.
+        @param gravity: A desired gravity chosen from L{GRAVITY}.
         @type geom: C{gtk.gdk.Rectangle}
         @type gravity: C{wnck.WINDOW_GRAVITY_*} or C{gtk.gdk.GRAVITY_*}
 
         @returns: The coordinates to be used to achieve the desired position.
         @rtype: C{(x, y)}
         """
-        grav_x, grav_y = cls.gravities[gravity]
+        grav_x, grav_y = GRAVITY[gravity]
 
         return (
             int(geom.x - (geom.width * grav_x)),

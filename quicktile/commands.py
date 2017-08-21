@@ -9,6 +9,7 @@ from heapq import heappop, heappush
 
 import gtk.gdk, wnck  # pylint: disable=import-error
 
+from .wm import GRAVITY
 from .util import fmt_table
 
 class CommandRegistry(object):
@@ -293,7 +294,7 @@ def move_to_position(winman, win, state, gravity, gravity_mask):
     """Move window to a position on the screen, preserving its dimensions."""
     use_rect = state['usable_rect']
 
-    grav_x, grav_y = winman.gravities[gravity]
+    grav_x, grav_y = GRAVITY[gravity]
     dims = (int(use_rect.width * grav_x), int(use_rect.height * grav_y), 0, 0)
     result = gtk.gdk.Rectangle(*dims)
     logging.debug("Calling reposition() with %r gravity and dimensions %r",

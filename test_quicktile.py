@@ -179,6 +179,47 @@ class TestHelpers(unittest.TestCase):
         """XInitError.__str__ output contains provided text"""
         self.assertIn("Testing 123", XInitError("Testing 123"))
 
+class TestWindowGravity(unittest.TestCase):
+    """Test the equivalence and correctness of L{wm.GRAVITY} values."""
+
+    def setUp(self):
+        # Set up a nice, oddly-shaped fake desktop made from screens
+        # I actually have access to (though not all on the same PC)
+        self.screens = [
+                gtk.gdk.Rectangle(0, 0, 1280, 1024),
+                gtk.gdk.Rectangle(1280, 0, 1280, 1024),
+                gtk.gdk.Rectangle(0, 1024, 1680, 1050),
+                gtk.gdk.Rectangle(1680, 1024, 1440, 900)
+        ]
+
+        # TODO: Also work in some fake panel struts
+        self.desktop = gtk.gdk.Region()
+        for rect in self.screens:
+            self.desktop.union_with_rect(rect)
+
+    def test_gravity_equivalence(self):
+        """Gravity Lookup Table: text/GDK/WNCK constants are equivalent"""
+        for alignment in ('CENTER', 'NORTH', 'NORTH_WEST', 'SOUTH_EAST',
+                          'EAST', 'NORTH_EAST', 'SOUTH', 'SOUTH_WEST', 'WEST'):
+            self.assertEqual(wm.GRAVITY[alignment],
+                wm.GRAVITY[getattr(gtk.gdk, 'GRAVITY_{}'.format(alignment))])
+            self.assertEqual(
+                wm.GRAVITY[getattr(wnck, 'WINDOW_GRAVITY_{}'.format(
+                    alignment.replace('_', '')))],
+                wm.GRAVITY[getattr(gtk.gdk, 'GRAVITY_{}'.format(
+                    alignment))])
+
+    def test_gravity_correctness(self):
+        """Gravity Lookup Table: Constants have correct percentage values"""
+        for alignment, coords in (
+                ('NORTH_WEST', (0, 0)), ('NORTH', (0.5, 0)),
+                ('NORTH_EAST', (1.0, 0.0)), ('WEST', (0.0, 0.5)),
+                ('CENTER', (0.5, 0.5)), ('EAST', (1, 0.5)),
+                ('SOUTH_WEST', (0.0, 1.0)), ('SOUTH', (0.5, 1.0)),
+                ('SOUTH_EAST', (1.0, 1.0))):
+            self.assertEqual(wm.GRAVITY[
+                getattr(gtk.gdk, 'GRAVITY_%s' % alignment)], coords)
+
 class TestWindowManagerDetached(unittest.TestCase):
     """Tests which exercise L{wm.WindowManager} without needing X11."""
 
@@ -199,27 +240,6 @@ class TestWindowManagerDetached(unittest.TestCase):
         self.desktop = gtk.gdk.Region()
         for rect in self.screens:
             self.desktop.union_with_rect(rect)
-
-    def test_gravity_equivalence(self):
-        """Gravity Lookup Table: GDK and WNCK constants are equivalent"""
-        for alignment in ('CENTER', 'NORTH', 'NORTH_WEST', 'SOUTH_EAST',
-                          'EAST', 'NORTH_EAST', 'SOUTH', 'SOUTH_WEST', 'WEST'):
-            self.assertEqual(
-                self.WM.gravities[getattr(wnck, 'WINDOW_GRAVITY_{}'.format(
-                    alignment.replace('_', '')))],
-                self.WM.gravities[getattr(gtk.gdk, 'GRAVITY_{}'.format(
-                    alignment))])
-
-    def test_gravity_correctness(self):
-        """Gravity Lookup Table: Constants have correct percentage values"""
-        for alignment, coords in (
-                ('NORTH_WEST', (0, 0)), ('NORTH', (0.5, 0)),
-                ('NORTH_EAST', (1.0, 0.0)), ('WEST', (0.0, 0.5)),
-                ('CENTER', (0.5, 0.5)), ('EAST', (1, 0.5)),
-                ('SOUTH_WEST', (0.0, 1.0)), ('SOUTH', (0.5, 1.0)),
-                ('SOUTH_EAST', (1.0, 1.0))):
-            self.assertEqual(self.WM.gravities[
-                getattr(gtk.gdk, 'GRAVITY_%s' % alignment)], coords)
 
     def test_win_gravity_noop(self):
         """WindowManager.calc_win_gravity: north-west should be a no-op
