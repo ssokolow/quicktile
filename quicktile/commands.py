@@ -73,8 +73,7 @@ class CommandRegistry(object):
 
                 monitor_id, monitor_geom = winman.get_monitor(window)
 
-                use_area, use_rect = winman.get_workarea(
-                    monitor_geom, winman.ignore_workarea)
+                use_area, use_rect = winman.workarea.get(monitor_geom)
 
                 # TODO: Replace this MPlayer safety hack with a properly
                 #       comprehensive exception catcher.

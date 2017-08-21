@@ -36,6 +36,123 @@ del _name, key, val
 
 # ---
 
+class WorkArea(object):
+    """Helper to calculate and query available workarea on the desktop."""
+    def __init__(self, gdk_screen, ignore_struts=False):
+        self.gdk_screen = gdk_screen
+        self.ignore_struts = ignore_struts
+
+    def get_monitor_rect(self, monitor):
+        """Helper to normalize various monitor identifiers."""
+        if isinstance(monitor, int):
+            usable_rect = self.gdk_screen.get_monitor_geometry(monitor)
+            logging.debug("Retrieved geometry %s for monitor #%s",
+                          usable_rect, monitor)
+        elif not isinstance(monitor, gtk.gdk.Rectangle):
+            logging.debug("Converting geometry %s to gtk.gdk.Rectangle",
+                          monitor)
+            usable_rect = gtk.gdk.Rectangle(monitor)
+        else:
+            usable_rect = monitor
+
+        usable_region = gtk.gdk.region_rectangle(usable_rect)
+        if not usable_region.get_rectangles():
+            logging.error("WorkArea.get_monitor_rect received "
+                          "an empty monitor region!")
+            return None, None
+
+        return usable_rect, usable_region
+
+    def get_struts(self, root_win):
+        """Retrieve the struts from the root window if supported."""
+        if not self.gdk_screen.supports_net_wm_hint("_NET_WM_STRUT_PARTIAL"):
+            return []
+
+        # Gather all struts
+        struts = [root_win.property_get("_NET_WM_STRUT_PARTIAL")]
+        if self.gdk_screen.supports_net_wm_hint("_NET_CLIENT_LIST"):
+            # Source: http://stackoverflow.com/a/11332614/435253
+            for wid in root_win.property_get('_NET_CLIENT_LIST')[2]:
+                w = gtk.gdk.window_foreign_new(wid)
+                struts.append(w.property_get("_NET_WM_STRUT_PARTIAL"))
+        struts = [x[2] for x in struts if x]
+
+        logging.debug("Gathered _NET_WM_STRUT_PARTIAL values:\n\t%s",
+                      struts)
+        return struts
+
+    def subtract_struts(self, usable_region, struts):
+        """Subtract the given struts from the given region."""
+
+        # Subtract the struts from the usable region
+        _Sub = lambda *g: usable_region.subtract(
+            gtk.gdk.region_rectangle(g))
+        _w, _h = self.gdk_screen.get_width(), self.gdk_screen.get_height()
+        for g in struts:  # pylint: disable=invalid-name
+            # http://standards.freedesktop.org/wm-spec/1.5/ar01s05.html
+            # XXX: Must not cache unless watching for notify events.
+            _Sub(0, g[4], g[0], g[5] - g[4] + 1)             # left
+            _Sub(_w - g[1], g[6], g[1], g[7] - g[6] + 1)     # right
+            _Sub(g[8], 0, g[9] - g[8] + 1, g[2])             # top
+            _Sub(g[10], _h - g[3], g[11] - g[10] + 1, g[3])  # bottom
+
+        # Generate a more restrictive version used as a fallback
+        usable_rect = usable_region.copy()
+        _Sub = lambda *g: usable_rect.subtract(gtk.gdk.region_rectangle(g))
+        for geom in struts:
+            # http://standards.freedesktop.org/wm-spec/1.5/ar01s05.html
+            # XXX: Must not cache unless watching for notify events.
+            _Sub(0, geom[4], geom[0], _h)             # left
+            _Sub(_w - geom[1], geom[6], geom[1], _h)  # right
+            _Sub(0, 0, _w, geom[2])                   # top
+            _Sub(0, _h - geom[3], _w, geom[3])        # bottom
+            # TODO: The required "+ 1" in certain spots confirms that we're
+            #       going to need unit tests which actually check that the
+            #       WM's code for constraining windows to the usable area
+            #       doesn't cause off-by-one bugs.
+            # TODO: Share this on http://stackoverflow.com/q/2598580/435253
+        return usable_rect.get_clipbox(), usable_region
+
+    def get(self, monitor, ignore_struts=None):
+        """Retrieve the usable area of the specified monitor using
+        the most expressive method the window manager supports.
+
+        @param monitor: The number or dimensions of the desired monitor.
+        @param ignore_struts: If C{True}, just return the size of the whole
+            monitor, allowing windows to overlap panels.
+        @type monitor: C{int} or C{gtk.gdk.Rectangle}
+        @type ignore_struts: C{bool}
+
+        @returns: The usable region and its largest rectangular subset.
+        @rtype: C{gtk.gdk.Region}, C{gtk.gdk.Rectangle}
+        """
+
+        usable_rect, usable_region = self.get_monitor_rect(monitor)
+
+        if ignore_struts or (ignore_struts is None and self.ignore_struts):
+            logging.debug("Panels ignored. Reported monitor geometry is:\n%s",
+                          usable_rect)
+            return usable_region, usable_rect
+
+        root_win = self.gdk_screen.get_root_window()
+
+        struts = self.get_struts(root_win)
+        if struts:
+            usable_rect, usable_region = self.subtract_struts(usable_region,
+                                                              struts)
+        elif self.gdk_screen.supports_net_wm_hint("_NET_WORKAREA"):
+            desktop_geo = tuple(root_win.property_get('_NET_WORKAREA')[2][0:4])
+            logging.debug("Falling back to _NET_WORKAREA: %s", desktop_geo)
+            usable_region.intersect(gtk.gdk.region_rectangle(desktop_geo))
+            usable_rect = usable_region.get_clipbox()
+
+        # FIXME: Only call get_rectangles if --debug
+        logging.debug("Usable region of monitor calculated as:\n"
+                      "\tRegion: %r\n\tRectangle: %r",
+                      usable_region.get_rectangles(), usable_rect)
+        return usable_region, usable_rect
+
+
 class WindowManager(object):
     """A simple API-wrapper class for manipulating window positioning."""
 
@@ -61,7 +178,8 @@ class WindowManager(object):
 
         # pylint: disable=no-member
         self.screen = wnck.screen_get(self.gdk_screen.get_number())
-        self.ignore_workarea = ignore_workarea
+        self.workarea = WorkArea(self.gdk_screen,
+                                 ignore_struts=ignore_workarea)
 
     @classmethod
     def calc_win_gravity(cls, geom, gravity):
@@ -119,95 +237,6 @@ class WindowManager(object):
         logging.debug(" Window is on monitor %s, which has geometry %s",
                       monitor_id, monitor_geom)
         return monitor_id, monitor_geom
-
-    def get_workarea(self, monitor, ignore_struts=False):
-        """Retrieve the usable area of the specified monitor using
-        the most expressive method the window manager supports.
-
-        @param monitor: The number or dimensions of the desired monitor.
-        @param ignore_struts: If C{True}, just return the size of the whole
-            monitor, allowing windows to overlap panels.
-        @type monitor: C{int} or C{gtk.gdk.Rectangle}
-        @type ignore_struts: C{bool}
-
-        @returns: The usable region and its largest rectangular subset.
-        @rtype: C{gtk.gdk.Region}, C{gtk.gdk.Rectangle}
-        """
-        if isinstance(monitor, int):
-            usable_rect = self.gdk_screen.get_monitor_geometry(monitor)
-            logging.debug("Retrieved geometry %s for monitor #%s",
-                          usable_rect, monitor)
-        elif not isinstance(monitor, gtk.gdk.Rectangle):
-            logging.debug("Converting geometry %s to gtk.gdk.Rectangle",
-                          monitor)
-            usable_rect = gtk.gdk.Rectangle(monitor)
-        else:
-            usable_rect = monitor
-
-        usable_region = gtk.gdk.region_rectangle(usable_rect)
-        if not usable_region.get_rectangles():
-            logging.error("get_workarea received an empty monitor region!")
-
-        if ignore_struts:
-            logging.debug("Panels ignored. Reported monitor geometry is:\n%s",
-                          usable_rect)
-            return usable_region, usable_rect
-
-        root_win = self.gdk_screen.get_root_window()
-
-        struts = []
-        if self.gdk_screen.supports_net_wm_hint("_NET_WM_STRUT_PARTIAL"):
-            # Gather all struts
-            struts.append(root_win.property_get("_NET_WM_STRUT_PARTIAL"))
-            if self.gdk_screen.supports_net_wm_hint("_NET_CLIENT_LIST"):
-                # Source: http://stackoverflow.com/a/11332614/435253
-                for wid in root_win.property_get('_NET_CLIENT_LIST')[2]:
-                    w = gtk.gdk.window_foreign_new(wid)
-                    struts.append(w.property_get("_NET_WM_STRUT_PARTIAL"))
-            struts = [x[2] for x in struts if x]
-
-            logging.debug("Gathered _NET_WM_STRUT_PARTIAL values:\n\t%s",
-                          struts)
-
-            # Subtract the struts from the usable region
-            _Sub = lambda *g: usable_region.subtract(
-                gtk.gdk.region_rectangle(g))
-            _w, _h = self.gdk_screen.get_width(), self.gdk_screen.get_height()
-            for g in struts:  # pylint: disable=invalid-name
-                # http://standards.freedesktop.org/wm-spec/1.5/ar01s05.html
-                # XXX: Must not cache unless watching for notify events.
-                _Sub(0, g[4], g[0], g[5] - g[4] + 1)             # left
-                _Sub(_w - g[1], g[6], g[1], g[7] - g[6] + 1)     # right
-                _Sub(g[8], 0, g[9] - g[8] + 1, g[2])             # top
-                _Sub(g[10], _h - g[3], g[11] - g[10] + 1, g[3])  # bottom
-
-            # Generate a more restrictive version used as a fallback
-            usable_rect = usable_region.copy()
-            _Sub = lambda *g: usable_rect.subtract(gtk.gdk.region_rectangle(g))
-            for geom in struts:
-                # http://standards.freedesktop.org/wm-spec/1.5/ar01s05.html
-                # XXX: Must not cache unless watching for notify events.
-                _Sub(0, geom[4], geom[0], _h)             # left
-                _Sub(_w - geom[1], geom[6], geom[1], _h)  # right
-                _Sub(0, 0, _w, geom[2])                   # top
-                _Sub(0, _h - geom[3], _w, geom[3])        # bottom
-                # TODO: The required "+ 1" in certain spots confirms that we're
-                #       going to need unit tests which actually check that the
-                #       WM's code for constraining windows to the usable area
-                #       doesn't cause off-by-one bugs.
-                # TODO: Share this on http://stackoverflow.com/q/2598580/435253
-            usable_rect = usable_rect.get_clipbox()
-        elif self.gdk_screen.supports_net_wm_hint("_NET_WORKAREA"):
-            desktop_geo = tuple(root_win.property_get('_NET_WORKAREA')[2][0:4])
-            logging.debug("Falling back to _NET_WORKAREA: %s", desktop_geo)
-            usable_region.intersect(gtk.gdk.region_rectangle(desktop_geo))
-            usable_rect = usable_region.get_clipbox()
-
-        # FIXME: Only call get_rectangles if --debug
-        logging.debug("Usable region of monitor calculated as:\n"
-                      "\tRegion: %r\n\tRectangle: %r",
-                      usable_region.get_rectangles(), usable_rect)
-        return usable_region, usable_rect
 
     def get_workspace(self, window=None, direction=None):
         """Get a workspace relative to either a window or the active one.
