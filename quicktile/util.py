@@ -6,7 +6,27 @@ __license__ = "GNU GPL 2.0 or later"
 from itertools import chain, combinations
 from UserDict import DictMixin
 
-def powerset(iterable):
+# Allow MyPy to work without depending on the `typing` package
+# (And silence complaints from only using the imported types in comments)
+try:
+    # pylint: disable=unused-import
+    from typing import (Any, Callable, Dict, Iterable, Iterator, List,  # NOQA
+                        Optional, Sequence, Tuple, TYPE_CHECKING)
+    from mypy_extensions import VarArg, KwArg  # NOQA
+
+    if TYPE_CHECKING:
+        from .wm import WindowManager  # NOQA
+
+    # pylint: disable=C0103
+    PercentRect = Tuple[float, float, float, float]
+    Strut = Tuple[int, int, int, int, int, int, int, int, int, int, int, int]
+
+    # FIXME: Replace */** with a dict so I can be strict here
+    CommandCB = Callable[..., Any]
+except:  # pylint: disable=bare-except
+    pass
+
+def powerset(iterable):  # type: (Iterable[Any]) -> Iterator[Sequence[Any]]
     """C{powerset([1,2,3])} --> C{() (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)}
 
     @rtype: iterable
@@ -14,7 +34,10 @@ def powerset(iterable):
     i = list(iterable)
     return chain.from_iterable(combinations(i, j) for j in range(len(i) + 1))
 
-def fmt_table(rows, headers, group_by=None):
+def fmt_table(rows,          # type: Any
+              headers,       # type: Sequence
+              group_by=None  # type: Optional[int]
+              ):  # type: (...) -> str
     """Format a collection as a textual table.
 
     @param headers: Header labels for the columns
@@ -28,12 +51,12 @@ def fmt_table(rows, headers, group_by=None):
 
     @rtype: C{str}
     """
-    output = []
+    output = []  # type: List[str]
 
     if isinstance(rows, dict):
         rows = list(sorted(rows.items()))
 
-    groups = {}
+    groups = {}  # type: Dict[str, List[str]]
     if group_by is not None:
         headers = list(headers)
         headers.pop(group_by)
@@ -94,7 +117,7 @@ class EnumSafeDict(DictMixin):
         ktype = type(key)
         return ktype in self._contents and key in self._contents[ktype]
 
-    def __delitem__(self, key):
+    def __delitem__(self, key):  # type: (Any) -> None
         if key in self:
             ktype = type(key)
             section = self._contents[ktype]
@@ -104,7 +127,7 @@ class EnumSafeDict(DictMixin):
         else:
             raise KeyError(key)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key):  # type: (Any) -> Any
         if key in self:
             return self._contents[type(key)][key]
         else:
@@ -115,18 +138,21 @@ class EnumSafeDict(DictMixin):
             for key in section.keys():
                 yield key
 
+    def __len__(self):
+        return len(self._contents)
+
     def __repr__(self):
         return "%s(%s)" % (self.__class__.__name__,
             ', '.join(repr(x) for x in self._contents.values()))
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value):  # type: (Any, Any) -> None
         ktype = type(key)
         self._contents.setdefault(ktype, {})[key] = value
 
     def iteritems(self):
         return [(key, self[key]) for key in self]
 
-    def keys(self):
+    def keys(self):  # type: () -> List[Any]
         """D.keys() -> list of D's keys"""
         return list(self)
 

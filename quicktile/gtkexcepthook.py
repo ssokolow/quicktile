@@ -45,6 +45,7 @@ import gtk, pango
 #     return trace
 
 def lookup(name, frame, lcls):
+    # TODO: MyPy type signature
     '''Find the value for a given name in the given frame'''
     if name in lcls:
         return 'local', lcls[name]
@@ -61,6 +62,7 @@ def lookup(name, frame, lcls):
     return None, []
 
 def analyse(exctyp, value, tback):
+    # TODO: MyPy type signature
     import tokenize, keyword
 
     trace = StringIO()
@@ -124,6 +126,7 @@ def analyse(exctyp, value, tback):
     return trace
 
 def _info(exctyp, value, tback):
+    # TODO: MyPy type signature
     # pylint: disable=no-member
     trace = None
     dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_WARNING,
@@ -231,7 +234,7 @@ def _info(exctyp, value, tback):
 
     dialog.destroy()
 
-def enable():
+def enable():  # type: () -> None
     """Call this to set gtkexcepthook as the default exception handler"""
     sys.excepthook = _info
 
@@ -241,7 +244,7 @@ if __name__ == '__main__':
         """Just something interesting to show in the augmented traceback"""
         y = 'Test'
 
-        def __init__(self):
+        def __init__(self): # type: () -> None
             self.z = self  # pylint: disable=invalid-name
     x = TestFodder()
     w = ' e'

@@ -12,6 +12,23 @@ import gtk.gdk, wnck  # pylint: disable=import-error
 from .wm import GRAVITY
 from .util import fmt_table
 
+# Allow MyPy to work without depending on the `typing` package
+# (And silence complaints from only using the imported types in comments)
+try:
+    # pylint: disable=unused-import
+    from typing import (Any, Callable, Dict, Iterable, Iterator, List,  # NOQA
+                        Optional, Sequence, Tuple, TYPE_CHECKING)
+    from mypy_extensions import VarArg, KwArg  # NOQA
+
+    if TYPE_CHECKING:
+        from .wm import WindowManager  # NOQA
+        from .util import CommandCB
+
+    # FIXME: Replace */** with a dict so I can be strict here
+    CommandCBWrapper = Callable[..., Any]
+except:  # pylint: disable=bare-except
+    pass
+
 class CommandRegistry(object):
     """Handles lookup and boilerplate for window management commands.
 
@@ -19,18 +36,20 @@ class CommandRegistry(object):
     GDK Screen object.
     """
 
-    def __init__(self):
-        self.commands = {}
-        self.help = {}
+    def __init__(self):  # type: () -> None
+        self.commands = {}  # type: Dict[str, CommandCBWrapper]
+        self.help = {}      # type: Dict[str, str]
 
-    def __iter__(self):
+    def __iter__(self):  # type: () -> Iterator[str]
         for x in self.commands:
             yield x
 
-    def __str__(self):
+    def __str__(self):   # type: () -> str
         return fmt_table(self.help, ('Known Commands', 'desc'), group_by=1)
 
     def add(self, name, *p_args, **p_kwargs):
+        # type: (str, *Any, **Any) -> Callable[[CommandCB], CommandCB]
+        # TODO: Rethink the return value of the command function.
         """Decorator to wrap a function in boilerplate and add it to the
             command registry under the given name.
 
@@ -43,11 +62,12 @@ class CommandRegistry(object):
             @type name: C{str}
             """
 
-        def decorate(func):
+        def decorate(func):  # type: (CommandCB) -> CommandCB
             """Closure used to allow decorator to take arguments"""
             @wraps(func)
             # pylint: disable=missing-docstring
             def wrapper(winman, window=None, *args, **kwargs):
+                # TODO: Add a MyPy type signature
 
                 # Get Wnck and GDK window objects
                 window = window or winman.screen.get_active_window()
@@ -98,6 +118,7 @@ class CommandRegistry(object):
                 logging.warn("Redefining existing command: %s", name)
             self.commands[name] = wrapper
 
+            assert func.__doc__, ("Command must have a docstring: %r" % func)
             help_str = func.__doc__.strip().split('\n')[0].split('. ')[0]
             self.help[name] = help_str.strip('.')
 
@@ -108,12 +129,15 @@ class CommandRegistry(object):
         return decorate
 
     def add_many(self, command_map):
+        # type: (Dict[str, List[Any]]) -> Callable[[CommandCB], CommandCB]
+        # TODO: Make this type signature more strict
         """Convenience decorator to allow many commands to be defined from
            the same function with different arguments.
 
            @param command_map: A dict mapping command names to argument lists.
            @type command_map: C{dict}
            """
+        # TODO: Refactor and redesign for better maintainability
         def decorate(func):
             """Closure used to allow decorator to take arguments"""
             for cmd, arglist in command_map.items():
@@ -122,6 +146,8 @@ class CommandRegistry(object):
         return decorate
 
     def call(self, command, winman, *args, **kwargs):
+        # type: (str, WindowManager, *Any, **Any) -> Any
+        # TODO: Decide what to do about return values
         """Resolve a textual positioning command and execute it."""
         cmd = self.commands.get(command, None)
 
@@ -136,7 +162,13 @@ class CommandRegistry(object):
 #: The instance of L{CommandRegistry} to be used in 99.9% of use cases.
 commands = CommandRegistry()
 
-def cycle_dimensions(winman, win, state, *dimensions):
+def cycle_dimensions(winman,      # type: WindowManager
+                     win,         # type: Any  # TODO: Consistent Window type
+                     state,       # type: Dict[str, Any]
+                     *dimensions  # type: Any
+                     ):  # type: (...) -> Optional[gtk.gdk.Rectangle]
+    # type: (WindowManager, Any, Dict[str, Any], *Tuple[...]) ->
+    # TODO: Standardize on what kind of window object to pass around
     """Cycle the active window through a list of positions and shapes.
 
     Takes one step each time this function is called.
@@ -183,7 +215,7 @@ def cycle_dimensions(winman, win, state, *dimensions):
 
     # Calculate euclidean distances between the window's current geometry
     # and all presets and store them in a min heap.
-    euclid_distance = []
+    euclid_distance = []  # type: List[Tuple[int, int]]
     for pos, val in enumerate(dims):
         distance = sum([(wg - vv) ** 2 for (wg, vv)
                         in zip(tuple(win_geom), tuple(val))]) ** 0.5
@@ -222,6 +254,7 @@ def cycle_dimensions(winman, win, state, *dimensions):
 @commands.add('monitor-next', 1)
 @commands.add('monitor-prev', -1)
 def cycle_monitors(winman, win, state, step=1):
+    # type: (WindowManager, Any, Any, int) -> None
     """Cycle the active window between monitors while preserving position.
 
     @todo 1.0.0: Remove C{monitor-switch} in favor of C{monitor-next}
@@ -239,6 +272,7 @@ def cycle_monitors(winman, win, state, step=1):
 @commands.add('monitor-prev-all', -1)
 @commands.add('monitor-next-all', 1)
 def cycle_monitors_all(winman, win, state, step=1):
+    # type: (WindowManager, wnck.Window, Any, int) -> None
     """Cycle all windows between monitors while preserving position."""
     n_monitors = winman.gdk_screen.get_n_monitors()
     curr_workspace = win.get_workspace()
@@ -289,7 +323,12 @@ MOVE_TO_COMMANDS = {
 }
 
 @commands.add_many(MOVE_TO_COMMANDS)
-def move_to_position(winman, win, state, gravity, gravity_mask):
+def move_to_position(winman,       # type: WindowManager
+                     win,          # type: Any  # TODO: Make this specific
+                     state,        # type: Dict[str, Any]
+                     gravity,      # type: Any  # TODO: Make this specific
+                     gravity_mask  # type: wnck.WindowMoveResizeMask
+                     ):  # type: (...) -> None  # TODO: Decide on a return type
     """Move window to a position on the screen, preserving its dimensions."""
     use_rect = state['usable_rect']
 
@@ -305,12 +344,14 @@ def move_to_position(winman, win, state, gravity, gravity_mask):
 
 @commands.add('bordered')
 def toggle_decorated(winman, win, state):  # pylint: disable=unused-argument
+    # type: (WindowManager, wnck.Window, Any) -> None
     """Toggle window state on the active window."""
     win = gtk.gdk.window_foreign_new(win.get_xid())
     win.set_decorations(not win.get_decorations())
 
 @commands.add('show-desktop')
 def toggle_desktop(winman, win, state):  # pylint: disable=unused-argument
+    # type: (WindowManager, Any, Any) -> None
     """Toggle "all windows minimized" to view the desktop"""
     target = not winman.screen.get_showing_desktop()
     winman.screen.toggle_showing_desktop(target)
@@ -328,6 +369,7 @@ def toggle_desktop(winman, win, state):  # pylint: disable=unused-argument
 @commands.add('shade', 'shade', 'is_shaded')
 # pylint: disable=unused-argument,too-many-arguments
 def toggle_state(winman, win, state, command, check, takes_bool=False):
+    # type: (WindowManager, wnck.Window, Any, str, str, bool) -> None
     """Toggle window state on the active window.
 
     @param command: The C{wnck.Window} method name to be conditionally prefixed
@@ -355,6 +397,7 @@ def toggle_state(winman, win, state, command, check, takes_bool=False):
 @commands.add('trigger-resize', 'size')
 # pylint: disable=unused-argument
 def trigger_keyboard_action(winman, win, state, command):
+    # type: (WindowManager, wnck.Window, Any, str) -> None
     """Ask the Window Manager to begin a keyboard-driven operation."""
     getattr(win, 'keyboard_' + command)()
 
@@ -365,6 +408,7 @@ def trigger_keyboard_action(winman, win, state, command):
 @commands.add('workspace-go-left', wnck.MOTION_LEFT)    # pylint: disable=E1101
 @commands.add('workspace-go-right', wnck.MOTION_RIGHT)  # pylint: disable=E1101
 def workspace_go(winman, win, state, motion):  # pylint: disable=W0613
+    # type: (WindowManager, wnck.Window, Any, wnck.MotionDirection) -> None
     """Switch the active workspace (next/prev wrap around)"""
     target = winman.get_workspace(None, motion)
     if not target:
@@ -380,6 +424,7 @@ def workspace_go(winman, win, state, motion):  # pylint: disable=W0613
 @commands.add('workspace-send-right', wnck.MOTION_RIGHT)
 # pylint: disable=unused-argument
 def workspace_send_window(winman, win, state, motion):
+    # type: (WindowManager, wnck.Window, Any, wnck.MotionDirection) -> None
     """Move the active window to another workspace (next/prev wrap around)"""
     target = winman.get_workspace(win, motion)
     if not target:

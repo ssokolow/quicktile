@@ -42,10 +42,11 @@ class ComplainingEnum(object):
 
     (A stricter version of the annoyance I observed in Glib enums.)
     """
-    def __init__(self, testcase):
+    def __init__(self, testcase):  # type: (unittest.TestCase) -> None
         self.testcase = testcase
+        # TODO: Why did I store this value again?
 
-    def __cmp__(self, other):
+    def __cmp__(self, other):  # type: (ComplainingEnum) -> int
         """Raises an exception if comparing against another type.
         @raises TypeError: C{type(self) != type(other)}
         @returns: C{id(self) == id(other)}
@@ -64,7 +65,7 @@ class Thing2(ComplainingEnum):
 
 class TestCommandRegistry(unittest.TestCase):
     """Tests for the CommandRegistry class"""
-    def setUp(self):
+    def setUp(self):  # type: () -> None
         self.registry = commands.CommandRegistry()
 
     # TODO: Implement tests for CommandRegistry
@@ -81,7 +82,7 @@ class TestCommandRegistry(unittest.TestCase):
 
 class TestEnumSafeDict(unittest.TestCase):
     """Tests to ensure EnumSafeDict never compares enums of different types"""
-    def setUp(self):
+    def setUp(self):  # type: () -> None
         self.thing1 = Thing1(self)
         self.thing2 = Thing2(self)
 
@@ -96,14 +97,14 @@ class TestEnumSafeDict(unittest.TestCase):
         self.full = EnumSafeDict(
                 *[dict([x]) for x in self.test_mappings])
 
-    def test_testing_shims(self):
+    def test_testing_shims(self): # type: () -> None
         """EnumSafeDict: Testing shims function correctly"""
         for oper in ('lt', 'le', 'eq', 'ne', 'ge', 'gt'):
             with self.assertRaises(TypeError):
                 print "Testing %s..." % oper
                 getattr(operator, oper)(self.thing1, self.thing2)
 
-    def test_init_with_content(self):
+    def test_init_with_content(self):  # type: () -> None
         """EnumSafeDict: Initialization with content"""
 
         test_map = self.test_mappings[:]
@@ -117,7 +118,7 @@ class TestEnumSafeDict(unittest.TestCase):
         self.assertFalse(test_map, "EnumSafeDict must contain ONLY things from"
                 " the input.")
 
-    def test_get_set_del(self):
+    def test_get_set_del(self):  # type: () -> None
         """EnumSafeDict: get/set/delitem"""
 
         # Test the "no matching key" branch of __getitem__
@@ -150,7 +151,7 @@ class TestHelpers(unittest.TestCase):
     @todo: Switch to pytest to get the assertEqual readout from assert in
            bare functions.
     """
-    def test_powerset(self):
+    def test_powerset(self):  # type: () -> None
         """Test that powerset() behaves as expected"""
         src_set = (1, 2, 3)
         expected = [(), (1,), (2,), (3,), (1, 2), (1, 3), (2, 3), (1, 2, 3)]
@@ -175,14 +176,14 @@ class TestHelpers(unittest.TestCase):
 
     # TODO: Test _make_positions
 
-    def test_xiniterror_str(self):
+    def test_xiniterror_str(self):  # type: () -> None
         """XInitError.__str__ output contains provided text"""
         self.assertIn("Testing 123", XInitError("Testing 123"))
 
 class TestWindowGravity(unittest.TestCase):
     """Test the equivalence and correctness of L{wm.GRAVITY} values."""
 
-    def setUp(self):
+    def setUp(self):  # type: () -> None
         # Set up a nice, oddly-shaped fake desktop made from screens
         # I actually have access to (though not all on the same PC)
         self.screens = [
@@ -197,7 +198,7 @@ class TestWindowGravity(unittest.TestCase):
         for rect in self.screens:
             self.desktop.union_with_rect(rect)
 
-    def test_gravity_equivalence(self):
+    def test_gravity_equivalence(self):  # type: () -> None
         """Gravity Lookup Table: text/GDK/WNCK constants are equivalent"""
         for alignment in ('CENTER', 'NORTH', 'NORTH_WEST', 'SOUTH_EAST',
                           'EAST', 'NORTH_EAST', 'SOUTH', 'SOUTH_WEST', 'WEST'):
@@ -209,7 +210,7 @@ class TestWindowGravity(unittest.TestCase):
                 wm.GRAVITY[getattr(gtk.gdk, 'GRAVITY_{}'.format(
                     alignment))])
 
-    def test_gravity_correctness(self):
+    def test_gravity_correctness(self):  # type: () -> None
         """Gravity Lookup Table: Constants have correct percentage values"""
         for alignment, coords in (
                 ('NORTH_WEST', (0, 0)), ('NORTH', (0.5, 0)),
@@ -223,7 +224,7 @@ class TestWindowGravity(unittest.TestCase):
 class TestWindowManagerDetached(unittest.TestCase):
     """Tests which exercise L{wm.WindowManager} without needing X11."""
 
-    def setUp(self):
+    def setUp(self):  # type: () -> None
         # Shorthand
         self.WM = wm.WindowManager  # pylint: disable=invalid-name
 
@@ -241,7 +242,7 @@ class TestWindowManagerDetached(unittest.TestCase):
         for rect in self.screens:
             self.desktop.union_with_rect(rect)
 
-    def test_win_gravity_noop(self):
+    def test_win_gravity_noop(self):  # type: () -> None
         """WindowManager.calc_win_gravity: north-west should be a no-op
 
         (Might as well use the screen shapes to test this. It saves effort.)
@@ -251,7 +252,7 @@ class TestWindowManagerDetached(unittest.TestCase):
                 self.WM.calc_win_gravity(rect, gtk.gdk.GRAVITY_NORTH_WEST),
                 "NORTHWEST gravity should be a no-op.")
 
-    def test_win_gravity_results(self):
+    def test_win_gravity_results(self):  # type: () -> None
         """WindowManager.calc_win_gravity: proper results"""
         for edge in (100, 200):
             ehalf = edge / 2

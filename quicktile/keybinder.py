@@ -12,6 +12,20 @@ from Xlib.error import BadAccess, DisplayConnectionError
 
 from .util import powerset, XInitError
 
+# Allow MyPy to work without depending on the `typing` package
+# (And silence complaints from only using the imported types in comments)
+try:
+    # pylint: disable=unused-import
+    from typing import (Any, Callable, Dict, Iterable, Iterator, List,  # NOQA
+                        Optional, Sequence, Sized, Tuple)
+
+    from Xlib.error import XError          # NOQA
+    from .commands import CommandRegistry  # NOQA
+    from .wm import WindowManager          # NOQA
+    from .util import CommandCB            # NOQA
+except:  # pylint: disable=bare-except
+    pass
+
 class KeyBinder(object):
     """A convenience class for wrapping C{XGrabKey}."""
 
@@ -22,7 +36,7 @@ class KeyBinder(object):
     #: Used to pass state from L{handle_xerror}
     keybind_failed = False
 
-    def __init__(self, xdisplay=None):
+    def __init__(self, xdisplay=None):  # type: (Optional[Display]) -> None
         """Connect to X11 and the Glib event loop.
 
         @param xdisplay: A C{python-xlib} display handle.
@@ -39,11 +53,11 @@ class KeyBinder(object):
                              % err.__class__.__name__)
 
         self.xroot = self.xdisp.screen().root
-        self._keys = {}
+        self._keys = {}  # type: Dict[int, List[Tuple[int, Callable]]]
 
         # Resolve these at runtime to avoid NameErrors
-        self.ignored_modifiers = [getattr(X, name) for name in
-                self.ignored_modifiers]
+        self._ignored_modifiers = [getattr(X, name) for name in
+                                   self.ignored_modifiers]  # type: List[int]
 
         # We want to receive KeyPress events
         self.xroot.change_attributes(event_mask=X.KeyPressMask)
@@ -56,7 +70,7 @@ class KeyBinder(object):
         gobject.io_add_watch(self.xroot.display,
                              gobject.IO_IN, self.handle_xevent)
 
-    def bind(self, accel, callback):
+    def bind(self, accel, callback):  # type: (str, Callable[[], None]) -> bool
         """Bind a global key combination to a callback.
 
         @param accel: An accelerator as either a string to be parsed by
@@ -94,7 +108,7 @@ class KeyBinder(object):
             modmask = modmask.real
 
         # Ignore modifiers like Mod2 (NumLock) and Lock (CapsLock)
-        for mmask in self._vary_modmask(modmask, self.ignored_modifiers):
+        for mmask in self._vary_modmask(modmask, self._ignored_modifiers):
             self._keys.setdefault(keycode, []).append((mmask, callback))
             self.xroot.grab_key(keycode, mmask,
                     1, X.GrabModeAsync, X.GrabModeAsync)
@@ -107,8 +121,11 @@ class KeyBinder(object):
             self.keybind_failed = False
             logging.warning("Failed to bind key. It may already be in use: %s",
                 accel)
+            return False
 
-    def handle_xerror(self, err, _):
+        return True
+
+    def handle_xerror(self, err, _):  # type: (XError, Any) -> None
         """Used to identify when attempts to bind keys fail.
         @note: If you can make python-xlib's C{CatchError} actually work or if
                you can retrieve more information to show, feel free.
@@ -119,6 +136,7 @@ class KeyBinder(object):
             self.xdisp.display.default_error_handler(err)
 
     def handle_xevent(self, src, cond, handle=None):  # pylint: disable=W0613
+        # type: (Any, Any, Display) -> bool
         """Dispatch C{XKeyPress} events to their callbacks.
 
         @rtype: C{True}
@@ -162,6 +180,7 @@ class KeyBinder(object):
 
     @staticmethod
     def _vary_modmask(modmask, ignored):
+        # type: (int, Sequence[int]) -> Iterator[int]
         """Generate all possible variations on C{modmask} that need to be
         taken into consideration if we can't properly ignore the modifiers in
         C{ignored}. (Typically NumLock and CapsLock)
@@ -179,7 +198,11 @@ class KeyBinder(object):
             imask = reduce(lambda x, y: x | y, ignored, 0)
             yield modmask | imask
 
-def init(modmask, mappings, commands, winman):
+def init(modmask,   # type: Optional[str]
+         mappings,  # type: Dict[str, CommandCB]
+         commands,  # type: CommandRegistry
+         winman     # type: WindowManager
+         ):         # type: (...) -> Optional[KeyBinder]
     """Initialize the keybinder and bind the requested mappings"""
     # Allow modmask to be empty for keybinds which don't share a common prefix
     if not modmask or modmask.lower() == 'none':
@@ -188,7 +211,7 @@ def init(modmask, mappings, commands, winman):
     try:
         keybinder = KeyBinder()
     except XInitError as err:
-        logging.error(err)
+        logging.error("%s", err)
         return None
     else:
         # TODO: Take a mapping dict with pre-modmasked keys

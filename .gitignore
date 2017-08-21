@@ -2,6 +2,7 @@ build
 .coverage
 dist
 html
+.mypy_cache
 _site
 .tox
 QuickTile.egg-info

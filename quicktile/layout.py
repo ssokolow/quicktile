@@ -3,6 +3,17 @@
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
+# Allow MyPy to work without depending on the `typing` package
+# (And silence complaints from only using the imported types in comments)
+try:
+    # pylint: disable=unused-import
+    from typing import (Any, Dict, Iterable, Iterator, List, Optional,  # NOQA
+                        Sequence, Sized, Tuple)
+
+    from .util import PercentRect  # NOQA
+except:  # pylint: disable=bare-except
+    pass
+
 class GravityLayout(object):  # pylint: disable=too-few-public-methods
     """Helper for translating top-left relative dimensions to other corners.
 
@@ -23,9 +34,9 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
         'bottom-left': (0.0, 1.0),
         'bottom': (0.5, 1.0),
         'bottom-right': (1.0, 1.0),
-    }
+    }  # type: Dict[str, Tuple[float, float]]
 
-    def __init__(self, margin_x=0, margin_y=0):
+    def __init__(self, margin_x=0, margin_y=0):  # type: (int, int) -> None
         """
         @param margin_x: Horizontal margin to apply when calculating window
             positions, as decimal percentage of screen width.
@@ -36,7 +47,13 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
         self.margin_y = margin_y
 
     # pylint: disable=too-many-arguments
-    def __call__(self, w, h, gravity='top-left', x=None, y=None):
+    def __call__(self,
+                 w,                   # type: float
+                 h,                   # type: float
+                 gravity='top-left',  # type: str
+                 x=None,              # type: Optional[float]
+                 y=None               # type: Optional[float]
+                 ):  # type: (...) -> Tuple[float, float, float, float]
         """Return an C{(x, y, w, h)} tuple relative to C{gravity}.
 
         This function takes and returns percentages, represented as decimals
@@ -76,6 +93,7 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
                 round(h - (self.margin_y * 2), 3))
 
 def make_winsplit_positions(columns):
+    # type: (int) -> Dict[str, List[PercentRect]]
     """Generate the classic WinSplit Revolution tiling presets
 
     @todo: Figure out how best to put this in the config file.

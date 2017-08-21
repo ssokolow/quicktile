@@ -6,8 +6,18 @@ __license__ = "GNU GPL 2.0 or later"
 import logging
 
 import gtk.gdk, wnck  # pylint: disable=import-error
+from gtk.gdk import Rectangle
 
 from .util import EnumSafeDict, XInitError
+
+# Allow MyPy to work without depending on the `typing` package
+# (And silence complaints from only using the imported types in comments)
+try:
+    # pylint: disable=unused-import
+    from typing import List, Sequence, Tuple  # NOQA
+    from .util import Strut
+except:  # pylint: disable=bare-except
+    pass
 
 #: Lookup table for internal window gravity support.
 #: (libwnck's support is either unreliable or broken)
@@ -39,19 +49,21 @@ del _name, key, val
 class WorkArea(object):
     """Helper to calculate and query available workarea on the desktop."""
     def __init__(self, gdk_screen, ignore_struts=False):
+        # type: (gtk.gdk.Screen, bool) -> None
         self.gdk_screen = gdk_screen
         self.ignore_struts = ignore_struts
 
+    # TODO: MyPy type signature
     def get_monitor_rect(self, monitor):
         """Helper to normalize various monitor identifiers."""
         if isinstance(monitor, int):
             usable_rect = self.gdk_screen.get_monitor_geometry(monitor)
             logging.debug("Retrieved geometry %s for monitor #%s",
                           usable_rect, monitor)
-        elif not isinstance(monitor, gtk.gdk.Rectangle):
+        elif not isinstance(monitor, Rectangle):
             logging.debug("Converting geometry %s to gtk.gdk.Rectangle",
                           monitor)
-            usable_rect = gtk.gdk.Rectangle(monitor)
+            usable_rect = Rectangle(monitor)
         else:
             usable_rect = monitor
 
@@ -63,7 +75,7 @@ class WorkArea(object):
 
         return usable_rect, usable_region
 
-    def get_struts(self, root_win):
+    def get_struts(self, root_win):  # type: (gtk.gdk.Window) -> List[Strut]
         """Retrieve the struts from the root window if supported."""
         if not self.gdk_screen.supports_net_wm_hint("_NET_WM_STRUT_PARTIAL"):
             return []
@@ -75,13 +87,15 @@ class WorkArea(object):
             for wid in root_win.property_get('_NET_CLIENT_LIST')[2]:
                 w = gtk.gdk.window_foreign_new(wid)
                 struts.append(w.property_get("_NET_WM_STRUT_PARTIAL"))
-        struts = [x[2] for x in struts if x]
+        struts = [tuple(x[2]) for x in struts if x]
 
         logging.debug("Gathered _NET_WM_STRUT_PARTIAL values:\n\t%s",
                       struts)
         return struts
 
-    def subtract_struts(self, usable_region, struts):
+    def subtract_struts(self, usable_region,  # type: gtk.gdk.Region
+                        struts                # type: Sequence[Strut]
+                        ):  # type: (...) -> Tuple[gtk.gdk.Region, Rectangle]
         """Subtract the given struts from the given region."""
 
         # Subtract the struts from the usable region
@@ -113,6 +127,7 @@ class WorkArea(object):
             # TODO: Share this on http://stackoverflow.com/q/2598580/435253
         return usable_rect.get_clipbox(), usable_region
 
+    # TODO: MyPy type signature
     def get(self, monitor, ignore_struts=None):
         """Retrieve the usable area of the specified monitor using
         the most expressive method the window manager supports.
@@ -157,6 +172,7 @@ class WindowManager(object):
     """A simple API-wrapper class for manipulating window positioning."""
 
     def __init__(self, screen=None, ignore_workarea=False):
+        # type: (gtk.gdk.Screen, bool) -> None
         """
         Initializes C{WindowManager}.
 
@@ -181,8 +197,9 @@ class WindowManager(object):
         self.workarea = WorkArea(self.gdk_screen,
                                  ignore_struts=ignore_workarea)
 
-    @classmethod
-    def calc_win_gravity(cls, geom, gravity):
+    @staticmethod
+    def calc_win_gravity(geom, gravity):
+        # TODO: MyPy type signature
         """Calculate the X and Y coordinates necessary to simulate non-topleft
         gravity on a window.
 
@@ -203,6 +220,7 @@ class WindowManager(object):
 
     @staticmethod
     def get_geometry_rel(window, monitor_geom):
+        # type: (wnck.Window, Rectangle) -> Rectangle
         """Get window position relative to the monitor rather than the desktop.
 
         @param monitor_geom: The rectangle returned by
@@ -212,13 +230,14 @@ class WindowManager(object):
 
         @rtype: C{gtk.gdk.Rectangle}
         """
-        win_geom = gtk.gdk.Rectangle(*window.get_geometry())
+        win_geom = Rectangle(*window.get_geometry())
         win_geom.x -= monitor_geom.x
         win_geom.y -= monitor_geom.y
 
         return win_geom
 
     def get_monitor(self, win):
+        # TODO: MyPy type signature
         """Given a Window (Wnck or GDK), retrieve the monitor ID and geometry.
 
         @type win: C{wnck.Window} or C{gtk.gdk.Window}
@@ -239,6 +258,7 @@ class WindowManager(object):
         return monitor_id, monitor_geom
 
     def get_workspace(self, window=None, direction=None):
+        # TODO: MyPy type signature
         """Get a workspace relative to either a window or the active one.
 
         @param window: The point of reference. C{None} for the active workspace
@@ -278,12 +298,13 @@ class WindowManager(object):
     def reposition(self,
             win,
             geom=None,
-            monitor=gtk.gdk.Rectangle(0, 0, 0, 0),
+            monitor=Rectangle(0, 0, 0, 0),
             keep_maximize=False,
             gravity=wnck.WINDOW_GRAVITY_NORTHWEST,
             geometry_mask=wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y |
                 wnck.WINDOW_CHANGE_WIDTH | wnck.WINDOW_CHANGE_HEIGHT
                    ):  # pylint: disable=no-member,too-many-arguments
+        # TODO: MyPy type signature
         # pylint:disable=line-too-long
         """
         Position and size a window, decorations inclusive, according to the

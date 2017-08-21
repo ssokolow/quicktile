@@ -15,13 +15,21 @@ except ImportError:
 
 import gtk, wnck
 
-import gtkexcepthook
+from . import gtkexcepthook
 gtkexcepthook.enable()
 
 from . import commands, layout
 from .util import fmt_table, XInitError
 from .version import __version__
 from .wm import WindowManager
+
+# Allow MyPy to work without depending on the `typing` package
+# (And silence complaints from only using the imported types in comments)
+try:
+    # pylint: disable=unused-import
+    from typing import Dict, Union # NOQA
+except:  # pylint: disable=bare-except
+    pass
 
 #: Location for config files (determined at runtime).
 XDG_CONFIG_DIR = os.environ.get('XDG_CONFIG_HOME',
@@ -51,7 +59,7 @@ DEFAULTS = {
         "H": "horizontal-maximize",
         "C": "move-to-center",
     }
-}
+}  # type: Dict[str, Dict[str, Union[str, int, float, bool, None]]]
 
 KEYLOOKUP = {
     ',': 'comma',
@@ -61,7 +69,10 @@ KEYLOOKUP = {
 }  #: Used for resolving certain keysyms
 
 
+# TODO: Move this to a more appropriate place
 wnck.set_client_type(wnck.CLIENT_TYPE_PAGER)  # pylint: disable=no-member
+
+# TODO: Audit all of my TODOs and API docs for accuracy and staleness.
 
 class QuickTileApp(object):
     """The basic Glib application itself."""
@@ -71,6 +82,7 @@ class QuickTileApp(object):
     dbus_obj = None
 
     def __init__(self, winman, commands, keys=None, modmask=None):
+        # TODO: MyPy type signature
         """Populate the instance variables.
 
         @param keys: A dict mapping X11 keysyms to L{CommandRegistry}
@@ -78,14 +90,13 @@ class QuickTileApp(object):
         @param modmask: A modifier mask to prefix to all keybindings.
         @type winman: The L{WindowManager} instance to use.
         @type keys: C{dict}
-        @type modmask: C{GdkModifierType}
         """
         self.winman = winman
         self.commands = commands
         self._keys = keys or {}
         self._modmask = modmask or ''
 
-    def run(self):
+    def run(self):  # type: () -> bool
         """Initialize keybinding and D-Bus if available, then call
         C{gtk.main()}.
 
@@ -124,7 +135,7 @@ class QuickTileApp(object):
         else:
             return False
 
-    def show_binds(self):
+    def show_binds(self): # type: () -> None
         """Print a formatted readout of defined keybindings and the modifier
         mask to stdout.
 
@@ -135,7 +146,7 @@ class QuickTileApp(object):
         print "Modifier: %s\n" % (self._modmask or '(none)')
         print fmt_table(self._keys, ('Key', 'Action'))
 
-def main():
+def main():  # type: () -> None
     """setuptools entry point"""
     from optparse import OptionParser, OptionGroup
     parser = OptionParser(usage="%prog [options] [action] ...",
@@ -171,6 +182,7 @@ def main():
                 stdin=subprocess.PIPE)
 
         # Redirect stderr through grep
+        assert glib_log_filter.stdin, "Did not receive stdin for log filter"
         os.dup2(glib_log_filter.stdin.fileno(), sys.stderr.fileno())
 
     # Set up the output verbosity
@@ -183,7 +195,10 @@ def main():
     first_run = not os.path.exists(cfg_path)
 
     config = RawConfigParser()
-    config.optionxform = str  # Make keys case-sensitive
+
+    # Make keys case-sensitive
+    config.optionxform = str  # type: ignore # (Cannot assign to a method)
+
     # TODO: Maybe switch to two config files so I can have only the keys in the
     #       keymap case-sensitive?
     config.read(cfg_path)
@@ -230,8 +245,12 @@ def main():
             dirty = True
 
     if dirty:
-        cfg_file = file(cfg_path, 'wb')
-        config.write(cfg_file)
+        cfg_file = open(cfg_path, 'wb')
+
+        # TODO: REPORT: Argument 1 to "write" of "RawConfigParser" has
+        #               incompatible type BinaryIO"; expected "file"
+        config.write(cfg_file)  # type: ignore
+
         cfg_file.close()
         if first_run:
             logging.info("Wrote default config file to %s", cfg_path)
@@ -247,7 +266,7 @@ def main():
     try:
         winman = WindowManager(ignore_workarea=ignore_workarea)
     except XInitError as err:
-        logging.critical(err)
+        logging.critical("%s", err)
         sys.exit(1)
     app = QuickTileApp(winman, commands.commands, keymap, modmask=modkeys)
 
