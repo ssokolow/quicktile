@@ -83,7 +83,7 @@ class QuickTileApp(object):
         self.winman = winman
         self.commands = commands
         self._keys = keys or {}
-        self._modmask = modmask or gtk.gdk.ModifierType(0)
+        self._modmask = modmask or ''
 
     def run(self):
         """Initialize keybinding and D-Bus if available, then call
@@ -132,7 +132,7 @@ class QuickTileApp(object):
         """
 
         print "Keybindings defined for use with --daemonize:\n"
-        print "Modifier: %s\n" % self._modmask
+        print "Modifier: %s\n" % (self._modmask or '(none)')
         print fmt_table(self._keys, ('Key', 'Action'))
 
 def main():

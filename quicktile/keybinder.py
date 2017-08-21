@@ -181,6 +181,10 @@ class KeyBinder(object):
 
 def init(modmask, mappings, commands, winman):
     """Initialize the keybinder and bind the requested mappings"""
+    # Allow modmask to be empty for keybinds which don't share a common prefix
+    if not modmask or modmask.lower() == 'none':
+        modmask = ''
+
     try:
         keybinder = KeyBinder()
     except XInitError as err:
