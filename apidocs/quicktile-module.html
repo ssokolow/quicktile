@@ -34,7 +34,7 @@
   <tr valign="top">
     <td width="100%">
       <span class="breadcrumbs">
-        Module&nbsp;quicktile
+        Package&nbsp;quicktile
       </span>
     </td>
     <td>
@@ -50,16 +50,16 @@
     </td>
   </tr>
 </table>
-<!-- ==================== MODULE DESCRIPTION ==================== -->
-<h1 class="epydoc">Module quicktile</h1><p class="nomargin-top"><span class="codelink"><a href="quicktile-pysrc.html">source&nbsp;code</a></span></p>
+<!-- ==================== PACKAGE DESCRIPTION ==================== -->
+<h1 class="epydoc">Package quicktile</h1><p class="nomargin-top"><span class="codelink"><a href="quicktile-pysrc.html">source&nbsp;code</a></span></p>
 <p>QuickTile, a WinSplit clone for X11 desktops</p>
   <p>Thanks to Thomas Vander Stichele for some of the documentation 
   cleanups.</p>
 
 <hr />
 <div class="fields">      <p><strong>To Do (1.0.0):</strong>
-        Retire <a href="quicktile-module.html#KEYLOOKUP" 
-    class="link">KEYLOOKUP</a>. (API-breaking change)
+        Retire <a href="quicktile.__main__-module.html#KEYLOOKUP" 
+    class="link">__main__.KEYLOOKUP</a>. (API-breaking change)
       </p>
       <strong>To Do:</strong>
       <ul class="nomargin-top">
@@ -81,10 +81,11 @@
         process-shape associations, locking/welding window edges, etc.)
       </li>
       <li>
-        Consider rewriting <a href="quicktile-module.html#cycle_dimensions"
-        class="link">cycle_dimensions</a> to allow command-line use to jump
-        to a specific index without actually flickering the window through 
-        all the intermediate shapes.
+        Consider rewriting <a 
+        href="quicktile.commands-module.html#cycle_dimensions" 
+        class="link">commands.cycle_dimensions</a> to allow command-line 
+        use to jump to a specific index without actually flickering the 
+        window through all the intermediate shapes.
       </li>
       <li>
         Can I hook into the GNOME and KDE keybinding APIs without using 
@@ -116,9 +117,6 @@
     </ul>
         </li>
       </ul>
-      <p><strong>Version:</strong>
-        0.2.2
-      </p>
       <p><strong>Author:</strong>
         Stephan Sokolow (deitarion/SSokolow)
       </p>
@@ -128,350 +126,38 @@
       <p><strong>Application Name:</strong>
         QuickTile
       </p>
-</div><!-- ==================== CLASSES ==================== -->
-<a name="section-Classes"></a>
+</div><!-- ==================== SUBMODULES ==================== -->
+<a name="section-Submodules"></a>
 <table class="summary" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr bgcolor="#70b0f0" class="table-header">
   <td colspan="2" class="table-header">
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
       <tr valign="top">
-        <td align="left"><span class="table-header">Classes</span></td>
+        <td align="left"><span class="table-header">Submodules</span></td>
         <td align="right" valign="top"
-         ><span class="options">[<a href="#section-Classes"
+         ><span class="options">[<a href="#section-Submodules"
          class="privatelink" onclick="toggle_private();"
          >hide private</a>]</span></td>
       </tr>
     </table>
   </td>
 </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="quicktile.CommandRegistry-class.html" class="summary-name">CommandRegistry</a><br />
-      Handles lookup and boilerplate for window management commands.
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="quicktile.WindowManager-class.html" class="summary-name">WindowManager</a><br />
-      A simple API-wrapper class for manipulating window positioning.
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="quicktile.KeyBinder-class.html" class="summary-name">KeyBinder</a><br />
-      A convenience class for wrapping <code>XGrabKey</code>.
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="quicktile.QuickTileApp-class.html" class="summary-name">QuickTileApp</a><br />
-      The basic Glib application itself.
-    </td>
-  </tr>
-<tr bgcolor="#e8f0f8" >
-  <th colspan="2" class="group-header"
-    >&nbsp;&nbsp;&nbsp;&nbsp;Settings</th></tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="quicktile.GravityLayout-class.html" class="summary-name">GravityLayout</a><br />
-      Helper for translating top-left relative dimensions to other 
-        corners.
-    </td>
-  </tr>
-<tr bgcolor="#e8f0f8" >
-  <th colspan="2" class="group-header"
-    >&nbsp;&nbsp;&nbsp;&nbsp;Helpers</th></tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="quicktile.EnumSafeDict-class.html" class="summary-name">EnumSafeDict</a><br />
-      A dict-like object which avoids comparing objects of different 
-        types to avoid triggering spurious Glib &quot;comparing different 
-        enum types&quot; warnings.
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="quicktile.XInitError-class.html" class="summary-name">XInitError</a><br />
-      Raised when something outside our control causes the X11 connection
-        to fail.
-    </td>
-  </tr>
+  <tr><td class="summary">
+  <ul class="nomargin">
+    <li class="private"> <strong class="uidlink"><a href="quicktile.__main__-module.html">quicktile.__main__</a></strong>: <em class="summary">Entry point and related functionality</em>    </li>
+    <li> <strong class="uidlink"><a href="quicktile.commands-module.html">quicktile.commands</a></strong>: <em class="summary">Available window-management commands</em>    </li>
+    <li> <strong class="uidlink"><a href="quicktile.dbus_api-module.html">quicktile.dbus_api</a></strong>: <em class="summary">D-Bus API for controlling QuickTile</em>    </li>
+    <li> <strong class="uidlink"><a href="quicktile.gtkexcepthook-module.html">quicktile.gtkexcepthook</a></strong>: <em class="summary">Graphical exception handler for PyGTK applications</em>    </li>
+    <li> <strong class="uidlink"><a href="quicktile.keybinder-module.html">quicktile.keybinder</a></strong>: <em class="summary">Xlib-based global hotkey-binding code</em>    </li>
+    <li> <strong class="uidlink"><a href="quicktile.layout-module.html">quicktile.layout</a></strong>: <em class="summary">Layout calculation code</em>    </li>
+    <li> <strong class="uidlink"><a href="quicktile.util-module.html">quicktile.util</a></strong>: <em class="summary">Helper functions and classes</em>    </li>
+    <li> <strong class="uidlink"><a href="quicktile.version-module.html">quicktile.version</a></strong>: <em class="summary">Common definition of the version for use in various places</em>    </li>
+    <li> <strong class="uidlink"><a href="quicktile.wm-module.html">quicktile.wm</a></strong>: <em class="summary">Wrapper around libwnck for interacting with the window manager</em>    </li>
+  </ul></td></tr>
 </table>
-<!-- ==================== FUNCTIONS ==================== -->
-<a name="section-Functions"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Functions</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-Functions"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-<tr bgcolor="#e8f0f8"  class="private">
-  <th colspan="2" class="group-header"
-    >&nbsp;&nbsp;&nbsp;&nbsp;Settings</th></tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile-module.html#_make_positions" class="summary-sig-name" onclick="show_private();">_make_positions</a>()</span><br />
-      Generate the classic WinSplit Revolution tiling presets</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#_make_positions">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr bgcolor="#e8f0f8" >
-  <th colspan="2" class="group-header"
-    >&nbsp;&nbsp;&nbsp;&nbsp;Helpers</th></tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">iterable</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="powerset"></a><span class="summary-sig-name">powerset</span>(<span class="summary-sig-arg">iterable</span>)</span><br />
-      <code>powerset([1,2,3])</code> --&gt; <code>() (1,) (2,) (3,) (1,2) 
-      (1,3) (2,3) (1,2,3)</code></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#powerset">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>str</code></span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile-module.html#fmt_table" class="summary-sig-name">fmt_table</a>(<span class="summary-sig-arg">rows</span>,
-        <span class="summary-sig-arg">headers</span>,
-        <span class="summary-sig-arg">group_by</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Format a collection as a textual table.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#fmt_table">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr bgcolor="#e8f0f8" >
-  <th colspan="2" class="group-header"
-    >&nbsp;&nbsp;&nbsp;&nbsp;Tiling Commands</th></tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>gtk.gdk.Rectangle</code></span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile-module.html#cycle_dimensions" class="summary-sig-name">cycle_dimensions</a>(<span class="summary-sig-arg">winman</span>,
-        <span class="summary-sig-arg">win</span>,
-        <span class="summary-sig-arg">state</span>,
-        <span class="summary-sig-arg">*dimensions</span>)</span><br />
-      Cycle the active window through a list of positions and shapes.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#cycle_dimensions">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile-module.html#cycle_monitors" class="summary-sig-name">cycle_monitors</a>(<span class="summary-sig-arg">winman</span>,
-        <span class="summary-sig-arg">win</span>,
-        <span class="summary-sig-arg">state</span>,
-        <span class="summary-sig-arg">step</span>=<span class="summary-sig-default">1</span>)</span><br />
-      Cycle the active window between monitors while preserving position.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#cycle_monitors">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile-module.html#cmd_moveCenter" class="summary-sig-name">cmd_moveCenter</a>(<span class="summary-sig-arg">winman</span>,
-        <span class="summary-sig-arg">win</span>,
-        <span class="summary-sig-arg">state</span>)</span><br />
-      Center the window in the monitor it currently occupies.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#cmd_moveCenter">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile-module.html#toggle_decorated" class="summary-sig-name">toggle_decorated</a>(<span class="summary-sig-arg">winman</span>,
-        <span class="summary-sig-arg">win</span>,
-        <span class="summary-sig-arg">state</span>)</span><br />
-      Toggle window state on the active window.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#toggle_decorated">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile-module.html#toggle_desktop" class="summary-sig-name">toggle_desktop</a>(<span class="summary-sig-arg">winman</span>,
-        <span class="summary-sig-arg">win</span>,
-        <span class="summary-sig-arg">state</span>)</span><br />
-      Toggle &quot;all windows minimized&quot; to view the desktop</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#toggle_desktop">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile-module.html#toggle_state" class="summary-sig-name">toggle_state</a>(<span class="summary-sig-arg">winman</span>,
-        <span class="summary-sig-arg">win</span>,
-        <span class="summary-sig-arg">state</span>,
-        <span class="summary-sig-arg">command</span>,
-        <span class="summary-sig-arg">check</span>,
-        <span class="summary-sig-arg">takes_bool</span>=<span class="summary-sig-default">False</span>)</span><br />
-      Toggle window state on the active window.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#toggle_state">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile-module.html#trigger_keyboard_action" class="summary-sig-name">trigger_keyboard_action</a>(<span class="summary-sig-arg">winman</span>,
-        <span class="summary-sig-arg">win</span>,
-        <span class="summary-sig-arg">state</span>,
-        <span class="summary-sig-arg">command</span>)</span><br />
-      Ask the Window Manager to begin a keyboard-driven operation.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#trigger_keyboard_action">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile-module.html#workspace_go" class="summary-sig-name">workspace_go</a>(<span class="summary-sig-arg">winman</span>,
-        <span class="summary-sig-arg">win</span>,
-        <span class="summary-sig-arg">state</span>,
-        <span class="summary-sig-arg">motion</span>)</span><br />
-      Switch the active workspace (next/prev wrap around)</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#workspace_go">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile-module.html#workspace_send_window" class="summary-sig-name">workspace_send_window</a>(<span class="summary-sig-arg">winman</span>,
-        <span class="summary-sig-arg">win</span>,
-        <span class="summary-sig-arg">state</span>,
-        <span class="summary-sig-arg">motion</span>)</span><br />
-      Move the active window to another workspace (next/prev wrap around)</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#workspace_send_window">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-</table>
+
+<br />
 <!-- ==================== VARIABLES ==================== -->
 <a name="section-Variables"></a>
 <table class="summary" border="1" cellpadding="3"
@@ -493,581 +179,10 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="XLIB_PRESENT"></a><span class="summary-name">XLIB_PRESENT</span> = <code title="True">True</code><br />
-      Indicates presence of python-xlib (runtime check)
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="sessBus"></a><span class="summary-name">sessBus</span> = <code title="SessionBus()">SessionBus()</code><br />
-      D-Bus Session Bus for <a href="quicktile.QuickTileApp-class.html#run"
-      class="link">QuickTileApp.run</a>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="DBUS_PRESENT"></a><span class="summary-name">DBUS_PRESENT</span> = <code title="True">True</code><br />
-      Indicates availability of D-Bus (runtime check)
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="XDG_CONFIG_DIR"></a><span class="summary-name">XDG_CONFIG_DIR</span> = <code title="'/home/ssokolow/.config'"><code class="variable-quote">'</code><code class="variable-string">/home/ssokolow/.config</code><code class="variable-quote">'</code></code><br />
-      Location for config files (determined at runtime).
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="commands"></a><span class="summary-name">commands</span> = <code title="CommandRegistry()">CommandRegistry()</code><br />
-      The instance of <a href="quicktile.CommandRegistry-class.html" 
-      class="link">CommandRegistry</a> to be used in 99.9% of use cases.
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
         <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="None">None</code>
     </td>
   </tr>
-<tr bgcolor="#e8f0f8" >
-  <th colspan="2" class="group-header"
-    >&nbsp;&nbsp;&nbsp;&nbsp;Settings</th></tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="quicktile-module.html#COLUMN_COUNT" class="summary-name">COLUMN_COUNT</a> = <code title="3">3</code><br />
-      Number of columns to base generated <a 
-      href="quicktile-module.html#POSITIONS" class="link">POSITIONS</a> 
-      presets on
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="quicktile-module.html#POSITIONS" class="summary-name">POSITIONS</a> = <code title="{'bottom': [(0.0, 0.5, 1.0, 0.5),
-            (0.333333333333, 0.5, 0.333333333333, 0.5),
-            (0.166666666667, 0.5, 0.666666666667, 0.5)],
- 'bottom-left': [(0.0, 0.5, 0.5, 0.5),
-                 (0.0, 0.5, 0.333333333333, 0.5),
-                 (0.0, 0.5, 0.666666666667, 0.5)],
- 'bottom-right': [(0.5, 0.5, 0.5, 0.5),
-                  (0.666666666667, 0.5, 0.333333333333, 0.5),
-..."><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">bottom</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">[</code><code class="variable-group">(</code>0.0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>1.0<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">, </code><code class="variable-group">(</code>0.333333333333<code class="variable-op">,</code><code class="variable-ellipsis">...</code></code><br />
-      command-to-position mappings for <a 
-      href="quicktile-module.html#cycle_dimensions" 
-      class="link">cycle_dimensions</a>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="quicktile-module.html#DEFAULTS" class="summary-name">DEFAULTS</a> = <code title="{'general': {'ModMask': '&lt;Ctrl&gt;&lt;Alt&gt;', 'UseWorkarea': True},
- 'keys': {'C': 'move-to-center',
-          'H': 'horizontal-maximize',
-          'KP_0': 'maximize',
-          'KP_1': 'bottom-left',
-          'KP_2': 'bottom',
-          'KP_3': 'bottom-right',
-          'KP_4': 'left',
-..."><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">general</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">ModMask</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">&lt;Ctrl&gt;&lt;Alt&gt;</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">UseWorkarea</code><code class="variable-ellipsis">...</code></code><br />
-      Default content for the config file
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="quicktile-module.html#KEYLOOKUP" class="summary-name">KEYLOOKUP</a> = <code title="{'+': 'plus', ',': 'comma', '-': 'minus', '.': 'period'}"><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">+</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">plus</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">,</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">comma</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">-</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">minus</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">.</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">pe</code><code class="variable-ellipsis">...</code></code><br />
-      Used for resolving certain keysyms
-    </td>
-  </tr>
 </table>
-<!-- ==================== FUNCTION DETAILS ==================== -->
-<a name="section-FunctionDetails"></a>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Function Details</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-FunctionDetails"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-</table>
-<a name="_make_positions"></a>
-<div class="private">
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">_make_positions</span>()</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#_make_positions">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Generate the classic WinSplit Revolution tiling presets</p>
-  <dl class="fields">
-  </dl>
-<div class="fields">      <p><strong>To Do:</strong>
-        Figure out how best to put this in the config file.
-      </p>
-</div></td></tr></table>
-</div>
-<a name="fmt_table"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">fmt_table</span>(<span class="sig-arg">rows</span>,
-        <span class="sig-arg">headers</span>,
-        <span class="sig-arg">group_by</span>=<span class="sig-default">None</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#fmt_table">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Format a collection as a textual table.</p>
-  <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>headers</code></strong> (<code>list(str)</code>) - Header labels for the columns</li>
-        <li><strong class="pname"><code>group_by</code></strong> (<code>int</code>) - Index of the column to group results by.</li>
-        <li><strong class="pname"><code>rows</code></strong> (<code>dict</code> or iterable of iterables)</li>
-    </ul></dd>
-    <dt>Returns: <code>str</code></dt>
-  </dl>
-<div class="fields">      <p><strong>Attention:</strong>
-        This uses <code>zip()</code> to combine things. The number of 
-        columns displayed will be defined by the narrowest of all rows.
-      </p>
-</div></td></tr></table>
-</div>
-<a name="cycle_dimensions"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">cycle_dimensions</span>(<span class="sig-arg">winman</span>,
-        <span class="sig-arg">win</span>,
-        <span class="sig-arg">state</span>,
-        <span class="sig-arg">*dimensions</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#cycle_dimensions">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Cycle the active window through a list of positions and shapes.</p>
-  <p>Takes one step each time this function is called.</p>
-  <p>If the window's dimensions are not within 100px (by euclidean 
-  distance) of an entry in the list, set them to the first list entry.</p>
-  <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>dimensions</code></strong> (<code>[(x, y, w, h), ...]</code>) - A list of tuples representing window geometries as floating-point
-          values between 0 and 1, inclusive.</li>
-        <li><strong class="pname"><code>win</code></strong> (<code>gtk.gdk.Window</code>)</li>
-    </ul></dd>
-    <dt>Returns: <code>gtk.gdk.Rectangle</code></dt>
-        <dd>The new window dimensions.</dd>
-    <dt>Decorators:</dt>
-    <dd><ul class="nomargin-top">
-        <li><code>@commands.add_many(POSITIONS)</code></li>
-    </ul></dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="cycle_monitors"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">cycle_monitors</span>(<span class="sig-arg">winman</span>,
-        <span class="sig-arg">win</span>,
-        <span class="sig-arg">state</span>,
-        <span class="sig-arg">step</span>=<span class="sig-default">1</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#cycle_monitors">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Cycle the active window between monitors while preserving 
-  position.</p>
-  <dl class="fields">
-    <dt>Decorators:</dt>
-    <dd><ul class="nomargin-top">
-        <li><code>@commands.add('monitor-switch')</code></li>
-        <li><code>@commands.add('monitor-next', 1)</code></li>
-        <li><code>@commands.add('monitor-prev',-1)</code></li>
-    </ul></dd>
-  </dl>
-<div class="fields">      <p><strong>To Do (1.0.0):</strong>
-        Remove <code>monitor-switch</code> in favor of 
-    <code>monitor-next</code> (API-breaking change)
-      </p>
-</div></td></tr></table>
-</div>
-<a name="cmd_moveCenter"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">cmd_moveCenter</span>(<span class="sig-arg">winman</span>,
-        <span class="sig-arg">win</span>,
-        <span class="sig-arg">state</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#cmd_moveCenter">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Center the window in the monitor it currently occupies.</p>
-  <dl class="fields">
-    <dt>Decorators:</dt>
-    <dd><ul class="nomargin-top">
-        <li><code>@commands.add('move-to-center')</code></li>
-    </ul></dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="toggle_decorated"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">toggle_decorated</span>(<span class="sig-arg">winman</span>,
-        <span class="sig-arg">win</span>,
-        <span class="sig-arg">state</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#toggle_decorated">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Toggle window state on the active window.</p>
-  <dl class="fields">
-    <dt>Decorators:</dt>
-    <dd><ul class="nomargin-top">
-        <li><code>@commands.add('bordered')</code></li>
-    </ul></dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="toggle_desktop"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">toggle_desktop</span>(<span class="sig-arg">winman</span>,
-        <span class="sig-arg">win</span>,
-        <span class="sig-arg">state</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#toggle_desktop">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Toggle &quot;all windows minimized&quot; to view the desktop</p>
-  <dl class="fields">
-    <dt>Decorators:</dt>
-    <dd><ul class="nomargin-top">
-        <li><code>@commands.add('show-desktop')</code></li>
-    </ul></dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="toggle_state"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">toggle_state</span>(<span class="sig-arg">winman</span>,
-        <span class="sig-arg">win</span>,
-        <span class="sig-arg">state</span>,
-        <span class="sig-arg">command</span>,
-        <span class="sig-arg">check</span>,
-        <span class="sig-arg">takes_bool</span>=<span class="sig-default">False</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#toggle_state">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Toggle window state on the active window.</p>
-  <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>command</code></strong> (<code>str</code>) - The <code>wnck.Window</code> method name to be conditionally 
-          prefixed with &quot;un&quot;, resolved, and called.</li>
-        <li><strong class="pname"><code>check</code></strong> (<code>str</code>) - The <code>wnck.Window</code> method name to be called to check 
-          whether <code>command</code> should be prefixed with 
-          &quot;un&quot;.</li>
-        <li><strong class="pname"><code>takes_bool</code></strong> (<code>bool</code>) - If <code>True</code>, pass <code>True</code> or 
-          <code>False</code> to <code>check</code> rather thank 
-          conditionally prefixing it with <code>un</code> before resolving.</li>
-    </ul></dd>
-    <dt>Decorators:</dt>
-    <dd><ul class="nomargin-top">
-        <li><code>@commands.add('all-desktops', 'pin', 'is_pinned')</code></li>
-        <li><code>@commands.add('fullscreen', 'set_fullscreen', 'is_fullscreen', True)</code></li>
-        <li><code>@commands.add('vertical-maximize', 'maximize_vertically', 'is_maximized_vertically')</code></li>
-        <li><code>@commands.add('horizontal-maximize', 'maximize_horizontally', 'is_maximized_horizontally')</code></li>
-        <li><code>@commands.add('maximize', 'maximize', 'is_maximized')</code></li>
-        <li><code>@commands.add('minimize', 'minimize', 'is_minimized')</code></li>
-        <li><code>@commands.add('always-above', 'make_above', 'is_above')</code></li>
-        <li><code>@commands.add('always-below', 'make_below', 'is_below')</code></li>
-        <li><code>@commands.add('shade', 'shade', 'is_shaded')</code></li>
-    </ul></dd>
-  </dl>
-<div class="fields">      <p><strong>To Do (1.0.0):</strong>
-        Rename <code>vertical-maximize</code> and 
-    <code>horizontal-maximize</code> to <code>maximize-vertical</code> and 
-    <code>maximize-horizontal</code>. (API-breaking change)
-      </p>
-</div></td></tr></table>
-</div>
-<a name="trigger_keyboard_action"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">trigger_keyboard_action</span>(<span class="sig-arg">winman</span>,
-        <span class="sig-arg">win</span>,
-        <span class="sig-arg">state</span>,
-        <span class="sig-arg">command</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#trigger_keyboard_action">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Ask the Window Manager to begin a keyboard-driven operation.</p>
-  <dl class="fields">
-    <dt>Decorators:</dt>
-    <dd><ul class="nomargin-top">
-        <li><code>@commands.add('trigger-move', 'move')</code></li>
-        <li><code>@commands.add('trigger-resize', 'size')</code></li>
-    </ul></dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="workspace_go"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">workspace_go</span>(<span class="sig-arg">winman</span>,
-        <span class="sig-arg">win</span>,
-        <span class="sig-arg">state</span>,
-        <span class="sig-arg">motion</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#workspace_go">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Switch the active workspace (next/prev wrap around)</p>
-  <dl class="fields">
-    <dt>Decorators:</dt>
-    <dd><ul class="nomargin-top">
-        <li><code>@commands.add('workspace-go-next', 1)</code></li>
-        <li><code>@commands.add('workspace-go-prev',-1)</code></li>
-        <li><code>@commands.add('workspace-go-up', wnck.MOTION_UP)</code></li>
-        <li><code>@commands.add('workspace-go-down', wnck.MOTION_DOWN)</code></li>
-        <li><code>@commands.add('workspace-go-left', wnck.MOTION_LEFT)</code></li>
-        <li><code>@commands.add('workspace-go-right', wnck.MOTION_RIGHT)</code></li>
-    </ul></dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="workspace_send_window"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">workspace_send_window</span>(<span class="sig-arg">winman</span>,
-        <span class="sig-arg">win</span>,
-        <span class="sig-arg">state</span>,
-        <span class="sig-arg">motion</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#workspace_send_window">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Move the active window to another workspace (next/prev wrap 
-  around)</p>
-  <dl class="fields">
-    <dt>Decorators:</dt>
-    <dd><ul class="nomargin-top">
-        <li><code>@commands.add('workspace-send-next', 1)</code></li>
-        <li><code>@commands.add('workspace-send-prev',-1)</code></li>
-        <li><code>@commands.add('workspace-send-up', wnck.MOTION_UP)</code></li>
-        <li><code>@commands.add('workspace-send-down', wnck.MOTION_DOWN)</code></li>
-        <li><code>@commands.add('workspace-send-left', wnck.MOTION_LEFT)</code></li>
-        <li><code>@commands.add('workspace-send-right', wnck.MOTION_RIGHT)</code></li>
-    </ul></dd>
-  </dl>
-</td></tr></table>
-</div>
-<br />
-<!-- ==================== VARIABLES DETAILS ==================== -->
-<a name="section-VariablesDetails"></a>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Variables Details</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-VariablesDetails"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-</table>
-<a name="COLUMN_COUNT"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">COLUMN_COUNT</h3>
-  <p>Number of columns to base generated <a 
-  href="quicktile-module.html#POSITIONS" class="link">POSITIONS</a> presets
-  on</p>
-  <dl class="fields">
-  </dl>
-<div class="fields">      <p><strong>To Do:</strong>
-        Store COLUMN_COUNT in quicktile.cfg for easy editing
-      </p>
-</div>  <dl class="fields">
-    <dt>Value:</dt>
-      <dd><table><tr><td><pre class="variable">
-3
-</pre></td></tr></table>
-</dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="POSITIONS"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">POSITIONS</h3>
-  <p>command-to-position mappings for <a 
-  href="quicktile-module.html#cycle_dimensions" 
-  class="link">cycle_dimensions</a></p>
-  <dl class="fields">
-  </dl>
-  <dl class="fields">
-    <dt>Value:</dt>
-      <dd><table><tr><td><pre class="variable">
-<code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">bottom</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">[</code><code class="variable-group">(</code>0.0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>1.0<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
-            <code class="variable-group">(</code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
-            <code class="variable-group">(</code>0.166666666667<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.666666666667<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-group">]</code><code class="variable-op">,</code>
- <code class="variable-quote">'</code><code class="variable-string">bottom-left</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">[</code><code class="variable-group">(</code>0.0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
-                 <code class="variable-group">(</code>0.0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
-                 <code class="variable-group">(</code>0.0<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.666666666667<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-group">]</code><code class="variable-op">,</code>
- <code class="variable-quote">'</code><code class="variable-string">bottom-right</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">[</code><code class="variable-group">(</code>0.5<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
-                  <code class="variable-group">(</code>0.666666666667<code class="variable-op">, </code>0.5<code class="variable-op">, </code>0.333333333333<code class="variable-op">, </code>0.5<code class="variable-group">)</code><code class="variable-op">,</code>
-<code class="variable-ellipsis">...</code>
-</pre></td></tr></table>
-</dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="DEFAULTS"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">DEFAULTS</h3>
-  <p>Default content for the config file</p>
-  <dl class="fields">
-  </dl>
-  <dl class="fields">
-    <dt>Value:</dt>
-      <dd><table><tr><td><pre class="variable">
-<code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">general</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">ModMask</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">&lt;Ctrl&gt;&lt;Alt&gt;</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">UseWorkarea</code><code class="variable-quote">'</code><code class="variable-op">: </code>True<code class="variable-group">}</code><code class="variable-op">,</code>
- <code class="variable-quote">'</code><code class="variable-string">keys</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">C</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">move-to-center</code><code class="variable-quote">'</code><code class="variable-op">,</code>
-          <code class="variable-quote">'</code><code class="variable-string">H</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">horizontal-maximize</code><code class="variable-quote">'</code><code class="variable-op">,</code>
-          <code class="variable-quote">'</code><code class="variable-string">KP_0</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">maximize</code><code class="variable-quote">'</code><code class="variable-op">,</code>
-          <code class="variable-quote">'</code><code class="variable-string">KP_1</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom-left</code><code class="variable-quote">'</code><code class="variable-op">,</code>
-          <code class="variable-quote">'</code><code class="variable-string">KP_2</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom</code><code class="variable-quote">'</code><code class="variable-op">,</code>
-          <code class="variable-quote">'</code><code class="variable-string">KP_3</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">bottom-right</code><code class="variable-quote">'</code><code class="variable-op">,</code>
-          <code class="variable-quote">'</code><code class="variable-string">KP_4</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">left</code><code class="variable-quote">'</code><code class="variable-op">,</code>
-<code class="variable-ellipsis">...</code>
-</pre></td></tr></table>
-</dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="KEYLOOKUP"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">KEYLOOKUP</h3>
-  <p>Used for resolving certain keysyms</p>
-  <dl class="fields">
-  </dl>
-  <dl class="fields">
-    <dt>Value:</dt>
-      <dd><table><tr><td><pre class="variable">
-<code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">+</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">plus</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">,</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">comma</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">-</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">minus</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">.</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">period</code><code class="variable-quote">'</code><code class="variable-group">}</code>
-</pre></td></tr></table>
-</dd>
-  </dl>
-</td></tr></table>
-</div>
-<br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
        bgcolor="#a0c0ff" cellspacing="0">
@@ -1091,7 +206,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sat Jan 28 12:29:35 2017
+    Generated by Epydoc 3.0.1 on Sun Aug 20 20:02:52 2017
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

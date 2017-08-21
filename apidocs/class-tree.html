@@ -54,7 +54,7 @@
 <ul class="nomargin-top">
     <li> <strong class="uidlink">UserDict.DictMixin</strong>
     <ul>
-    <li> <strong class="uidlink"><a href="quicktile.EnumSafeDict-class.html">quicktile.EnumSafeDict</a></strong>:
+    <li> <strong class="uidlink"><a href="quicktile.util.EnumSafeDict-class.html">quicktile.util.EnumSafeDict</a></strong>:
       <em class="summary">A dict-like object which avoids comparing objects of different 
         types to avoid triggering spurious Glib &quot;comparing different 
         enum types&quot; warnings.</em>
@@ -79,7 +79,7 @@
     </li>
     </ul>
     </li>
-    <li> <strong class="uidlink"><a href="quicktile.XInitError-class.html">quicktile.XInitError</a></strong>:
+    <li> <strong class="uidlink"><a href="quicktile.util.XInitError-class.html">quicktile.util.XInitError</a></strong>:
       <em class="summary">Raised when something outside our control causes the X11 connection
         to fail.</em>
     </li>
@@ -87,7 +87,7 @@
     </li>
     </ul>
     </li>
-    <li> <strong class="uidlink"><a href="quicktile.CommandRegistry-class.html">quicktile.CommandRegistry</a></strong>:
+    <li> <strong class="uidlink"><a href="quicktile.commands.CommandRegistry-class.html">quicktile.commands.CommandRegistry</a></strong>:
       <em class="summary">Handles lookup and boilerplate for window management commands.</em>
     </li>
     <li> <strong class="uidlink"><a href="test_quicktile.ComplainingEnum-class.html">test_quicktile.ComplainingEnum</a></strong>:
@@ -104,20 +104,33 @@
     </li>
     </ul>
     </li>
-    <li> <strong class="uidlink"><a href="quicktile.GravityLayout-class.html">quicktile.GravityLayout</a></strong>:
+    <li> <strong class="uidlink"><a href="quicktile.layout.GravityLayout-class.html">quicktile.layout.GravityLayout</a></strong>:
       <em class="summary">Helper for translating top-left relative dimensions to other 
         corners.</em>
     </li>
-    <li> <strong class="uidlink"><a href="quicktile.KeyBinder-class.html">quicktile.KeyBinder</a></strong>:
+    <li> <strong class="uidlink">dbus.service.Interface</strong>
+    <ul>
+    <li> <strong class="uidlink">dbus.service.Object</strong>:
+      <em class="summary">A base class for exporting your own Objects across the Bus.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="quicktile.dbus_api.QuickTile-class.html">quicktile.dbus_api.QuickTile</a></strong>:
+      <em class="summary">D-Bus endpoint definition</em>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="quicktile.keybinder.KeyBinder-class.html">quicktile.keybinder.KeyBinder</a></strong>:
       <em class="summary">A convenience class for wrapping <code>XGrabKey</code>.</em>
     </li>
-    <li> <strong class="uidlink"><a href="quicktile.QuickTileApp-class.html">quicktile.QuickTileApp</a></strong>:
+    <li> <strong class="uidlink"><a href="quicktile.__main__.QuickTileApp-class.html">quicktile.__main__.QuickTileApp</a></strong>:
       <em class="summary">The basic Glib application itself.</em>
     </li>
     <li> <strong class="uidlink">unittest.case.TestCase</strong>:
       <em class="summary">A class whose instances are single test cases.</em>
     <ul>
-    <li> <strong class="uidlink"><a href="test_quicktile.TestCommandRegistry-class.html">test_quicktile.TestCommandRegistry</a></strong>
+    <li> <strong class="uidlink"><a href="test_quicktile.TestCommandRegistry-class.html">test_quicktile.TestCommandRegistry</a></strong>:
+      <em class="summary">Tests for the CommandRegistry class</em>
     </li>
     <li> <strong class="uidlink"><a href="test_quicktile.TestEnumSafeDict-class.html">test_quicktile.TestEnumSafeDict</a></strong>:
       <em class="summary">Tests to ensure EnumSafeDict never compares enums of different 
@@ -126,12 +139,13 @@
     <li> <strong class="uidlink"><a href="test_quicktile.TestHelpers-class.html">test_quicktile.TestHelpers</a></strong>
     </li>
     <li> <strong class="uidlink"><a href="test_quicktile.TestWindowManagerDetached-class.html">test_quicktile.TestWindowManagerDetached</a></strong>:
-      <em class="summary">Tests which exercise <a href="quicktile.WindowManager-class.html" 
-        class="link">quicktile.WindowManager</a> without needing X11.</em>
+      <em class="summary">Tests which exercise <a 
+        href="quicktile.wm.WindowManager-class.html" 
+        class="link">wm.WindowManager</a> without needing X11.</em>
     </li>
     </ul>
     </li>
-    <li> <strong class="uidlink"><a href="quicktile.WindowManager-class.html">quicktile.WindowManager</a></strong>:
+    <li> <strong class="uidlink"><a href="quicktile.wm.WindowManager-class.html">quicktile.wm.WindowManager</a></strong>:
       <em class="summary">A simple API-wrapper class for manipulating window positioning.</em>
     </li>
     </ul>
@@ -160,7 +174,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sat Jan 28 12:29:35 2017
+    Generated by Epydoc 3.0.1 on Sun Aug 20 20:02:52 2017
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

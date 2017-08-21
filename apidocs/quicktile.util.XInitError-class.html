@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>test_quicktile.Thing2</title>
+  <title>quicktile.util.XInitError</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -34,8 +34,9 @@
   <tr valign="top">
     <td width="100%">
       <span class="breadcrumbs">
-        <a href="test_quicktile-module.html">Module&nbsp;test_quicktile</a> ::
-        Class&nbsp;Thing2
+        <a href="quicktile-module.html">Package&nbsp;quicktile</a> ::
+        <a href="quicktile.util-module.html">Module&nbsp;util</a> ::
+        Class&nbsp;XInitError
       </span>
     </td>
     <td>
@@ -45,25 +46,27 @@
     onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="test_quicktile.Thing2-class.html"
+            >]&nbsp;|&nbsp;<a href="quicktile.util.XInitError-class.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class Thing2</h1><p class="nomargin-top"><span class="codelink"><a href="test_quicktile-pysrc.html#Thing2">source&nbsp;code</a></span></p>
+<h1 class="epydoc">Class XInitError</h1><p class="nomargin-top"><span class="codelink"><a href="quicktile.util-pysrc.html#XInitError">source&nbsp;code</a></span></p>
 <pre class="base-tree">
-     object --+    
-              |    
-<a href="test_quicktile.ComplainingEnum-class.html">ComplainingEnum</a> --+
-                  |
-                 <strong class="uidshort">Thing2</strong>
+              object --+        
+                       |        
+exceptions.BaseException --+    
+                           |    
+        exceptions.Exception --+
+                               |
+                              <strong class="uidshort">XInitError</strong>
 </pre>
 
 <hr />
-<p>See <a href="test_quicktile.ComplainingEnum-class.html" 
-  class="link">ComplainingEnum</a></p>
+<p>Raised when something outside our control causes the X11 connection to
+  fail.</p>
 
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
@@ -82,24 +85,45 @@
     </table>
   </td>
 </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.util.XInitError-class.html#__str__" class="summary-sig-name">__str__</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      str(x)</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile.util-pysrc.html#XInitError.__str__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="test_quicktile.ComplainingEnum-class.html">ComplainingEnum</a></code></b>:
-      <code><a href="test_quicktile.ComplainingEnum-class.html#__cmp__">__cmp__</a></code>,
-      <code><a href="test_quicktile.ComplainingEnum-class.html#__init__">__init__</a></code>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>exceptions.Exception</code></b>:
+      <code>__init__</code>,
+      <code>__new__</code>
       </p>
-    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+    <p class="indent-wrapped-lines"><b>Inherited from <code>exceptions.BaseException</code></b>:
       <code>__delattr__</code>,
-      <code>__format__</code>,
       <code>__getattribute__</code>,
-      <code>__hash__</code>,
-      <code>__new__</code>,
+      <code>__getitem__</code>,
+      <code>__getslice__</code>,
       <code>__reduce__</code>,
-      <code>__reduce_ex__</code>,
       <code>__repr__</code>,
       <code>__setattr__</code>,
+      <code>__setstate__</code>,
+      <code>__unicode__</code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__format__</code>,
+      <code>__hash__</code>,
+      <code>__reduce_ex__</code>,
       <code>__sizeof__</code>,
-      <code>__str__</code>,
       <code>__subclasshook__</code>
       </p>
     </td>
@@ -124,12 +148,59 @@
 </tr>
   <tr>
     <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>exceptions.BaseException</code></b>:
+      <code>args</code>,
+      <code>message</code>
+      </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__class__</code>
       </p>
     </td>
   </tr>
 </table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__str__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__str__</span>(<span class="sig-arg">self</span>)</span>
+    <br /><em class="fname">(Informal representation operator)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="quicktile.util-pysrc.html#XInitError.__str__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>str(x)</p>
+  <dl class="fields">
+    <dt>Overrides:
+        object.__str__
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
        bgcolor="#a0c0ff" cellspacing="0">

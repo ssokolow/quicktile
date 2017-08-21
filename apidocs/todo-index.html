@@ -49,6 +49,7 @@
 <center><b>[
  <a href="identifier-index.html">Identifiers</a>
 | <a href="todo-index.html">To Do</a>
+| <a href="since-index.html">Introductions</a>
 ]</b></center><br />
 <h1 class="epydoc"><a name="todo">To Do List</a></h1>
 <br />
@@ -71,10 +72,11 @@
         process-shape associations, locking/welding window edges, etc.)
       </li>
       <li>
-        Consider rewriting <a href="quicktile-module.html#cycle_dimensions"
-        class="link">cycle_dimensions</a> to allow command-line use to jump
-        to a specific index without actually flickering the window through 
-        all the intermediate shapes.
+        Consider rewriting <a 
+        href="quicktile.commands-module.html#cycle_dimensions" 
+        class="link">commands.cycle_dimensions</a> to allow command-line 
+        use to jump to a specific index without actually flickering the 
+        window through all the intermediate shapes.
       </li>
       <li>
         Can I hook into the GNOME and KDE keybinding APIs without using 
@@ -104,31 +106,42 @@
     </ul></li>
     </ul>
 </table></div>
-<div>
-<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile-module.html#COLUMN_COUNT">quicktile.COLUMN_COUNT</a></b>    <ul class="nomargin">
-      <li>Store COLUMN_COUNT in quicktile.cfg for easy editing</li>
+<div class="private">
+<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.__main__.QuickTileApp-class.html#show_binds">quicktile.__main__.QuickTileApp.show_binds</a></b>    <ul class="nomargin">
+      <li>Look into moving this into <a 
+    href="quicktile.keybinder.KeyBinder-class.html" 
+    class="link">KeyBinder</a></li>
     </ul>
 </table></div>
 <div>
-<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.KeyBinder-class.html#handle_xevent">quicktile.KeyBinder.handle_xevent</a></b>    <ul class="nomargin">
+<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.gtkexcepthook-module.html">quicktile.gtkexcepthook</a></b>    <ul class="nomargin">
+      <li>Polish this up to meet my code formatting and clarity standards.</li>
+      <li>Clean up the SMTP support. It's a mess.</li>
+      <li>Confirm there isn't any other generally-applicable information that 
+    could be included in the debugging dump.</li>
+      <li>Consider the pros and cons of offering a function which allows 
+    app-specific debugging information to be registered for inclusion.</li>
+    </ul>
+</table></div>
+<div>
+<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.keybinder.KeyBinder-class.html#handle_xevent">quicktile.keybinder.KeyBinder.handle_xevent</a></b>    <ul class="nomargin">
       <li>Make sure uncaught exceptions are prevented from making quicktile 
     unresponsive in the general case.</li>
     </ul>
 </table></div>
 <div>
-<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.KeyBinder-class.html#ignored_modifiers">quicktile.KeyBinder.ignored_modifiers</a></b>    <ul class="nomargin">
+<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.keybinder.KeyBinder-class.html#ignored_modifiers">quicktile.keybinder.KeyBinder.ignored_modifiers</a></b>    <ul class="nomargin">
       <li>Figure out how to set the modifier mask in X11 and use 
     <code>gtk.accelerator_get_default_mod_mask()</code> to feed said code.</li>
     </ul>
 </table></div>
 <div>
-<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.QuickTileApp-class.html#show_binds">quicktile.QuickTileApp.show_binds</a></b>    <ul class="nomargin">
-      <li>Look into moving this into <a href="quicktile.KeyBinder-class.html" 
-    class="link">KeyBinder</a></li>
+<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.layout-module.html#make_winsplit_positions">quicktile.layout.make_winsplit_positions</a></b>    <ul class="nomargin">
+      <li>Figure out how best to put this in the config file.</li>
     </ul>
 </table></div>
 <div>
-<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.WindowManager-class.html#__init__">quicktile.WindowManager.__init__</a></b>    <ul class="nomargin">
+<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.wm.WindowManager-class.html#__init__">quicktile.wm.WindowManager.__init__</a></b>    <ul class="nomargin">
       <li>Confirm that the root window only changes on X11 server restart. 
     (Something which will crash QuickTile anyway since PyGTK makes X server
     disconnects uncatchable.)
@@ -137,14 +150,27 @@
     elsewhere)</p></li>
     </ul>
 </table></div>
-<div class="private">
-<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile-module.html#_make_positions" onclick="show_private();">quicktile._make_positions</a></b>    <ul class="nomargin">
-      <li>Figure out how best to put this in the config file.</li>
+<div>
+<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="setup-module.html">setup</a></b>    <ul class="nomargin">
+      <li><ul>
+      <li>
+        Identify minimum dependency versions properly.
+      </li>
+      <li>
+        Figure out how to mark optional packages as optional.
+      </li>
+      <li>
+        Is there a more idiomatic way to handle install_requires for things
+        which don't always install the requisite metadata for normal 
+        detection?
+      </li>
+    </ul></li>
     </ul>
 </table></div>
 <div>
 <table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="test_quicktile.TestHelpers-class.html">test_quicktile.TestHelpers</a></b>    <ul class="nomargin">
-      <li>Figure out how to get the assertEqual readout in bare functions.</li>
+      <li>Switch to pytest to get the assertEqual readout from assert in bare 
+    functions.</li>
     </ul>
 </table></div>
 <div><!-- ==================== 1.0.0 ==================== -->
@@ -166,37 +192,42 @@
 </tr>
 </table><div>
 <table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile-module.html">quicktile</a></b>    <ul class="nomargin">
-      <li>Retire <a href="quicktile-module.html#KEYLOOKUP" 
-    class="link">KEYLOOKUP</a>. (API-breaking change)</li>
+      <li>Retire <a href="quicktile.__main__-module.html#KEYLOOKUP" 
+    class="link">__main__.KEYLOOKUP</a>. (API-breaking change)</li>
     </ul>
 </table></div>
-<div>
-<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.GravityLayout-class.html#GRAVITIES">quicktile.GravityLayout.GRAVITIES</a></b>    <ul class="nomargin">
-      <li>Normalize these to X11 or CSS terminology for 1.0 (API-breaking change)</li>
-    </ul>
-</table></div>
-<div>
-<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.QuickTileApp-class.html#run">quicktile.QuickTileApp.run</a></b>    <ul class="nomargin">
+<div class="private">
+<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.__main__.QuickTileApp-class.html#run">quicktile.__main__.QuickTileApp.run</a></b>    <ul class="nomargin">
       <li>Retire the <code>doCommand</code> name. (API-breaking change)</li>
     </ul>
 </table></div>
 <div>
-<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.WindowManager-class.html#reposition">quicktile.WindowManager.reposition</a></b>    <ul class="nomargin">
-      <li>Look for a way to accomplish this with a cleaner method signature. This
-    is getting a little hairy. (API-breaking change)</li>
-    </ul>
-</table></div>
-<div>
-<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile-module.html#cycle_monitors">quicktile.cycle_monitors</a></b>    <ul class="nomargin">
+<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.commands-module.html#cycle_monitors">quicktile.commands.cycle_monitors</a></b>    <ul class="nomargin">
       <li>Remove <code>monitor-switch</code> in favor of 
     <code>monitor-next</code> (API-breaking change)</li>
     </ul>
 </table></div>
 <div>
-<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile-module.html#toggle_state">quicktile.toggle_state</a></b>    <ul class="nomargin">
+<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.commands-module.html#toggle_state">quicktile.commands.toggle_state</a></b>    <ul class="nomargin">
       <li>Rename <code>vertical-maximize</code> and 
     <code>horizontal-maximize</code> to <code>maximize-vertical</code> and 
     <code>maximize-horizontal</code>. (API-breaking change)</li>
+    </ul>
+</table></div>
+<div>
+<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.dbus_api.QuickTile-class.html#doCommand">quicktile.dbus_api.QuickTile.doCommand</a></b>    <ul class="nomargin">
+      <li>Expose a proper, introspectable D-Bus API</li>
+    </ul>
+</table></div>
+<div>
+<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.layout.GravityLayout-class.html#GRAVITIES">quicktile.layout.GravityLayout.GRAVITIES</a></b>    <ul class="nomargin">
+      <li>Normalize these to X11 or CSS terminology for 1.0 (API-breaking change)</li>
+    </ul>
+</table></div>
+<div>
+<table width="100%" class="metadata-index" bgcolor="#e0e0e0"><tr><td class="metadata-index"><b>To Do in <a href="quicktile.wm.WindowManager-class.html#reposition">quicktile.wm.WindowManager.reposition</a></b>    <ul class="nomargin">
+      <li>Look for a way to accomplish this with a cleaner method signature. This
+    is getting a little hairy. (API-breaking change)</li>
     </ul>
 </table></div>
 <br /><!-- ==================== NAVIGATION BAR ==================== -->
@@ -222,7 +253,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sat Jan 28 12:29:35 2017
+    Generated by Epydoc 3.0.1 on Sun Aug 20 20:02:52 2017
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

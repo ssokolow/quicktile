@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>quicktile.KeyBinder</title>
+  <title>quicktile.keybinder.KeyBinder</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -34,7 +34,8 @@
   <tr valign="top">
     <td width="100%">
       <span class="breadcrumbs">
-        <a href="quicktile-module.html">Module&nbsp;quicktile</a> ::
+        <a href="quicktile-module.html">Package&nbsp;quicktile</a> ::
+        <a href="quicktile.keybinder-module.html">Module&nbsp;keybinder</a> ::
         Class&nbsp;KeyBinder
       </span>
     </td>
@@ -45,14 +46,14 @@
     onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="quicktile.KeyBinder-class.html"
+            >]&nbsp;|&nbsp;<a href="quicktile.keybinder.KeyBinder-class.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class KeyBinder</h1><p class="nomargin-top"><span class="codelink"><a href="quicktile-pysrc.html#KeyBinder">source&nbsp;code</a></span></p>
+<h1 class="epydoc">Class KeyBinder</h1><p class="nomargin-top"><span class="codelink"><a href="quicktile.keybinder-pysrc.html#KeyBinder">source&nbsp;code</a></span></p>
 <pre class="base-tree">
 object --+
          |
@@ -85,11 +86,11 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="quicktile.KeyBinder-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="quicktile.keybinder.KeyBinder-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">xdisplay</span>=<span class="summary-sig-default">None</span>)</span><br />
       Connect to X11 and the Glib event loop.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#KeyBinder.__init__">source&nbsp;code</a></span>
+            <span class="codelink"><a href="quicktile.keybinder-pysrc.html#KeyBinder.__init__">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -103,12 +104,12 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="quicktile.KeyBinder-class.html#bind" class="summary-sig-name">bind</a>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="quicktile.keybinder.KeyBinder-class.html#bind" class="summary-sig-name">bind</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">accel</span>,
         <span class="summary-sig-arg">callback</span>)</span><br />
       Bind a global key combination to a callback.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#KeyBinder.bind">source&nbsp;code</a></span>
+            <span class="codelink"><a href="quicktile.keybinder-pysrc.html#KeyBinder.bind">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -122,12 +123,12 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="quicktile.KeyBinder-class.html#handle_xerror" class="summary-sig-name">handle_xerror</a>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="quicktile.keybinder.KeyBinder-class.html#handle_xerror" class="summary-sig-name">handle_xerror</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">err</span>,
         <span class="summary-sig-arg">_</span>)</span><br />
       Used to identify when attempts to bind keys fail.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#KeyBinder.handle_xerror">source&nbsp;code</a></span>
+            <span class="codelink"><a href="quicktile.keybinder-pysrc.html#KeyBinder.handle_xerror">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -141,13 +142,13 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="quicktile.KeyBinder-class.html#handle_xevent" class="summary-sig-name">handle_xevent</a>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="quicktile.keybinder.KeyBinder-class.html#handle_xevent" class="summary-sig-name">handle_xevent</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">src</span>,
         <span class="summary-sig-arg">cond</span>,
         <span class="summary-sig-arg">handle</span>=<span class="summary-sig-default">None</span>)</span><br />
       Dispatch <code>XKeyPress</code> events to their callbacks.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#KeyBinder.handle_xevent">source&nbsp;code</a></span>
+            <span class="codelink"><a href="quicktile.keybinder-pysrc.html#KeyBinder.handle_xevent">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -197,13 +198,13 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="quicktile.KeyBinder-class.html#_vary_modmask" class="summary-sig-name" onclick="show_private();">_vary_modmask</a>(<span class="summary-sig-arg">modmask</span>,
+          <td><span class="summary-sig"><a href="quicktile.keybinder.KeyBinder-class.html#_vary_modmask" class="summary-sig-name" onclick="show_private();">_vary_modmask</a>(<span class="summary-sig-arg">modmask</span>,
         <span class="summary-sig-arg">ignored</span>)</span><br />
       Generate all possible variations on <code>modmask</code> that need to
       be taken into consideration if we can't properly ignore the modifiers
       in <code>ignored</code>.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#KeyBinder._vary_modmask">source&nbsp;code</a></span>
+            <span class="codelink"><a href="quicktile.keybinder-pysrc.html#KeyBinder._vary_modmask">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -233,7 +234,7 @@ object --+
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="quicktile.KeyBinder-class.html#ignored_modifiers" class="summary-name">ignored_modifiers</a> = <code title="['Mod2Mask', 'LockMask']"><code class="variable-group">[</code><code class="variable-quote">'</code><code class="variable-string">Mod2Mask</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">LockMask</code><code class="variable-quote">'</code><code class="variable-group">]</code></code>
+        <a href="quicktile.keybinder.KeyBinder-class.html#ignored_modifiers" class="summary-name">ignored_modifiers</a> = <code title="['Mod2Mask', 'LockMask']"><code class="variable-group">[</code><code class="variable-quote">'</code><code class="variable-string">Mod2Mask</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">LockMask</code><code class="variable-quote">'</code><code class="variable-group">]</code></code>
     </td>
   </tr>
 <tr>
@@ -242,7 +243,7 @@ object --+
     </td><td class="summary">
         <a name="keybind_failed"></a><span class="summary-name">keybind_failed</span> = <code title="False">False</code><br />
       Used to pass state from <a 
-      href="quicktile.KeyBinder-class.html#handle_xerror" 
+      href="quicktile.keybinder.KeyBinder-class.html#handle_xerror" 
       class="link">handle_xerror</a>
     </td>
   </tr>
@@ -302,7 +303,7 @@ object --+
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#KeyBinder.__init__">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="quicktile.keybinder-pysrc.html#KeyBinder.__init__">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -330,7 +331,7 @@ object --+
         <span class="sig-arg">callback</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#KeyBinder.bind">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="quicktile.keybinder-pysrc.html#KeyBinder.bind">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -363,7 +364,7 @@ object --+
         <span class="sig-arg">_</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#KeyBinder.handle_xerror">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="quicktile.keybinder-pysrc.html#KeyBinder.handle_xerror">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -389,7 +390,7 @@ object --+
         <span class="sig-arg">handle</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#KeyBinder.handle_xevent">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="quicktile.keybinder-pysrc.html#KeyBinder.handle_xevent">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -415,7 +416,7 @@ object --+
     <br /><em class="fname">Static Method</em>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#KeyBinder._vary_modmask">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="quicktile.keybinder-pysrc.html#KeyBinder._vary_modmask">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -497,7 +498,7 @@ object --+
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sat Jan 28 12:29:36 2017
+    Generated by Epydoc 3.0.1 on Sun Aug 20 20:02:52 2017
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

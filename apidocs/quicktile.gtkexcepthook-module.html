@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>test_quicktile</title>
+  <title>quicktile.gtkexcepthook</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -34,7 +34,8 @@
   <tr valign="top">
     <td width="100%">
       <span class="breadcrumbs">
-        Module&nbsp;test_quicktile
+        <a href="quicktile-module.html">Package&nbsp;quicktile</a> ::
+        Module&nbsp;gtkexcepthook
       </span>
     </td>
     <td>
@@ -44,34 +45,70 @@
     onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="test_quicktile-module.html"
+            >]&nbsp;|&nbsp;<a href="quicktile.gtkexcepthook-module.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
 <!-- ==================== MODULE DESCRIPTION ==================== -->
-<h1 class="epydoc">Module test_quicktile</h1><p class="nomargin-top"><span class="codelink"><a href="test_quicktile-pysrc.html">source&nbsp;code</a></span></p>
-<p>Unit Test Suite for QuickTile using Nose test discovery</p>
+<h1 class="epydoc">Module gtkexcepthook</h1><p class="nomargin-top"><span class="codelink"><a href="quicktile.gtkexcepthook-pysrc.html">source&nbsp;code</a></span></p>
+<p>Graphical exception handler for PyGTK applications</p>
+  <p>(c) 2003 Gustavo J A M Carneiro gjc at inescporto.pt (c) 2004-2005 
+  Filip Van Raemdonck (c) 2009, 2011, 2017 Stephan Sokolow</p>
+  <p>http://www.daa.com.au/pipermail/pygtk/2003-August/005775.html 
+  Message-ID: &lt;1062087716.1196.5.camel@emperor.homelinux.net&gt; 
+  &quot;The license is whatever you want.&quot;</p>
+  <p>Instructions: import gtkexcepthook; gtkexcepthook.enable()</p>
+  <p>Changes from Van Raemdonck version:</p>
+  <ul>
+    <li>
+      Switched from auto-enable to gtkexcepthook.enable() to silence 
+      PyFlakes false positives. (Borrowed naming convention from cgitb)
+    </li>
+    <li>
+      Split out traceback import to silence PyFlakes warning.
+    </li>
+    <li>
+      Started to resolve PyLint complaints
+    </li>
+  </ul>
 
 <hr />
-<div class="fields">      <p><strong>Author:</strong>
-        Stephan Sokolow (deitarion/SSokolow)
+<div class="fields">      <strong>To Do:</strong>
+      <ul class="nomargin-top">
+        <li>
+        Polish this up to meet my code formatting and clarity standards.
+        </li>
+        <li>
+        Clean up the SMTP support. It's a mess.
+        </li>
+        <li>
+        Confirm there isn't any other generally-applicable information that 
+    could be included in the debugging dump.
+        </li>
+        <li>
+        Consider the pros and cons of offering a function which allows 
+    app-specific debugging information to be registered for inclusion.
+        </li>
+      </ul>
+      <p><strong>Author:</strong>
+        Filip Van Daemdonck
       </p>
       <p><strong>License:</strong>
-        GNU GPL 2.0 or later
+        whatever you want
       </p>
-</div><!-- ==================== CLASSES ==================== -->
-<a name="section-Classes"></a>
+</div><!-- ==================== FUNCTIONS ==================== -->
+<a name="section-Functions"></a>
 <table class="summary" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr bgcolor="#70b0f0" class="table-header">
   <td colspan="2" class="table-header">
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
       <tr valign="top">
-        <td align="left"><span class="table-header">Classes</span></td>
+        <td align="left"><span class="table-header">Functions</span></td>
         <td align="right" valign="top"
-         ><span class="options">[<a href="#section-Classes"
+         ><span class="options">[<a href="#section-Functions"
          class="privatelink" onclick="toggle_private();"
          >hide private</a>]</span></td>
       </tr>
@@ -82,61 +119,72 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="test_quicktile.ComplainingEnum-class.html" class="summary-name">ComplainingEnum</a><br />
-      A parent class for classes which should raise 
-        <code>TypeError</code> when compared
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="lookup"></a><span class="summary-sig-name">lookup</span>(<span class="summary-sig-arg">name</span>,
+        <span class="summary-sig-arg">frame</span>,
+        <span class="summary-sig-arg">lcls</span>)</span><br />
+      Find the value for a given name in the given frame</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile.gtkexcepthook-pysrc.html#lookup">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="test_quicktile.Thing1-class.html" class="summary-name">Thing1</a><br />
-      See <a href="test_quicktile.ComplainingEnum-class.html" 
-        class="link">ComplainingEnum</a>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="analyse"></a><span class="summary-sig-name">analyse</span>(<span class="summary-sig-arg">exctyp</span>,
+        <span class="summary-sig-arg">value</span>,
+        <span class="summary-sig-arg">tback</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile.gtkexcepthook-pysrc.html#analyse">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_info"></a><span class="summary-sig-name">_info</span>(<span class="summary-sig-arg">exctyp</span>,
+        <span class="summary-sig-arg">value</span>,
+        <span class="summary-sig-arg">tback</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile.gtkexcepthook-pysrc.html#_info">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="test_quicktile.Thing2-class.html" class="summary-name">Thing2</a><br />
-      See <a href="test_quicktile.ComplainingEnum-class.html" 
-        class="link">ComplainingEnum</a>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="test_quicktile.TestCommandRegistry-class.html" class="summary-name">TestCommandRegistry</a><br />
-      Tests for the CommandRegistry class
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="test_quicktile.TestEnumSafeDict-class.html" class="summary-name">TestEnumSafeDict</a><br />
-      Tests to ensure EnumSafeDict never compares enums of different 
-        types
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="test_quicktile.TestHelpers-class.html" class="summary-name">TestHelpers</a>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="test_quicktile.TestWindowManagerDetached-class.html" class="summary-name">TestWindowManagerDetached</a><br />
-      Tests which exercise <a 
-        href="quicktile.wm.WindowManager-class.html" 
-        class="link">wm.WindowManager</a> without needing X11.
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="enable"></a><span class="summary-sig-name">enable</span>()</span><br />
+      Call this to set gtkexcepthook as the default exception handler</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile.gtkexcepthook-pysrc.html#enable">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
     </td>
   </tr>
 </table>
@@ -161,14 +209,7 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="log"></a><span class="summary-name">log</span> = <code title="logging.getLogger(__name__)">logging.getLogger(__name__)</code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="None">None</code>
+        <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="'quicktile'"><code class="variable-quote">'</code><code class="variable-string">quicktile</code><code class="variable-quote">'</code></code>
     </td>
   </tr>
 </table>

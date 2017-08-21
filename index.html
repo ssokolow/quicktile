@@ -9,29 +9,25 @@ title: Main
 <p>QuickTile is a simple utility, inspired by WinSplit Revolution for Windows,
     which adds window-tiling keybindings to your existing X11 window manager.</p>
 <p>You can also think of it as a standalone alternative to the keyboard-related features of the Compiz Grid plugin.</p>
+<p>For more details, see the illustrations in the <a href="http://ssokolow.com/quicktile/commands.html">command reference</a>.</p>
 <!-- TODO: Illustrations to explain how QuickTile's keybindings work -->
 
 <dl>
     <dt>Dependencies {% include apt_btn.html packages="python,python-gtk2,python-xlib,python-dbus,python-wnck" %}</dt>
-    <dd><a href="http://python.org/">Python</a> 2.x,
-        <a href="http://pygtk.org/">PyGTK</a> 2.2+,
+    <dd><a href="http://python.org/">Python</a> 2.7,
+        <a href="http://pygtk.org/">PyGTK</a>,
         <a href="http://ftp.gnome.org/pub/GNOME/sources/gnome-python-desktop/">python-wnck</a> 2.20+, and (optional)
         <a href="http://python-xlib.sourceforge.net/">python-xlib</a> or
         <a href="http://www.freedesktop.org/wiki/Software/DBusBindings">dbus-python</a></dd>
 
     <dt>Caveats</dt>
-    <dd>There are a few minor <a href="https://github.com/ssokolow/quicktile/issues?q=label%3Abug+label%3Aconfirmed+is%3Aopen"
-        >known bugs</a> and the minimum
-        dependency versions have not been re-confirmed recently.</dd>
+    <dd>There are a few minor <a href="https://github.com/ssokolow/quicktile/issues?q=label%3Abug+label%3Aconfirmed+is%3Aopen">known bugs</a></dd>
 
     <dt>Install</dt>
-    <dd><ul>
-            <li>Just unpack and run. No installation necessary.</li>
-            <li>Keybindings for <kbd>--daemonize</kbd> can be edited in
-                <kbd>~/.config/quicktile.cfg</kbd></li>
-            <li>To install QuickTile system-wide and add it to your
-                desktop's list of programs to be started on login,
-                run <kbd>sudo ./setup.py install</kbd></li>
+    <dd>Your choice of three different installation methods:<ul>
+            <li><kbd>sudo pip2 install https://github.com/ssokolow/quicktile/archive/master.zip</kbd></li>
+            <li>Unpack and run <code>./install.sh</code></li>
+            <li>Unpack and copy the <code>quicktile</code> folder and <code>quicktile.sh</code> script to a folder of your choice.</li>
     </ul></dd>
 
     <dt>License</dt>

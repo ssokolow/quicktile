@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>quicktile.GravityLayout</title>
+  <title>quicktile.layout.GravityLayout</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -34,7 +34,8 @@
   <tr valign="top">
     <td width="100%">
       <span class="breadcrumbs">
-        <a href="quicktile-module.html">Module&nbsp;quicktile</a> ::
+        <a href="quicktile-module.html">Package&nbsp;quicktile</a> ::
+        <a href="quicktile.layout-module.html">Module&nbsp;layout</a> ::
         Class&nbsp;GravityLayout
       </span>
     </td>
@@ -45,14 +46,14 @@
     onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="quicktile.GravityLayout-class.html"
+            >]&nbsp;|&nbsp;<a href="quicktile.layout.GravityLayout-class.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class GravityLayout</h1><p class="nomargin-top"><span class="codelink"><a href="quicktile-pysrc.html#GravityLayout">source&nbsp;code</a></span></p>
+<h1 class="epydoc">Class GravityLayout</h1><p class="nomargin-top"><span class="codelink"><a href="quicktile.layout-pysrc.html#GravityLayout">source&nbsp;code</a></span></p>
 <pre class="base-tree">
 object --+
          |
@@ -62,8 +63,9 @@ object --+
 <hr />
 <p>Helper for translating top-left relative dimensions to other 
   corners.</p>
-  <p>Used to generate <a href="quicktile-module.html#cycle_dimensions" 
-  class="link">cycle_dimensions</a> presets.</p>
+  <p>Used to generate <a 
+  href="quicktile.commands-module.html#cycle_dimensions" 
+  class="link">commands.cycle_dimensions</a> presets.</p>
   <p>Expects to operate on decimal percentage values. (0 &lt;= x &lt;= 
   1)</p>
 
@@ -90,12 +92,12 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="quicktile.GravityLayout-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="quicktile.layout.GravityLayout-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">margin_x</span>=<span class="summary-sig-default">0</span>,
         <span class="summary-sig-arg">margin_y</span>=<span class="summary-sig-default">0</span>)</span><br />
       x.__init__(...) initializes x; see help(type(x)) for signature</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#GravityLayout.__init__">source&nbsp;code</a></span>
+            <span class="codelink"><a href="quicktile.layout-pysrc.html#GravityLayout.__init__">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -109,7 +111,7 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="quicktile.GravityLayout-class.html#__call__" class="summary-sig-name">__call__</a>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="quicktile.layout.GravityLayout-class.html#__call__" class="summary-sig-name">__call__</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">w</span>,
         <span class="summary-sig-arg">h</span>,
         <span class="summary-sig-arg">gravity</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">top-left</code><code class="variable-quote">'</code></span>,
@@ -118,7 +120,7 @@ object --+
       Return an <code>(x, y, w, h)</code> tuple relative to 
       <code>gravity</code>.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile-pysrc.html#GravityLayout.__call__">source&nbsp;code</a></span>
+            <span class="codelink"><a href="quicktile.layout-pysrc.html#GravityLayout.__call__">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -166,7 +168,7 @@ object --+
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="quicktile.GravityLayout-class.html#GRAVITIES" class="summary-name">GRAVITIES</a> = <code title="{'bottom': (0.5, 1.0),
+        <a href="quicktile.layout.GravityLayout-class.html#GRAVITIES" class="summary-name">GRAVITIES</a> = <code title="{'bottom': (0.5, 1.0),
  'bottom-left': (0.0, 1.0),
  'bottom-right': (1.0, 1.0),
  'left': (0.0, 0.5),
@@ -235,7 +237,7 @@ object --+
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#GravityLayout.__init__">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="quicktile.layout-pysrc.html#GravityLayout.__init__">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -270,7 +272,7 @@ object --+
     <br /><em class="fname">(Call operator)</em>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile-pysrc.html#GravityLayout.__call__">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="quicktile.layout-pysrc.html#GravityLayout.__call__">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -299,7 +301,7 @@ object --+
         <li><strong class="pname"><code>w</code></strong> - Desired width</li>
         <li><strong class="pname"><code>h</code></strong> - Desired height</li>
         <li><strong class="pname"><code>gravity</code></strong> - Desired window alignment from <a 
-          href="quicktile.GravityLayout-class.html#GRAVITIES" 
+          href="quicktile.layout.GravityLayout-class.html#GRAVITIES" 
           class="link">GRAVITIES</a></li>
         <li><strong class="pname"><code>x</code></strong> - Desired horizontal position if not the same as 
           <code>gravity</code></li>
@@ -386,7 +388,7 @@ object --+
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sat Jan 28 12:29:36 2017
+    Generated by Epydoc 3.0.1 on Sun Aug 20 20:02:52 2017
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
