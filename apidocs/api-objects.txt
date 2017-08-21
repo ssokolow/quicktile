@@ -8,12 +8,13 @@ quicktile.__main__.main	quicktile.__main__-module.html#main
 quicktile.__main__.KEYLOOKUP	quicktile.__main__-module.html#KEYLOOKUP
 quicktile.__main__.XDG_CONFIG_DIR	quicktile.__main__-module.html#XDG_CONFIG_DIR
 quicktile.commands	quicktile.commands-module.html
+quicktile.commands.workspace_send_window	quicktile.commands-module.html#workspace_send_window
 quicktile.commands.cycle_dimensions	quicktile.commands-module.html#cycle_dimensions
 quicktile.commands.fmt_table	quicktile.util-module.html#fmt_table
 quicktile.commands.trigger_keyboard_action	quicktile.commands-module.html#trigger_keyboard_action
 quicktile.commands.toggle_state	quicktile.commands-module.html#toggle_state
 quicktile.commands.__package__	quicktile.commands-module.html#__package__
-quicktile.commands.workspace_send_window	quicktile.commands-module.html#workspace_send_window
+quicktile.commands.cycle_monitors_all	quicktile.commands-module.html#cycle_monitors_all
 quicktile.commands.toggle_decorated	quicktile.commands-module.html#toggle_decorated
 quicktile.commands.cycle_monitors	quicktile.commands-module.html#cycle_monitors
 quicktile.commands.workspace_go	quicktile.commands-module.html#workspace_go
