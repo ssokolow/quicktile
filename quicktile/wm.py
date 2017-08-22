@@ -51,8 +51,8 @@ del _name, key, val
 def persist_maximization(win, keep_maximize=True):
     """Context manager to persist maximization state after a reposition
 
-    @param keep_maximize: If C{False}, this becomes a no-op to ease writing
-        clean code which needs to support both behaviours.
+    If C{keep_maximize=False}, this becomes a no-op to ease writing
+    clean code which needs to support both behaviours.
     """
     # Unmaximize and record the types we may need to restore
     max_types, maxed = ['', '_horizontally', '_vertically'], []
