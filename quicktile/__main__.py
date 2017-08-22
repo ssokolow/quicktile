@@ -27,7 +27,7 @@ from .wm import WindowManager
 # (And silence complaints from only using the imported types in comments)
 try:
     # pylint: disable=unused-import
-    from typing import Callable, Dict, Union # NOQA
+    from typing import Callable, Dict, Union  # NOQA
 
 
 except:  # pylint: disable=bare-except
@@ -84,11 +84,11 @@ class QuickTileApp(object):
     dbus_name = None
     dbus_obj = None
 
-    def __init__(self, winman, # type: WindowManager
-                 commands,     # type: commands.CommandRegistry
-                 keys=None,    # type: Dict[str, Callable]
-                 modmask=None  # type: str
-                 ):  # type: (...) -> None
+    def __init__(self, winman,  # type: WindowManager
+                 commands,      # type: commands.CommandRegistry
+                 keys=None,     # type: Dict[str, Callable]
+                 modmask=None   # type: str
+                 ):             # type: (...) -> None
         """Populate the instance variables.
 
         @param keys: A dict mapping X11 keysyms to L{CommandRegistry}
@@ -141,7 +141,7 @@ class QuickTileApp(object):
         else:
             return False
 
-    def show_binds(self): # type: () -> None
+    def show_binds(self):  # type: () -> None
         """Print a formatted readout of defined keybindings and the modifier
         mask to stdout.
 
@@ -152,62 +152,35 @@ class QuickTileApp(object):
         print "Modifier: %s\n" % (self._modmask or '(none)')
         print fmt_table(self._keys, ('Key', 'Action'))
 
-def main():  # type: () -> None
-    """setuptools entry point"""
-    from optparse import OptionParser, OptionGroup
-    parser = OptionParser(usage="%prog [options] [action] ...",
-            version="%%prog v%s" % __version__)
-    parser.add_option('-d', '--daemonize', action="store_true",
-        dest="daemonize", default=False, help="Attempt to set up global "
-        "keybindings using python-xlib and a D-Bus service using dbus-python. "
-        "Exit if neither succeeds")
-    parser.add_option('-b', '--bindkeys', action="store_true",
-        dest="daemonize", default=False,
-        help="Deprecated alias for --daemonize")
-    parser.add_option('--debug', action="store_true", dest="debug",
-        default=False, help="Display debug messages")
-    parser.add_option('--no-workarea', action="store_true", dest="no_workarea",
-        default=False, help="Overlap panels but work better with "
-        "non-rectangular desktops")
+def attach_glib_log_filter():
+    """Attach a copy of grep to our stderr to filter out _OB_WM errors.
 
-    help_group = OptionGroup(parser, "Additional Help")
-    help_group.add_option('--show-bindings', action="store_true",
-        dest="show_binds", default=False, help="List all configured keybinds")
-    help_group.add_option('--show-actions', action="store_true",
-        dest="show_args", default=False, help="List valid arguments for use "
-        "without --daemonize")
-    parser.add_option_group(help_group)
+    Hook up grep to filter out spurious libwnck error messages that we
+    can't filter properly because PyGTK doesn't expose g_log_set_handler()
+    """
+    glib_log_filter = subprocess.Popen(
+            ['grep', '-v', 'Unhandled action type _OB_WM'],
+            stdin=subprocess.PIPE)
 
-    opts, args = parser.parse_args()
+    # Redirect stderr through grep
+    assert glib_log_filter.stdin, "Did not receive stdin for log filter"
+    os.dup2(glib_log_filter.stdin.fileno(), sys.stderr.fileno())
 
-    # Hook up grep to filter out spurious libwnck error messages that we
-    # can't filter properly because PyGTK doesn't expose g_log_set_handler()
-    if not opts.debug:
-        glib_log_filter = subprocess.Popen(
-                ['grep', '-v', 'Unhandled action type _OB_WM'],
-                stdin=subprocess.PIPE)
+def load_config(path):  # type: (str) -> RawConfigParser
+    """Load the config file from the given path, applying fixes as needed.
 
-        # Redirect stderr through grep
-        assert glib_log_filter.stdin, "Did not receive stdin for log filter"
-        os.dup2(glib_log_filter.stdin.fileno(), sys.stderr.fileno())
-
-    # Set up the output verbosity
-    logging.basicConfig(level=logging.DEBUG if opts.debug else logging.INFO,
-                        format='%(levelname)s: %(message)s')
-
-    # Load the config from file if present
-    # TODO: Refactor all this
-    cfg_path = os.path.join(XDG_CONFIG_DIR, 'quicktile.cfg')
-    first_run = not os.path.exists(cfg_path)
+    @todo: Refactor all this
+    """
+    first_run = not os.path.exists(path)
 
     config = RawConfigParser()
 
-    # Make keys case-sensitive
+    # Make keys case-sensitive because keysyms must be
     config.optionxform = str  # type: ignore # (Cannot assign to a method)
 
     # TODO: Maybe switch to two config files so I can have only the keys in the
     #       keymap case-sensitive?
-    config.read(cfg_path)
+    config.read(path)
     dirty = False
 
     if not config.has_section('general'):
@@ -251,7 +224,7 @@ def main():  # type: () -> None
             dirty = True
 
     if dirty:
-        cfg_file = open(cfg_path, 'wb')
+        cfg_file = open(path, 'wb')
 
         # TODO: REPORT: Argument 1 to "write" of "RawConfigParser" has
         #               incompatible type BinaryIO"; expected "file"
@@ -259,7 +232,49 @@ def main():  # type: () -> None
 
         cfg_file.close()
         if first_run:
-            logging.info("Wrote default config file to %s", cfg_path)
+            logging.info("Wrote default config file to %s", path)
+
+    return config
+
+def main():  # type: () -> None
+    """setuptools entry point"""
+    # TODO: Switch to argparse
+    from optparse import OptionParser, OptionGroup
+    parser = OptionParser(usage="%prog [options] [action] ...",
+            version="%%prog v%s" % __version__)
+    parser.add_option('-d', '--daemonize', action="store_true",
+        dest="daemonize", default=False, help="Attempt to set up global "
+        "keybindings using python-xlib and a D-Bus service using dbus-python. "
+        "Exit if neither succeeds")
+    parser.add_option('-b', '--bindkeys', action="store_true",
+        dest="daemonize", default=False,
+        help="Deprecated alias for --daemonize")
+    parser.add_option('--debug', action="store_true", dest="debug",
+        default=False, help="Display debug messages")
+    parser.add_option('--no-workarea', action="store_true", dest="no_workarea",
+        default=False, help="Overlap panels but work better with "
+        "non-rectangular desktops")
+
+    help_group = OptionGroup(parser, "Additional Help")
+    help_group.add_option('--show-bindings', action="store_true",
+        dest="show_binds", default=False, help="List all configured keybinds")
+    help_group.add_option('--show-actions', action="store_true",
+        dest="show_args", default=False, help="List valid arguments for use "
+        "without --daemonize")
+    parser.add_option_group(help_group)
+
+    opts, args = parser.parse_args()
+
+    if not opts.debug:
+        attach_glib_log_filter()
+
+    # Set up the output verbosity
+    logging.basicConfig(level=logging.DEBUG if opts.debug else logging.INFO,
+                        format='%(levelname)s: %(message)s')
+
+    cfg_path = os.path.join(XDG_CONFIG_DIR, 'quicktile.cfg')
+    first_run = not os.path.exists(cfg_path)
+    config = load_config(cfg_path)
 
     ignore_workarea = ((not config.getboolean('general', 'UseWorkarea')) or
                        opts.no_workarea)
@@ -275,7 +290,10 @@ def main():  # type: () -> None
     except XInitError as err:
         logging.critical("%s", err)
         sys.exit(1)
-    app = QuickTileApp(winman, commands.commands, keymap, modmask=modkeys)
+    app = QuickTileApp(winman,
+                       commands.commands,
+                       keys=dict(config.items('keys')),
+                       modmask=config.get('general', 'ModMask'))
 
     if opts.show_binds:
         app.show_binds()

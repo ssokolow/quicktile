@@ -9,7 +9,6 @@ import gobject, gtk
 from Xlib import X
 from Xlib.display import Display
 from Xlib.error import BadAccess, DisplayConnectionError
-from Xlib.protocol.event import KeyPress as XKeyPress
 
 from .util import powerset, XInitError
 
@@ -20,10 +19,11 @@ try:
     from typing import (Any, Callable, Dict, Iterable, Iterator, List,  # NOQA
                         Optional, Sequence, Sized, Tuple)
 
-    from Xlib.error import XError          # NOQA
-    from .commands import CommandRegistry  # NOQA
-    from .wm import WindowManager          # NOQA
-    from .util import CommandCB            # NOQA
+    from Xlib.error import XError                          # NOQA
+    from Xlib.protocol.event import KeyPress as XKeyPress  # NOQA
+    from .commands import CommandRegistry                  # NOQA
+    from .wm import WindowManager                          # NOQA
+    from .util import CommandCB                            # NOQA
 except:  # pylint: disable=bare-except
     pass
 
@@ -151,8 +151,8 @@ class KeyBinder(object):
         # Display a meaningful debug message
         # FIXME: Only call this code if --debug
         # FIXME: Proper "index" arg for keycode_to_keysym
-        keysym = self.xdisp.keycode_to_keysym(keysig[0], 0)
-        kbstr = gtk.accelerator_name(keysym, keysig[1]) # pylint: disable=E1101
+        ksym = self.xdisp.keycode_to_keysym(keysig[0], 0)
+        kbstr = gtk.accelerator_name(ksym, keysig[1])  # pylint: disable=E1101
         logging.debug("Received keybind: %s", kbstr)
 
         # Call the associated callback
@@ -162,7 +162,7 @@ class KeyBinder(object):
                     ):  # type: (...) -> Tuple[Optional[int], Optional[int]]
         """Convert an accelerator string into the form XGrabKey needs."""
 
-        keysym, modmask = gtk.accelerator_parse(accel)
+        keysym, modmask = gtk.accelerator_parse(accel)  # pylint: disable=E1101
         if not gtk.accelerator_valid(keysym, modmask):  # pylint: disable=E1101
             logging.error("Invalid keybinding: %s", accel)
             return None, None

@@ -17,7 +17,7 @@ from .util import clamp_idx, fmt_table
 MYPY = False
 if MYPY:
     # pylint: disable=unused-import
-    from typing import (Any, Callable, Dict, Iterable, Iterator, List, # NOQA
+    from typing import (Any, Callable, Dict, Iterable, Iterator, List,  # NOQA
                         Optional, Sequence, Tuple)
     from mypy_extensions import VarArg, KwArg  # NOQA
 
