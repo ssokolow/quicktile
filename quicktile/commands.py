@@ -255,15 +255,20 @@ def cycle_dimensions(winman,      # type: WindowManager
 @commands.add('monitor-switch', force_wrap=True)
 @commands.add('monitor-next', 1)
 @commands.add('monitor-prev', -1)
-def cycle_monitors(winman, win, state, step=1, force_wrap=False):
-    # type: (WindowManager, Any, Dict[str, Any], int, bool) -> None
+def cycle_monitors(winman,            # type: WindowManager
+                   win,               # type: wnck.Window
+                   state,             # type: Dict[str, Any]
+                   step=1,            # type: int
+                   force_wrap=False,  # type: bool
+                   n_monitors=None    # type: Optional[int]
+                   ):                 # type: (...) -> None
     """Cycle the active window between monitors while preserving position.
 
     @todo 1.0.0: Remove C{monitor-switch} in favor of C{monitor-next}
         (API-breaking change)
     """
-    mon_id = state['monitor_id']
-    n_monitors = winman.gdk_screen.get_n_monitors()
+    mon_id, _ = winman.get_monitor(win)
+    n_monitors = n_monitors or winman.gdk_screen.get_n_monitors()
 
     new_mon_id = clamp_idx(mon_id + step, n_monitors,
         state['config'].getboolean('general', 'MovementsWrap') or
@@ -289,19 +294,7 @@ def cycle_monitors_all(winman, win, state, step=1, force_wrap=False):
         return
 
     for window in winman.get_relevant_windows(curr_workspace):
-        mon_id, _ = winman.get_monitor(window)
-
-        # TODO: deduplicate cycle_monitors and cycle_monitors_all
-        new_mon_id = clamp_idx(mon_id + step, n_monitors,
-            state['config'].getboolean('general', 'MovementsWrap') or
-            force_wrap)
-
-        new_mon_geom = winman.gdk_screen.get_monitor_geometry(new_mon_id)
-        logging.debug(
-            "Moving window %s to monitor 0x%d, which has geometry %s",
-            window, new_mon_id, new_mon_geom)
-
-        winman.reposition(window, None, new_mon_geom, keep_maximize=True)
+        cycle_monitors(winman, window, state, step, force_wrap, n_monitors)
 
 # pylint: disable=no-member
 MOVE_TO_COMMANDS = {
