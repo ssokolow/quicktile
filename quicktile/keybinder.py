@@ -86,26 +86,9 @@ class KeyBinder(object):
             request.)
         @rtype: C{bool}
         """
-        if isinstance(accel, basestring):
-            # pylint: disable=no-member
-            keysym, modmask = gtk.accelerator_parse(accel)
-        else:
-            keysym, modmask = accel
-
-        if not gtk.accelerator_valid(keysym, modmask):  # pylint: disable=E1101
-            logging.error("Invalid keybinding: %s", accel)
+        keycode, modmask = self.parse_accel(accel)
+        if keycode is None:
             return False
-
-        if modmask > 2**16 - 1:
-            logging.error("Modifier out of range for XGrabKey "
-                          "(int(modmask) > 65535). "
-                          "Did you use <Super> instead of <Mod4>?")
-            return False
-
-        # Convert to what XGrabKey expects
-        keycode = self.xdisp.keysym_to_keycode(keysym)
-        if isinstance(modmask, gtk.gdk.ModifierType):
-            modmask = modmask.real
 
         # Ignore modifiers like Mod2 (NumLock) and Lock (CapsLock)
         for mmask in self._vary_modmask(modmask, self._ignored_modifiers):
@@ -117,10 +100,11 @@ class KeyBinder(object):
         # I assume it flushes the XGrabKey calls to the server.
         self.xdisp.sync()
 
+        # React to any handle_xerror that might have resulted from xdisp.sync()
         if self.keybind_failed:
             self.keybind_failed = False
             logging.warning("Failed to bind key. It may already be in use: %s",
-                accel)
+                            accel)
             return False
 
         return True
@@ -177,6 +161,28 @@ class KeyBinder(object):
 
         # Necessary for proper function
         return True
+
+    def parse_accel(self, accel):  # type: (str) -> Tuple[int, int]
+        """Convert an accelerator string into the form XGrabKey needs."""
+
+        keysym, modmask = gtk.accelerator_parse(accel)
+        if not gtk.accelerator_valid(keysym, modmask):  # pylint: disable=E1101
+            logging.error("Invalid keybinding: %s", accel)
+            return None, None
+
+        if modmask > 2**16 - 1:
+            logging.error("Modifier out of range for XGrabKey "
+                          "(int(modmask) > 65535). "
+                          "Did you use <Super> instead of <Mod4>?")
+            return None, None
+
+        # Convert to what XGrabKey expects
+        keycode = self.xdisp.keysym_to_keycode(keysym)
+        if isinstance(modmask, gtk.gdk.ModifierType):
+            modmask = modmask.real
+
+        print(keycode, modmask)
+        return keycode, modmask
 
     @staticmethod
     def _vary_modmask(modmask, ignored):
