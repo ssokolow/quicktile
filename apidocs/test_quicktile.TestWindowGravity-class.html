@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>test_quicktile.TestEnumSafeDict</title>
+  <title>test_quicktile.TestWindowGravity</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -35,7 +35,7 @@
     <td width="100%">
       <span class="breadcrumbs">
         <a href="test_quicktile-module.html">Module&nbsp;test_quicktile</a> ::
-        Class&nbsp;TestEnumSafeDict
+        Class&nbsp;TestWindowGravity
       </span>
     </td>
     <td>
@@ -45,25 +45,26 @@
     onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="test_quicktile.TestEnumSafeDict-class.html"
+            >]&nbsp;|&nbsp;<a href="test_quicktile.TestWindowGravity-class.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class TestEnumSafeDict</h1><p class="nomargin-top"><span class="codelink"><a href="test_quicktile-pysrc.html#TestEnumSafeDict">source&nbsp;code</a></span></p>
+<h1 class="epydoc">Class TestWindowGravity</h1><p class="nomargin-top"><span class="codelink"><a href="test_quicktile-pysrc.html#TestWindowGravity">source&nbsp;code</a></span></p>
 <pre class="base-tree">
             object --+    
                      |    
 unittest.case.TestCase --+
                          |
-                        <strong class="uidshort">TestEnumSafeDict</strong>
+                        <strong class="uidshort">TestWindowGravity</strong>
 </pre>
 
 <hr />
-<p>Tests to ensure EnumSafeDict never compares enums of different 
-  types</p>
+<p>Test the equivalence and correctness of <a 
+  href="quicktile.wm-module.html#GRAVITY" class="link">wm.GRAVITY</a> 
+  values.</p>
 
 <!-- ==================== NESTED CLASSES ==================== -->
 <a name="section-NestedClasses"></a>
@@ -113,10 +114,10 @@ unittest.case.TestCase --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="test_quicktile.TestEnumSafeDict-class.html#setUp" class="summary-sig-name">setUp</a>(<span class="summary-sig-arg">self</span>)</span><br />
+          <td><span class="summary-sig"><a href="test_quicktile.TestWindowGravity-class.html#setUp" class="summary-sig-name">setUp</a>(<span class="summary-sig-arg">self</span>)</span><br />
       Hook method for setting up the test fixture before exercising it.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="test_quicktile-pysrc.html#TestEnumSafeDict.setUp">source&nbsp;code</a></span>
+            <span class="codelink"><a href="test_quicktile-pysrc.html#TestWindowGravity.setUp">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -130,10 +131,10 @@ unittest.case.TestCase --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="test_testing_shims"></a><span class="summary-sig-name">test_testing_shims</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      EnumSafeDict: Testing shims function correctly</td>
+          <td><span class="summary-sig"><a name="test_gravity_equivalence"></a><span class="summary-sig-name">test_gravity_equivalence</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Gravity Lookup Table: text/GDK/WNCK constants are equivalent</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="test_quicktile-pysrc.html#TestEnumSafeDict.test_testing_shims">source&nbsp;code</a></span>
+            <span class="codelink"><a href="test_quicktile-pysrc.html#TestWindowGravity.test_gravity_equivalence">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -147,27 +148,10 @@ unittest.case.TestCase --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="test_init_with_content"></a><span class="summary-sig-name">test_init_with_content</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      EnumSafeDict: Initialization with content</td>
+          <td><span class="summary-sig"><a name="test_gravity_correctness"></a><span class="summary-sig-name">test_gravity_correctness</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Gravity Lookup Table: Constants have correct percentage values</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="test_quicktile-pysrc.html#TestEnumSafeDict.test_init_with_content">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="test_get_set_del"></a><span class="summary-sig-name">test_get_set_del</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      EnumSafeDict: get/set/delitem</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="test_quicktile-pysrc.html#TestEnumSafeDict.test_get_set_del">source&nbsp;code</a></span>
+            <span class="codelink"><a href="test_quicktile-pysrc.html#TestWindowGravity.test_gravity_correctness">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -371,7 +355,7 @@ unittest.case.TestCase --+
   <h3 class="epydoc"><span class="sig"><span class="sig-name">setUp</span>(<span class="sig-arg">self</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="test_quicktile-pysrc.html#TestEnumSafeDict.setUp">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="test_quicktile-pysrc.html#TestWindowGravity.setUp">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   

@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>exceptions.AssertionError</title>
+  <title>quicktile.wm.WorkArea</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -34,9 +34,9 @@
   <tr valign="top">
     <td width="100%">
       <span class="breadcrumbs">
-        exceptions ::
-        AssertionError ::
-        Class&nbsp;AssertionError
+        <a href="quicktile-module.html">Package&nbsp;quicktile</a> ::
+        <a href="quicktile.wm-module.html">Module&nbsp;wm</a> ::
+        Class&nbsp;WorkArea
       </span>
     </td>
     <td>
@@ -46,28 +46,22 @@
     onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="exceptions.AssertionError-class.html"
+            >]&nbsp;|&nbsp;<a href="quicktile.wm.WorkArea-class.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class AssertionError</h1><p class="nomargin-top"></p>
+<h1 class="epydoc">Class WorkArea</h1><p class="nomargin-top"><span class="codelink"><a href="quicktile.wm-pysrc.html#WorkArea">source&nbsp;code</a></span></p>
 <pre class="base-tree">
-   object --+            
-            |            
-BaseException --+        
-                |        
-        Exception --+    
-                    |    
-        StandardError --+
-                        |
-                       <strong class="uidshort">AssertionError</strong>
+object --+
+         |
+        <strong class="uidshort">WorkArea</strong>
 </pre>
 
 <hr />
-<p>Assertion failed.</p>
+<p>Helper to calculate and query available workarea on the desktop.</p>
 
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
@@ -92,10 +86,12 @@ BaseException --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="exceptions.AssertionError-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">...</span>)</span><br />
+          <td><span class="summary-sig"><a href="quicktile.wm.WorkArea-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">gdk_screen</span>,
+        <span class="summary-sig-arg">ignore_struts</span>=<span class="summary-sig-default">False</span>)</span><br />
       x.__init__(...) initializes x; see help(type(x)) for signature</td>
           <td align="right" valign="top">
-            
+            <span class="codelink"><a href="quicktile.wm-pysrc.html#WorkArea.__init__">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -105,15 +101,72 @@ BaseException --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">a new object with type S, a subtype of T</span>
+      <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="exceptions.AssertionError-class.html#__new__" class="summary-sig-name">__new__</a>(<span class="summary-sig-arg">T</span>,
-        <span class="summary-sig-arg">S</span>,
-        <span class="summary-sig-arg">...</span>)</span></td>
+          <td><span class="summary-sig"><a name="get_monitor_rect"></a><span class="summary-sig-name">get_monitor_rect</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">monitor</span>)</span><br />
+      Helper to normalize various monitor identifiers.</td>
           <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile.wm-pysrc.html#WorkArea.get_monitor_rect">source&nbsp;code</a></span>
             
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="get_struts"></a><span class="summary-sig-name">get_struts</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">root_win</span>)</span><br />
+      Retrieve the struts from the root window if supported.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile.wm-pysrc.html#WorkArea.get_struts">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="subtract_struts"></a><span class="summary-sig-name">subtract_struts</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">usable_region</span>,
+        <span class="summary-sig-arg">struts</span>)</span><br />
+      Subtract the given struts from the given region.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile.wm-pysrc.html#WorkArea.subtract_struts">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>gtk.gdk.Region</code>, <code>gtk.gdk.Rectangle</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.wm.WorkArea-class.html#get" class="summary-sig-name">get</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">monitor</span>,
+        <span class="summary-sig-arg">ignore_struts</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Retrieve the usable area of the specified monitor using the most 
+      expressive method the window manager supports.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile.wm-pysrc.html#WorkArea.get">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -123,23 +176,18 @@ BaseException --+
   </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code>BaseException</code></b>:
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
+      <code>__format__</code>,
       <code>__getattribute__</code>,
-      <code>__getitem__</code>,
-      <code>__getslice__</code>,
+      <code>__hash__</code>,
+      <code>__new__</code>,
       <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
       <code>__repr__</code>,
       <code>__setattr__</code>,
-      <code>__setstate__</code>,
-      <code>__str__</code>,
-      <code>__unicode__</code>
-      </p>
-    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
-      <code>__format__</code>,
-      <code>__hash__</code>,
-      <code>__reduce_ex__</code>,
       <code>__sizeof__</code>,
+      <code>__str__</code>,
       <code>__subclasshook__</code>
       </p>
     </td>
@@ -164,10 +212,6 @@ BaseException --+
 </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code>BaseException</code></b>:
-      <code>args</code>,
-      <code>message</code>
-      </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__class__</code>
       </p>
@@ -199,11 +243,13 @@ BaseException --+
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">...</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">gdk_screen</span>,
+        <span class="sig-arg">ignore_struts</span>=<span class="sig-default">False</span>)</span>
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
-    >&nbsp;
+    ><span class="codelink"><a href="quicktile.wm-pysrc.html#WorkArea.__init__">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -211,32 +257,38 @@ BaseException --+
   <dl class="fields">
     <dt>Overrides:
         object.__init__
+        <dd><em class="note">(inherited documentation)</em></dd>
     </dt>
   </dl>
 </td></tr></table>
 </div>
-<a name="__new__"></a>
+<a name="get"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__new__</span>(<span class="sig-arg">T</span>,
-        <span class="sig-arg">S</span>,
-        <span class="sig-arg">...</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">monitor</span>,
+        <span class="sig-arg">ignore_struts</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    >&nbsp;
+    ><span class="codelink"><a href="quicktile.wm-pysrc.html#WorkArea.get">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
-  
+  <p>Retrieve the usable area of the specified monitor using the most 
+  expressive method the window manager supports.</p>
   <dl class="fields">
-    <dt>Returns: a new object with type S, a subtype of T</dt>
-    <dt>Overrides:
-        object.__new__
-    </dt>
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>monitor</code></strong> (<code>int</code> or <code>gtk.gdk.Rectangle</code>) - The number or dimensions of the desired monitor.</li>
+        <li><strong class="pname"><code>ignore_struts</code></strong> (<code>bool</code>) - If <code>True</code>, just return the size of the whole monitor, 
+          allowing windows to overlap panels.</li>
+    </ul></dd>
+    <dt>Returns: <code>gtk.gdk.Region</code>, <code>gtk.gdk.Rectangle</code></dt>
+        <dd>The usable region and its largest rectangular subset.</dd>
   </dl>
 </td></tr></table>
 </div>

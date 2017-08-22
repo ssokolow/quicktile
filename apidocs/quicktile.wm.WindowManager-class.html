@@ -119,33 +119,14 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>gtk.gdk.Region</code>, <code>gtk.gdk.Rectangle</code></span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile.wm.WindowManager-class.html#get_workarea" class="summary-sig-name">get_workarea</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">monitor</span>,
-        <span class="summary-sig-arg">ignore_struts</span>=<span class="summary-sig-default">False</span>)</span><br />
-      Retrieve the usable area of the specified monitor using the most 
-      expressive method the window manager supports.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile.wm-pysrc.html#WindowManager.get_workarea">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type"><code>wnck.Workspace</code> or <code>None</code></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="quicktile.wm.WindowManager-class.html#get_workspace" class="summary-sig-name">get_workspace</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">window</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">direction</span>=<span class="summary-sig-default">None</span>)</span><br />
+        <span class="summary-sig-arg">direction</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">wrap_around</span>=<span class="summary-sig-default">True</span>)</span><br />
       Get a workspace relative to either a window or the active one.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="quicktile.wm-pysrc.html#WindowManager.get_workspace">source&nbsp;code</a></span>
@@ -199,44 +180,6 @@ object --+
     </td>
   </tr>
 </table>
-<!-- ==================== CLASS METHODS ==================== -->
-<a name="section-ClassMethods"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Class Methods</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-ClassMethods"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>(x, y)</code></span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="quicktile.wm.WindowManager-class.html#calc_win_gravity" class="summary-sig-name">calc_win_gravity</a>(<span class="summary-sig-arg">cls</span>,
-        <span class="summary-sig-arg">geom</span>,
-        <span class="summary-sig-arg">gravity</span>)</span><br />
-      Calculate the X and Y coordinates necessary to simulate non-topleft 
-      gravity on a window.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="quicktile.wm-pysrc.html#WindowManager.calc_win_gravity">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-</table>
 <!-- ==================== STATIC METHODS ==================== -->
 <a name="section-StaticMethods"></a>
 <table class="summary" border="1" cellpadding="3"
@@ -256,6 +199,25 @@ object --+
 </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>(x, y)</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="quicktile.wm.WindowManager-class.html#calc_win_gravity" class="summary-sig-name">calc_win_gravity</a>(<span class="summary-sig-arg">geom</span>,
+        <span class="summary-sig-arg">gravity</span>)</span><br />
+      Calculate the X and Y coordinates necessary to simulate non-topleft 
+      gravity on a window.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="quicktile.wm-pysrc.html#WindowManager.calc_win_gravity">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type"><code>gtk.gdk.Rectangle</code></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -270,40 +232,6 @@ object --+
         </tr>
       </table>
       
-    </td>
-  </tr>
-</table>
-<!-- ==================== CLASS VARIABLES ==================== -->
-<a name="section-ClassVariables"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Class Variables</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-ClassVariables"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="quicktile.wm.WindowManager-class.html#gravities" class="summary-name">gravities</a> = <code title="EnumSafeDict({&lt;enum GDK_GRAVITY_NORTH_WEST of type GdkGravity&gt;: (0.0, \
-0.0), &lt;enum GDK_GRAVITY_NORTH of type GdkGravity&gt;: (0.5, 0.0), &lt;enum G\
-DK_GRAVITY_NORTH_EAST of type GdkGravity&gt;: (1.0, 0.0), &lt;enum GDK_GRAVI\
-TY_WEST of type GdkGravity&gt;: (0.0, 0.5), &lt;enum GDK_GRAVITY_CENTER of t\
-ype GdkGravity&gt;: (0.5, 0.5), &lt;enum GDK_GRAVITY_EAST of type GdkGravity\
-&gt;: (1.0, 0.5), &lt;enum GDK_GRAVITY_SOUTH_WEST of type GdkGravity&gt;: (0.0,\
- 1.0), &lt;enum GDK_GRAVITY_SOUTH of type GdkGravity&gt;: (0.5, 1.0), &lt;enum \
-GDK_GRAVITY_SOUTH_EAST of type GdkGravity&gt;: (1.0, 1.0)}, {&lt;enum WNCK_W\
-...">EnumSafeDict({&lt;enum GDK_GRAVITY_NORTH_WEST of type<code class="variable-ellipsis">...</code></code><br />
-      Lookup table for internal window gravity support.
     </td>
   </tr>
 </table>
@@ -396,10 +324,9 @@ GDK_GRAVITY_SOUTH_EAST of type GdkGravity&gt;: (1.0, 1.0)}, {&lt;enum WNCK_W\
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">calc_win_gravity</span>(<span class="sig-arg">cls</span>,
-        <span class="sig-arg">geom</span>,
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">calc_win_gravity</span>(<span class="sig-arg">geom</span>,
         <span class="sig-arg">gravity</span>)</span>
-    <br /><em class="fname">Class Method</em>
+    <br /><em class="fname">Static Method</em>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="quicktile.wm-pysrc.html#WindowManager.calc_win_gravity">source&nbsp;code</a></span>&nbsp;
@@ -414,8 +341,7 @@ GDK_GRAVITY_SOUTH_EAST of type GdkGravity&gt;: (1.0, 1.0)}, {&lt;enum WNCK_W\
         <li><strong class="pname"><code>geom</code></strong> (<code>gtk.gdk.Rectangle</code>) - The window geometry to which to apply the corrections.</li>
         <li><strong class="pname"><code>gravity</code></strong> (<code>wnck.WINDOW_GRAVITY_*</code> or 
           <code>gtk.gdk.GRAVITY_*</code>) - A desired gravity chosen from <a 
-          href="quicktile.wm.WindowManager-class.html#gravities" 
-          class="link">gravities</a>.</li>
+          href="quicktile.wm-module.html#GRAVITY" class="link">GRAVITY</a>.</li>
     </ul></dd>
     <dt>Returns: <code>(x, y)</code></dt>
         <dd>The coordinates to be used to achieve the desired position.</dd>
@@ -478,36 +404,6 @@ GDK_GRAVITY_SOUTH_EAST of type GdkGravity&gt;: (1.0, 1.0)}, {&lt;enum WNCK_W\
   </dl>
 </td></tr></table>
 </div>
-<a name="get_workarea"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_workarea</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">monitor</span>,
-        <span class="sig-arg">ignore_struts</span>=<span class="sig-default">False</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="quicktile.wm-pysrc.html#WindowManager.get_workarea">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Retrieve the usable area of the specified monitor using the most 
-  expressive method the window manager supports.</p>
-  <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>monitor</code></strong> (<code>int</code> or <code>gtk.gdk.Rectangle</code>) - The number or dimensions of the desired monitor.</li>
-        <li><strong class="pname"><code>ignore_struts</code></strong> (<code>bool</code>) - If <code>True</code>, just return the size of the whole monitor, 
-          allowing windows to overlap panels.</li>
-    </ul></dd>
-    <dt>Returns: <code>gtk.gdk.Region</code>, <code>gtk.gdk.Rectangle</code></dt>
-        <dd>The usable region and its largest rectangular subset.</dd>
-  </dl>
-</td></tr></table>
-</div>
 <a name="get_workspace"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -517,7 +413,8 @@ GDK_GRAVITY_SOUTH_EAST of type GdkGravity&gt;: (1.0, 1.0)}, {&lt;enum WNCK_W\
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">get_workspace</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">window</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">direction</span>=<span class="sig-default">None</span>)</span>
+        <span class="sig-arg">direction</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">wrap_around</span>=<span class="sig-default">True</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="quicktile.wm-pysrc.html#WindowManager.get_workspace">source&nbsp;code</a></span>&nbsp;
@@ -544,6 +441,7 @@ GDK_GRAVITY_SOUTH_EAST of type GdkGravity&gt;: (1.0, 1.0)}, {&lt;enum WNCK_W\
               point of reference
             </li>
           </ul></li>
+        <li><strong class="pname"><code>wrap_around</code></strong> (<code>bool</code>) - Whether relative indexes should wrap around.</li>
     </ul></dd>
     <dt>Returns: <code>wnck.Workspace</code> or <code>None</code></dt>
         <dd>The workspace object or <code>None</code> if no match could be 
@@ -607,52 +505,6 @@ GDK_GRAVITY_SOUTH_EAST of type GdkGravity&gt;: (1.0, 1.0)}, {&lt;enum WNCK_W\
 </div></td></tr></table>
 </div>
 <br />
-<!-- ==================== CLASS VARIABLE DETAILS ==================== -->
-<a name="section-ClassVariableDetails"></a>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Class Variable Details</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-ClassVariableDetails"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-</table>
-<a name="gravities"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">gravities</h3>
-  <p>Lookup table for internal window gravity support. (libwnck's support 
-  is either unreliable or broken)</p>
-  <dl class="fields">
-  </dl>
-  <dl class="fields">
-    <dt>Value:</dt>
-      <dd><table><tr><td><pre class="variable">
-EnumSafeDict({&lt;enum GDK_GRAVITY_NORTH_WEST of type GdkGravity&gt;: (0.0, <span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-0.0), &lt;enum GDK_GRAVITY_NORTH of type GdkGravity&gt;: (0.5, 0.0), &lt;enum G<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-DK_GRAVITY_NORTH_EAST of type GdkGravity&gt;: (1.0, 0.0), &lt;enum GDK_GRAVI<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-TY_WEST of type GdkGravity&gt;: (0.0, 0.5), &lt;enum GDK_GRAVITY_CENTER of t<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-ype GdkGravity&gt;: (0.5, 0.5), &lt;enum GDK_GRAVITY_EAST of type GdkGravity<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-&gt;: (1.0, 0.5), &lt;enum GDK_GRAVITY_SOUTH_WEST of type GdkGravity&gt;: (0.0,<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
- 1.0), &lt;enum GDK_GRAVITY_SOUTH of type GdkGravity&gt;: (0.5, 1.0), &lt;enum <span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-GDK_GRAVITY_SOUTH_EAST of type GdkGravity&gt;: (1.0, 1.0)}, {&lt;enum WNCK_W<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-<code class="variable-ellipsis">...</code>
-</pre></td></tr></table>
-</dd>
-  </dl>
-</td></tr></table>
-</div>
-<br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
        bgcolor="#a0c0ff" cellspacing="0">
@@ -676,7 +528,7 @@ GDK_GRAVITY_SOUTH_EAST of type GdkGravity&gt;: (1.0, 1.0)}, {&lt;enum WNCK_W<spa
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Aug 20 21:41:19 2017
+    Generated by Epydoc 3.0.1 on Tue Aug 22 00:53:59 2017
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

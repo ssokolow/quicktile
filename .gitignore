@@ -1,6 +1,7 @@
 build
 .coverage
 dist
+.mypy_cache
 QuickTile.egg-info
 _site/
 .tox/
