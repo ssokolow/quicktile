@@ -14,7 +14,7 @@ from .util import clamp_idx, EnumSafeDict, XInitError
 # (And silence complaints from only using the imported types in comments)
 try:
     # pylint: disable=unused-import
-    from typing import List, Sequence, Tuple  # NOQA
+    from typing import List, Optional, Sequence, Tuple  # NOQA
     from .util import Strut  # NOQA
 except:  # pylint: disable=bare-except
     pass
@@ -52,28 +52,6 @@ class WorkArea(object):
         # type: (gtk.gdk.Screen, bool) -> None
         self.gdk_screen = gdk_screen
         self.ignore_struts = ignore_struts
-
-    # TODO: MyPy type signature
-    def get_monitor_rect(self, monitor):
-        """Helper to normalize various monitor identifiers."""
-        if isinstance(monitor, int):
-            usable_rect = self.gdk_screen.get_monitor_geometry(monitor)
-            logging.debug("Retrieved geometry %s for monitor #%s",
-                          usable_rect, monitor)
-        elif not isinstance(monitor, Rectangle):
-            logging.debug("Converting geometry %s to gtk.gdk.Rectangle",
-                          monitor)
-            usable_rect = Rectangle(monitor)
-        else:
-            usable_rect = monitor
-
-        usable_region = gtk.gdk.region_rectangle(usable_rect)
-        if not usable_region.get_rectangles():
-            logging.error("WorkArea.get_monitor_rect received "
-                          "an empty monitor region!")
-            return None, None
-
-        return usable_rect, usable_region
 
     def get_struts(self, root_win):  # type: (gtk.gdk.Window) -> List[Strut]
         """Retrieve the struts from the root window if supported."""
@@ -127,31 +105,40 @@ class WorkArea(object):
             # TODO: Share this on http://stackoverflow.com/q/2598580/435253
         return usable_rect.get_clipbox(), usable_region
 
-    # TODO: MyPy type signature
     def get(self, monitor, ignore_struts=None):
+        # type: (Rectangle, bool) -> Tuple[gtk.gdk.Region, Rectangle]
         """Retrieve the usable area of the specified monitor using
         the most expressive method the window manager supports.
 
         @param monitor: The number or dimensions of the desired monitor.
         @param ignore_struts: If C{True}, just return the size of the whole
             monitor, allowing windows to overlap panels.
-        @type monitor: C{int} or C{gtk.gdk.Rectangle}
+
+        @type monitor: C{gtk.gdk.Rectangle}
         @type ignore_struts: C{bool}
 
         @returns: The usable region and its largest rectangular subset.
         @rtype: C{gtk.gdk.Region}, C{gtk.gdk.Rectangle}
         """
 
-        usable_rect, usable_region = self.get_monitor_rect(monitor)
+        # Get the region and return failure early if it's empty
+        usable_rect, usable_region = monitor, gtk.gdk.region_rectangle(monitor)
+        if not usable_region.get_rectangles():
+            logging.error("WorkArea.get_monitor_rect received "
+                          "an empty monitor region!")
+            return None, None
 
+        # Return early if asked to ignore struts
         if ignore_struts or (ignore_struts is None and self.ignore_struts):
             logging.debug("Panels ignored. Reported monitor geometry is:\n%s",
                           usable_rect)
             return usable_region, usable_rect
 
+        # Get the list of struts from the root window
         root_win = self.gdk_screen.get_root_window()
-
         struts = self.get_struts(root_win)
+
+        # Fall back to _NET_WORKAREA if we couldn't get any struts
         if struts:
             usable_rect, usable_region = self.subtract_struts(usable_region,
                                                               struts)
@@ -199,7 +186,7 @@ class WindowManager(object):
 
     @staticmethod
     def calc_win_gravity(geom, gravity):
-        # TODO: MyPy type signature
+        # (Rectangle, Tuple[float, float]) -> Tuple[int, int]
         """Calculate the X and Y coordinates necessary to simulate non-topleft
         gravity on a window.
 
@@ -237,10 +224,10 @@ class WindowManager(object):
         return win_geom
 
     def get_monitor(self, win):
-        # TODO: MyPy type signature
-        """Given a Window (Wnck or GDK), retrieve the monitor ID and geometry.
+        # type: (wnck.Window) -> Tuple[int, Rectangle]
+        """Given a C{wnck.Window}, retrieve the monitor ID and geometry.
 
-        @type win: C{wnck.Window} or C{gtk.gdk.Window}
+        @type win: C{wnck.Window}
         @returns: A tuple containing the monitor ID and geometry.
         @rtype: C{(int, gtk.gdk.Rectangle)}
         """
@@ -257,8 +244,26 @@ class WindowManager(object):
                       monitor_id, monitor_geom)
         return monitor_id, monitor_geom
 
-    def get_workspace(self, window=None, direction=None, wrap_around=True):
-        # TODO: MyPy type signature
+    def get_relevant_windows(self, workspace):
+        """C{wnck.Screen.get_windows} without WINDOW_DESKTOP/DOCK windows."""
+
+        for window in self.screen.get_windows():
+            # Skip windows on other virtual desktops for intuitiveness
+            if workspace and not window.is_on_workspace(workspace):
+                logging.debug("Skipping window on other workspace: %r", window)
+                continue
+
+            # Don't cycle elements of the desktop
+            if not self.is_relevant(window):
+                continue
+
+            yield window
+
+    def get_workspace(self,
+                      window=None,      # type: wnck.Window
+                      direction=None,   # type: wnck.MotionDirection
+                      wrap_around=True  # type: bool
+                      ):                # type: (...) -> wnck.Workspace
         """Get a workspace relative to either a window or the active one.
 
         @param window: The point of reference. C{None} for the active workspace
@@ -301,16 +306,35 @@ class WindowManager(object):
 
         return nxt
 
+    def is_relevant(self, window):
+        # type: (wnck.Window) -> bool
+        """Return False if the window should be ignored.
+
+        (eg. If it's the desktop or a panel)
+        """
+        if not window:
+            logging.debug("Received no window object to manipulate")
+            return False
+
+        if window.get_window_type() in [
+                wnck.WINDOW_DESKTOP,  # pylint: disable=E1101
+                wnck.WINDOW_DOCK]:    # pylint: disable=E1101
+            logging.debug("Irrelevant window: %r", window)
+            return False
+        return True
+
     def reposition(self,
-            win,
-            geom=None,
-            monitor=Rectangle(0, 0, 0, 0),
-            keep_maximize=False,
+            win,                                    # type: wnck.Window
+            geom=None,                              # type: Optional[Rectangle]
+            monitor=Rectangle(0, 0, 0, 0),          # type: Rectangle
+            keep_maximize=False,                    # type: bool
             gravity=wnck.WINDOW_GRAVITY_NORTHWEST,
             geometry_mask=wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y |
-                wnck.WINDOW_CHANGE_WIDTH | wnck.WINDOW_CHANGE_HEIGHT
+                wnck.WINDOW_CHANGE_WIDTH |
+                wnck.WINDOW_CHANGE_HEIGHT  # type: wnck.WindowMoveResizeMask
                    ):  # pylint: disable=no-member,too-many-arguments
-        # TODO: MyPy type signature
+        # type: (...) -> None
+        # TODO: Complete MyPy type signature
         # pylint:disable=line-too-long
         """
         Position and size a window, decorations inclusive, according to the
@@ -333,8 +357,8 @@ class WindowManager(object):
             requested geometry should actually be applied to the window.
             (Allows the same geometry definition to easily be shared between
             operations like move and resize.)
-        @type win: C{gtk.gdk.Window}
-        @type geom: C{gtk.gdk.Rectangle}
+        @type win: C{wnck.Window}
+        @type geom: C{gtk.gdk.Rectangle} or C{None}
         @type monitor: C{gtk.gdk.Rectangle}
         @type keep_maximize: C{bool}
         @type gravity: U{WnckWindowGravity<https://developer.gnome.org/libwnck/stable/WnckWindow.html#WnckWindowGravity>} or U{GDK Gravity Constant<http://www.pygtk.org/docs/pygtk/gdk-constants.html#gdk-gravity-constants>}

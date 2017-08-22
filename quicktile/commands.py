@@ -22,7 +22,7 @@ try:
 
     if TYPE_CHECKING:
         from .wm import WindowManager  # NOQA
-        from .util import CommandCB
+        from .util import CommandCB    # NOQA
 
     # FIXME: Replace */** with a dict so I can be strict here
     CommandCBWrapper = Callable[..., Any]
@@ -68,30 +68,24 @@ class CommandRegistry(object):
             """Closure used to allow decorator to take arguments"""
             @wraps(func)
             # pylint: disable=missing-docstring
-            def wrapper(winman, window=None, *args, **kwargs):
-                # TODO: Add a MyPy type signature
+            def wrapper(winman,       # type: WindowManager
+                        window=None,  # type: wnck.Window
+                        *args,
+                        **kwargs
+                        ):            # type: (...) -> None
 
-                # Get Wnck and GDK window objects
                 window = window or winman.screen.get_active_window()
-                if isinstance(window, gtk.gdk.Window):
-                    win = wnck.window_get(window.xid)  # pylint: disable=E1101
-                else:
-                    win = window
 
-                # pylint: disable=no-member
-                if not win:
-                    logging.debug("Received no window object to manipulate.")
+                # Bail out early on None or things like the desktop window
+                if not winman.is_relevant(window):
                     return None
-                elif win.get_window_type() == wnck.WINDOW_DESKTOP:
-                    logging.debug("Received desktop window object. Ignoring.")
-                    return None
-                else:
-                    # FIXME: Make calls to win.get_* lazy in case --debug
-                    #        wasn't passed.
-                    logging.debug("Operating on window 0x%x with title \"%s\" "
-                                  "and geometry %r",
-                                  win.get_xid(), win.get_name(),
-                                  win.get_geometry())
+
+                # FIXME: Make calls to win.get_* lazy in case --debug
+                #        wasn't passed.
+                logging.debug("Operating on window %r with title \"%s\" "
+                              "and geometry %r",
+                              window, window.get_name(),
+                              window.get_geometry())
 
                 monitor_id, monitor_geom = winman.get_monitor(window)
 
@@ -116,7 +110,7 @@ class CommandRegistry(object):
                 })
 
                 args, kwargs = p_args + args, dict(p_kwargs, **kwargs)
-                func(winman, win, state, *args, **kwargs)
+                func(winman, window, state, *args, **kwargs)
 
             if name in self.commands:
                 logging.warn("Redefining existing command: %s", name)
@@ -150,8 +144,7 @@ class CommandRegistry(object):
         return decorate
 
     def call(self, command, winman, *args, **kwargs):
-        # type: (str, WindowManager, *Any, **Any) -> Any
-        # TODO: Decide what to do about return values
+        # type: (str, WindowManager, *Any, **Any) -> bool
         """Resolve a textual positioning command and execute it."""
         cmd = self.commands.get(command, None)
 
@@ -159,8 +152,12 @@ class CommandRegistry(object):
             logging.debug("Executing command '%s' with arguments %r, %r",
                           command, args, kwargs)
             cmd(winman, *args, **kwargs)
+
+            # TODO: Allow commands to report success or failure
+            return True
         else:
             logging.error("Unrecognized command: %s", command)
+            return False
 
 
 #: The instance of L{CommandRegistry} to be used in 99.9% of use cases.
@@ -290,20 +287,8 @@ def cycle_monitors_all(winman, win, state, step=1, force_wrap=False):
         logging.debug("get_workspace() returned None")
         return
 
-    for window in winman.screen.get_windows():
-        # Skip windows on other virtual desktops for intuitiveness
-        if not window.is_on_workspace(curr_workspace):
-            logging.debug("Skipping window on other workspace")
-            continue
-
-        # Don't cycle elements of the desktop
-        if window.get_window_type() in [
-              wnck.WINDOW_DESKTOP, wnck.WINDOW_DOCK]:  # pylint: disable=E1101
-            logging.debug("Skipping desktop/dock window")
-            continue
-
-        gdkwin = gtk.gdk.window_foreign_new(window.get_xid())
-        mon_id = winman.gdk_screen.get_monitor_at_window(gdkwin)
+    for window in winman.get_relevant_windows(curr_workspace):
+        mon_id, _ = winman.get_monitor(window)
 
         # TODO: deduplicate cycle_monitors and cycle_monitors_all
         new_mon_id = clamp_idx(mon_id + step, n_monitors,
@@ -313,7 +298,7 @@ def cycle_monitors_all(winman, win, state, step=1, force_wrap=False):
         new_mon_geom = winman.gdk_screen.get_monitor_geometry(new_mon_id)
         logging.debug(
             "Moving window %s to monitor 0x%d, which has geometry %s",
-            hex(window.get_xid()), new_mon_id, new_mon_geom)
+            window, new_mon_id, new_mon_geom)
 
         winman.reposition(window, None, new_mon_geom, keep_maximize=True)
 
@@ -358,7 +343,7 @@ def move_to_position(winman,       # type: WindowManager
 @commands.add('bordered')
 def toggle_decorated(winman, win, state):  # pylint: disable=unused-argument
     # type: (WindowManager, wnck.Window, Any) -> None
-    """Toggle window state on the active window."""
+    """Toggle window decoration state on the active window."""
     win = gtk.gdk.window_foreign_new(win.get_xid())
     win.set_decorations(not win.get_decorations())
 

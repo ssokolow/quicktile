@@ -27,7 +27,9 @@ from .wm import WindowManager
 # (And silence complaints from only using the imported types in comments)
 try:
     # pylint: disable=unused-import
-    from typing import Dict, Union # NOQA
+    from typing import Callable, Dict, Union # NOQA
+
+
 except:  # pylint: disable=bare-except
     pass
 
@@ -82,8 +84,11 @@ class QuickTileApp(object):
     dbus_name = None
     dbus_obj = None
 
-    def __init__(self, winman, commands, keys=None, modmask=None):
-        # TODO: MyPy type signature
+    def __init__(self, winman, # type: WindowManager
+                 commands,     # type: commands.CommandRegistry
+                 keys=None,    # type: Dict[str, Callable]
+                 modmask=None  # type: str
+                 ):  # type: (...) -> None
         """Populate the instance variables.
 
         @param keys: A dict mapping X11 keysyms to L{CommandRegistry}

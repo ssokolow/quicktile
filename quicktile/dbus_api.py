@@ -34,10 +34,9 @@ class QuickTile(Object):
         self.commands = commands
         self.winman = winman
 
-    # TODO: Add a MyPy type signature
     @method(dbus_interface='com.ssokolow.QuickTile',
             in_signature='s', out_signature='b')
-    def doCommand(self, command):
+    def doCommand(self, command):  # type: (str) -> bool
         """Execute a QuickTile tiling command
 
         @todo 1.0.0: Expose a proper, introspectable D-Bus API"""
