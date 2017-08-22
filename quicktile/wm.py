@@ -13,12 +13,12 @@ from .util import clamp_idx, EnumSafeDict, XInitError
 
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
-try:
+MYPY = False
+if MYPY:
     # pylint: disable=unused-import
     from typing import List, Optional, Sequence, Tuple  # NOQA
     from .util import Strut  # NOQA
-except:  # pylint: disable=bare-except
-    pass
+del MYPY
 
 #: Lookup table for internal window gravity support.
 #: (libwnck's support is either unreliable or broken)
@@ -342,7 +342,8 @@ class WindowManager(object):
 
         return nxt
 
-    def is_relevant(self, window):
+    @staticmethod
+    def is_relevant(window):
         # type: (wnck.Window) -> bool
         """Return False if the window should be ignored.
 

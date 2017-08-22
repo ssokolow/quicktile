@@ -8,14 +8,12 @@ from UserDict import DictMixin
 
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
-try:
+MYPY = False
+if MYPY:
     # pylint: disable=unused-import
     from typing import (Any, Callable, Dict, Iterable, Iterator, List,  # NOQA
-                        Optional, Sequence, Tuple, TYPE_CHECKING)
+                        Optional, Sequence, Tuple)
     from mypy_extensions import VarArg, KwArg  # NOQA
-
-    if TYPE_CHECKING:
-        from .wm import WindowManager  # NOQA
 
     # pylint: disable=C0103
     PercentRect = Tuple[float, float, float, float]
@@ -23,8 +21,7 @@ try:
 
     # FIXME: Replace */** with a dict so I can be strict here
     CommandCB = Callable[..., Any]
-except:  # pylint: disable=bare-except
-    pass
+del MYPY
 
 def clamp_idx(idx, stop, wrap=True):
     # type: (int, int, bool) -> int
@@ -122,8 +119,8 @@ class EnumSafeDict(DictMixin):
     def __init__(self, *args):
         self._contents = {}
 
-        for inDict in args:
-            for key, val in inDict.items():
+        for in_dict in args:
+            for key, val in in_dict.items():
                 self[key] = val
 
     def __contains__(self, key):

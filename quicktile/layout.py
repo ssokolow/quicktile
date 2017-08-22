@@ -5,14 +5,14 @@ __license__ = "GNU GPL 2.0 or later"
 
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
-try:
+MYPY = False
+if MYPY:
     # pylint: disable=unused-import
     from typing import (Any, Dict, Iterable, Iterator, List, Optional,  # NOQA
                         Sequence, Sized, Tuple)
 
     from .util import PercentRect  # NOQA
-except:  # pylint: disable=bare-except
-    pass
+del MYPY
 
 class GravityLayout(object):  # pylint: disable=too-few-public-methods
     """Helper for translating top-left relative dimensions to other corners.
@@ -48,8 +48,8 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
 
     # pylint: disable=too-many-arguments
     def __call__(self,
-                 w,                   # type: float
-                 h,                   # type: float
+                 width,               # type: float
+                 height,              # type: float
                  gravity='top-left',  # type: str
                  x=None,              # type: Optional[float]
                  y=None               # type: Optional[float]
@@ -70,8 +70,8 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
           geometry tuple which is relative to the top-left corner so that it is
           instead relative to another corner.
 
-        @param w: Desired width
-        @param h: Desired height
+        @param width: Desired width
+        @param height: Desired height
         @param gravity: Desired window alignment from L{GRAVITIES}
         @param x: Desired horizontal position if not the same as C{gravity}
         @param y: Desired vertical position if not the same as C{gravity}
@@ -84,13 +84,13 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
 
         x = x or self.GRAVITIES[gravity][0]
         y = y or self.GRAVITIES[gravity][1]
-        offset_x = w * self.GRAVITIES[gravity][0]
-        offset_y = h * self.GRAVITIES[gravity][1]
+        offset_x = width * self.GRAVITIES[gravity][0]
+        offset_y = height * self.GRAVITIES[gravity][1]
 
         return (round(x - offset_x + self.margin_x, 3),
                 round(y - offset_y + self.margin_y, 3),
-                round(w - (self.margin_x * 2), 3),
-                round(h - (self.margin_y * 2), 3))
+                round(width - (self.margin_x * 2), 3),
+                round(height - (self.margin_y * 2), 3))
 
 def make_winsplit_positions(columns):
     # type: (int) -> Dict[str, List[PercentRect]]

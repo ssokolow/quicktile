@@ -14,20 +14,19 @@ from .util import clamp_idx, fmt_table
 
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
-try:
+MYPY = False
+if MYPY:
     # pylint: disable=unused-import
-    from typing import (Any, Callable, Dict, Iterable, Iterator, List,  # NOQA
-                        Optional, Sequence, Tuple, TYPE_CHECKING)
+    from typing import (Any, Callable, Dict, Iterable, Iterator, List, # NOQA
+                        Optional, Sequence, Tuple)
     from mypy_extensions import VarArg, KwArg  # NOQA
 
-    if TYPE_CHECKING:
-        from .wm import WindowManager  # NOQA
-        from .util import CommandCB    # NOQA
+    from .wm import WindowManager  # NOQA
+    from .util import CommandCB    # NOQA
 
     # FIXME: Replace */** with a dict so I can be strict here
     CommandCBWrapper = Callable[..., Any]
-except:  # pylint: disable=bare-except
-    pass
+del MYPY
 
 class CommandRegistry(object):
     """Handles lookup and boilerplate for window management commands.
@@ -43,8 +42,8 @@ class CommandRegistry(object):
         self.help = {}      # type: Dict[str, str]
 
     def __iter__(self):  # type: () -> Iterator[str]
-        for x in self.commands:
-            yield x
+        for name in self.commands:
+            yield name
 
     def __str__(self):   # type: () -> str
         return fmt_table(self.help, ('Known Commands', 'desc'), group_by=1)

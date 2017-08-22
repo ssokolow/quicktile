@@ -12,15 +12,14 @@ from dbus.mainloop.glib import DBusGMainLoop
 
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
-try:
+MYPY = False
+if MYPY:
     # pylint: disable=unused-import
-    from typing import Optional, Tuple, TYPE_CHECKING  # NOQA
+    from typing import Optional, Tuple  # NOQA
 
-    if TYPE_CHECKING:
-        from .commands import CommandRegistry  # NOQA
-        from .wm import WindowManager  # NOQA
-except:  # pylint: disable=bare-except
-    pass
+    from .commands import CommandRegistry  # NOQA
+    from .wm import WindowManager  # NOQA
+del MYPY
 
 class QuickTile(Object):
     """D-Bus endpoint definition"""
