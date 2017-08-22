@@ -2,9 +2,13 @@
 - Split QuickTile up into multiple files for easier refactoring and improvement
 - Fix a few latent WindowManager bugs revealed by the split-up.
 - Add a `ColumnCount` field to the config file
-- Add `monitor-prev-all` and `monitor-next-all` commands
+- Add a `MovementsWrap` field to the config file to control wrapping in
+  `-next` and `-previous` movements
+- Allow `ModMask` to be empty/None to enable bindings without a common prefix
+- Add `monitor-prev-all`, `monitor-next-all`, and `monitor-switch-all` commands
 - Add gtkexcepthook for more convenient handling of unexpected errors
 - Work around PyGTK's incompatibilty with tox
+- Make install.sh a bit more robust
 
 0.2.2:
 - Added move-to{,-top,-bottom}{,-left,-right} (David Stygstra)
