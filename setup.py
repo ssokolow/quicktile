@@ -8,6 +8,8 @@
    don't always install the requisite metadata for normal detection?
 """
 
+from __future__ import print_function
+
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
@@ -26,7 +28,7 @@ try:
     # pylint: disable=unused-import
     import gtk  # NOQA
 except ImportError:
-    print '--------------'
+    print('--------------')
     import subprocess
     instdir = subprocess.check_output([
         '/usr/bin/python',

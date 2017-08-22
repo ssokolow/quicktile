@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 """Unit Test Suite for QuickTile using Nose test discovery"""
 
+from __future__ import print_function
+
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
@@ -35,8 +37,16 @@ if sys.version_info[0] == 2 and sys.version_info[1] < 7:  # pragma: no cover
 else:                                                     # pragma: no cover
     import unittest
 
-# pylint: disable=too-few-public-methods
+# Set up a nice, oddly-shaped fake desktop made from screens
+# I actually have access to (though not all on the same PC)
+MOCK_SCREENS = [
+    gtk.gdk.Rectangle(0, 0, 1280, 1024),
+    gtk.gdk.Rectangle(1280, 0, 1280, 1024),
+    gtk.gdk.Rectangle(0, 1024, 1680, 1050),
+    gtk.gdk.Rectangle(1680, 1024, 1440, 900)
+]
 
+# pylint: disable=too-few-public-methods
 class ComplainingEnum(object):
     """A parent class for classes which should raise C{TypeError} when compared
 
@@ -97,11 +107,11 @@ class TestEnumSafeDict(unittest.TestCase):
         self.full = EnumSafeDict(
                 *[dict([x]) for x in self.test_mappings])
 
-    def test_testing_shims(self): # type: () -> None
+    def test_testing_shims(self):  # type: () -> None
         """EnumSafeDict: Testing shims function correctly"""
         for oper in ('lt', 'le', 'eq', 'ne', 'ge', 'gt'):
             with self.assertRaises(TypeError):
-                print "Testing %s..." % oper
+                print("Testing %s..." % oper)
                 getattr(operator, oper)(self.thing1, self.thing2)
 
     def test_init_with_content(self):  # type: () -> None
@@ -186,16 +196,10 @@ class TestWindowGravity(unittest.TestCase):
     def setUp(self):  # type: () -> None
         # Set up a nice, oddly-shaped fake desktop made from screens
         # I actually have access to (though not all on the same PC)
-        self.screens = [
-                gtk.gdk.Rectangle(0, 0, 1280, 1024),
-                gtk.gdk.Rectangle(1280, 0, 1280, 1024),
-                gtk.gdk.Rectangle(0, 1024, 1680, 1050),
-                gtk.gdk.Rectangle(1680, 1024, 1440, 900)
-        ]
 
         # TODO: Also work in some fake panel struts
         self.desktop = gtk.gdk.Region()
-        for rect in self.screens:
+        for rect in MOCK_SCREENS:
             self.desktop.union_with_rect(rect)
 
     def test_gravity_equivalence(self):  # type: () -> None
@@ -228,18 +232,9 @@ class TestWindowManagerDetached(unittest.TestCase):
         # Shorthand
         self.WM = wm.WindowManager  # pylint: disable=invalid-name
 
-        # Set up a nice, oddly-shaped fake desktop made from screens
-        # I actually have access to (though not all on the same PC)
-        self.screens = [
-                gtk.gdk.Rectangle(0, 0, 1280, 1024),
-                gtk.gdk.Rectangle(1280, 0, 1280, 1024),
-                gtk.gdk.Rectangle(0, 1024, 1680, 1050),
-                gtk.gdk.Rectangle(1680, 1024, 1440, 900)
-        ]
-
         # TODO: Also work in some fake panel struts
         self.desktop = gtk.gdk.Region()
-        for rect in self.screens:
+        for rect in MOCK_SCREENS:
             self.desktop.union_with_rect(rect)
 
     def test_win_gravity_noop(self):  # type: () -> None
@@ -247,7 +242,7 @@ class TestWindowManagerDetached(unittest.TestCase):
 
         (Might as well use the screen shapes to test this. It saves effort.)
         """
-        for rect in [self.desktop.get_clipbox()] + self.screens:
+        for rect in [self.desktop.get_clipbox()] + MOCK_SCREENS:
             self.assertEqual((rect.x, rect.y),
                 self.WM.calc_win_gravity(rect, gtk.gdk.GRAVITY_NORTH_WEST),
                 "NORTHWEST gravity should be a no-op.")

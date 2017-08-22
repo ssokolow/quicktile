@@ -25,7 +25,7 @@ if MYPY:
     from .util import CommandCB    # NOQA
 
     # FIXME: Replace */** with a dict so I can be strict here
-    CommandCBWrapper = Callable[..., Any]
+    CommandCBWrapper = Callable[..., Any]  # pylint: disable=invalid-name
 del MYPY
 
 class CommandRegistry(object):
@@ -115,7 +115,9 @@ class CommandRegistry(object):
                 logging.warn("Redefining existing command: %s", name)
             self.commands[name] = wrapper
 
-            assert func.__doc__, ("Command must have a docstring: %r" % func)
+            if not func.__doc__:
+                raise AssertionError("All commands must have a docstring: "
+                                     "%r" % func)
             help_str = func.__doc__.strip().split('\n')[0].split('. ')[0]
             self.help[name] = help_str.strip('.')
 

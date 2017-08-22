@@ -14,7 +14,8 @@ from .util import powerset, XInitError
 
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
-try:
+MYPY = False
+if MYPY:
     # pylint: disable=unused-import
     from typing import (Any, Callable, Dict, Iterable, Iterator, List,  # NOQA
                         Optional, Sequence, Sized, Tuple)
@@ -24,8 +25,7 @@ try:
     from .commands import CommandRegistry                  # NOQA
     from .wm import WindowManager                          # NOQA
     from .util import CommandCB                            # NOQA
-except:  # pylint: disable=bare-except
-    pass
+del MYPY
 
 class KeyBinder(object):
     """A convenience class for wrapping C{XGrabKey}."""
@@ -45,7 +45,7 @@ class KeyBinder(object):
         """
         try:
             self.xdisp = xdisplay or Display()
-        except (UnicodeDecodeError, DisplayConnectionError), err:
+        except (UnicodeDecodeError, DisplayConnectionError) as err:
             raise XInitError("python-xlib failed with %s when asked to open"
                              " a connection to the X server. Cannot bind keys."
                              "\n\tIt's unclear why this happens, but it is"

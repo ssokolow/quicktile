@@ -1,8 +1,9 @@
 """Entry point and related functionality"""
 
+from __future__ import print_function
+
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
-
 
 import errno, logging, os, subprocess, sys
 from ConfigParser import RawConfigParser
@@ -25,13 +26,11 @@ from .wm import WindowManager
 
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
-try:
+MYPY = False
+if MYPY:
     # pylint: disable=unused-import
     from typing import Callable, Dict, Union  # NOQA
-
-
-except:  # pylint: disable=bare-except
-    pass
+del MYPY
 
 #: Location for config files (determined at runtime).
 XDG_CONFIG_DIR = os.environ.get('XDG_CONFIG_HOME',
@@ -148,9 +147,9 @@ class QuickTileApp(object):
         @todo: Look into moving this into L{KeyBinder}
         """
 
-        print "Keybindings defined for use with --daemonize:\n"
-        print "Modifier: %s\n" % (self._modmask or '(none)')
-        print fmt_table(self._keys, ('Key', 'Action'))
+        print("Keybindings defined for use with --daemonize:\n")
+        print("Modifier: %s\n" % (self._modmask or '(none)'))
+        print(fmt_table(self._keys, ('Key', 'Action')))
 
 def attach_glib_log_filter():
     """Attach a copy of grep to our stderr to filter out _OB_WM errors.
@@ -163,7 +162,8 @@ def attach_glib_log_filter():
             stdin=subprocess.PIPE)
 
     # Redirect stderr through grep
-    assert glib_log_filter.stdin, "Did not receive stdin for log filter"
+    if not glib_log_filter.stdin:
+        raise AssertionError("Did not receive stdin for log filter")
     os.dup2(glib_log_filter.stdin.fileno(), sys.stderr.fileno())
 
 def load_config(path):  # type: (str) -> RawConfigParser
@@ -298,7 +298,7 @@ def main():  # type: () -> None
     if opts.show_binds:
         app.show_binds()
     if opts.show_args:
-        print commands.commands
+        print(commands.commands)
 
     if opts.daemonize:
         if not app.run():
@@ -315,8 +315,8 @@ def main():  # type: () -> None
             while gtk.events_pending():  # pylint: disable=no-member
                 gtk.main_iteration()  # pylint: disable=no-member
         elif not opts.show_args and not opts.show_binds:
-            print commands.commands
-            print "\nUse --help for a list of valid options."
+            print(commands.commands)
+            print("\nUse --help for a list of valid options.")
             sys.exit(errno.ENOENT)
 
 if __name__ == '__main__':

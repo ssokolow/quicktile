@@ -358,6 +358,10 @@ class WindowManager(object):
                 wnck.WINDOW_DOCK]:    # pylint: disable=E1101
             logging.debug("Irrelevant window: %r", window)
             return False
+
+        # TODO: Support customizations to exclude things like my Conky window
+        # (Which I can't make a `desktop` window because I sometimes drag it)
+
         return True
 
     def reposition(self,
