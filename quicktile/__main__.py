@@ -41,6 +41,7 @@ DEFAULTS = {
         # Use Ctrl+Alt as the default base for key combinations
         'ModMask': '<Ctrl><Alt>',
         'UseWorkarea': True,
+        'MovementsWrap': True,
         'ColumnCount': 3
     },
     'keys': {
@@ -262,6 +263,7 @@ def main():  # type: () -> None
     commands.cycle_dimensions = commands.commands.add_many(
         layout.make_winsplit_positions(config.getint('general', 'ColumnCount'))
     )(commands.cycle_dimensions)
+    commands.commands.extra_state = {'config': config}
 
     try:
         winman = WindowManager(ignore_workarea=ignore_workarea)

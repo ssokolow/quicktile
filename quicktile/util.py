@@ -26,6 +26,19 @@ try:
 except:  # pylint: disable=bare-except
     pass
 
+def clamp_idx(idx, stop, wrap=True):
+    # type: (int, int, bool) -> int
+    """Ensure a 0-based index is within a given range [0, stop).
+
+    Uses the same half-open range convention as Python slices.
+
+    @param wrap: If C{True}, wrap around rather than saturating.
+    """
+    if wrap:
+        return idx % stop
+    else:
+        return max(min(idx, stop - 1), 0)
+
 def powerset(iterable):  # type: (Iterable[Any]) -> Iterator[Sequence[Any]]
     """C{powerset([1,2,3])} --> C{() (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)}
 

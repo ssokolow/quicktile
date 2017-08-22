@@ -8,14 +8,14 @@ import logging
 import gtk.gdk, wnck  # pylint: disable=import-error
 from gtk.gdk import Rectangle
 
-from .util import EnumSafeDict, XInitError
+from .util import clamp_idx, EnumSafeDict, XInitError
 
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
 try:
     # pylint: disable=unused-import
     from typing import List, Sequence, Tuple  # NOQA
-    from .util import Strut
+    from .util import Strut  # NOQA
 except:  # pylint: disable=bare-except
     pass
 
@@ -257,7 +257,7 @@ class WindowManager(object):
                       monitor_id, monitor_geom)
         return monitor_id, monitor_geom
 
-    def get_workspace(self, window=None, direction=None):
+    def get_workspace(self, window=None, direction=None, wrap_around=True):
         # TODO: MyPy type signature
         """Get a workspace relative to either a window or the active one.
 
@@ -268,8 +268,10 @@ class WindowManager(object):
              - C{int}: Relative index in the list of workspaces
              - C{None}: Just get the workspace object for the point of
                reference
+        @param wrap_around: Whether relative indexes should wrap around.
 
         @type window: C{wnck.Window} or C{None}
+        @type wrap_around: C{bool}
         @rtype: C{wnck.Workspace} or C{None}
         @returns: The workspace object or C{None} if no match could be found.
         """
@@ -285,8 +287,12 @@ class WindowManager(object):
         if isinstance(direction, wnck.MotionDirection):
             nxt = cur.get_neighbor(direction)
         elif isinstance(direction, int):
-            nxt = self.screen.get_workspace((cur.get_number() + direction) %
-                    self.screen.get_workspace_count())
+            # TODO: Deduplicate with the wrapping code in commands.py
+            n_spaces = self.screen.get_workspace_count()
+
+            nxt = self.screen.get_workspace(
+                clamp_idx(cur.get_number() + direction, n_spaces, wrap_around))
+
         elif direction is None:
             nxt = cur
         else:

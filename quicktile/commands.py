@@ -10,7 +10,7 @@ from heapq import heappop, heappush
 import gtk.gdk, wnck  # pylint: disable=import-error
 
 from .wm import GRAVITY
-from .util import fmt_table
+from .util import clamp_idx, fmt_table
 
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
@@ -36,7 +36,9 @@ class CommandRegistry(object):
     GDK Screen object.
     """
 
-    def __init__(self):  # type: () -> None
+    extra_state = {}  # type: Dict[str, Any]
+
+    def __init__(self):     # type: () -> None
         self.commands = {}  # type: Dict[str, CommandCBWrapper]
         self.help = {}      # type: Dict[str, str]
 
@@ -103,13 +105,15 @@ class CommandRegistry(object):
                                   "nothing.", use_rect)
                     return None
 
-                state = {
+                state = {}
+                state.update(self.extra_state)
+                state.update({
                     "cmd_name": name,
                     "monitor_id": monitor_id,
                     "monitor_geom": monitor_geom,
                     "usable_region": use_area,
                     "usable_rect": use_rect,
-                }
+                })
 
                 args, kwargs = p_args + args, dict(p_kwargs, **kwargs)
                 func(winman, win, state, *args, **kwargs)
@@ -250,18 +254,22 @@ def cycle_dimensions(winman,      # type: WindowManager
     winman.reposition(win, result)
     return result
 
-@commands.add('monitor-switch')
+@commands.add('monitor-switch', force_wrap=True)
 @commands.add('monitor-next', 1)
 @commands.add('monitor-prev', -1)
-def cycle_monitors(winman, win, state, step=1):
-    # type: (WindowManager, Any, Any, int) -> None
+def cycle_monitors(winman, win, state, step=1, force_wrap=False):
+    # type: (WindowManager, Any, Dict[str, Any], int, bool) -> None
     """Cycle the active window between monitors while preserving position.
 
     @todo 1.0.0: Remove C{monitor-switch} in favor of C{monitor-next}
         (API-breaking change)
     """
     mon_id = state['monitor_id']
-    new_mon_id = (mon_id + step) % winman.gdk_screen.get_n_monitors()
+    n_monitors = winman.gdk_screen.get_n_monitors()
+
+    new_mon_id = clamp_idx(mon_id + step, n_monitors,
+        state['config'].getboolean('general', 'MovementsWrap') or
+        force_wrap)
 
     new_mon_geom = winman.gdk_screen.get_monitor_geometry(new_mon_id)
     logging.debug("Moving window to monitor %s, which has geometry %s",
@@ -269,10 +277,11 @@ def cycle_monitors(winman, win, state, step=1):
 
     winman.reposition(win, None, new_mon_geom, keep_maximize=True)
 
+@commands.add('monitor-switch-all', force_wrap=True)
 @commands.add('monitor-prev-all', -1)
 @commands.add('monitor-next-all', 1)
-def cycle_monitors_all(winman, win, state, step=1):
-    # type: (WindowManager, wnck.Window, Any, int) -> None
+def cycle_monitors_all(winman, win, state, step=1, force_wrap=False):
+    # type: (WindowManager, wnck.Window, Dict[str, Any], int, bool) -> None
     """Cycle all windows between monitors while preserving position."""
     n_monitors = winman.gdk_screen.get_n_monitors()
     curr_workspace = win.get_workspace()
@@ -295,7 +304,11 @@ def cycle_monitors_all(winman, win, state, step=1):
 
         gdkwin = gtk.gdk.window_foreign_new(window.get_xid())
         mon_id = winman.gdk_screen.get_monitor_at_window(gdkwin)
-        new_mon_id = (mon_id + step) % n_monitors
+
+        # TODO: deduplicate cycle_monitors and cycle_monitors_all
+        new_mon_id = clamp_idx(mon_id + step, n_monitors,
+            state['config'].getboolean('general', 'MovementsWrap') or
+            force_wrap)
 
         new_mon_geom = winman.gdk_screen.get_monitor_geometry(new_mon_id)
         logging.debug(
@@ -410,7 +423,8 @@ def trigger_keyboard_action(winman, win, state, command):
 def workspace_go(winman, win, state, motion):  # pylint: disable=W0613
     # type: (WindowManager, wnck.Window, Any, wnck.MotionDirection) -> None
     """Switch the active workspace (next/prev wrap around)"""
-    target = winman.get_workspace(None, motion)
+    target = winman.get_workspace(None, motion,
+        wrap_around=state['config'].getboolean('general', 'MovementsWrap'))
     if not target:
         return  # It's either pinned, on no workspaces, or there is no match
     target.activate(int(time.time()))
@@ -426,7 +440,8 @@ def workspace_go(winman, win, state, motion):  # pylint: disable=W0613
 def workspace_send_window(winman, win, state, motion):
     # type: (WindowManager, wnck.Window, Any, wnck.MotionDirection) -> None
     """Move the active window to another workspace (next/prev wrap around)"""
-    target = winman.get_workspace(win, motion)
+    target = winman.get_workspace(win, motion,
+        wrap_around=state['config'].getboolean('general', 'MovementsWrap'))
     if not target:
         return  # It's either pinned, on no workspaces, or there is no match
 
