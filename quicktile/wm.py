@@ -4,9 +4,10 @@ __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
 import logging
+from contextlib import contextmanager
 
-import gtk.gdk, wnck  # pylint: disable=import-error
-from gtk.gdk import Rectangle
+import gtk.gdk, wnck           # pylint: disable=import-error
+from gtk.gdk import Rectangle  # pylint: disable=import-error
 
 from .util import clamp_idx, EnumSafeDict, XInitError
 
@@ -45,6 +46,28 @@ for key, val in GRAVITY.items():
 del _name, key, val
 
 # ---
+
+@contextmanager
+def persist_maximization(win, keep_maximize=True):
+    """Context manager to persist maximization state after a reposition
+
+    @param keep_maximize: If C{False}, this becomes a no-op to ease writing
+        clean code which needs to support both behaviours.
+    """
+    # Unmaximize and record the types we may need to restore
+    max_types, maxed = ['', '_horizontally', '_vertically'], []
+    for maxtype in max_types:
+        if getattr(win, 'is_maximized' + maxtype)():
+            maxed.append(maxtype)
+            getattr(win, 'unmaximize' + maxtype)()
+
+    yield
+
+    # Restore maximization if asked
+    if maxed and keep_maximize:
+        for maxtype in maxed:
+            getattr(win, 'maximize' + maxtype)()
+
 
 class WorkArea(object):
     """Helper to calculate and query available workarea on the desktop."""
@@ -197,6 +220,19 @@ class WindowManager(object):
 
         @returns: The coordinates to be used to achieve the desired position.
         @rtype: C{(x, y)}
+
+        This exists because, for whatever reason, whether it's wnck, Openbox,
+        or both at fault, the WM's support for window gravities seems to have
+        no effect beyond double-compensating for window border thickness unless
+        using WINDOW_GRAVITY_STATIC.
+
+        My best guess is that the gravity modifiers are being applied to the
+        window frame rather than the window itself, hence static gravity would
+        position correctly and north-west gravity would double-compensate for
+        the titlebar and border dimensions.
+
+        ...however, that still doesn't explain why the non-topleft gravities
+        have no effect. I'm guessing something's just broken.
         """
         grav_x, grav_y = GRAVITY[gravity]
 
@@ -379,37 +415,15 @@ class WindowManager(object):
         else:
             geom = old_geom
 
-        # Unmaximize and record the types we may need to restore
-        max_types, maxed = ['', '_horizontally', '_vertically'], []
-        for maxtype in max_types:
-            if getattr(win, 'is_maximized' + maxtype)():
-                maxed.append(maxtype)
-                getattr(win, 'unmaximize' + maxtype)()
+        with persist_maximization(win, keep_maximize):
+            # Apply gravity and resolve to absolute desktop coordinates.
+            new_x, new_y = self.calc_win_gravity(geom, gravity)
+            new_x += monitor.x
+            new_y += monitor.y
 
-        # Apply gravity and resolve to absolute desktop coordinates.
-        new_x, new_y = self.calc_win_gravity(geom, gravity)
-        new_x += monitor.x
-        new_y += monitor.y
+            logging.debug(" Repositioning to (%d, %d, %d, %d)\n",
+                    new_x, new_y, geom.width, geom.height)
 
-        logging.debug(" Repositioning to (%d, %d, %d, %d)\n",
-                new_x, new_y, geom.width, geom.height)
-
-        # XXX: I'm not sure whether wnck, Openbox, or both are at fault,
-        #      but window gravities seem to have no effect beyond double-
-        #      compensating for window border thickness unless using
-        #      WINDOW_GRAVITY_STATIC.
-        #
-        #      My best guess is that the gravity modifiers are being applied
-        #      to the window frame rather than the window itself, hence why
-        #      static gravity would position correctly and north-west gravity
-        #      would double-compensate for the titlebar and border dimensions.
-        #
-        #      ...however, that still doesn't explain why the non-topleft
-        #      gravities have no effect. I'm guessing something's just broken.
-        win.set_geometry(wnck.WINDOW_GRAVITY_STATIC, geometry_mask,
-                new_x, new_y, geom.width, geom.height)
-
-        # Restore maximization if asked
-        if maxed and keep_maximize:
-            for maxtype in maxed:
-                getattr(win, 'maximize' + maxtype)()
+            # See the calc_win_gravity docstring for the rationale here
+            win.set_geometry(wnck.WINDOW_GRAVITY_STATIC, geometry_mask,
+                    new_x, new_y, geom.width, geom.height)
