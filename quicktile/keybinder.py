@@ -9,6 +9,7 @@ import gobject, gtk
 from Xlib import X
 from Xlib.display import Display
 from Xlib.error import BadAccess, DisplayConnectionError
+from Xlib.protocol.event import KeyPress as XKeyPress
 
 from .util import powerset, XInitError
 
@@ -33,7 +34,7 @@ class KeyBinder(object):
     #:        C{gtk.accelerator_get_default_mod_mask()} to feed said code.
     ignored_modifiers = ['Mod2Mask', 'LockMask']
 
-    #: Used to pass state from L{handle_xerror}
+    #: Used to pass state from L{cb_xerror}
     keybind_failed = False
 
     def __init__(self, xdisplay=None):  # type: (Optional[Display]) -> None
@@ -53,7 +54,7 @@ class KeyBinder(object):
                              % err.__class__.__name__)
 
         self.xroot = self.xdisp.screen().root
-        self._keys = {}  # type: Dict[int, List[Tuple[int, Callable]]]
+        self._keys = {}  # type: Dict[Tuple[int, int], Callable]
 
         # Resolve these at runtime to avoid NameErrors
         self._ignored_modifiers = [getattr(X, name) for name in
@@ -63,12 +64,12 @@ class KeyBinder(object):
         self.xroot.change_attributes(event_mask=X.KeyPressMask)
 
         # Set up a handler to catch XGrabKey() failures
-        self.xdisp.set_error_handler(self.handle_xerror)
+        self.xdisp.set_error_handler(self.cb_xerror)
 
         # Merge python-xlib into the Glib event loop
         # Source: http://www.pygtk.org/pygtk2tutorial/sec-MonitoringIO.html
         gobject.io_add_watch(self.xroot.display,
-                             gobject.IO_IN, self.handle_xevent)
+                             gobject.IO_IN, self.cb_xevent)
 
     def bind(self, accel, callback):  # type: (str, Callable[[], None]) -> bool
         """Bind a global key combination to a callback.
@@ -87,20 +88,21 @@ class KeyBinder(object):
         @rtype: C{bool}
         """
         keycode, modmask = self.parse_accel(accel)
-        if keycode is None:
+        if keycode is None or modmask is None:
             return False
 
         # Ignore modifiers like Mod2 (NumLock) and Lock (CapsLock)
+        self._keys[(keycode, 0)] = callback  # Null modifiers seem to be a risk
         for mmask in self._vary_modmask(modmask, self._ignored_modifiers):
-            self._keys.setdefault(keycode, []).append((mmask, callback))
+            self._keys[(keycode, mmask)] = callback
             self.xroot.grab_key(keycode, mmask,
-                    1, X.GrabModeAsync, X.GrabModeAsync)
+                                1, X.GrabModeAsync, X.GrabModeAsync)
 
         # If we don't do this, then nothing works.
         # I assume it flushes the XGrabKey calls to the server.
         self.xdisp.sync()
 
-        # React to any handle_xerror that might have resulted from xdisp.sync()
+        # React to any cb_xerror that might have resulted from xdisp.sync()
         if self.keybind_failed:
             self.keybind_failed = False
             logging.warning("Failed to bind key. It may already be in use: %s",
@@ -109,7 +111,7 @@ class KeyBinder(object):
 
         return True
 
-    def handle_xerror(self, err, _):  # type: (XError, Any) -> None
+    def cb_xerror(self, err, _):  # type: (XError, Any) -> None
         """Used to identify when attempts to bind keys fail.
         @note: If you can make python-xlib's C{CatchError} actually work or if
                you can retrieve more information to show, feel free.
@@ -119,9 +121,9 @@ class KeyBinder(object):
         else:
             self.xdisp.display.default_error_handler(err)
 
-    def handle_xevent(self, src, cond, handle=None):  # pylint: disable=W0613
-        # type: (Any, Any, Display) -> bool
-        """Dispatch C{XKeyPress} events to their callbacks.
+    def cb_xevent(self, src, cond, handle=None):  # pylint: disable=W0613
+        # type: (Any, Any, Optional[Display]) -> bool
+        """Callback to dispatch X events to more specific handlers.
 
         @rtype: C{True}
 
@@ -133,36 +135,31 @@ class KeyBinder(object):
         for _ in range(0, handle.pending_events()):
             xevent = handle.next_event()
             if xevent.type == X.KeyPress:
-                if xevent.detail in self._keys:
-                    for mmask, callback in self._keys[xevent.detail]:
-                        if mmask == xevent.state:
-                            # FIXME: Only call accelerator_name if --debug
-                            # FIXME: Proper "index" arg for keycode_to_keysym
-                            keysym = self.xdisp.keycode_to_keysym(
-                                xevent.detail, 0)
-
-                            # pylint: disable=no-member
-                            kb_str = gtk.accelerator_name(keysym, xevent.state)
-                            logging.debug("Received keybind: %s", kb_str)
-                            callback()
-                            break
-                        elif mmask == 0:
-                            logging.debug("X11 returned null modifier!")
-                            callback()
-                            break
-                    else:
-                        logging.error("Received an event for a recognized key "
-                                  "with unrecognized modifiers: %s, %s",
-                                  xevent.detail, xevent.state)
-
-                else:
-                    logging.error("Received an event for an unrecognized "
-                        "keybind: %s, %s", xevent.detail, xevent.state)
+                self.handle_keypress(xevent)
 
         # Necessary for proper function
         return True
 
-    def parse_accel(self, accel):  # type: (str) -> Tuple[int, int]
+    def handle_keypress(self, xevent):  # type: (XKeyPress) -> None
+        """Dispatch C{XKeyPress} events to their callbacks."""
+        keysig = (xevent.detail, xevent.state)
+        if keysig not in self._keys:
+            logging.error("Received an event for an unrecognized keybind: "
+                          "%s, %s", xevent.detail, xevent.state)
+            return
+
+        # Display a meaningful debug message
+        # FIXME: Only call this code if --debug
+        # FIXME: Proper "index" arg for keycode_to_keysym
+        keysym = self.xdisp.keycode_to_keysym(keysig[0], 0)
+        kbstr = gtk.accelerator_name(keysym, keysig[1]) # pylint: disable=E1101
+        logging.debug("Received keybind: %s", kbstr)
+
+        # Call the associated callback
+        self._keys[keysig]()
+
+    def parse_accel(self, accel  # type: str
+                    ):  # type: (...) -> Tuple[Optional[int], Optional[int]]
         """Convert an accelerator string into the form XGrabKey needs."""
 
         keysym, modmask = gtk.accelerator_parse(accel)
@@ -181,7 +178,6 @@ class KeyBinder(object):
         if isinstance(modmask, gtk.gdk.ModifierType):
             modmask = modmask.real
 
-        print(keycode, modmask)
         return keycode, modmask
 
     @staticmethod
