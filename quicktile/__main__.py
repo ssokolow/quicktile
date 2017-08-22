@@ -243,11 +243,11 @@ def main():  # type: () -> None
     for key in keymap:
         # Look up unrecognized shortkeys in a hardcoded dict and
         # replace with valid names like ',' -> 'comma'
-        transKey = key
         if key in KEYLOOKUP:
             logging.warn("Updating config file from deprecated keybind syntax:"
                     "\n\t%r --> %r", key, KEYLOOKUP[key])
-            transKey = KEYLOOKUP[key]
+            config.remove_option('keys', key)
+            config.set('keys', KEYLOOKUP[key], keymap[key])
             dirty = True
 
     if dirty:
