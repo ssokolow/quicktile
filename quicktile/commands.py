@@ -8,8 +8,7 @@ from functools import wraps
 
 import gtk.gdk, wnck  # pylint: disable=import-error
 
-from .layout import (check_tolerance, closest_geom_match,
-                     resolve_fractional_geom)
+from .layout import resolve_fractional_geom
 from .wm import GRAVITY
 from .util import clamp_idx, fmt_table
 
@@ -110,6 +109,12 @@ class CommandRegistry(object):
                 })
 
                 args, kwargs = p_args + args, dict(p_kwargs, **kwargs)
+
+                # TODO: Factor out this hack
+                if 'cmd_idx' in kwargs:
+                    state['cmd_idx'] = kwargs['cmd_idx']
+                    del kwargs['cmd_idx']
+
                 func(winman, window, state, *args, **kwargs)
 
             if name in self.commands:
@@ -140,8 +145,8 @@ class CommandRegistry(object):
         # TODO: Refactor and redesign for better maintainability
         def decorate(func):
             """Closure used to allow decorator to take arguments"""
-            for cmd, arglist in command_map.items():
-                self.add(cmd, *arglist)(func)
+            for pos, (cmd, arglist) in enumerate(command_map.items()):
+                self.add(cmd, cmd_idx=pos, *arglist)(func)
             return func
         return decorate
 
@@ -203,11 +208,18 @@ def cycle_dimensions(winman,      # type: WindowManager
     logging.debug("Selected preset sequence resolves to these monitor-relative"
                   " pixel dimensions:\n\t%r", dims)
 
-    closest_distance, closest_idx = closest_geom_match(win_geom, dims)
-    if check_tolerance(closest_distance, clip_box):
-        pos = (closest_idx + 1) % len(dims)
+    try:
+        cmd_idx, pos = winman.get_property('_QUICKTILE_CYCLE_POS', win)[2]
+    except TypeError:
+        cmd_idx, pos = None, -1
+
+    if cmd_idx == state.get('cmd_idx', 0):
+        pos = (pos + 1) % len(dims)
     else:
         pos = 0
+
+    winman.set_property('_QUICKTILE_CYCLE_POS',
+                        (state.get('cmd_idx', 0), pos), win)
     result = gtk.gdk.Rectangle(*dims[pos])
 
     logging.debug("Target preset is %s relative to monitor %s",

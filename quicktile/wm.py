@@ -287,6 +287,48 @@ class WindowManager(object):
             return gtk.gdk.window_foreign_new(window.get_xid())
         else:
             return self.gdk_screen.get_root_window()
+
+    def get_property(self, key, window=None):
+        # type: (str, Optional[wnck.Window]) -> Any
+        """Retrieve the value of a property on the given window.
+
+        @param window: If unset, the root window will be queried.
+        @type window: C{wnck.Window} or C{None}
+        """
+        return self._get_win_for_prop(window).property_get(key)
+
+    def set_property(self, key,   # type: str
+                     value,       # type: Union[Sequence[int], int, str]
+                     window=None  # type: Optional[wnck.Window]
+                     ):           # type: (...) -> None
+        """Set the value of a property on the given window.
+
+        @param window: If unset, the root window will be queried.
+        @type window: C{wnck.Window} or C{None}
+        """
+
+        if isinstance(value, basestring):
+            prop_format = 8
+            prop_type = "STRING"
+        else:
+            prop_format = 32
+            prop_type = "CARDINAL"
+            if isinstance(value, int):
+                value = [value]
+
+        self._get_win_for_prop(window).property_change(
+            key, prop_type,
+            prop_format, gtk.gdk.PROP_MODE_REPLACE, value)
+
+    def del_property(self, key, window=None):
+        # type: (str, Optional[wnck.Window]) -> None
+        """Unset a property on the given window.
+
+        @param window: If unset, the root window will be queried.
+        @type window: C{wnck.Window} or C{None}
+        """
+        self._get_win_for_prop(window).property_delete(key)
+
     def get_relevant_windows(self, workspace):
         """C{wnck.Screen.get_windows} without WINDOW_DESKTOP/DOCK windows."""
 

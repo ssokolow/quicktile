@@ -7,6 +7,8 @@ from __future__ import print_function
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
+# TODO: I need a functional test to make sure issue #25 doesn't regress
+
 try:
     import pygtk
     pygtk.require('2.0')

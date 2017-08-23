@@ -7,8 +7,10 @@
 - Allow `ModMask` to be empty/None to enable bindings without a common prefix
 - Add `monitor-prev-all`, `monitor-next-all`, and `monitor-switch-all` commands
 - Add gtkexcepthook for more convenient handling of unexpected errors
+- Fix window cycling when windows impose constraints on their dimensions
 - Work around PyGTK's incompatibilty with tox
 - Make install.sh a bit more robust
+- Do a ton of refactoring to ease reusing existing code in new commands.
 
 0.2.2:
 - Added move-to{,-top,-bottom}{,-left,-right} (David Stygstra)
