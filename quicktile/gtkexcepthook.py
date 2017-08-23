@@ -267,7 +267,10 @@ class ExceptionHandler(object):
 
 def enable(feedback_email=None, smtp_server=None):  # type: (str, str) -> None
     """Call this to set gtkexcepthook as the default exception handler"""
-    sys.excepthook = ExceptionHandler(feedback_email, smtp_server)
+
+    # MyPy disabled pending a release of the fix to #797
+    sys.excepthook = ExceptionHandler(  # type: ignore
+        feedback_email, smtp_server)
 
 if __name__ == '__main__':
     class TestFodder(object):  # pylint: disable=too-few-public-methods
