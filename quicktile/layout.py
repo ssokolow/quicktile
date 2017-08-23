@@ -106,7 +106,7 @@ def make_winsplit_positions(columns):
                         for x in range(1, columns))
 
     middle_steps = (1.0,) + cycle_steps
-    edge_steps = (0.5,) + cycle_steps
+    edge_steps = tuple(sorted(set((0.5,) + cycle_steps)))
 
     positions = {
         'middle': [gvlay(width, 1, 'middle') for width in middle_steps],
