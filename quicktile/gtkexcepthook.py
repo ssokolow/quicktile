@@ -143,7 +143,7 @@ def analyse(exctyp, value, tback):
 
 class ExceptionHandler(object):
     """GTK-based graphical exception handler"""
-    cached_tback = None
+    cached_tb = None
 
     def __init__(self, feedback_email=None, smtp_server=None):
         # type: (str, str) -> None
@@ -246,14 +246,14 @@ class ExceptionHandler(object):
         while True:
             resp = dialog.run()
 
-            # Generate and cache a traceback on demand
-            if resp in (2, 3) and self.cached_tback is None:
-                self.cached_tback = analyse(exctyp, value, tback).getvalue()
-
             if resp == 3:
-                self.send_report(self.cached_tback)
+                if self.cached_tb is None:
+                    self.cached_tb = analyse(exctyp, value, tback).getvalue()
+                self.send_report(self.cached_tb)
             elif resp == 2:
-                details = self.make_details_dialog(dialog, self.cached_tback)
+                if self.cached_tb is None:
+                    self.cached_tb = analyse(exctyp, value, tback).getvalue()
+                details = self.make_details_dialog(dialog, self.cached_tb)
                 details.run()
                 details.destroy()
             elif resp == 1 and gtk.main_level() > 0:
