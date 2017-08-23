@@ -11,6 +11,7 @@ Message-ID: <1062087716.1196.5.camel@emperor.homelinux.net>
 Instructions: import gtkexcepthook; gtkexcepthook.enable()
 
 Changes from Van Raemdonck version:
+ - Refactored code for maintainability and added MyPy type annotations
  - Switched from auto-enable to gtkexcepthook.enable() to silence PyFlakes
    false positives. (Borrowed naming convention from cgitb)
  - Split out traceback import to silence PyFlakes warning.
@@ -24,7 +25,8 @@ Changes from Van Raemdonck version:
        app-specific debugging information to be registered for inclusion.
 """
 
-__author__ = "Filip Van Daemdonck"
+__author__ = "Filip Van Daemdonck; Stephan Sokolow"
+__authors__ = ["Filip Van Daemdonck", "Stephan Sokolow"]
 __license__ = "whatever you want"
 
 import inspect, linecache, pydoc, sys
@@ -34,9 +36,21 @@ from gettext import gettext as _
 from pprint import pformat
 from smtplib import SMTP
 
-import pygtk
-pygtk.require('2.0')
+try:
+    import pygtk
+    pygtk.require('2.0')
+except ImportError:
+    pass
+
 import gtk, pango
+
+MYPY = False
+if MYPY:
+    # pylint: disable=unused-import
+    from typing import Any, Optional, Type  # NOQA
+del MYPY
+
+# == Analyzer Backend ==
 
 # TODO: Decide what to do with this
 # def analyse(exctyp, value, tback):
@@ -125,134 +139,145 @@ def analyse(exctyp, value, tback):
     trace.write('%s: %s' % (exctyp.__name__, value))
     return trace
 
-def _info(exctyp, value, tback):
-    # TODO: MyPy type signature
-    # pylint: disable=no-member
-    trace = None
-    dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_WARNING,
-                               buttons=gtk.BUTTONS_NONE)
-    dialog.set_title(_("Bug Detected"))
-    if gtk.check_version(2, 4, 0) is not None:
-        dialog.set_has_separator(False)
+# == GTK+ Frontend ==
 
-    primary = _("<big><b>A programming error has been detected during the "
-                "execution of this program.</b></big>")
-    secondary = _("It probably isn't fatal, but should be reported to the "
-                  "developers nonetheless.")
+class ExceptionHandler(object):
+    """GTK-based graphical exception handler"""
+    cached_tback = None
 
-    try:
-        # TODO: Refactor to not use a try/except
-        email = feedback  # pylint: disable=undefined-variable
-        dialog.add_button(_("Report..."), 3)
-    except NameError:
-        secondary += _("\n\nPlease remember to include the contents of the "
-                       "Details dialog.")
-        # could ask for an email address instead...
+    def __init__(self, feedback_email=None, smtp_server=None):
+        # type: (str, str) -> None
+        self.email = feedback_email
+        self.smtphost = smtp_server or 'localhost'
 
-    try:
-        setsec = dialog.format_secondary_text
-    except AttributeError:
-        raise
-        # TODO
-        # dialog.vbox.get_children()[0].get_children()[1].set_markup(
-        #    '%s\n\n%s' % (primary, secondary))
-        # lbl.set_property("use-markup", True)
-    else:
-        del setsec
-        dialog.set_markup(primary)
-        dialog.format_secondary_text(secondary)
+    def make_info_dialog(self):
+        # type: () -> gtk.MessageDialog
+        """Initialize and return the top-level dialog"""
 
-    dialog.add_button(_("Details..."), 2)
-    dialog.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
-    dialog.add_button(gtk.STOCK_QUIT, 1)
+        # pylint: disable=no-member
+        dialog = gtk.MessageDialog(parent=None, flags=0,
+                                   type=gtk.MESSAGE_WARNING,
+                                   buttons=gtk.BUTTONS_NONE)
+        dialog.set_title(_("Bug Detected"))
+        if gtk.check_version(2, 4, 0) is not None:
+            dialog.set_has_separator(False)
 
-    while True:
-        resp = dialog.run()
-        if resp == 3:
-            if trace is None:
-                trace = analyse(exctyp, value, tback)
+        primary = _("<big><b>A programming error has been detected during the "
+                    "execution of this program.</b></big>")
+        secondary = _("It probably isn't fatal, but should be reported to the "
+                      "developers nonetheless.")
 
-            # TODO: prettyprint, deal with problems in sending feedback, &tc
-            # TODO: Refactor to not use a try/except
-            try:
-                server = smtphost  # pylint: disable=undefined-variable
-            except NameError:
-                server = 'localhost'
-
-            message = ('From: buggy_application"\nTo: bad_programmer\n'
-                'Subject: Exception feedback\n\n%s' % trace.getvalue())
-
-            smtp = SMTP()
-            smtp.connect(server)
-            smtp.sendmail(email, (email,), message)
-            smtp.quit()
-            break
-
-        elif resp == 2:
-            if trace is None:
-                trace = analyse(exctyp, value, tback)
-
-            # Show details...
-            details = gtk.Dialog(_("Bug Details"), dialog,
-              gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-              (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE, ))
-            details.set_property("has-separator", False)
-
-            textview = gtk.TextView()
-            textview.show()
-            textview.set_editable(False)
-            textview.modify_font(pango.FontDescription("Monospace"))
-
-            swin = gtk.ScrolledWindow()
-            swin.show()
-            swin.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-            swin.add(textview)
-            details.vbox.add(swin)
-            textbuffer = textview.get_buffer()
-            textbuffer.set_text(trace.getvalue())
-
-            monitor = gtk.gdk.screen_get_default().get_monitor_at_window(
-                dialog.window)
-            area = gtk.gdk.screen_get_default().get_monitor_geometry(monitor)
-            try:
-                w = area.width // 1.6
-                h = area.height // 1.6
-            except SyntaxError:
-                # python < 2.2
-                w = area.width / 1.6
-                h = area.height / 1.6
-            details.set_default_size(int(w), int(h))
-
-            details.run()
-            details.destroy()
-
-        elif resp == 1 and gtk.main_level() > 0:
-            gtk.main_quit()
-            break
+        if self.email:
+            dialog.add_button(_("Report..."), 3)
         else:
-            break
+            secondary += _("\n\nPlease remember to include the contents of "
+                           "the Details dialog.")
+        try:
+            setsec = dialog.format_secondary_text
+        except AttributeError:
+            raise
+            # TODO
+            # dialog.vbox.get_children()[0].get_children()[1].set_markup(
+            #    '%s\n\n%s' % (primary, secondary))
+            # lbl.set_property("use-markup", True)
+        else:
+            del setsec
+            dialog.set_markup(primary)
+            dialog.format_secondary_text(secondary)
 
-    dialog.destroy()
+        dialog.add_button(_("Details..."), 2)
+        dialog.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
+        dialog.add_button(gtk.STOCK_QUIT, 1)
 
-def enable():  # type: () -> None
+        return dialog
+
+    @staticmethod
+    def make_details_dialog(parent, text):
+        # type: (gtk.MessageDialog, str) -> gtk.MessageDialog
+        """Initialize and return the details dialog"""
+
+        # pylint: disable=no-member
+        details = gtk.Dialog(_("Bug Details"), parent,
+          gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+          (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE, ))
+        details.set_property("has-separator", False)
+
+        textview = gtk.TextView()
+        textview.show()
+        textview.set_editable(False)
+        textview.modify_font(pango.FontDescription("Monospace"))
+
+        swin = gtk.ScrolledWindow()
+        swin.show()
+        swin.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        swin.add(textview)
+        details.vbox.add(swin)
+        textbuffer = textview.get_buffer()
+        textbuffer.set_text(text)
+
+        # Set the default size to just over 60% of the screen's dimensions
+        screen = gtk.gdk.screen_get_default()
+        monitor = screen.get_monitor_at_window(parent.window)
+        area = gtk.gdk.screen_get_default().get_monitor_geometry(monitor)
+        width, height = area.width // 1.6, area.height // 1.6
+        details.set_default_size(int(width), int(height))
+
+        return details
+
+    def send_report(self, traceback):
+        # type: (str) -> None
+        """Send the given traceback as a bug report."""
+
+        # TODO: prettyprint, deal with problems in sending feedback, &tc
+        message = ('From: buggy_application"\nTo: bad_programmer\n'
+            'Subject: Exception feedback\n\n%s' % traceback)
+
+        smtp = SMTP()
+        smtp.connect(self.smtphost)
+        smtp.sendmail(self.email, (self.email,), message)
+        smtp.quit()
+
+    def __call__(self, exctyp, value, tback):
+        # type: (Type[BaseException], BaseException, Any) -> None
+        """Custom sys.excepthook callback which displays a GTK+ dialog"""
+        # pylint: disable=no-member
+
+        dialog = self.make_info_dialog()
+        while True:
+            resp = dialog.run()
+
+            # Generate and cache a traceback on demand
+            if resp in (2, 3) and self.cached_tback is None:
+                self.cached_tback = analyse(exctyp, value, tback).getvalue()
+
+            if resp == 3:
+                self.send_report(self.cached_tback)
+            elif resp == 2:
+                details = self.make_details_dialog(dialog, self.cached_tback)
+                details.run()
+                details.destroy()
+            elif resp == 1 and gtk.main_level() > 0:
+                gtk.main_quit()
+
+            # Only the "Details" dialog loops back when closed
+            if resp != 2:
+                break
+
+        dialog.destroy()
+
+def enable(feedback_email=None, smtp_server=None):  # type: (str, str) -> None
     """Call this to set gtkexcepthook as the default exception handler"""
-    sys.excepthook = _info
-
+    sys.excepthook = ExceptionHandler(feedback_email, smtp_server)
 
 if __name__ == '__main__':
     class TestFodder(object):  # pylint: disable=too-few-public-methods
         """Just something interesting to show in the augmented traceback"""
         y = 'Test'
 
-        def __init__(self): # type: () -> None
+        def __init__(self):  # type: () -> None
             self.z = self  # pylint: disable=invalid-name
     x = TestFodder()
     w = ' e'
-
-    # TODO: Refactor this
-    # feedback = 'developer@bigcorp.comp'
-    # smtphost = 'mx.bigcorp.comp'
-    # 1, x.z.y, f, w
 
     enable()
     raise Exception(x.z.y + w)
