@@ -12,12 +12,13 @@ MYPY = False
 if MYPY:
     # pylint: disable=unused-import
     from typing import (Any, Callable, Dict, Iterable, Iterator, List,  # NOQA
-                        Optional, Sequence, Tuple)
+                        Optional, Sequence, Tuple, Union)
     from mypy_extensions import VarArg, KwArg  # NOQA
 
     # pylint: disable=C0103
     PercentRect = Tuple[float, float, float, float]
     Strut = Tuple[int, int, int, int, int, int, int, int, int, int, int, int]
+    GeomTuple = Tuple[int, int, int, int]
 
     # FIXME: Replace */** with a dict so I can be strict here
     CommandCB = Callable[..., Any]

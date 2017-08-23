@@ -16,7 +16,7 @@ from .util import clamp_idx, EnumSafeDict, XInitError
 MYPY = False
 if MYPY:
     # pylint: disable=unused-import
-    from typing import List, Optional, Sequence, Tuple  # NOQA
+    from typing import Any, List, Optional, Sequence, Tuple, Union  # NOQA
     from .util import Strut  # NOQA
 del MYPY
 
@@ -280,6 +280,13 @@ class WindowManager(object):
                       monitor_id, monitor_geom)
         return monitor_id, monitor_geom
 
+    def _get_win_for_prop(self, window=None):
+        # type: (Optional[wnck.Window]) -> gtk.gdk.Window
+        """Retrieve a GdkWindow for a given WnckWindow, or the root if None."""
+        if window:
+            return gtk.gdk.window_foreign_new(window.get_xid())
+        else:
+            return self.gdk_screen.get_root_window()
     def get_relevant_windows(self, workspace):
         """C{wnck.Screen.get_windows} without WINDOW_DESKTOP/DOCK windows."""
 

@@ -5,10 +5,11 @@ __license__ = "GNU GPL 2.0 or later"
 
 import logging, time
 from functools import wraps
-from heapq import heappop, heappush
 
 import gtk.gdk, wnck  # pylint: disable=import-error
 
+from .layout import (check_tolerance, closest_geom_match,
+                     resolve_fractional_geom)
 from .wm import GRAVITY
 from .util import clamp_idx, fmt_table
 
@@ -189,45 +190,22 @@ def cycle_dimensions(winman,      # type: WindowManager
     win_geom = winman.get_geometry_rel(win, state['monitor_geom'])
     usable_region = state['usable_region']
 
-    # Get the bounding box for the usable region (overlaps panels which
-    # don't fill 100% of their edge of the screen)
+    # Get the bounding box for the usable region
     clip_box = usable_region.get_clipbox()
 
     logging.debug("Selected preset sequence:\n\t%r", dimensions)
 
     # Resolve proportional (eg. 0.5) and preserved (None) coordinates
-    dims = []
-    for tup in dimensions:
-        current_dim = []
-        for pos, val in enumerate(tup):
-            if val is None:
-                current_dim.append(tuple(win_geom)[pos])
-            else:
-                # FIXME: This is a bit of an ugly way to get (w, h, w, h)
-                # from clip_box.
-                current_dim.append(int(val * tuple(clip_box)[2 + pos % 2]))
-
-        dims.append(current_dim)
-
+    dims = [resolve_fractional_geom(i, clip_box, win_geom) for i in dimensions]
     if not dims:
         return None
 
     logging.debug("Selected preset sequence resolves to these monitor-relative"
                   " pixel dimensions:\n\t%r", dims)
 
-    # Calculate euclidean distances between the window's current geometry
-    # and all presets and store them in a min heap.
-    euclid_distance = []  # type: List[Tuple[int, int]]
-    for pos, val in enumerate(dims):
-        distance = sum([(wg - vv) ** 2 for (wg, vv)
-                        in zip(tuple(win_geom), tuple(val))]) ** 0.5
-        heappush(euclid_distance, (distance, pos))
-
-    # If the window is already on one of the configured geometries, advance
-    # to the next configuration. Otherwise, use the first configuration.
-    min_distance = heappop(euclid_distance)
-    if float(min_distance[0]) / tuple(clip_box)[2] < 0.1:
-        pos = (min_distance[1] + 1) % len(dims)
+    closest_distance, closest_idx = closest_geom_match(win_geom, dims)
+    if check_tolerance(closest_distance, clip_box):
+        pos = (closest_idx + 1) % len(dims)
     else:
         pos = 0
     result = gtk.gdk.Rectangle(*dims[pos])
