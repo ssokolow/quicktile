@@ -48,6 +48,38 @@ class CommandRegistry(object):
     def __str__(self):   # type: () -> str
         return fmt_table(self.help, ('Known Commands', 'desc'), group_by=1)
 
+    @staticmethod
+    def get_window_meta(window, state, winman):
+        # Bail out early on None or things like the desktop window
+        if not winman.is_relevant(window):
+            return False
+
+        # FIXME: Make calls to win.get_* lazy in case --debug
+        #        wasn't passed.
+        logging.debug("Operating on window %r with title \"%s\" "
+                      "and geometry %r",
+                      window, window.get_name(),
+                      window.get_geometry())
+
+        monitor_id, monitor_geom = winman.get_monitor(window)
+        use_area, use_rect = winman.workarea.get(monitor_geom)
+
+        # TODO: Replace this MPlayer safety hack with a properly
+        #       comprehensive exception catcher.
+        if not use_rect:
+            logging.debug("Received a worthless value for largest "
+                          "rectangular subset of desktop (%r). Doing "
+                          "nothing.", use_rect)
+            return False
+
+        state.update({
+            "monitor_id": monitor_id,
+            "monitor_geom": monitor_geom,
+            "usable_region": use_area,
+            "usable_rect": use_rect,
+        })
+        return True
+
     def add(self, name, *p_args, **p_kwargs):
         # type: (str, *Any, **Any) -> Callable[[CommandCB], CommandCB]
         # TODO: Rethink the return value of the command function.
@@ -55,6 +87,7 @@ class CommandRegistry(object):
             command registry under the given name.
 
             @param name: The name to know the command by.
+            @param windowless: Allow this command to run with no active window
             @param p_args: Positional arguments to prepend to all calls made
                 via C{name}.
             @param p_kwargs: Keyword arguments to prepend to all calls made
@@ -75,38 +108,20 @@ class CommandRegistry(object):
 
                 window = window or winman.screen.get_active_window()
 
-                # Bail out early on None or things like the desktop window
-                if not winman.is_relevant(window):
-                    return None
-
-                # FIXME: Make calls to win.get_* lazy in case --debug
-                #        wasn't passed.
-                logging.debug("Operating on window %r with title \"%s\" "
-                              "and geometry %r",
-                              window, window.get_name(),
-                              window.get_geometry())
-
-                monitor_id, monitor_geom = winman.get_monitor(window)
-
-                use_area, use_rect = winman.workarea.get(monitor_geom)
-
-                # TODO: Replace this MPlayer safety hack with a properly
-                #       comprehensive exception catcher.
-                if not use_rect:
-                    logging.debug("Received a worthless value for largest "
-                                  "rectangular subset of desktop (%r). Doing "
-                                  "nothing.", use_rect)
-                    return None
-
                 state = {}
                 state.update(self.extra_state)
-                state.update({
-                    "cmd_name": name,
-                    "monitor_id": monitor_id,
-                    "monitor_geom": monitor_geom,
-                    "usable_region": use_area,
-                    "usable_rect": use_rect,
-                })
+                state["cmd_name"] = name
+
+                # FIXME: Refactor to avoid this hack
+                windowless = p_kwargs.get('windowless', False)
+                if 'windowless' in p_kwargs:
+                    del p_kwargs['windowless']
+
+                # Bail out early on None or things like the desktop window
+                if not (windowless or self.get_window_meta(
+                        window, state, winman)):
+                    logging.debug("No window and windowless=False")
+                    return None
 
                 args, kwargs = p_args + args, dict(p_kwargs, **kwargs)
 
@@ -331,7 +346,7 @@ def toggle_decorated(winman, win, state):  # pylint: disable=unused-argument
     win = gtk.gdk.window_foreign_new(win.get_xid())
     win.set_decorations(not win.get_decorations())
 
-@commands.add('show-desktop')
+@commands.add('show-desktop', windowless=True)
 def toggle_desktop(winman, win, state):  # pylint: disable=unused-argument
     # type: (WindowManager, Any, Any) -> None
     """Toggle "all windows minimized" to view the desktop"""
@@ -383,19 +398,22 @@ def trigger_keyboard_action(winman, win, state, command):
     """Ask the Window Manager to begin a keyboard-driven operation."""
     getattr(win, 'keyboard_' + command)()
 
-@commands.add('workspace-go-next', 1)
-@commands.add('workspace-go-prev', -1)
-@commands.add('workspace-go-up', wnck.MOTION_UP)        # pylint: disable=E1101
-@commands.add('workspace-go-down', wnck.MOTION_DOWN)    # pylint: disable=E1101
-@commands.add('workspace-go-left', wnck.MOTION_LEFT)    # pylint: disable=E1101
-@commands.add('workspace-go-right', wnck.MOTION_RIGHT)  # pylint: disable=E1101
+# pylint: disable=E1101
+@commands.add('workspace-go-next', 1, windowless=True)
+@commands.add('workspace-go-prev', -1, windowless=True)
+@commands.add('workspace-go-up', wnck.MOTION_UP, windowless=True)
+@commands.add('workspace-go-down', wnck.MOTION_DOWN, windowless=True)
+@commands.add('workspace-go-left', wnck.MOTION_LEFT, windowless=True)
+@commands.add('workspace-go-right', wnck.MOTION_RIGHT, windowless=True)
 def workspace_go(winman, win, state, motion):  # pylint: disable=W0613
     # type: (WindowManager, wnck.Window, Any, wnck.MotionDirection) -> None
     """Switch the active workspace (next/prev wrap around)"""
     target = winman.get_workspace(None, motion,
         wrap_around=state['config'].getboolean('general', 'MovementsWrap'))
     if not target:
-        return  # It's either pinned, on no workspaces, or there is no match
+        logging.debug("Couldn't get the active workspace.")
+        return
+    logging.debug("Activating workspace %s", target)
     target.activate(int(time.time()))
 
 @commands.add('workspace-send-next', 1)
