@@ -86,8 +86,10 @@ class CommandRegistry(object):
         """Decorator to wrap a function in boilerplate and add it to the
             command registry under the given name.
 
+            NOTE: The `windowless` parameter allows a command to be registered
+            as not requiring and active window.
+
             @param name: The name to know the command by.
-            @param windowless: Allow this command to run with no active window
             @param p_args: Positional arguments to prepend to all calls made
                 via C{name}.
             @param p_kwargs: Keyword arguments to prepend to all calls made
