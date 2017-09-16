@@ -167,9 +167,8 @@ class CommandRegistry(object):
             return func
         return decorate
 
-    def call(self, command, winman, *args, **kwargs):
+    def checkCommand(self, command,winman,*args,**kwargs):
         # type: (str, WindowManager, *Any, **Any) -> bool
-        """Resolve a textual positioning command and execute it."""
         cmd = self.commands.get(command, None)
 
         if cmd:
@@ -182,6 +181,20 @@ class CommandRegistry(object):
         else:
             logging.error("Unrecognized command: %s", command)
             return False
+
+    def call(self, command, winman, *args, **kwargs):
+        # type: (str, WindowManager, *Any, **Any) -> bool
+        """Resolve a textual positioning command and execute it."""
+        cmds = []
+        success = True
+        if ',' in command:
+            cmds = [i.strip() for i in command.split(',')]
+            for cmd in cmds:
+                success = self.checkCommand(cmd, winman, *args, **kwargs)
+        else:
+            return self.checkCommand(command,winman,*args,**kwargs)
+
+        return success 
 
 
 #: The instance of L{CommandRegistry} to be used in 99.9% of use cases.
@@ -340,6 +353,20 @@ def move_to_position(winman,       # type: WindowManager
     # pylint: disable=no-member
     winman.reposition(win, result, use_rect, gravity=gravity,
             geometry_mask=gravity_mask)
+
+@commands.add('WithBorder')
+def add_decoration(winman, win, state):  # pylint: disable=unused-argument
+    # type: (WindowManager, wnck.Window, Any) -> None
+    """Add window decoration on the active window."""
+    win = gtk.gdk.window_foreign_new(win.get_xid())
+    win.set_decorations(True)
+
+@commands.add('borderless')
+def remove_decoration(winman, win, state):  # pylint: disable=unused-argument
+    # type: (WindowManager, wnck.Window, Any) -> None
+    """Remove window decoration on the active window."""
+    win = gtk.gdk.window_foreign_new(win.get_xid())
+    win.set_decorations(False)
 
 @commands.add('bordered')
 def toggle_decorated(winman, win, state):  # pylint: disable=unused-argument
