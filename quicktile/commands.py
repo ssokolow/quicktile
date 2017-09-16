@@ -167,7 +167,8 @@ class CommandRegistry(object):
             return func
         return decorate
 
-    def checkCommand(self, command,winman,*args,**kwargs):
+    def check_command(self, command, winman, *args, **kwargs):
+        """ check if the command is valid and execute it"""
         # type: (str, WindowManager, *Any, **Any) -> bool
         cmd = self.commands.get(command, None)
 
@@ -190,11 +191,11 @@ class CommandRegistry(object):
         if ',' in command:
             cmds = [i.strip() for i in command.split(',')]
             for cmd in cmds:
-                success = self.checkCommand(cmd, winman, *args, **kwargs)
+                success = self.check_command(cmd, winman, *args, **kwargs)
         else:
-            return self.checkCommand(command,winman,*args,**kwargs)
+            return self.check_command(command, winman, *args, **kwargs)
 
-        return success 
+        return success
 
 
 #: The instance of L{CommandRegistry} to be used in 99.9% of use cases.
@@ -354,26 +355,17 @@ def move_to_position(winman,       # type: WindowManager
     winman.reposition(win, result, use_rect, gravity=gravity,
             geometry_mask=gravity_mask)
 
-@commands.add('WithBorder')
-def add_decoration(winman, win, state):  # pylint: disable=unused-argument
-    # type: (WindowManager, wnck.Window, Any) -> None
-    """Add window decoration on the active window."""
-    win = gtk.gdk.window_foreign_new(win.get_xid())
-    win.set_decorations(True)
-
-@commands.add('borderless')
-def remove_decoration(winman, win, state):  # pylint: disable=unused-argument
-    # type: (WindowManager, wnck.Window, Any) -> None
-    """Remove window decoration on the active window."""
-    win = gtk.gdk.window_foreign_new(win.get_xid())
-    win.set_decorations(False)
-
+@commands.add('WithBorder', True)
+@commands.add('borderless', False)
 @commands.add('bordered')
-def toggle_decorated(winman, win, state):  # pylint: disable=unused-argument
+def toggle_decorated(winman, win, state, decoration=None):  # pylint: disable=unused-argument
     # type: (WindowManager, wnck.Window, Any) -> None
     """Toggle window decoration state on the active window."""
     win = gtk.gdk.window_foreign_new(win.get_xid())
-    win.set_decorations(not win.get_decorations())
+    if decoration is not None:
+        win.set_decorations(decoration)
+    else:
+        win.set_decorations(not win.get_decorations())
 
 @commands.add('show-desktop', windowless=True)
 def toggle_desktop(winman, win, state):  # pylint: disable=unused-argument
