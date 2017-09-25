@@ -167,8 +167,8 @@ class CommandRegistry(object):
             return func
         return decorate
 
-    def check_command(self, command, winman, *args, **kwargs):
-        """ check if the command is valid and execute it"""
+    def call(self, command, winman, *args, **kwargs):
+        """Check if the command is valid and execute it."""
         # type: (str, WindowManager, *Any, **Any) -> bool
         cmd = self.commands.get(command, None)
 
@@ -192,9 +192,9 @@ class CommandRegistry(object):
         if ',' in command:
             cmds = [i.strip() for i in command.split(',')]
             for cmd in cmds:
-                success = self.check_command(cmd, winman, *args, **kwargs)
+                success = self.call(cmd, winman, *args, **kwargs)
         else:
-            return self.check_command(command, winman, *args, **kwargs)
+            return self.call(command, winman, *args, **kwargs)
 
         return success
 
