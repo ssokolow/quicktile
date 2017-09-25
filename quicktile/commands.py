@@ -183,9 +183,10 @@ class CommandRegistry(object):
             logging.error("Unrecognized command: %s", command)
             return False
 
-    def call(self, command, winman, *args, **kwargs):
+    def call_multiple(self, command, winman, *args, **kwargs):
         # type: (str, WindowManager, *Any, **Any) -> bool
-        """Resolve a textual positioning command and execute it."""
+        """Resolve a textual positioning command and execute it.
+           Accepts a comma seperated list as the command."""
         cmds = []
         success = True
         if ',' in command:
@@ -355,8 +356,8 @@ def move_to_position(winman,       # type: WindowManager
     winman.reposition(win, result, use_rect, gravity=gravity,
             geometry_mask=gravity_mask)
 
-@commands.add('WithBorder', True)
-@commands.add('borderless', False)
+@commands.add('bordered-set', True)
+@commands.add('bordered-unset', False)
 @commands.add('bordered')
 def toggle_decorated(winman, win, state, decoration=None):  # pylint: disable=unused-argument
     # type: (WindowManager, wnck.Window, Any) -> None
