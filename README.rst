@@ -46,6 +46,7 @@ Requirements:
 * Python 2.7
 * PyGTK
 * ``python-wnck``
+* ``python-setuptools``
 * ``python-xlib`` (optional, required for key-binding)
 * ``dbus-python`` (optional, required for D-Bus service)
 
@@ -60,7 +61,7 @@ following commands to easily install them:
 
 .. code:: sh
 
-    sudo apt-get install python python-gtk2 python-xlib python-dbus python-wnck
+    sudo apt-get install python python-gtk2 python-xlib python-dbus python-wnck python-setuptools
 
 **Fedora 22 and above:**
 
