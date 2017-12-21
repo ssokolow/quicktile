@@ -184,9 +184,9 @@ class CommandRegistry(object):
             return False
 
     def call_multiple(self, command, winman, *args, **kwargs):
+        # type: (List[str], WindowManager, *Any, **Any) -> bool
         """Resolve a textual positioning command and execute it.
            Accepts a comma seperated list as the command."""
-        # type: (str, WindowManager, *Any, **Any) -> bool
         cmds = []
         success = True
         if ',' in command:
