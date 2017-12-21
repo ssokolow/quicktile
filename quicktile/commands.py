@@ -57,9 +57,9 @@ class CommandRegistry(object):
         # FIXME: Make calls to win.get_* lazy in case --debug
         #        wasn't passed.
         logging.debug("Operating on window %r with title \"%s\" "
-                "and geometry %r",
-                window, window.get_name(),
-                window.get_geometry())
+                      "and geometry %r",
+                      window, window.get_name(),
+                      window.get_geometry())
 
         monitor_id, monitor_geom = winman.get_monitor(window)
         use_area, use_rect = winman.workarea.get(monitor_geom)
@@ -68,8 +68,8 @@ class CommandRegistry(object):
         #       comprehensive exception catcher.
         if not use_rect:
             logging.debug("Received a worthless value for largest "
-                    "rectangular subset of desktop (%r). Doing "
-                    "nothing.", use_rect)
+                          "rectangular subset of desktop (%r). Doing "
+                          "nothing.", use_rect)
             return False
 
         state.update({
@@ -77,7 +77,7 @@ class CommandRegistry(object):
             "monitor_geom": monitor_geom,
             "usable_region": use_area,
             "usable_rect": use_rect,
-            })
+        })
         return True
 
     def add(self, name, *p_args, **p_kwargs):
@@ -103,10 +103,10 @@ class CommandRegistry(object):
             @wraps(func)
             # pylint: disable=missing-docstring
             def wrapper(winman,       # type: WindowManager
-                    window=None,  # type: wnck.Window
-                    *args,
-                    **kwargs
-                    ):            # type: (...) -> None
+                        window=None,  # type: wnck.Window
+                        *args,
+                        **kwargs
+                        ):            # type: (...) -> None
 
                 window = window or winman.screen.get_active_window()
 
@@ -121,7 +121,7 @@ class CommandRegistry(object):
 
                 # Bail out early on None or things like the desktop window
                 if not (windowless or self.get_window_meta(
-                    window, state, winman)):
+                        window, state, winman)):
                     logging.debug("No window and windowless=False")
                     return None
 
@@ -140,8 +140,8 @@ class CommandRegistry(object):
 
             if not func.__doc__:
                 raise AssertionError("All commands must have a docstring: "
-                        "%r" % func)
-                help_str = func.__doc__.strip().split('\n')[0].split('. ')[0]
+                                     "%r" % func)
+            help_str = func.__doc__.strip().split('\n')[0].split('. ')[0]
             self.help[name] = help_str.strip('.')
 
             # Return the unwrapped function so decorators can be stacked
@@ -174,7 +174,7 @@ class CommandRegistry(object):
 
         if cmd:
             logging.debug("Executing command '%s' with arguments %r, %r",
-                    command, args, kwargs)
+                          command, args, kwargs)
             cmd(winman, *args, **kwargs)
 
             # TODO: Allow commands to report success or failure
@@ -184,7 +184,7 @@ class CommandRegistry(object):
             return False
 
     def call_multiple(self, command, winman, *args, **kwargs):
-        # type: (List[str], WindowManager, *Any, **Any) -> bool
+        # type: (str, WindowManager, *Any, **Any) -> bool
         """Resolve a textual positioning command and execute it.
            Accepts a comma seperated list as the command."""
         cmds = []
@@ -203,10 +203,10 @@ class CommandRegistry(object):
 commands = CommandRegistry()
 
 def cycle_dimensions(winman,      # type: WindowManager
-        win,         # type: Any  # TODO: Consistent Window type
-        state,       # type: Dict[str, Any]
-        *dimensions  # type: Any
-        ):  # type: (...) -> Optional[gtk.gdk.Rectangle]
+                     win,         # type: Any  # TODO: Consistent Window type
+                     state,       # type: Dict[str, Any]
+                     *dimensions  # type: Any
+                     ):  # type: (...) -> Optional[gtk.gdk.Rectangle]
     # type: (WindowManager, Any, Dict[str, Any], *Tuple[...]) ->
     # TODO: Standardize on what kind of window object to pass around
     """Cycle the active window through a list of positions and shapes.
@@ -238,7 +238,7 @@ def cycle_dimensions(winman,      # type: WindowManager
         return None
 
     logging.debug("Selected preset sequence resolves to these monitor-relative"
-            " pixel dimensions:\n\t%r", dims)
+                  " pixel dimensions:\n\t%r", dims)
 
     try:
         cmd_idx, pos = winman.get_property('_QUICKTILE_CYCLE_POS', win)[2]
@@ -251,11 +251,11 @@ def cycle_dimensions(winman,      # type: WindowManager
         pos = 0
 
     winman.set_property('_QUICKTILE_CYCLE_POS',
-            (state.get('cmd_idx', 0), pos), win)
+                        (state.get('cmd_idx', 0), pos), win)
     result = gtk.gdk.Rectangle(*dims[pos])
 
     logging.debug("Target preset is %s relative to monitor %s",
-            result, clip_box)
+                  result, clip_box)
     result.x += clip_box.x
     result.y += clip_box.y
 
@@ -265,25 +265,25 @@ def cycle_dimensions(winman,      # type: WindowManager
     if not usable_region.rect_in(result) == gtk.gdk.OVERLAP_RECTANGLE_IN:
         result = result.intersect(state['usable_rect'])
         logging.debug("Result exceeds usable (non-rectangular) region of "
-                "desktop. (overlapped a non-fullwidth panel?) Reducing "
-                "to within largest usable rectangle: %s",
-                state['usable_rect'])
+                      "desktop. (overlapped a non-fullwidth panel?) Reducing "
+                      "to within largest usable rectangle: %s",
+                      state['usable_rect'])
 
-        logging.debug("Calling reposition() with default gravity and dimensions "
-                "%r", tuple(result))
-        winman.reposition(win, result)
+    logging.debug("Calling reposition() with default gravity and dimensions "
+                  "%r", tuple(result))
+    winman.reposition(win, result)
     return result
 
 @commands.add('monitor-switch', force_wrap=True)
 @commands.add('monitor-next', 1)
 @commands.add('monitor-prev', -1)
 def cycle_monitors(winman,            # type: WindowManager
-        win,               # type: wnck.Window
-        state,             # type: Dict[str, Any]
-        step=1,            # type: int
-        force_wrap=False,  # type: bool
-        n_monitors=None    # type: Optional[int]
-        ):                 # type: (...) -> None
+                   win,               # type: wnck.Window
+                   state,             # type: Dict[str, Any]
+                   step=1,            # type: int
+                   force_wrap=False,  # type: bool
+                   n_monitors=None    # type: Optional[int]
+                   ):                 # type: (...) -> None
     """Cycle the active window between monitors while preserving position.
 
     @todo 1.0.0: Remove C{monitor-switch} in favor of C{monitor-next}
@@ -293,12 +293,12 @@ def cycle_monitors(winman,            # type: WindowManager
     n_monitors = n_monitors or winman.gdk_screen.get_n_monitors()
 
     new_mon_id = clamp_idx(mon_id + step, n_monitors,
-            state['config'].getboolean('general', 'MovementsWrap') or
-            force_wrap)
+        state['config'].getboolean('general', 'MovementsWrap') or
+        force_wrap)
 
     new_mon_geom = winman.gdk_screen.get_monitor_geometry(new_mon_id)
     logging.debug("Moving window to monitor %s, which has geometry %s",
-            new_mon_id, new_mon_geom)
+                  new_mon_id, new_mon_geom)
 
     winman.reposition(win, None, new_mon_geom, keep_maximize=True)
 
@@ -320,29 +320,29 @@ def cycle_monitors_all(winman, win, state, step=1, force_wrap=False):
 
 # pylint: disable=no-member
 MOVE_TO_COMMANDS = {
-        'move-to-top-left': [wnck.WINDOW_GRAVITY_NORTHWEST,
-            wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
-        'move-to-top': [wnck.WINDOW_GRAVITY_NORTH, wnck.WINDOW_CHANGE_Y],
-        'move-to-top-right': [wnck.WINDOW_GRAVITY_NORTHEAST,
-            wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
-        'move-to-left': [wnck.WINDOW_GRAVITY_WEST, wnck.WINDOW_CHANGE_X],
-        'move-to-center': [wnck.WINDOW_GRAVITY_CENTER,
-            wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
-        'move-to-right': [wnck.WINDOW_GRAVITY_EAST, wnck.WINDOW_CHANGE_X],
-        'move-to-bottom-left': [wnck.WINDOW_GRAVITY_SOUTHWEST,
-            wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
-        'move-to-bottom': [wnck.WINDOW_GRAVITY_SOUTH, wnck.WINDOW_CHANGE_Y],
-        'move-to-bottom-right': [wnck.WINDOW_GRAVITY_SOUTHEAST,
-            wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
-        }
+    'move-to-top-left': [wnck.WINDOW_GRAVITY_NORTHWEST,
+                         wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+    'move-to-top': [wnck.WINDOW_GRAVITY_NORTH, wnck.WINDOW_CHANGE_Y],
+    'move-to-top-right': [wnck.WINDOW_GRAVITY_NORTHEAST,
+                          wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+    'move-to-left': [wnck.WINDOW_GRAVITY_WEST, wnck.WINDOW_CHANGE_X],
+    'move-to-center': [wnck.WINDOW_GRAVITY_CENTER,
+                       wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+    'move-to-right': [wnck.WINDOW_GRAVITY_EAST, wnck.WINDOW_CHANGE_X],
+    'move-to-bottom-left': [wnck.WINDOW_GRAVITY_SOUTHWEST,
+                            wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+    'move-to-bottom': [wnck.WINDOW_GRAVITY_SOUTH, wnck.WINDOW_CHANGE_Y],
+    'move-to-bottom-right': [wnck.WINDOW_GRAVITY_SOUTHEAST,
+                             wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+}
 
 @commands.add_many(MOVE_TO_COMMANDS)
 def move_to_position(winman,       # type: WindowManager
-        win,          # type: Any  # TODO: Make this specific
-        state,        # type: Dict[str, Any]
-        gravity,      # type: Any  # TODO: Make this specific
-        gravity_mask  # type: wnck.WindowMoveResizeMask
-        ):  # type: (...) -> None  # TODO: Decide on a return type
+                     win,          # type: Any  # TODO: Make this specific
+                     state,        # type: Dict[str, Any]
+                     gravity,      # type: Any  # TODO: Make this specific
+                     gravity_mask  # type: wnck.WindowMoveResizeMask
+                     ):  # type: (...) -> None  # TODO: Decide on a return type
     """Move window to a position on the screen, preserving its dimensions."""
     use_rect = state['usable_rect']
 
@@ -350,13 +350,13 @@ def move_to_position(winman,       # type: WindowManager
     dims = (int(use_rect.width * grav_x), int(use_rect.height * grav_y), 0, 0)
     result = gtk.gdk.Rectangle(*dims)
     logging.debug("Calling reposition() with %r gravity and dimensions %r",
-            gravity, tuple(result))
+                  gravity, tuple(result))
 
     # pylint: disable=no-member
     winman.reposition(win, result, use_rect, gravity=gravity,
             geometry_mask=gravity_mask)
 
-    @commands.add('bordered-set', True)
+@commands.add('bordered-set', True)
 @commands.add('bordered-unset', False)
 @commands.add('bordered')
 def toggle_decorated(winman, win, state, decoration=None):  # pylint: disable=unused-argument
@@ -378,9 +378,9 @@ def toggle_desktop(winman, win, state):  # pylint: disable=unused-argument
 @commands.add('all-desktops', 'pin', 'is_pinned')
 @commands.add('fullscreen', 'set_fullscreen', 'is_fullscreen', True)
 @commands.add('vertical-maximize', 'maximize_vertically',
-        'is_maximized_vertically')
+                                   'is_maximized_vertically')
 @commands.add('horizontal-maximize', 'maximize_horizontally',
-        'is_maximized_horizontally')
+                                     'is_maximized_horizontally')
 @commands.add('maximize', 'maximize', 'is_maximized')
 @commands.add('minimize', 'minimize', 'is_minimized')
 @commands.add('always-above', 'make_above', 'is_above')
@@ -431,7 +431,7 @@ def workspace_go(winman, win, state, motion):  # pylint: disable=W0613
     # type: (WindowManager, wnck.Window, Any, wnck.MotionDirection) -> None
     """Switch the active workspace (next/prev wrap around)"""
     target = winman.get_workspace(None, motion,
-            wrap_around=state['config'].getboolean('general', 'MovementsWrap'))
+        wrap_around=state['config'].getboolean('general', 'MovementsWrap'))
     if not target:
         logging.debug("Couldn't get the active workspace.")
         return
@@ -450,7 +450,7 @@ def workspace_send_window(winman, win, state, motion):
     # type: (WindowManager, wnck.Window, Any, wnck.MotionDirection) -> None
     """Move the active window to another workspace (next/prev wrap around)"""
     target = winman.get_workspace(win, motion,
-            wrap_around=state['config'].getboolean('general', 'MovementsWrap'))
+        wrap_around=state['config'].getboolean('general', 'MovementsWrap'))
     if not target:
         return  # It's either pinned, on no workspaces, or there is no match
 
