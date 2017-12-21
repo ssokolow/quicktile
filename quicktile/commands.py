@@ -168,8 +168,8 @@ class CommandRegistry(object):
         return decorate
 
     def call(self, command, winman, *args, **kwargs):
-        """Check if the command is valid and execute it."""
         # type: (str, WindowManager, *Any, **Any) -> bool
+        """Check if the command is valid and execute it."""
         cmd = self.commands.get(command, None)
 
         if cmd:
@@ -186,8 +186,8 @@ class CommandRegistry(object):
     def call_multiple(self, command, winman, *args, **kwargs):
         # type: (str, WindowManager, *Any, **Any) -> bool
         """Resolve a textual positioning command and execute it.
-           Accepts a comma seperated list as the command."""
-        cmds = []
+           Accepts a comma seperated string as the command."""
+        cmds = [] #type: List[str]
         success = True
         if ',' in command:
             cmds = [i.strip() for i in command.split(',')]
@@ -360,7 +360,7 @@ def move_to_position(winman,       # type: WindowManager
 @commands.add('bordered-unset', False)
 @commands.add('bordered')
 def toggle_decorated(winman, win, state, decoration=None):  # pylint: disable=unused-argument
-    # type: (WindowManager, wnck.Window, Any) -> None
+    # type: (WindowManager, wnck.Window, Any, Optional[bool]) -> None
     """Toggle window decoration state on the active window."""
     win = gtk.gdk.window_foreign_new(win.get_xid())
     if decoration is not None:
