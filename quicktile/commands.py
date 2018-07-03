@@ -355,6 +355,43 @@ def toggle_desktop(winman, win, state):  # pylint: disable=unused-argument
     target = not winman.screen.get_showing_desktop()
     winman.screen.toggle_showing_desktop(target)
 
+# pylint: disable=no-member
+SMARTTILE_COMMANDS = {
+    'smarttile-top': [0, -1],
+    'smarttile-bottom': [0, 1],
+    'smarttile-left': [-1, 0],
+    'smarttile-right': [1, 0]
+}
+@commands.add_many(SMARTTILE_COMMANDS)
+def smart_tile(winman, win, state, delta_x, delta_y): # pylint: disable=unused-argument
+    # type: (WindowManager, wnck.Window, Any, int,int) -> None
+    """Smart window arrangement with only arrow keys. (Useful for laptops without keypad)"""
+    """Move window on SmartTile grid by delta x and y:
+    1 2 3
+    4 5 6
+    7 8 9
+    5: state as it was before smart_tile started changing it
+    4: window fills left half of screen
+    2: window fills top half of screen
+    1: window fills top-left quarter of screen
+    Every time you try to move on a SmartTile out of the bounds of your screen, dimensions are cycled by cycle_dimensions.
+    """
+    smarttiles = [
+        ['top-left', 'top', 'top-right'],
+        ['left', 'reset', 'right'],
+        ['bottom-left', 'bottom', 'bottom-right']
+    ]
+    columns = 3  # could be even more if there were a way to put windows in specific rows
+    winpos = winman.get_property('_SMARTTILE_WIN_POS', win)  # position in SmartTile grid
+    if not winpos:  # smarttile was never called on this window yet
+        winpos = [None, None, (1, 1)]
+    (x, y) = winpos[2]
+    if 0 <= x + delta_x < columns and 0 <= y + delta_y < 3:  # if not over-/underflow
+        x += delta_x
+        y += delta_y
+    winman.set_property('_SMARTTILE_WIN_POS', (x, y), win)
+    commands.call(smarttiles[y][x], winman)
+
 @commands.add('all-desktops', 'pin', 'is_pinned')
 @commands.add('fullscreen', 'set_fullscreen', 'is_fullscreen', True)
 @commands.add('vertical-maximize', 'maximize_vertically',
