@@ -384,13 +384,17 @@ def smart_tile(winman, win, state, delta_x, delta_y): # pylint: disable=unused-a
     columns = 3  # could be even more if there were a way to put windows in specific rows
     winpos = winman.get_property('_SMARTTILE_WIN_POS', win)  # position in SmartTile grid
     if not winpos:  # smarttile was never called on this window yet
+        winman.set_property('_SMARTTILE_WIN_INIT_POS', win.get_geometry(), win)  # initial pos to return to
         winpos = [None, None, (1, 1)]
     (x, y) = winpos[2]
     if 0 <= x + delta_x < columns and 0 <= y + delta_y < 3:  # if not over-/underflow
         x += delta_x
         y += delta_y
     winman.set_property('_SMARTTILE_WIN_POS', (x, y), win)
-    commands.call(smarttiles[y][x], winman)
+    if smarttiles[y][x] == 'reset':
+        winman.reposition(win, gtk.gdk.Rectangle(*winman.get_property('_SMARTTILE_WIN_INIT_POS', win)[2]))
+    else:
+        commands.call(smarttiles[y][x], winman)
 
 @commands.add('all-desktops', 'pin', 'is_pinned')
 @commands.add('fullscreen', 'set_fullscreen', 'is_fullscreen', True)
