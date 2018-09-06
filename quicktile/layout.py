@@ -98,7 +98,7 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
         'bottom-right': (1.0, 1.0),
     }  # type: Dict[str, Tuple[float, float]]
 
-    def __init__(self, margin_x=0, margin_y=0):  # type: (int, int) -> None
+    def __init__(self, margin_x=0.0, margin_y=0.0):  # type: (float, float) -> None
         """
         @param margin_x: Horizontal margin to apply when calculating window
             positions, as decimal percentage of screen width.
@@ -154,15 +154,14 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
                 round(width - (self.margin_x * 2), 3),
                 round(height - (self.margin_y * 2), 3))
 
-def make_winsplit_positions(columns):
-    # type: (int) -> Dict[str, List[PercentRect]]
+def make_winsplit_positions(columns, marginX, marginY):
+    # type: (int, float, float) -> Dict[str, List[PercentRect]]
     """Generate the classic WinSplit Revolution tiling presets
 
     @todo: Figure out how best to put this in the config file.
     """
 
-    # TODO: Plumb GravityLayout.__init__'s arguments into the config file
-    gvlay = GravityLayout()
+    gvlay = GravityLayout(marginX, marginY)
     col_width = 1.0 / columns
     cycle_steps = tuple(round(col_width * x, 3)
                         for x in range(1, columns))

@@ -43,7 +43,9 @@ DEFAULTS = {
         'ModMask': '<Ctrl><Alt>',
         'UseWorkarea': True,
         'MovementsWrap': True,
-        'ColumnCount': 3
+        'ColumnCount': 3,
+        'MarginX': 0.0,
+        'MarginY': 0.0,
     },
     'keys': {
         "KP_Enter": "monitor-switch",
@@ -281,7 +283,7 @@ def main():  # type: () -> None
 
     # TODO: Rearchitect so this hack isn't needed
     commands.cycle_dimensions = commands.commands.add_many(
-        layout.make_winsplit_positions(config.getint('general', 'ColumnCount'))
+        layout.make_winsplit_positions(config.getint('general', 'ColumnCount'), config.getfloat('general', 'MarginX'), config.getfloat('general', 'MarginY'))
     )(commands.cycle_dimensions)
     commands.commands.extra_state = {'config': config}
 
