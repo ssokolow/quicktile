@@ -98,15 +98,18 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
         'bottom-right': (1.0, 1.0),
     }  # type: Dict[str, Tuple[float, float]]
 
-    def __init__(self, margin_x=0.0, margin_y=0.0):  # type: (float, float) -> None
+    def __init__(self, margin_x=0.0, margin_y=0.0, no_margin_at_edges=False):  # type: (float, float, bool) -> None
         """
         @param margin_x: Horizontal margin to apply when calculating window
             positions, as decimal percentage of screen width.
         @param margin_y: Vertical margin to apply when calculating window
             positions, as decimal percentage of screen height.
+        @param no_margin_at_edges: Should margins be hidden if they are
+            adjacent to the edge of the screen
         """
         self.margin_x = margin_x
         self.margin_y = margin_y
+        self.no_margin_at_edges = no_margin_at_edges
 
     # pylint: disable=too-many-arguments
     def __call__(self,
@@ -149,19 +152,43 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
         offset_x = width * self.GRAVITIES[gravity][0]
         offset_y = height * self.GRAVITIES[gravity][1]
 
-        return (round(x - offset_x + self.margin_x, 3),
-                round(y - offset_y + self.margin_y, 3),
-                round(width - (self.margin_x * 2), 3),
-                round(height - (self.margin_y * 2), 3))
+        return (round(self.apply_margin_loc(x - offset_x, self.margin_x), 3),
+                round(self.apply_margin_loc(y - offset_y, self.margin_y), 3),
+                round(self.apply_margin_dim(x - offset_x, width, self.margin_x), 3),
+                round(self.apply_margin_dim(y - offset_y, height, self.margin_y), 3))
+    
+    def apply_margin_loc(self, loc, margin):
+        if self.no_margin_at_edges and loc != 0.0 and loc != 1.0:
+            # If this location is not at an edge, then add margin
+            return loc + margin
+        else:
+            # If this location IS at an edge, then don't apply the margin
+            return loc
 
-def make_winsplit_positions(columns, marginX, marginY):
-    # type: (int, float, float) -> Dict[str, List[PercentRect]]
+    def apply_margin_dim(self, loc, dim, margin):
+        # Calculate the location where this dimension ends
+        end = loc + dim
+        
+        # If the location for this dimension is at an edge, then increase the dimension
+        #   to compensate for the excluded margin
+        if self.no_margin_at_edges and (loc == 0.0 or loc == 1.0):
+            dim += margin
+        
+        if self.no_margin_at_edges and end != 0.0 and end != 1.0:
+            # If this dimension does not end at an edge, then add margin
+            return dim - (margin * 2)
+        else:
+            # If this dimension DOES end at an edge, then don't add the margin
+            return dim
+
+def make_winsplit_positions(columns, margin_x, margin_y, no_margin_at_edges):
+    # type: (int, float, float, bool) -> Dict[str, List[PercentRect]]
     """Generate the classic WinSplit Revolution tiling presets
 
     @todo: Figure out how best to put this in the config file.
     """
 
-    gvlay = GravityLayout(marginX, marginY)
+    gvlay = GravityLayout(margin_x, margin_y, no_margin_at_edges)
     col_width = 1.0 / columns
     cycle_steps = tuple(round(col_width * x, 3)
                         for x in range(1, columns))

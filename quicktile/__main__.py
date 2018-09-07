@@ -46,6 +46,7 @@ DEFAULTS = {
         'ColumnCount': 3,
         'MarginX': 0.0,
         'MarginY': 0.0,
+        'NoMarginAtEdges': False
     },
     'keys': {
         "KP_Enter": "monitor-switch",
@@ -282,8 +283,14 @@ def main():  # type: () -> None
                        opts.no_workarea)
 
     # TODO: Rearchitect so this hack isn't needed
+    
+    column_count = config.getint('general', 'ColumnCount')
+    margin_x = config.getfloat('general', 'MarginX')
+    margin_y = config.getfloat('general', 'MarginY')
+    no_margin_at_edges = config.getboolean('general', 'NoMarginAtEdges')
+    
     commands.cycle_dimensions = commands.commands.add_many(
-        layout.make_winsplit_positions(config.getint('general', 'ColumnCount'), config.getfloat('general', 'MarginX'), config.getfloat('general', 'MarginY'))
+        layout.make_winsplit_positions(column_count, margin_x, margin_y, no_margin_at_edges)
     )(commands.cycle_dimensions)
     commands.commands.extra_state = {'config': config}
 
