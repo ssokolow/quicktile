@@ -179,6 +179,15 @@ def _init_x_server(argv, display_num, magic_cookie, verbose=False):
         raise subprocess.CalledProcessError(xproc.returncode, repr(argv), '')
 
 @contextmanager
+def background_proc(*args, **kwargs):
+    """Context manager for scoping the lifetime of a subprocess.Popen call"""
+    popen_obj = subprocess.Popen(*args, **kwargs)
+    try:
+        yield
+    finally:
+        popen_obj.terminate()
+
+@contextmanager
 def env_vars(new):
     """Context manager to temporarily change environment variables"""
     old_vals = {}
