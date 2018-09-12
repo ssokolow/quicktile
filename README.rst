@@ -290,3 +290,47 @@ Known Bugs
 
 Thanks to Thomas Vander Stichele for some of the documentation cleanups.
 
+-------
+Removal
+-------
+
+As QuickTile does not yet have a one-command uninstall script, you will need to
+do the following.
+
+A. If you installed via ``pip2``...
+
+
+.. code:: sh
+
+    sudo pip2 uninstall quicktile
+    sudo rm /usr/local/bin/quicktile
+
+
+B. If you installed via ``install.sh``...
+
+ ``install.sh`` doesn't yet log what it installed the way ``pip2`` does, so
+ this will be a bit more involved.
+
+ First, remove the system integration files:
+
+ .. code:: sh
+
+     # Remove the command that can be typed at the command-line
+     sudo rm /usr/local/bin/quicktile
+
+     # Remove the autostart file
+     sudo rm /etc/xdg/autostart/quicktile.desktop
+
+     # Remove the launcher menu entry
+     sudo rm /usr/local/share/applications/quicktile.desktop
+
+ Second, remove QuickTile itself from your Python packages folder.
+
+ As development and release installations produce different file layouts,
+ the way I recommend doing this is to run the following command, verify that
+ nothing looks obviously wrong about the list of files and folders it
+ produces, and then delete them:
+
+ .. code:: sh
+
+    find /usr/local/lib/python2.7 -iname 'quicktile*'
