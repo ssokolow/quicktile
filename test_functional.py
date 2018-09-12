@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 """Beginnings of a functional test harness for QuickTile
 
+--snip--
+
 This script replicates some of the algorithms implemented in the unattributed
 /usr/bin/xvfb-run script included in the xvfb package provided by
 Ubuntu Linux 14.04.5 LTS.
@@ -292,7 +294,10 @@ def main():
 
     from argparse import ArgumentParser, RawDescriptionHelpFormatter
     parser = ArgumentParser(formatter_class=RawDescriptionHelpFormatter,
-            description=__doc__.replace('\r\n', '\n').split('\n--snip--\n')[0])
+            description=__doc__.replace('\r\n', '\n').split('\n--snip--\n')[0],
+            epilog="NOTE: Running tests under the Xephyr X server will change "
+            "their behaviour if they depend on Xvfb's ability to present "
+            "a desktop with non-sequentially numbered screens.")
     parser.add_argument('-v', '--verbose', action="count",
         default=2, help="Increase the verbosity. Use twice for extra effect.")
     parser.add_argument('-q', '--quiet', action="count",
