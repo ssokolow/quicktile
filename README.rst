@@ -43,21 +43,22 @@ Requirements:
 -------------
 
 * An X11-based desktop (The code expects NETWM hints and X11-style window decorations)
-* Python 2.7
-* PyGTK
-* ``python-wnck``
+* Python (currently tested under 2.7)
+* Python GI and its API definitions for the following libraries:
+  * Gdk 2.x
+  * Gtk+ 3.x
+  * Wnck 3.x
 * ``python-setuptools``
 * ``python-xlib`` (optional, required for key-binding)
 * ``dbus-python`` (optional, required for D-Bus service)
 
-As PyGTK was never ported to Python 3.x and porting to GTK+ 3.x wouldn't bring
-any significant benefits for a utility that is fundamentally incompatible with
-Wayland's security model, these requirements are unlikely to change.
 
 Depending on the distro you are using, you may be able to use one of the
 following commands to easily install them:
 
 **Debian and derivatives (Ubuntu, Mint, etc.):**
+
+**FIXME:** Update these instructions.
 
 .. code:: sh
 
@@ -65,11 +66,15 @@ following commands to easily install them:
 
 **Fedora 22 and above:**
 
+**FIXME:** Update these instructions.
+
 .. code:: sh
 
     sudo dnf install python pygtk2 pygobject2 dbus-python gnome-python2-libwnck
 
 **Fedora 21 and below:**
+
+**FIXME:** Update or remove these instructions.
 
 .. code:: sh
 

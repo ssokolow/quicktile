@@ -6,7 +6,7 @@ __license__ = "GNU GPL 2.0 or later"
 import logging, time
 from functools import wraps
 
-import gtk.gdk, wnck  # pylint: disable=import-error
+from gi.repository import Gdk, Wnck
 
 from .layout import resolve_fractional_geom
 from .wm import GRAVITY
@@ -103,7 +103,7 @@ class CommandRegistry(object):
             @wraps(func)
             # pylint: disable=missing-docstring
             def wrapper(winman,       # type: WindowManager
-                        window=None,  # type: wnck.Window
+                        window=None,  # type: Wnck.Window
                         *args,
                         **kwargs
                         ):            # type: (...) -> None
@@ -191,7 +191,7 @@ def cycle_dimensions(winman,      # type: WindowManager
                      win,         # type: Any  # TODO: Consistent Window type
                      state,       # type: Dict[str, Any]
                      *dimensions  # type: Any
-                     ):  # type: (...) -> Optional[gtk.gdk.Rectangle]
+                     ):  # type: (...) -> Optional[Gdk.Rectangle]
     # type: (WindowManager, Any, Dict[str, Any], *Tuple[...]) ->
     # TODO: Standardize on what kind of window object to pass around
     """Cycle the active window through a list of positions and shapes.
@@ -204,10 +204,10 @@ def cycle_dimensions(winman,      # type: WindowManager
     @param dimensions: A list of tuples representing window geometries as
         floating-point values between 0 and 1, inclusive.
     @type dimensions: C{[(x, y, w, h), ...]}
-    @type win: C{gtk.gdk.Window}
+    @type win: C{Gdk.Window}
 
     @returns: The new window dimensions.
-    @rtype: C{gtk.gdk.Rectangle}
+    @rtype: C{Gdk.Rectangle}
     """
     win_geom = winman.get_geometry_rel(win, state['monitor_geom'])
     usable_region = state['usable_region']
@@ -237,7 +237,7 @@ def cycle_dimensions(winman,      # type: WindowManager
 
     winman.set_property('_QUICKTILE_CYCLE_POS',
                         (state.get('cmd_idx', 0), pos), win)
-    result = gtk.gdk.Rectangle(*dims[pos])
+    result = Gdk.Rectangle(*dims[pos])
 
     logging.debug("Target preset is %s relative to monitor %s",
                   result, clip_box)
@@ -247,7 +247,7 @@ def cycle_dimensions(winman,      # type: WindowManager
     # If we're overlapping a panel, fall back to a monitor-specific
     # analogue to _NET_WORKAREA to prevent overlapping any panels and
     # risking the WM potentially meddling with the result of resposition()
-    if not usable_region.rect_in(result) == gtk.gdk.OVERLAP_RECTANGLE_IN:
+    if not usable_region.rect_in(result) == Gdk.OVERLAP_RECTANGLE_IN:
         result = result.intersect(state['usable_rect'])
         logging.debug("Result exceeds usable (non-rectangular) region of "
                       "desktop. (overlapped a non-fullwidth panel?) Reducing "
@@ -263,7 +263,7 @@ def cycle_dimensions(winman,      # type: WindowManager
 @commands.add('monitor-next', 1)
 @commands.add('monitor-prev', -1)
 def cycle_monitors(winman,            # type: WindowManager
-                   win,               # type: wnck.Window
+                   win,               # type: Wnck.Window
                    state,             # type: Dict[str, Any]
                    step=1,            # type: int
                    force_wrap=False,  # type: bool
@@ -291,7 +291,7 @@ def cycle_monitors(winman,            # type: WindowManager
 @commands.add('monitor-prev-all', -1)
 @commands.add('monitor-next-all', 1)
 def cycle_monitors_all(winman, win, state, step=1, force_wrap=False):
-    # type: (WindowManager, wnck.Window, Dict[str, Any], int, bool) -> None
+    # type: (WindowManager, Wnck.Window, Dict[str, Any], int, bool) -> None
     """Cycle all windows between monitors while preserving position."""
     n_monitors = winman.gdk_screen.get_n_monitors()
     curr_workspace = win.get_workspace()
@@ -303,22 +303,21 @@ def cycle_monitors_all(winman, win, state, step=1, force_wrap=False):
     for window in winman.get_relevant_windows(curr_workspace):
         cycle_monitors(winman, window, state, step, force_wrap, n_monitors)
 
-# pylint: disable=no-member
 MOVE_TO_COMMANDS = {
-    'move-to-top-left': [wnck.WINDOW_GRAVITY_NORTHWEST,
-                         wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
-    'move-to-top': [wnck.WINDOW_GRAVITY_NORTH, wnck.WINDOW_CHANGE_Y],
-    'move-to-top-right': [wnck.WINDOW_GRAVITY_NORTHEAST,
-                          wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
-    'move-to-left': [wnck.WINDOW_GRAVITY_WEST, wnck.WINDOW_CHANGE_X],
-    'move-to-center': [wnck.WINDOW_GRAVITY_CENTER,
-                       wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
-    'move-to-right': [wnck.WINDOW_GRAVITY_EAST, wnck.WINDOW_CHANGE_X],
-    'move-to-bottom-left': [wnck.WINDOW_GRAVITY_SOUTHWEST,
-                            wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
-    'move-to-bottom': [wnck.WINDOW_GRAVITY_SOUTH, wnck.WINDOW_CHANGE_Y],
-    'move-to-bottom-right': [wnck.WINDOW_GRAVITY_SOUTHEAST,
-                             wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y],
+    'move-to-top-left': [Wnck.WindowGravity.NORTHWEST,
+                    Wnck.WindowMoveResizeMask.X | Wnck.WindowMoveResizeMask.Y],
+    'move-to-top': [Wnck.WindowGravity.NORTH, Wnck.WindowMoveResizeMask.Y],
+    'move-to-top-right': [Wnck.WindowGravity.NORTHEAST,
+                    Wnck.WindowMoveResizeMask.X | Wnck.WindowMoveResizeMask.Y],
+    'move-to-left': [Wnck.WindowGravity.WEST, Wnck.WindowMoveResizeMask.X],
+    'move-to-center': [Wnck.WindowGravity.CENTER,
+                    Wnck.WindowMoveResizeMask.X | Wnck.WindowMoveResizeMask.Y],
+    'move-to-right': [Wnck.WindowGravity.EAST, Wnck.WindowMoveResizeMask.X],
+    'move-to-bottom-left': [Wnck.WindowGravity.SOUTHWEST,
+                    Wnck.WindowMoveResizeMask.X | Wnck.WindowMoveResizeMask.Y],
+    'move-to-bottom': [Wnck.WindowGravity.SOUTH, Wnck.WindowMoveResizeMask.Y],
+    'move-to-bottom-right': [Wnck.WindowGravity.SOUTHEAST,
+                    Wnck.WindowMoveResizeMask.X | Wnck.WindowMoveResizeMask.Y],
 }
 
 @commands.add_many(MOVE_TO_COMMANDS)
@@ -326,26 +325,25 @@ def move_to_position(winman,       # type: WindowManager
                      win,          # type: Any  # TODO: Make this specific
                      state,        # type: Dict[str, Any]
                      gravity,      # type: Any  # TODO: Make this specific
-                     gravity_mask  # type: wnck.WindowMoveResizeMask
+                     gravity_mask  # type: Wnck.WindowMoveResizeMask
                      ):  # type: (...) -> None  # TODO: Decide on a return type
     """Move window to a position on the screen, preserving its dimensions."""
     use_rect = state['usable_rect']
 
     grav_x, grav_y = GRAVITY[gravity]
     dims = (int(use_rect.width * grav_x), int(use_rect.height * grav_y), 0, 0)
-    result = gtk.gdk.Rectangle(*dims)
+    result = Gdk.Rectangle(*dims)
     logging.debug("Calling reposition() with %r gravity and dimensions %r",
                   gravity, tuple(result))
 
-    # pylint: disable=no-member
     winman.reposition(win, result, use_rect, gravity=gravity,
             geometry_mask=gravity_mask)
 
 @commands.add('bordered')
 def toggle_decorated(winman, win, state):  # pylint: disable=unused-argument
-    # type: (WindowManager, wnck.Window, Any) -> None
+    # type: (WindowManager, Wnck.Window, Any) -> None
     """Toggle window decoration state on the active window."""
-    win = gtk.gdk.window_foreign_new(win.get_xid())
+    win = Gdk.window_foreign_new(win.get_xid())
     win.set_decorations(not win.get_decorations())
 
 @commands.add('show-desktop', windowless=True)
@@ -368,12 +366,12 @@ def toggle_desktop(winman, win, state):  # pylint: disable=unused-argument
 @commands.add('shade', 'shade', 'is_shaded')
 # pylint: disable=unused-argument,too-many-arguments
 def toggle_state(winman, win, state, command, check, takes_bool=False):
-    # type: (WindowManager, wnck.Window, Any, str, str, bool) -> None
+    # type: (WindowManager, Wnck.Window, Any, str, str, bool) -> None
     """Toggle window state on the active window.
 
-    @param command: The C{wnck.Window} method name to be conditionally prefixed
+    @param command: The C{Wnck.Window} method name to be conditionally prefixed
         with "un", resolved, and called.
-    @param check: The C{wnck.Window} method name to be called to check
+    @param check: The C{Wnck.Window} method name to be called to check
         whether C{command} should be prefixed with "un".
     @param takes_bool: If C{True}, pass C{True} or C{False} to C{check} rather
         thank conditionally prefixing it with C{un} before resolving.
@@ -396,19 +394,18 @@ def toggle_state(winman, win, state, command, check, takes_bool=False):
 @commands.add('trigger-resize', 'size')
 # pylint: disable=unused-argument
 def trigger_keyboard_action(winman, win, state, command):
-    # type: (WindowManager, wnck.Window, Any, str) -> None
+    # type: (WindowManager, Wnck.Window, Any, str) -> None
     """Ask the Window Manager to begin a keyboard-driven operation."""
     getattr(win, 'keyboard_' + command)()
 
-# pylint: disable=E1101
 @commands.add('workspace-go-next', 1, windowless=True)
 @commands.add('workspace-go-prev', -1, windowless=True)
-@commands.add('workspace-go-up', wnck.MOTION_UP, windowless=True)
-@commands.add('workspace-go-down', wnck.MOTION_DOWN, windowless=True)
-@commands.add('workspace-go-left', wnck.MOTION_LEFT, windowless=True)
-@commands.add('workspace-go-right', wnck.MOTION_RIGHT, windowless=True)
+@commands.add('workspace-go-up', Wnck.MotionDirection.UP, windowless=True)
+@commands.add('workspace-go-down', Wnck.MotionDirection.DOWN, windowless=True)
+@commands.add('workspace-go-left', Wnck.MotionDirection.LEFT, windowless=True)
+@commands.add('workspace-go-right', Wnck.MotionDirection.RIGHT, windowless=True)
 def workspace_go(winman, win, state, motion):  # pylint: disable=W0613
-    # type: (WindowManager, wnck.Window, Any, wnck.MotionDirection) -> None
+    # type: (WindowManager, Wnck.Window, Any, Wnck.MotionDirection) -> None
     """Switch the active workspace (next/prev wrap around)"""
     target = winman.get_workspace(None, motion,
         wrap_around=state['config'].getboolean('general', 'MovementsWrap'))
@@ -420,14 +417,13 @@ def workspace_go(winman, win, state, motion):  # pylint: disable=W0613
 
 @commands.add('workspace-send-next', 1)
 @commands.add('workspace-send-prev', -1)
-@commands.add('workspace-send-up', wnck.MOTION_UP)      # pylint: disable=E1101
-@commands.add('workspace-send-down', wnck.MOTION_DOWN)  # pylint: disable=E1101
-@commands.add('workspace-send-left', wnck.MOTION_LEFT)  # pylint: disable=E1101
-# pylint: disable=E1101
-@commands.add('workspace-send-right', wnck.MOTION_RIGHT)
+@commands.add('workspace-send-up', Wnck.MotionDirection.UP)
+@commands.add('workspace-send-down', Wnck.MotionDirection.DOWN)
+@commands.add('workspace-send-left', Wnck.MotionDirection.LEFT)
+@commands.add('workspace-send-right', Wnck.MotionDirection.RIGHT)
 # pylint: disable=unused-argument
 def workspace_send_window(winman, win, state, motion):
-    # type: (WindowManager, wnck.Window, Any, wnck.MotionDirection) -> None
+    # type: (WindowManager, Wnck.Window, Any, Wnck.MotionDirection) -> None
     """Move the active window to another workspace (next/prev wrap around)"""
     target = winman.get_workspace(win, motion,
         wrap_around=state['config'].getboolean('general', 'MovementsWrap'))

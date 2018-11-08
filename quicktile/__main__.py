@@ -5,19 +5,16 @@ from __future__ import print_function
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
-import errno, logging, os, subprocess, sys
+import errno, logging, os, sys
 from ConfigParser import RawConfigParser
 
-try:
-    import pygtk
-    pygtk.require('2.0')
-except ImportError:
-    pass  # Apparently Travis-CI's build environment doesn't add this
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, Wnck  # pylint: disable=no-name-in-module
 
-import gtk, wnck
-
-from . import gtkexcepthook
-gtkexcepthook.enable()
+# TODO: Port gtkexcepthook to GTK+ 3.x
+# from . import gtkexcepthook
+# gtkexcepthook.enable()
 
 from . import commands, layout
 from .util import fmt_table, XInitError
@@ -72,7 +69,7 @@ KEYLOOKUP = {
 
 
 # TODO: Move this to a more appropriate place
-wnck.set_client_type(wnck.CLIENT_TYPE_PAGER)  # pylint: disable=no-member
+Wnck.set_client_type(Wnck.ClientType.PAGER)
 
 # TODO: Audit all of my TODOs and API docs for accuracy and staleness.
 
@@ -103,7 +100,7 @@ class QuickTileApp(object):
 
     def run(self):  # type: () -> bool
         """Initialize keybinding and D-Bus if available, then call
-        C{gtk.main()}.
+        C{Gtk.main()}.
 
         @returns: C{False} if none of the supported backends were available.
         @rtype: C{bool}
@@ -133,7 +130,7 @@ class QuickTileApp(object):
         # If either persistent backend loaded, start the GTK main loop.
         if self.keybinder or self.dbus_obj:
             try:
-                gtk.main()  # pylint: disable=no-member
+                Gtk.main()
             except KeyboardInterrupt:
                 pass
             return True
@@ -150,21 +147,6 @@ class QuickTileApp(object):
         print("Keybindings defined for use with --daemonize:\n")
         print("Modifier: %s\n" % (self._modmask or '(none)'))
         print(fmt_table(self._keys, ('Key', 'Action')))
-
-def attach_glib_log_filter():
-    """Attach a copy of grep to our stderr to filter out _OB_WM errors.
-
-    Hook up grep to filter out spurious libwnck error messages that we
-    can't filter properly because PyGTK doesn't expose g_log_set_handler()
-    """
-    glib_log_filter = subprocess.Popen(
-            ['grep', '-v', 'Unhandled action type _OB_WM'],
-            stdin=subprocess.PIPE)
-
-    # Redirect stderr through grep
-    if not glib_log_filter.stdin:
-        raise AssertionError("Did not receive stdin for log filter")
-    os.dup2(glib_log_filter.stdin.fileno(), sys.stderr.fileno())
 
 def load_config(path):  # type: (str) -> RawConfigParser
     """Load the config file from the given path, applying fixes as needed.
@@ -265,8 +247,7 @@ def main():  # type: () -> None
 
     opts, args = parser.parse_args()
 
-    if not opts.debug:
-        attach_glib_log_filter()
+    # TODO: Do we still need to replace attach_glib_log_filter()?
 
     # Set up the output verbosity
     logging.basicConfig(level=logging.DEBUG if opts.debug else logging.INFO,
@@ -312,8 +293,8 @@ def main():  # type: () -> None
 
             for arg in args:
                 commands.commands.call(arg, winman)
-            while gtk.events_pending():  # pylint: disable=no-member
-                gtk.main_iteration()  # pylint: disable=no-member
+            while Gtk.events_pending():
+                Gtk.main_iteration()
         elif not opts.show_args and not opts.show_binds:
             print(commands.commands)
             print("\nUse --help for a list of valid options.")

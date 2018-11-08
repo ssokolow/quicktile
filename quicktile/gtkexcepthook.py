@@ -154,7 +154,6 @@ class ExceptionHandler(object):
         # type: () -> gtk.MessageDialog
         """Initialize and return the top-level dialog"""
 
-        # pylint: disable=no-member
         dialog = gtk.MessageDialog(parent=None, flags=0,
                                    type=gtk.MESSAGE_WARNING,
                                    buttons=gtk.BUTTONS_NONE)
@@ -196,7 +195,6 @@ class ExceptionHandler(object):
         # type: (gtk.MessageDialog, str) -> gtk.MessageDialog
         """Initialize and return the details dialog"""
 
-        # pylint: disable=no-member
         details = gtk.Dialog(_("Bug Details"), parent,
           gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
           (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE, ))
@@ -240,7 +238,6 @@ class ExceptionHandler(object):
     def __call__(self, exctyp, value, tback):
         # type: (Type[BaseException], BaseException, Any) -> None
         """Custom sys.excepthook callback which displays a GTK+ dialog"""
-        # pylint: disable=no-member
 
         dialog = self.make_info_dialog()
         while True:

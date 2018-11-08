@@ -15,7 +15,7 @@ if MYPY:
                         Sequence, Sized, Tuple, Union)
 
     # pylint: disable=import-error, no-name-in-module
-    from gtk.gdk import Rectangle  # NOQA
+    from gi.repository.Gdk import Rectangle
     from .util import GeomTuple, PercentRect  # NOQA
 
     Geom = Union[Rectangle, GeomTuple]  # pylint: disable=invalid-name

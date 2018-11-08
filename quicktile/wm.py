@@ -6,8 +6,9 @@ __license__ = "GNU GPL 2.0 or later"
 import logging
 from contextlib import contextmanager
 
-import gtk.gdk, wnck           # pylint: disable=import-error
-from gtk.gdk import Rectangle  # pylint: disable=import-error
+import cairo
+from gi.repository import Gdk, GdkX11, Wnck
+from gi.repository.Gdk import Rectangle
 
 from .util import clamp_idx, EnumSafeDict, XInitError
 
@@ -36,11 +37,11 @@ GRAVITY = EnumSafeDict({
 key, val = None, None  # Safety cushion for the "del" line.
 for key, val in GRAVITY.items():
     # Support GDK gravity constants
-    GRAVITY[getattr(gtk.gdk, 'GRAVITY_%s' % key)] = val
+    GRAVITY[getattr(Gdk.Gravity, key)] = val
 
     # Support libwnck gravity constants
-    _name = 'WINDOW_GRAVITY_%s' % key.replace('_', '')
-    GRAVITY[getattr(wnck, _name)] = val
+    _name = key.replace('_', '')
+    GRAVITY[getattr(Wnck.WindowGravity, _name)] = val
 
 # Prevent these temporary variables from showing up in the apidocs
 del _name, key, val
@@ -72,21 +73,24 @@ def persist_maximization(win, keep_maximize=True):
 class WorkArea(object):
     """Helper to calculate and query available workarea on the desktop."""
     def __init__(self, gdk_screen, ignore_struts=False):
-        # type: (gtk.gdk.Screen, bool) -> None
+        # type: (Gdk.Screen, bool) -> None
         self.gdk_screen = gdk_screen
+        self.gdk_display = gdk_screen.get_display()
         self.ignore_struts = ignore_struts
 
-    def get_struts(self, root_win):  # type: (gtk.gdk.Window) -> List[Strut]
+    def get_struts(self, root_win):  # type: (Gdk.Window) -> List[Strut]
         """Retrieve the struts from the root window if supported."""
-        if not self.gdk_screen.supports_net_wm_hint("_NET_WM_STRUT_PARTIAL"):
+        _net_wm_strut_partial = Gdk.Atom.intern("_NET_WM_STRUT_PARTIAL", True)
+        if not self.gdk_screen.supports_net_wm_hint(_net_wm_strut_partial):
             return []
 
         # Gather all struts
-        struts = [root_win.property_get("_NET_WM_STRUT_PARTIAL")]
+        struts = [root_win.property_get(root_win, _net_wm_strut_partial)]
         if self.gdk_screen.supports_net_wm_hint("_NET_CLIENT_LIST"):
             # Source: http://stackoverflow.com/a/11332614/435253
             for wid in root_win.property_get('_NET_CLIENT_LIST')[2]:
-                w = gtk.gdk.window_foreign_new(wid)
+                w = GdkX11.X11Window.foreign_new_for_display(self.gdk_display,
+                                                             wid)
                 struts.append(w.property_get("_NET_WM_STRUT_PARTIAL"))
         struts = [tuple(x[2]) for x in struts if x]
 
@@ -94,14 +98,14 @@ class WorkArea(object):
                       struts)
         return struts
 
-    def subtract_struts(self, usable_region,  # type: gtk.gdk.Region
+    def subtract_struts(self, usable_region,  # type: cairo.Region
                         struts                # type: Sequence[Strut]
-                        ):  # type: (...) -> Tuple[gtk.gdk.Region, Rectangle]
+                        ):  # type: (...) -> Tuple[cairo.Region, Rectangle]
         """Subtract the given struts from the given region."""
 
         # Subtract the struts from the usable region
         _Sub = lambda *g: usable_region.subtract(
-            gtk.gdk.region_rectangle(g))
+            cairo.Region(cairo.RectangleInt(*g)))
         _w, _h = self.gdk_screen.get_width(), self.gdk_screen.get_height()
         for g in struts:  # pylint: disable=invalid-name
             # http://standards.freedesktop.org/wm-spec/1.5/ar01s05.html
@@ -113,7 +117,8 @@ class WorkArea(object):
 
         # Generate a more restrictive version used as a fallback
         usable_rect = usable_region.copy()
-        _Sub = lambda *g: usable_rect.subtract(gtk.gdk.region_rectangle(g))
+        _Sub = lambda *g: usable_rect.subtract(
+            cairo.Region(cairo.RectangleInt(*g)))
         for geom in struts:
             # http://standards.freedesktop.org/wm-spec/1.5/ar01s05.html
             # XXX: Must not cache unless watching for notify events.
@@ -129,7 +134,7 @@ class WorkArea(object):
         return usable_rect.get_clipbox(), usable_region
 
     def get(self, monitor, ignore_struts=None):
-        # type: (Rectangle, bool) -> Tuple[gtk.gdk.Region, Rectangle]
+        # type: (Rectangle, bool) -> Tuple[cairo.Region, Rectangle]
         """Retrieve the usable area of the specified monitor using
         the most expressive method the window manager supports.
 
@@ -137,16 +142,17 @@ class WorkArea(object):
         @param ignore_struts: If C{True}, just return the size of the whole
             monitor, allowing windows to overlap panels.
 
-        @type monitor: C{gtk.gdk.Rectangle}
+        @type monitor: C{Gdk.Rectangle}
         @type ignore_struts: C{bool}
 
         @returns: The usable region and its largest rectangular subset.
-        @rtype: C{gtk.gdk.Region}, C{gtk.gdk.Rectangle}
+        @rtype: C{cairo.Region}, C{Gdk.Rectangle}
         """
 
         # Get the region and return failure early if it's empty
-        usable_rect, usable_region = monitor, gtk.gdk.region_rectangle(monitor)
-        if not usable_region.get_rectangles():
+        usable_rect, usable_region = (monitor, cairo.Region(cairo.RectangleInt(
+            monitor.x, monitor.y, monitor.width, monitor.height)))
+        if not usable_region.num_rectangles():
             logging.error("WorkArea.get_monitor_rect received "
                           "an empty monitor region!")
             return None, None
@@ -162,13 +168,15 @@ class WorkArea(object):
         struts = self.get_struts(root_win)
 
         # Fall back to _NET_WORKAREA if we couldn't get any struts
+        _net_workarea = Gdk.Atom.intern("_NET_WORKAREA", True)
         if struts:
             usable_rect, usable_region = self.subtract_struts(usable_region,
                                                               struts)
-        elif self.gdk_screen.supports_net_wm_hint("_NET_WORKAREA"):
-            desktop_geo = tuple(root_win.property_get('_NET_WORKAREA')[2][0:4])
+        elif self.gdk_screen.supports_net_wm_hint(_net_workarea):
+            desktop_geo = tuple(root_win.property_get(_net_workarea)[2][0:4])
             logging.debug("Falling back to _NET_WORKAREA: %s", desktop_geo)
-            usable_region.intersect(gtk.gdk.region_rectangle(desktop_geo))
+            usable_region.intersect(
+                cairo.Region(cairo.RectangleInt(*desktop_geo)))
             usable_rect = usable_region.get_clipbox()
 
         # FIXME: Only call get_rectangles if --debug
@@ -182,13 +190,13 @@ class WindowManager(object):
     """A simple API-wrapper class for manipulating window positioning."""
 
     def __init__(self, screen=None, ignore_workarea=False):
-        # type: (gtk.gdk.Screen, bool) -> None
+        # type: (Gdk.Screen, bool) -> None
         """
         Initializes C{WindowManager}.
 
         @param screen: The X11 screen to operate on. If C{None}, the default
-            screen as retrieved by C{gtk.gdk.screen_get_default} will be used.
-        @type screen: C{gtk.gdk.Screen}
+            screen as retrieved by C{Gdk.Screen.get_default} will be used.
+        @type screen: C{Gdk.Screen}
 
         @todo: Confirm that the root window only changes on X11 server
                restart. (Something which will crash QuickTile anyway since
@@ -197,13 +205,13 @@ class WindowManager(object):
                It could possibly change while toggling "allow desktop icons"
                in KDE 3.x. (Not sure what would be equivalent elsewhere)
         """
-        self.gdk_screen = screen or gtk.gdk.screen_get_default()
+        self.gdk_screen = screen or Gdk.Screen.get_default()
         if self.gdk_screen is None:
             raise XInitError("GTK+ could not open a connection to the X server"
                              " (bad DISPLAY value?)")
+        self.gdk_display = self.gdk_screen.get_display()
 
-        # pylint: disable=no-member
-        self.screen = wnck.screen_get(self.gdk_screen.get_number())
+        self.screen = Wnck.Screen.get(self.gdk_screen.get_number())
         self.workarea = WorkArea(self.gdk_screen,
                                  ignore_struts=ignore_workarea)
 
@@ -215,8 +223,8 @@ class WindowManager(object):
 
         @param geom: The window geometry to which to apply the corrections.
         @param gravity: A desired gravity chosen from L{GRAVITY}.
-        @type geom: C{gtk.gdk.Rectangle}
-        @type gravity: C{wnck.WINDOW_GRAVITY_*} or C{gtk.gdk.GRAVITY_*}
+        @type geom: C{Gdk.Rectangle}
+        @type gravity: C{Wnck.WindowGravity.*} or C{Gdk.Gravity.*}
 
         @returns: The coordinates to be used to achieve the desired position.
         @rtype: C{(x, y)}
@@ -224,7 +232,7 @@ class WindowManager(object):
         This exists because, for whatever reason, whether it's wnck, Openbox,
         or both at fault, the WM's support for window gravities seems to have
         no effect beyond double-compensating for window border thickness unless
-        using WINDOW_GRAVITY_STATIC.
+        using C{WindowGravity.STATIC}.
 
         My best guess is that the gravity modifiers are being applied to the
         window frame rather than the window itself, hence static gravity would
@@ -243,15 +251,15 @@ class WindowManager(object):
 
     @staticmethod
     def get_geometry_rel(window, monitor_geom):
-        # type: (wnck.Window, Rectangle) -> Rectangle
+        # type: (Wnck.Window, Rectangle) -> Rectangle
         """Get window position relative to the monitor rather than the desktop.
 
         @param monitor_geom: The rectangle returned by
             C{gdk.Screen.get_monitor_geometry}
-        @type window: C{wnck.Window}
-        @type monitor_geom: C{gtk.gdk.Rectangle}
+        @type window: C{Wnck.Window}
+        @type monitor_geom: C{Gdk.Rectangle}
 
-        @rtype: C{gtk.gdk.Rectangle}
+        @rtype: C{Gdk.Rectangle}
         """
         win_geom = Rectangle(*window.get_geometry())
         win_geom.x -= monitor_geom.x
@@ -260,17 +268,18 @@ class WindowManager(object):
         return win_geom
 
     def get_monitor(self, win):
-        # type: (wnck.Window) -> Tuple[int, Rectangle]
-        """Given a C{wnck.Window}, retrieve the monitor ID and geometry.
+        # type: (Wnck.Window) -> Tuple[int, Rectangle]
+        """Given a C{Wnck.Window}, retrieve the monitor ID and geometry.
 
-        @type win: C{wnck.Window}
+        @type win: C{Wnck.Window}
         @returns: A tuple containing the monitor ID and geometry.
-        @rtype: C{(int, gtk.gdk.Rectangle)}
+        @rtype: C{(int, Gdk.Rectangle)}
         """
         # TODO: Look for a way to get the monitor ID without having
-        #       to instantiate a gtk.gdk.Window
-        if not isinstance(win, gtk.gdk.Window):
-            win = gtk.gdk.window_foreign_new(win.get_xid())
+        #       to instantiate a Gdk.Window
+        if not isinstance(win, Gdk.Window):
+            win = GdkX11.X11Window.foreign_new_for_display(self.gdk_display,
+                                                           win.get_xid())
 
         # TODO: How do I retrieve the root window from a given one?
         monitor_id = self.gdk_screen.get_monitor_at_window(win)
@@ -281,30 +290,30 @@ class WindowManager(object):
         return monitor_id, monitor_geom
 
     def _get_win_for_prop(self, window=None):
-        # type: (Optional[wnck.Window]) -> gtk.gdk.Window
+        # type: (Optional[Wnck.Window]) -> Gdk.Window
         """Retrieve a GdkWindow for a given WnckWindow, or the root if None."""
         if window:
-            return gtk.gdk.window_foreign_new(window.get_xid())
+            return Gdk.window_foreign_new(window.get_xid())
         else:
             return self.gdk_screen.get_root_window()
 
     def get_property(self, key, window=None):
-        # type: (str, Optional[wnck.Window]) -> Any
+        # type: (str, Optional[Wnck.Window]) -> Any
         """Retrieve the value of a property on the given window.
 
         @param window: If unset, the root window will be queried.
-        @type window: C{wnck.Window} or C{None}
+        @type window: C{Wnck.Window} or C{None}
         """
         return self._get_win_for_prop(window).property_get(key)
 
     def set_property(self, key,   # type: str
                      value,       # type: Union[Sequence[int], int, str]
-                     window=None  # type: Optional[wnck.Window]
+                     window=None  # type: Optional[Wnck.Window]
                      ):           # type: (...) -> None
         """Set the value of a property on the given window.
 
         @param window: If unset, the root window will be queried.
-        @type window: C{wnck.Window} or C{None}
+        @type window: C{Wnck.Window} or C{None}
         """
 
         if isinstance(value, basestring):
@@ -318,19 +327,19 @@ class WindowManager(object):
 
         self._get_win_for_prop(window).property_change(
             key, prop_type,
-            prop_format, gtk.gdk.PROP_MODE_REPLACE, value)
+            prop_format, Gdk.PROP_MODE_REPLACE, value)
 
     def del_property(self, key, window=None):
-        # type: (str, Optional[wnck.Window]) -> None
+        # type: (str, Optional[Wnck.Window]) -> None
         """Unset a property on the given window.
 
         @param window: If unset, the root window will be queried.
-        @type window: C{wnck.Window} or C{None}
+        @type window: C{Wnck.Window} or C{None}
         """
         self._get_win_for_prop(window).property_delete(key)
 
     def get_relevant_windows(self, workspace):
-        """C{wnck.Screen.get_windows} without WINDOW_DESKTOP/DOCK windows."""
+        """C{Wnck.Screen.get_windows} without WINDOW_DESKTOP/DOCK windows."""
 
         for window in self.screen.get_windows():
             # Skip windows on other virtual desktops for intuitiveness
@@ -345,24 +354,24 @@ class WindowManager(object):
             yield window
 
     def get_workspace(self,
-                      window=None,      # type: wnck.Window
-                      direction=None,   # type: wnck.MotionDirection
+                      window=None,      # type: Wnck.Window
+                      direction=None,   # type: Wnck.MotionDirection
                       wrap_around=True  # type: bool
-                      ):                # type: (...) -> wnck.Workspace
+                      ):                # type: (...) -> Wnck.Workspace
         """Get a workspace relative to either a window or the active one.
 
         @param window: The point of reference. C{None} for the active workspace
         @param direction: The direction in which to look, relative to the point
             of reference. Accepts the following types:
-             - C{wnck.MotionDirection}: Non-cycling direction
+             - C{Wnck.MotionDirection}: Non-cycling direction
              - C{int}: Relative index in the list of workspaces
              - C{None}: Just get the workspace object for the point of
                reference
         @param wrap_around: Whether relative indexes should wrap around.
 
-        @type window: C{wnck.Window} or C{None}
+        @type window: C{Wnck.Window} or C{None}
         @type wrap_around: C{bool}
-        @rtype: C{wnck.Workspace} or C{None}
+        @rtype: C{Wnck.Workspace} or C{None}
         @returns: The workspace object or C{None} if no match could be found.
         """
         if window:
@@ -373,8 +382,7 @@ class WindowManager(object):
         if not cur:
             return None  # It's either pinned or on no workspaces
 
-        # pylint: disable=no-member
-        if isinstance(direction, wnck.MotionDirection):
+        if isinstance(direction, Wnck.MotionDirection):
             nxt = cur.get_neighbor(direction)
         elif isinstance(direction, int):
             # TODO: Deduplicate with the wrapping code in commands.py
@@ -393,7 +401,7 @@ class WindowManager(object):
 
     @staticmethod
     def is_relevant(window):
-        # type: (wnck.Window) -> bool
+        # type: (Wnck.Window) -> bool
         """Return False if the window should be ignored.
 
         (eg. If it's the desktop or a panel)
@@ -403,8 +411,8 @@ class WindowManager(object):
             return False
 
         if window.get_window_type() in [
-                wnck.WINDOW_DESKTOP,  # pylint: disable=E1101
-                wnck.WINDOW_DOCK]:    # pylint: disable=E1101
+                Wnck.WindowType.DESKTOP,
+                Wnck.WindowType.DOCK]:
             logging.debug("Irrelevant window: %r", window)
             return False
 
@@ -414,15 +422,17 @@ class WindowManager(object):
         return True
 
     def reposition(self,
-            win,                                    # type: wnck.Window
+            win,                                    # type: Wnck.Window
             geom=None,                              # type: Optional[Rectangle]
             monitor=Rectangle(0, 0, 0, 0),          # type: Rectangle
             keep_maximize=False,                    # type: bool
-            gravity=wnck.WINDOW_GRAVITY_NORTHWEST,
-            geometry_mask=wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y |
-                wnck.WINDOW_CHANGE_WIDTH |
-                wnck.WINDOW_CHANGE_HEIGHT  # type: wnck.WindowMoveResizeMask
-                   ):  # pylint: disable=no-member,too-many-arguments
+            gravity=Wnck.WindowGravity.NORTHWEST,
+            geometry_mask=(
+                Wnck.WindowMoveResizeMask.X |
+                Wnck.WindowMoveResizeMask.Y |
+                Wnck.WindowMoveResizeMask.WIDTH |
+                Wnck.WindowMoveResizeMask.HEIGHT)
+                   ):  # pylint: disable=too-many-arguments
         # type: (...) -> None
         # TODO: Complete MyPy type signature
         # pylint:disable=line-too-long
@@ -433,7 +443,7 @@ class WindowManager(object):
         If no monitor rectangle is specified, position relative to the desktop
         as a whole.
 
-        @param win: The C{wnck.Window} to operate on.
+        @param win: The C{Wnck.Window} to operate on.
         @param geom: The new geometry for the window. Can be left unspecified
             if the intent is to move the window to another monitor without
             repositioning it.
@@ -447,11 +457,11 @@ class WindowManager(object):
             requested geometry should actually be applied to the window.
             (Allows the same geometry definition to easily be shared between
             operations like move and resize.)
-        @type win: C{wnck.Window}
-        @type geom: C{gtk.gdk.Rectangle} or C{None}
-        @type monitor: C{gtk.gdk.Rectangle}
+        @type win: C{Wnck.Window}
+        @type geom: C{Gdk.Rectangle} or C{None}
+        @type monitor: C{Gdk.Rectangle}
         @type keep_maximize: C{bool}
-        @type gravity: U{WnckWindowGravity<https://developer.gnome.org/libwnck/stable/WnckWindow.html#WnckWindowGravity>} or U{GDK Gravity Constant<http://www.pygtk.org/docs/pygtk/gdk-constants.html#gdk-gravity-constants>}
+        @type gravity: U{WnckWindowGravity<https://developer.gnome.org/libwnck/stable/WnckWindow.html#WnckWindowGravity>} or U{GDK Gravity Constant<http://www.pygtk.org/docs/pyGdk-constants.html#gdk-gravity-constants>}
         @type geometry_mask: U{WnckWindowMoveResizeMask<https://developer.gnome.org/libwnck/2.30/WnckWindow.html#WnckWindowMoveResizeMask>}
 
         @todo 1.0.0: Look for a way to accomplish this with a cleaner method
@@ -463,7 +473,7 @@ class WindowManager(object):
         old_geom = self.get_geometry_rel(win, self.get_monitor(win)[1])
         if geom:
             for attr in ('x', 'y', 'width', 'height'):
-                if not geometry_mask & getattr(wnck,
+                if not geometry_mask & getattr(Wnck,
                         'WINDOW_CHANGE_%s' % attr.upper()):
                     setattr(geom, attr, getattr(old_geom, attr))
         else:
@@ -479,5 +489,5 @@ class WindowManager(object):
                     new_x, new_y, geom.width, geom.height)
 
             # See the calc_win_gravity docstring for the rationale here
-            win.set_geometry(wnck.WINDOW_GRAVITY_STATIC, geometry_mask,
+            win.set_geometry(Wnck.WindowGravity.STATIC, geometry_mask,
                     new_x, new_y, geom.width, geom.height)

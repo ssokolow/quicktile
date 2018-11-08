@@ -9,19 +9,11 @@ __license__ = "GNU GPL 2.0 or later"
 
 # TODO: I need a functional test to make sure issue #25 doesn't regress
 
-try:
-    import pygtk
-    pygtk.require('2.0')
-except ImportError as err:
-    # Apparently Travis-CI's build environment doesn't add this
-    import sys
-    sys.path.append('/usr/lib/python2.7/dist-packages')
-    sys.path.append('/usr/lib/python2.7/dist-packages/gtk-2.0')
-
 import logging, operator, sys
 
-import gtk
-import gtk.gdk, wnck  # pylint: disable=import-error
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import cairo, Gdk, Gtk, Wnck # pylint: disable=E0611
 
 from quicktile import commands, wm
 from quicktile.util import powerset, EnumSafeDict, XInitError
@@ -42,10 +34,10 @@ else:                                                     # pragma: no cover
 # Set up a nice, oddly-shaped fake desktop made from screens
 # I actually have access to (though not all on the same PC)
 MOCK_SCREENS = [
-    gtk.gdk.Rectangle(0, 0, 1280, 1024),
-    gtk.gdk.Rectangle(1280, 0, 1280, 1024),
-    gtk.gdk.Rectangle(0, 1024, 1680, 1050),
-    gtk.gdk.Rectangle(1680, 1024, 1440, 900)
+    Gdk.Rectangle(0, 0, 1280, 1024),
+    Gdk.Rectangle(1280, 0, 1280, 1024),
+    Gdk.Rectangle(0, 1024, 1680, 1050),
+    Gdk.Rectangle(1680, 1024, 1440, 900)
 ]
 
 # pylint: disable=too-few-public-methods
@@ -200,7 +192,7 @@ class TestWindowGravity(unittest.TestCase):
         # I actually have access to (though not all on the same PC)
 
         # TODO: Also work in some fake panel struts
-        self.desktop = gtk.gdk.Region()
+        self.desktop = cairo.Region()
         for rect in MOCK_SCREENS:
             self.desktop.union_with_rect(rect)
 
@@ -209,12 +201,11 @@ class TestWindowGravity(unittest.TestCase):
         for alignment in ('CENTER', 'NORTH', 'NORTH_WEST', 'SOUTH_EAST',
                           'EAST', 'NORTH_EAST', 'SOUTH', 'SOUTH_WEST', 'WEST'):
             self.assertEqual(wm.GRAVITY[alignment],
-                wm.GRAVITY[getattr(gtk.gdk, 'GRAVITY_{}'.format(alignment))])
+                wm.GRAVITY[getattr(Gdk.Gravity, alignment)])
             self.assertEqual(
-                wm.GRAVITY[getattr(wnck, 'WINDOW_GRAVITY_{}'.format(
-                    alignment.replace('_', '')))],
-                wm.GRAVITY[getattr(gtk.gdk, 'GRAVITY_{}'.format(
-                    alignment))])
+                wm.GRAVITY[getattr(Wnck.WindowGravity,
+                                   alignment.replace('_', ''))],
+                wm.GRAVITY[getattr(Gdk.Gravity, alignment)])
 
     def test_gravity_correctness(self):  # type: () -> None
         """Gravity Lookup Table: Constants have correct percentage values"""
@@ -225,7 +216,7 @@ class TestWindowGravity(unittest.TestCase):
                 ('SOUTH_WEST', (0.0, 1.0)), ('SOUTH', (0.5, 1.0)),
                 ('SOUTH_EAST', (1.0, 1.0))):
             self.assertEqual(wm.GRAVITY[
-                getattr(gtk.gdk, 'GRAVITY_%s' % alignment)], coords)
+                getattr(Gdk.Gravity, alignment)], coords)
 
 class TestWindowManagerDetached(unittest.TestCase):
     """Tests which exercise L{wm.WindowManager} without needing X11."""
@@ -235,7 +226,7 @@ class TestWindowManagerDetached(unittest.TestCase):
         self.WM = wm.WindowManager  # pylint: disable=invalid-name
 
         # TODO: Also work in some fake panel struts
-        self.desktop = gtk.gdk.Region()
+        self.desktop = cairo.Region()
         for rect in MOCK_SCREENS:
             self.desktop.union_with_rect(rect)
 
@@ -246,7 +237,7 @@ class TestWindowManagerDetached(unittest.TestCase):
         """
         for rect in [self.desktop.get_clipbox()] + MOCK_SCREENS:
             self.assertEqual((rect.x, rect.y),
-                self.WM.calc_win_gravity(rect, gtk.gdk.GRAVITY_NORTH_WEST),
+                self.WM.calc_win_gravity(rect, Gdk.GRAVITY_NORTH_WEST),
                 "NORTHWEST gravity should be a no-op.")
 
     def test_win_gravity_results(self):  # type: () -> None
@@ -259,8 +250,8 @@ class TestWindowManagerDetached(unittest.TestCase):
                     ('CENTER', (-ehalf, -ehalf)), ('EAST', (-edge, -ehalf)),
                     ('SOUTH_WEST', (0, -edge)), ('SOUTH', (-ehalf, -edge)),
                     ('SOUTH_EAST', (-edge, -edge))):
-                rect = gtk.gdk.Rectangle(0, 0, edge, edge)
-                grav = getattr(gtk.gdk, 'GRAVITY_%s' % gravity)
+                rect = Gdk.Rectangle(0, 0, edge, edge)
+                grav = getattr(Gdk.Gravity, gravity)
 
                 self.assertEqual(self.WM.calc_win_gravity(rect, grav), expect)
 

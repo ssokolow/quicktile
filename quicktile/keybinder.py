@@ -5,12 +5,15 @@ __license__ = "GNU GPL 2.0 or later"
 
 import logging
 
-import gobject, gtk
+from gi.repository import GObject, Gtk, Gdk
 from Xlib import X
 from Xlib.display import Display
 from Xlib.error import BadAccess, DisplayConnectionError
 
 from .util import powerset, XInitError
+
+# TODO: Check whether the X11 APIs available through PyGI remove the need for
+# python-xlib. If so, then use that as my avenue for porting to Python 3.x.
 
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
@@ -68,8 +71,8 @@ class KeyBinder(object):
 
         # Merge python-xlib into the Glib event loop
         # Source: http://www.pygtk.org/pygtk2tutorial/sec-MonitoringIO.html
-        gobject.io_add_watch(self.xroot.display,
-                             gobject.IO_IN, self.cb_xevent)
+        GObject.io_add_watch(self.xroot.display,
+                             GObject.IO_IN, self.cb_xevent)
 
     def bind(self, accel, callback):  # type: (str, Callable[[], None]) -> bool
         """Bind a global key combination to a callback.
@@ -152,7 +155,8 @@ class KeyBinder(object):
         # FIXME: Only call this code if --debug
         # FIXME: Proper "index" arg for keycode_to_keysym
         ksym = self.xdisp.keycode_to_keysym(keysig[0], 0)
-        kbstr = gtk.accelerator_name(ksym, keysig[1])  # pylint: disable=E1101
+        gmod = Gdk.ModifierType(keysig[1])
+        kbstr = Gtk.accelerator_name(ksym, gmod)
         logging.debug("Received keybind: %s", kbstr)
 
         # Call the associated callback
@@ -162,8 +166,8 @@ class KeyBinder(object):
                     ):  # type: (...) -> Tuple[Optional[int], Optional[int]]
         """Convert an accelerator string into the form XGrabKey needs."""
 
-        keysym, modmask = gtk.accelerator_parse(accel)  # pylint: disable=E1101
-        if not gtk.accelerator_valid(keysym, modmask):  # pylint: disable=E1101
+        keysym, modmask = Gtk.accelerator_parse(accel)
+        if not Gtk.accelerator_valid(keysym, modmask):
             logging.error("Invalid keybinding: %s", accel)
             return None, None
 
@@ -175,7 +179,7 @@ class KeyBinder(object):
 
         # Convert to what XGrabKey expects
         keycode = self.xdisp.keysym_to_keycode(keysym)
-        if isinstance(modmask, gtk.gdk.ModifierType):
+        if isinstance(modmask, Gdk.ModifierType):
             modmask = modmask.real
 
         return keycode, modmask
