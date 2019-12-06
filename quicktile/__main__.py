@@ -311,7 +311,7 @@ def main():  # type: () -> None
             winman.screen.force_update()
 
             for arg in args:
-                commands.commands.call(arg, winman)
+                commands.commands.call_multiple(arg, winman)
             while gtk.events_pending():  # pylint: disable=no-member
                 gtk.main_iteration()  # pylint: disable=no-member
         elif not opts.show_args and not opts.show_binds:

@@ -169,7 +169,7 @@ class CommandRegistry(object):
 
     def call(self, command, winman, *args, **kwargs):
         # type: (str, WindowManager, *Any, **Any) -> bool
-        """Resolve a textual positioning command and execute it."""
+        """Check if the command is valid and execute it."""
         cmd = self.commands.get(command, None)
 
         if cmd:
@@ -182,6 +182,21 @@ class CommandRegistry(object):
         else:
             logging.error("Unrecognized command: %s", command)
             return False
+
+    def call_multiple(self, command, winman, *args, **kwargs):
+        # type: (str, WindowManager, *Any, **Any) -> bool
+        """Resolve a textual positioning command and execute it.
+           Accepts a comma seperated string as the command."""
+        cmds = [] #type: List[str]
+        success = True
+        if ',' in command:
+            cmds = [i.strip() for i in command.split(',')]
+            for cmd in cmds:
+                success = self.call(cmd, winman, *args, **kwargs)
+        else:
+            return self.call(command, winman, *args, **kwargs)
+
+        return success
 
 
 #: The instance of L{CommandRegistry} to be used in 99.9% of use cases.
@@ -341,12 +356,17 @@ def move_to_position(winman,       # type: WindowManager
     winman.reposition(win, result, use_rect, gravity=gravity,
             geometry_mask=gravity_mask)
 
+@commands.add('bordered-set', True)
+@commands.add('bordered-unset', False)
 @commands.add('bordered')
-def toggle_decorated(winman, win, state):  # pylint: disable=unused-argument
-    # type: (WindowManager, wnck.Window, Any) -> None
+def toggle_decorated(winman, win, state, decoration=None):  # pylint: disable=unused-argument
+    # type: (WindowManager, wnck.Window, Any, Optional[bool]) -> None
     """Toggle window decoration state on the active window."""
     win = gtk.gdk.window_foreign_new(win.get_xid())
-    win.set_decorations(not win.get_decorations())
+    if decoration is not None:
+        win.set_decorations(decoration)
+    else:
+        win.set_decorations(not win.get_decorations())
 
 @commands.add('show-desktop', windowless=True)
 def toggle_desktop(winman, win, state):  # pylint: disable=unused-argument

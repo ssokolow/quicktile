@@ -39,8 +39,8 @@ class QuickTile(Object):
         """Execute a QuickTile tiling command
 
         @todo 1.0.0: Expose a proper, introspectable D-Bus API"""
-        return self.commands.call(command, self.winman)
-        # FIXME: self.commands.call always returns None
+        return self.commands.call_multiple(command, self.winman)
+        # FIXME: self.commands.call_multiple always returns None
 
 def init(commands,  # type: CommandRegistry
          winman     # type: WindowManager

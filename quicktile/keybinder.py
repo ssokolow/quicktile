@@ -222,7 +222,7 @@ def init(modmask,   # type: Optional[str]
             def call(func=func):
                 """Closure to resolve `func` and call it on a
                    `WindowManager` instance"""
-                commands.call(func, winman)
+                commands.call_multiple(func, winman)
 
             keybinder.bind(modmask + key, call)
     return keybinder
