@@ -45,6 +45,8 @@ MOCK_SCREENS = [
 ]
 
 # pylint: disable=too-few-public-methods
+
+
 class ComplainingEnum(object):
     """A parent class for classes which should raise C{TypeError} when compared
 
@@ -66,10 +68,14 @@ class ComplainingEnum(object):
         else:
             return cmp(id(self), id(other))
 
+
 class Thing1(ComplainingEnum):
     """See L{ComplainingEnum}"""
+
+
 class Thing2(ComplainingEnum):
     """See L{ComplainingEnum}"""
+
 
 class TestCommandRegistry(unittest.TestCase):
     """Tests for the CommandRegistry class"""
@@ -87,6 +93,7 @@ class TestCommandRegistry(unittest.TestCase):
 # TODO: Implement tests for trigger_keyboard_action
 # TODO: Implement tests for workspace_go
 # TODO: Implement tests for workspace_send_window
+
 
 class TestEnumSafeDict(unittest.TestCase):
     """Tests to ensure EnumSafeDict never compares enums of different types"""
@@ -222,6 +229,7 @@ class TestWindowGravity(unittest.TestCase):
                 ('SOUTH_EAST', (1.0, 1.0))):
             self.assertEqual(wm.GRAVITY[
                 getattr(Gdk.Gravity, alignment)], coords)
+
 
 class TestWindowManagerDetached(unittest.TestCase):
     """Tests which exercise L{wm.WindowManager} without needing X11."""

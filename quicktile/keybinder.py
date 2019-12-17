@@ -31,6 +31,7 @@ if MYPY:
     from .util import CommandCB                            # NOQA
 del MYPY
 
+
 class KeyBinder(object):
     """A convenience class for wrapping C{XGrabKey}."""
 
@@ -204,6 +205,7 @@ class KeyBinder(object):
         for ignored in powerset(ignored):
             imask = reduce(lambda x, y: x | y, ignored, 0)
             yield modmask | imask
+
 
 def init(modmask,   # type: Optional[str]
          mappings,  # type: Dict[str, CommandCB]

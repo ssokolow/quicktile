@@ -21,6 +21,7 @@ if MYPY:
     Geom = Union[Rectangle, GeomTuple]  # pylint: disable=invalid-name
 del MYPY
 
+
 def check_tolerance(distance, monitor_geom, tolerance=0.1):
     """Check whether a distance is within tolerance, adjusted for window size.
 
@@ -34,6 +35,7 @@ def check_tolerance(distance, monitor_geom, tolerance=0.1):
     # Take the euclidean distance of the monitor rectangle and convert
     # `distance` into a percentage of it, then test against `tolerance`.
     return float(distance) / math.hypot(*tuple(monitor_geom)[2:4]) < tolerance
+
 
 def closest_geom_match(needle, haystack):
     # type: (Geom, Sequence[Geom]) -> Tuple[int, int]
@@ -57,6 +59,7 @@ def closest_geom_match(needle, haystack):
     closest_distance, closest_idx = heappop(euclid_distance)
     return closest_distance, closest_idx
 
+
 def resolve_fractional_geom(geom_tuple, monitor_geom, win_geom=None):
     # type: (Optional[Geom], Geom, Optional[Geom]) -> Geom
     """Resolve proportional (eg. 0.5) and preserved (None) coordinates.
@@ -78,6 +81,7 @@ def resolve_fractional_geom(geom_tuple, monitor_geom, win_geom=None):
         # Multiply x and w by monitor.w, y and h by monitor.h
         return tuple(int(i * j) for i, j in
                      zip(geom_tuple, monitor_geom[2:4] + monitor_geom[2:4]))
+
 
 class GravityLayout(object):  # pylint: disable=too-few-public-methods
     """Helper for translating top-left relative dimensions to other corners.
@@ -156,6 +160,7 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
                 round(y - offset_y + self.margin_y, 3),
                 round(width - (self.margin_x * 2), 3),
                 round(height - (self.margin_y * 2), 3))
+
 
 def make_winsplit_positions(columns):
     # type: (int) -> Dict[str, List[PercentRect]]

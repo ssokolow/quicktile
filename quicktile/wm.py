@@ -50,6 +50,7 @@ del _name, key, val
 
 # ---
 
+
 @contextmanager
 def persist_maximization(win, keep_maximize=True):
     """Context manager to persist maximization state after a reposition

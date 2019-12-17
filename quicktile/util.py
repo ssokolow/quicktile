@@ -25,6 +25,7 @@ if MYPY:
     CommandCB = Callable[..., Any]
 del MYPY
 
+
 def clamp_idx(idx, stop, wrap=True):
     # type: (int, int, bool) -> int
     """Ensure a 0-based index is within a given range [0, stop).
@@ -38,6 +39,7 @@ def clamp_idx(idx, stop, wrap=True):
     else:
         return max(min(idx, stop - 1), 0)
 
+
 def powerset(iterable):  # type: (Iterable[Any]) -> Iterator[Sequence[Any]]
     """C{powerset([1,2,3])} --> C{() (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)}
 
@@ -45,6 +47,7 @@ def powerset(iterable):  # type: (Iterable[Any]) -> Iterator[Sequence[Any]]
     """
     i = list(iterable)
     return chain.from_iterable(combinations(i, j) for j in range(len(i) + 1))
+
 
 def fmt_table(rows,          # type: Any
               headers,       # type: Sequence

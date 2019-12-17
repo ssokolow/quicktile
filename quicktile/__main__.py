@@ -74,6 +74,7 @@ Wnck.set_client_type(Wnck.ClientType.PAGER)
 
 # TODO: Audit all of my TODOs and API docs for accuracy and staleness.
 
+
 class QuickTileApp(object):
     """The basic Glib application itself."""
 
@@ -149,6 +150,7 @@ class QuickTileApp(object):
         print("Modifier: %s\n" % (self._modmask or '(none)'))
         print(fmt_table(self._keys, ('Key', 'Action')))
 
+
 def load_config(path):  # type: (str) -> ConfigParser
     """Load the config file from the given path, applying fixes as needed.
 
@@ -218,6 +220,7 @@ def load_config(path):  # type: (str) -> ConfigParser
             logging.info("Wrote default config file to %s", path)
 
     return config
+
 
 def main():  # type: () -> None
     """setuptools entry point"""
