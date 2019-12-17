@@ -186,7 +186,8 @@ class TestHelpers(unittest.TestCase):
 
     def test_xiniterror_str(self):  # type: () -> None
         """XInitError.__str__ output contains provided text"""
-        self.assertIn("Testing 123", XInitError("Testing 123"))
+        self.assertIn("Testing 123", str(XInitError("Testing 123")))
+
 
 class TestWindowGravity(unittest.TestCase):
     """Test the equivalence and correctness of L{wm.GRAVITY} values."""
@@ -241,7 +242,7 @@ class TestWindowManagerDetached(unittest.TestCase):
         """
         for rect in [self.desktop.get_clipbox()] + MOCK_SCREENS:
             self.assertEqual((rect.x, rect.y),
-                self.WM.calc_win_gravity(rect, Gdk.GRAVITY_NORTH_WEST),
+                self.WM.calc_win_gravity(rect, Gdk.Gravity.NORTH_WEST),
                 "NORTHWEST gravity should be a no-op.")
 
     def test_win_gravity_results(self):  # type: () -> None

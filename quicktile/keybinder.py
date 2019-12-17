@@ -4,8 +4,9 @@ __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
 import logging
+from functools import reduce
 
-from gi.repository import GObject, Gtk, Gdk
+from gi.repository import GLib, Gtk, Gdk
 from Xlib import X
 from Xlib.display import Display
 from Xlib.error import BadAccess, DisplayConnectionError
@@ -41,7 +42,7 @@ class KeyBinder(object):
     keybind_failed = False
 
     def __init__(self, xdisplay=None):  # type: (Optional[Display]) -> None
-        """Connect to X11 and the Glib event loop.
+        """Connect to X11 and the GLib event loop.
 
         @param xdisplay: A C{python-xlib} display handle.
         @type xdisplay: C{Xlib.display.Display}
@@ -69,10 +70,10 @@ class KeyBinder(object):
         # Set up a handler to catch XGrabKey() failures
         self.xdisp.set_error_handler(self.cb_xerror)
 
-        # Merge python-xlib into the Glib event loop
+        # Merge python-xlib into the GLib event loop
         # Source: http://www.pygtk.org/pygtk2tutorial/sec-MonitoringIO.html
-        GObject.io_add_watch(self.xroot.display,
-                             GObject.IO_IN, self.cb_xevent)
+        GLib.io_add_watch(self.xroot.display, GLib.PRIORITY_DEFAULT,
+                         GLib.IO_IN, self.cb_xevent)
 
     def bind(self, accel, callback):  # type: (str, Callable[[], None]) -> bool
         """Bind a global key combination to a callback.

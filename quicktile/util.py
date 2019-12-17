@@ -4,8 +4,8 @@ __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
 import copy
+from collections import MutableMapping, namedtuple
 from itertools import chain, combinations
-from UserDict import DictMixin
 
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
@@ -112,7 +112,8 @@ def fmt_table(rows,          # type: Any
 
     return ''.join(output)
 
-class EnumSafeDict(DictMixin):
+
+class EnumSafeDict(MutableMapping):
     """A dict-like object which avoids comparing objects of different types
     to avoid triggering spurious Glib "comparing different enum types"
     warnings.

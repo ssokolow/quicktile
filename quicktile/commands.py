@@ -6,7 +6,11 @@ __license__ = "GNU GPL 2.0 or later"
 import logging, time
 from functools import wraps
 
+import gi
+gi.require_version('Gdk', '3.0')
+
 from gi.repository import Gdk, Wnck
+from gi.repository.Wnck import MotionDirection
 
 from .layout import resolve_fractional_geom
 from .wm import GRAVITY
@@ -135,7 +139,7 @@ class CommandRegistry(object):
                 func(winman, window, state, *args, **kwargs)
 
             if name in self.commands:
-                logging.warn("Redefining existing command: %s", name)
+                logging.warning("Redefining existing command: %s", name)
             self.commands[name] = wrapper
 
             if not func.__doc__:
@@ -192,7 +196,6 @@ def cycle_dimensions(winman,      # type: WindowManager
                      state,       # type: Dict[str, Any]
                      *dimensions  # type: Any
                      ):  # type: (...) -> Optional[Gdk.Rectangle]
-    # type: (WindowManager, Any, Dict[str, Any], *Tuple[...]) ->
     # TODO: Standardize on what kind of window object to pass around
     """Cycle the active window through a list of positions and shapes.
 
@@ -400,12 +403,12 @@ def trigger_keyboard_action(winman, win, state, command):
 
 @commands.add('workspace-go-next', 1, windowless=True)
 @commands.add('workspace-go-prev', -1, windowless=True)
-@commands.add('workspace-go-up', Wnck.MotionDirection.UP, windowless=True)
-@commands.add('workspace-go-down', Wnck.MotionDirection.DOWN, windowless=True)
-@commands.add('workspace-go-left', Wnck.MotionDirection.LEFT, windowless=True)
-@commands.add('workspace-go-right', Wnck.MotionDirection.RIGHT, windowless=True)
+@commands.add('workspace-go-up', MotionDirection.UP, windowless=True)
+@commands.add('workspace-go-down', MotionDirection.DOWN, windowless=True)
+@commands.add('workspace-go-left', MotionDirection.LEFT, windowless=True)
+@commands.add('workspace-go-right', MotionDirection.RIGHT, windowless=True)
 def workspace_go(winman, win, state, motion):  # pylint: disable=W0613
-    # type: (WindowManager, Wnck.Window, Any, Wnck.MotionDirection) -> None
+    # type: (WindowManager, Wnck.Window, Any, MotionDirection) -> None
     """Switch the active workspace (next/prev wrap around)"""
     target = winman.get_workspace(None, motion,
         wrap_around=state['config'].getboolean('general', 'MovementsWrap'))
@@ -417,13 +420,13 @@ def workspace_go(winman, win, state, motion):  # pylint: disable=W0613
 
 @commands.add('workspace-send-next', 1)
 @commands.add('workspace-send-prev', -1)
-@commands.add('workspace-send-up', Wnck.MotionDirection.UP)
-@commands.add('workspace-send-down', Wnck.MotionDirection.DOWN)
-@commands.add('workspace-send-left', Wnck.MotionDirection.LEFT)
-@commands.add('workspace-send-right', Wnck.MotionDirection.RIGHT)
+@commands.add('workspace-send-up', MotionDirection.UP)
+@commands.add('workspace-send-down', MotionDirection.DOWN)
+@commands.add('workspace-send-left', MotionDirection.LEFT)
+@commands.add('workspace-send-right', MotionDirection.RIGHT)
 # pylint: disable=unused-argument
 def workspace_send_window(winman, win, state, motion):
-    # type: (WindowManager, Wnck.Window, Any, Wnck.MotionDirection) -> None
+    # type: (WindowManager, Wnck.Window, Any, MotionDirection) -> None
     """Move the active window to another workspace (next/prev wrap around)"""
     target = winman.get_workspace(win, motion,
         wrap_around=state['config'].getboolean('general', 'MovementsWrap'))

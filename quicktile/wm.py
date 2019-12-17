@@ -37,7 +37,7 @@ GRAVITY = EnumSafeDict({
     'SOUTH_EAST': (1.0, 1.0),
 })
 key, val = None, None  # Safety cushion for the "del" line.
-for key, val in GRAVITY.items():
+for key, val in list(GRAVITY.items()):
     # Support GDK gravity constants
     GRAVITY[getattr(Gdk.Gravity, key)] = val
 
@@ -318,7 +318,8 @@ class WindowManager(object):
         @type window: C{Wnck.Window} or C{None}
         """
 
-        if isinstance(value, basestring):
+        # TODO: Verify that this isn't supposed to be `bytes` instead
+        if isinstance(value, str):
             prop_format = 8
             prop_type = "STRING"
         else:

@@ -6,10 +6,11 @@ __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
 import errno, logging, os, sys
-from ConfigParser import RawConfigParser
+from configparser import ConfigParser
 
 import gi
 gi.require_version('Gtk', '3.0')
+gi.require_version('Wnck', '3.0')
 from gi.repository import Gtk, Wnck  # pylint: disable=no-name-in-module
 
 # TODO: Port gtkexcepthook to GTK+ 3.x
@@ -148,14 +149,14 @@ class QuickTileApp(object):
         print("Modifier: %s\n" % (self._modmask or '(none)'))
         print(fmt_table(self._keys, ('Key', 'Action')))
 
-def load_config(path):  # type: (str) -> RawConfigParser
+def load_config(path):  # type: (str) -> ConfigParser
     """Load the config file from the given path, applying fixes as needed.
 
     @todo: Refactor all this
     """
     first_run = not os.path.exists(path)
 
-    config = RawConfigParser()
+    config = ConfigParser(interpolation=None)
 
     # Make keys case-sensitive because keysyms must be
     config.optionxform = str  # type: ignore # (Cannot assign to a method)
@@ -169,7 +170,7 @@ def load_config(path):  # type: (str) -> RawConfigParser
         config.add_section('general')
         # Change this if you make backwards-incompatible changes to the
         # section and key naming in the config file.
-        config.set('general', 'cfg_schema', 1)
+        config.set('general', 'cfg_schema', '1')
         dirty = True
 
     for key, val in DEFAULTS['general'].items():
@@ -206,11 +207,11 @@ def load_config(path):  # type: (str) -> RawConfigParser
             dirty = True
 
     if dirty:
-        cfg_file = open(path, 'wb')
+        cfg_file = open(path, 'w')
 
-        # TODO: REPORT: Argument 1 to "write" of "RawConfigParser" has
+        # TODO: REPORT: Argument 1 to "write" of "ConfigParser" has
         #               incompatible type BinaryIO"; expected "file"
-        config.write(cfg_file)  # type: ignore
+        config.write(cfg_file)
 
         cfg_file.close()
         if first_run:

@@ -48,7 +48,10 @@ def closest_geom_match(needle, haystack):
     for haystack_pos, haystack_val in enumerate(haystack):
         distance = sum([(needle_i - haystack_i) ** 2 for (needle_i, haystack_i)
                         in zip(tuple(needle), tuple(haystack_val))]) ** 0.5
-        heappush(euclid_distance, (distance, haystack_pos))
+
+        # MyPy disabled until I figure out why the type annotation on
+        # euclid_distance doesn't prevent "Cannot infer type argument 1"
+        heappush(euclid_distance, (distance, haystack_pos))  # type: ignore
 
     # to the next configuration. Otherwise, use the first configuration.
     closest_distance, closest_idx = heappop(euclid_distance)
