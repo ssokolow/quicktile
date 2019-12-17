@@ -12,11 +12,15 @@ __license__ = "GNU GPL 2.0 or later"
 import logging, operator, sys
 
 import gi
+gi.require_version('cairo', '1.0')
+gi.require_version('Gdk', '3.0')
 gi.require_version('Gtk', '3.0')
-from gi.repository import cairo, Gdk, Gtk, Wnck # pylint: disable=E0611
+gi.require_version('Wnck', '3.0')
+from gi.repository import Gdk, Wnck  # pylint: disable=E0611
 
 from quicktile import commands, wm
-from quicktile.util import powerset, EnumSafeDict, XInitError
+from quicktile.util import (powerset, EnumSafeDict, Rectangle, Region,
+                            XInitError)
 
 # Ensure code coverage is accurate
 from quicktile import __main__  # pylint: disable=unused-import
@@ -34,10 +38,10 @@ else:                                                     # pragma: no cover
 # Set up a nice, oddly-shaped fake desktop made from screens
 # I actually have access to (though not all on the same PC)
 MOCK_SCREENS = [
-    Gdk.Rectangle(0, 0, 1280, 1024),
-    Gdk.Rectangle(1280, 0, 1280, 1024),
-    Gdk.Rectangle(0, 1024, 1680, 1050),
-    Gdk.Rectangle(1680, 1024, 1440, 900)
+    Rectangle(0, 0, 1280, 1024),
+    Rectangle(1280, 0, 1280, 1024),
+    Rectangle(0, 1024, 1680, 1050),
+    Rectangle(1680, 1024, 1440, 900)
 ]
 
 # pylint: disable=too-few-public-methods
@@ -192,7 +196,7 @@ class TestWindowGravity(unittest.TestCase):
         # I actually have access to (though not all on the same PC)
 
         # TODO: Also work in some fake panel struts
-        self.desktop = cairo.Region()
+        self.desktop = Region()
         for rect in MOCK_SCREENS:
             self.desktop.union_with_rect(rect)
 
@@ -226,7 +230,7 @@ class TestWindowManagerDetached(unittest.TestCase):
         self.WM = wm.WindowManager  # pylint: disable=invalid-name
 
         # TODO: Also work in some fake panel struts
-        self.desktop = cairo.Region()
+        self.desktop = Region()
         for rect in MOCK_SCREENS:
             self.desktop.union_with_rect(rect)
 
@@ -250,7 +254,7 @@ class TestWindowManagerDetached(unittest.TestCase):
                     ('CENTER', (-ehalf, -ehalf)), ('EAST', (-edge, -ehalf)),
                     ('SOUTH_WEST', (0, -edge)), ('SOUTH', (-ehalf, -edge)),
                     ('SOUTH_EAST', (-edge, -edge))):
-                rect = Gdk.Rectangle(0, 0, edge, edge)
+                rect = Rectangle(0, 0, edge, edge)
                 grav = getattr(Gdk.Gravity, gravity)
 
                 self.assertEqual(self.WM.calc_win_gravity(rect, grav), expect)

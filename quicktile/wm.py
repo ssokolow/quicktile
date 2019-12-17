@@ -8,9 +8,11 @@ from contextlib import contextmanager
 
 import cairo
 from gi.repository import Gdk, GdkX11, Wnck
-from gi.repository.Gdk import Rectangle
 
-from .util import clamp_idx, EnumSafeDict, XInitError
+from .util import clamp_idx, EnumSafeDict, Rectangle, Region, XInitError
+
+# Workaround for MyPy type comment getting wrapped by code formatter
+_Rect = Rectangle
 
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
@@ -98,14 +100,14 @@ class WorkArea(object):
                       struts)
         return struts
 
-    def subtract_struts(self, usable_region,  # type: cairo.Region
+    def subtract_struts(self, usable_region,  # type: Region
                         struts                # type: Sequence[Strut]
-                        ):  # type: (...) -> Tuple[cairo.Region, Rectangle]
+                        ):  # type: (...) -> Tuple[Rectangle, Region]
         """Subtract the given struts from the given region."""
 
         # Subtract the struts from the usable region
         _Sub = lambda *g: usable_region.subtract(
-            cairo.Region(cairo.RectangleInt(*g)))
+            Region(Rectangle(*g)))
         _w, _h = self.gdk_screen.get_width(), self.gdk_screen.get_height()
         for g in struts:  # pylint: disable=invalid-name
             # http://standards.freedesktop.org/wm-spec/1.5/ar01s05.html
@@ -118,7 +120,7 @@ class WorkArea(object):
         # Generate a more restrictive version used as a fallback
         usable_rect = usable_region.copy()
         _Sub = lambda *g: usable_rect.subtract(
-            cairo.Region(cairo.RectangleInt(*g)))
+            Region(Rectangle(*g)))
         for geom in struts:
             # http://standards.freedesktop.org/wm-spec/1.5/ar01s05.html
             # XXX: Must not cache unless watching for notify events.
@@ -134,7 +136,7 @@ class WorkArea(object):
         return usable_rect.get_clipbox(), usable_region
 
     def get(self, monitor, ignore_struts=None):
-        # type: (Rectangle, bool) -> Tuple[cairo.Region, Rectangle]
+        # type: (_Rect, bool) -> Tuple[Optional[Region], Optional[_Rect]]
         """Retrieve the usable area of the specified monitor using
         the most expressive method the window manager supports.
 
@@ -142,17 +144,17 @@ class WorkArea(object):
         @param ignore_struts: If C{True}, just return the size of the whole
             monitor, allowing windows to overlap panels.
 
-        @type monitor: C{Gdk.Rectangle}
+        @type monitor: L{Rectangle}
         @type ignore_struts: C{bool}
 
         @returns: The usable region and its largest rectangular subset.
-        @rtype: C{cairo.Region}, C{Gdk.Rectangle}
+        @rtype: L{Region}, L{Rectangle}
         """
 
         # Get the region and return failure early if it's empty
-        usable_rect, usable_region = (monitor, cairo.Region(cairo.RectangleInt(
+        usable_rect, usable_region = (monitor, Region(Rectangle(
             monitor.x, monitor.y, monitor.width, monitor.height)))
-        if not usable_region.num_rectangles():
+        if usable_region.is_empty():
             logging.error("WorkArea.get_monitor_rect received "
                           "an empty monitor region!")
             return None, None
@@ -176,7 +178,7 @@ class WorkArea(object):
             desktop_geo = tuple(root_win.property_get(_net_workarea)[2][0:4])
             logging.debug("Falling back to _NET_WORKAREA: %s", desktop_geo)
             usable_region.intersect(
-                cairo.Region(cairo.RectangleInt(*desktop_geo)))
+                Region(Rectangle(*desktop_geo)))
             usable_rect = usable_region.get_clipbox()
 
         # FIXME: Only call get_rectangles if --debug
@@ -223,7 +225,7 @@ class WindowManager(object):
 
         @param geom: The window geometry to which to apply the corrections.
         @param gravity: A desired gravity chosen from L{GRAVITY}.
-        @type geom: C{Gdk.Rectangle}
+        @type geom: L{Rectangle}
         @type gravity: C{Wnck.WindowGravity.*} or C{Gdk.Gravity.*}
 
         @returns: The coordinates to be used to achieve the desired position.
@@ -257,13 +259,13 @@ class WindowManager(object):
         @param monitor_geom: The rectangle returned by
             C{gdk.Screen.get_monitor_geometry}
         @type window: C{Wnck.Window}
-        @type monitor_geom: C{Gdk.Rectangle}
+        @type monitor_geom: L{Rectangle}
 
-        @rtype: C{Gdk.Rectangle}
+        @rtype: L{Rectangle}
         """
         win_geom = Rectangle(*window.get_geometry())
-        win_geom.x -= monitor_geom.x
-        win_geom.y -= monitor_geom.y
+        win_geom = win_geom._replace(x=win_geom.x - monitor_geom.x,
+                                     y=win_geom.y - monitor_geom.y)
 
         return win_geom
 
@@ -273,7 +275,7 @@ class WindowManager(object):
 
         @type win: C{Wnck.Window}
         @returns: A tuple containing the monitor ID and geometry.
-        @rtype: C{(int, Gdk.Rectangle)}
+        @rtype: C{(int, Rectangle)}
         """
         # TODO: Look for a way to get the monitor ID without having
         #       to instantiate a Gdk.Window
@@ -458,8 +460,8 @@ class WindowManager(object):
             (Allows the same geometry definition to easily be shared between
             operations like move and resize.)
         @type win: C{Wnck.Window}
-        @type geom: C{Gdk.Rectangle} or C{None}
-        @type monitor: C{Gdk.Rectangle}
+        @type geom: L{Rectangle} or C{None}
+        @type monitor: L{Rectangle}
         @type keep_maximize: C{bool}
         @type gravity: U{WnckWindowGravity<https://developer.gnome.org/libwnck/stable/WnckWindow.html#WnckWindowGravity>} or U{GDK Gravity Constant<http://www.pygtk.org/docs/pyGdk-constants.html#gdk-gravity-constants>}
         @type geometry_mask: U{WnckWindowMoveResizeMask<https://developer.gnome.org/libwnck/2.30/WnckWindow.html#WnckWindowMoveResizeMask>}

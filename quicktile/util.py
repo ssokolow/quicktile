@@ -3,6 +3,7 @@
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
+import copy
 from itertools import chain, combinations
 from UserDict import DictMixin
 
@@ -166,6 +167,47 @@ class EnumSafeDict(DictMixin):
     def keys(self):  # type: () -> List[Any]
         """D.keys() -> list of D's keys"""
         return list(self)
+
+
+class Rectangle(namedtuple('Rectangle', 'x y width height')):
+    """A replacement for broken Gdk.Rectangle constructor in *buntu 16.04"""
+    __slots__ = ()
+
+
+class Region(object):
+    """A replacement for broken cairo.Region constructor in *buntu 16.04"""
+
+    def __init__(self, *initial_rects):
+        """Initialze a new region, optionally with a shallow copy of a rect."""
+        self._rects = copy.deepcopy(list(initial_rects))
+
+    def _clean_up(self):
+        """Simplify the internal list of rectangles"""
+        out_list = []
+        self._rects.sort(key)
+
+    def copy(self):
+        """Porting shim for things expecting cairo.Region.copy"""
+        return copy.deepcopy(self)
+
+    def get_clipbox(self):
+        """Return the smallest rectangle which encompasses the region"""
+        return Rectangle(*[sum(x) for x in zip(*self._rects)])
+
+    def get_rectangles(self):
+        """Retrieve a shallow copy of the internal list of rectangles"""
+        return self._rects[:]
+
+    def is_empty(self):
+        return len(self._rects) == 0
+
+    def union_with_rect(self, rect):
+        """Add a copy of the given Rectangle to this Region"""
+        self._rects.append(copy.deepcopy(rect))
+        # TODO: Simplify the list of rects
+        # (eg. eliminate rects with no areas that don't overlap other rects)
+        # (Use https://www.widelands.org/~sirver/wl/141229_devail_rects.pdf)
+
 
 class XInitError(Exception):
     """Raised when something outside our control causes the X11 connection to
