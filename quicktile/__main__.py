@@ -5,7 +5,7 @@ from __future__ import print_function
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
-import errno, logging, os, sys
+import errno, logging, os, signal, sys
 from configparser import ConfigParser
 
 import gi
@@ -286,6 +286,9 @@ def main():  # type: () -> None
         print(commands.commands)
 
     if opts.daemonize:
+        # Restore PyGTK-like Ctrl+C behaviour for easy development
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
+
         if not app.run():
             logging.critical("Neither the Xlib nor the D-Bus backends were "
                              "available")
