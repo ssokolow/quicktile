@@ -52,21 +52,21 @@ class ComplainingEnum(object):
 
     (A stricter version of the annoyance I observed in Glib enums.)
     """
-    def __init__(self, testcase):  # type: (unittest.TestCase) -> None
-        self.testcase = testcase
-        # TODO: Why did I store this value again?
+    def __hash__(self):
+        """Use the identity of the object for its hash"""
+        return id(self)
 
-    def __cmp__(self, other):  # type: (ComplainingEnum) -> int
+    def __eq__(self, other):
         """Raises an exception if comparing against another type.
         @raises TypeError: C{type(self) != type(other)}
         @returns: C{id(self) == id(other)}
         @rtype: C{bool}
         """
-        if type(self) != type(other):  # pylint: disable=unidiomatic-typecheck
+        if not isinstance(self, type(other)):
             raise TypeError("Should not be comparing heterogeneous enums: "
                     "%s != %s" % (type(self), type(other)))
         else:
-            return cmp(id(self), id(other))
+            return id(self) == id(other)
 
 
 class Thing1(ComplainingEnum):
@@ -94,12 +94,14 @@ class TestCommandRegistry(unittest.TestCase):
 # TODO: Implement tests for workspace_go
 # TODO: Implement tests for workspace_send_window
 
+# TODO: Move tests for util.py into tests/util.py
+
 
 class TestEnumSafeDict(unittest.TestCase):
     """Tests to ensure EnumSafeDict never compares enums of different types"""
     def setUp(self):  # type: () -> None
-        self.thing1 = Thing1(self)
-        self.thing2 = Thing2(self)
+        self.thing1 = Thing1()
+        self.thing2 = Thing2()
 
         self.test_mappings = [
             (self.thing1, 'a'),
@@ -139,6 +141,10 @@ class TestEnumSafeDict(unittest.TestCase):
         # Test the "no matching key" branch of __getitem__
         with self.assertRaises(KeyError):
             self.empty['nonexist']  # pylint: disable=pointless-statement
+
+        # Test the "no matching key" branch of __delitem__
+        with self.assertRaises(KeyError):
+            del self.empty['nonexist']
 
         # Let Thing1 and Thing2 error out if they're compared in __setitem__
         for key, val in self.test_mappings:
