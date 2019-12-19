@@ -9,7 +9,8 @@ from contextlib import contextmanager
 import cairo
 from gi.repository import Gdk, GdkX11, Wnck
 
-from .util import clamp_idx, EnumSafeDict, Rectangle, Region, XInitError
+from .util import (clamp_idx, EnumSafeDict, Rectangle, Region, StrutPartial,
+                   XInitError)
 
 # Workaround for MyPy type comment getting wrapped by code formatter
 _Rect = Rectangle
@@ -156,7 +157,7 @@ class WorkArea(object):
         # Get the region and return failure early if it's empty
         usable_rect, usable_region = (monitor, Region(Rectangle(
             monitor.x, monitor.y, monitor.width, monitor.height)))
-        if usable_region.is_empty():
+        if usable_region:
             logging.error("WorkArea.get_monitor_rect received "
                           "an empty monitor region!")
             return None, None
@@ -179,14 +180,12 @@ class WorkArea(object):
         elif self.gdk_screen.supports_net_wm_hint(_net_workarea):
             desktop_geo = tuple(root_win.property_get(_net_workarea)[2][0:4])
             logging.debug("Falling back to _NET_WORKAREA: %s", desktop_geo)
-            usable_region.intersect(
-                Region(Rectangle(*desktop_geo)))
+            usable_region &= Rectangle(*desktop_geo)
             usable_rect = usable_region.get_clipbox()
 
-        # FIXME: Only call get_rectangles if --debug
         logging.debug("Usable region of monitor calculated as:\n"
                       "\tRegion: %r\n\tRectangle: %r",
-                      usable_region.get_rectangles(), usable_rect)
+                      usable_region, usable_rect)
         return usable_region, usable_rect
 
 

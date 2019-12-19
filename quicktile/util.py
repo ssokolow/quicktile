@@ -259,27 +259,79 @@ class Region(object):
     def _clean_up(self):  # type: () -> None
         self._rects.sort()
 
+        # Strip out empty rects
+        self._rects = [x for x in self._rects if x]
+
+        # TODO: Simplify the list of rects
+        # (eg. eliminate rects with no areas that don't overlap other rects)
+        #
+        # TODO: Once I have something basic that works, use
+        # https://www.widelands.org/~sirver/wl/141229_devail_rects.pdf to
+        # do it with lower algorithmic complexity.
+        #
+        # Other resources to consider if, for some reason, that's unsuitable:
+        # - https://stackoverflow.com/a/40673354
+        # - https://stackoverflow.com/a/30307841
+        # - https://mathematica.stackexchange.com/a/58939
+
     def copy(self):  # type: () -> Region
         """Porting shim for things expecting cairo.Region.copy"""
         return copy.deepcopy(self)
 
     def get_clipbox(self):  # type: () -> Rectangle
         """Return the smallest rectangle which encompasses the region"""
-        return Rectangle(*[sum(x) for x in zip(*self._rects)])
+        # TODO: Unit tests
+        field_vecs = list(zip(*((r.x, r.y, r.x2, r.y2)
+            for r in self._rects if r)))
+        return Rectangle(
+            x=min(field_vecs[0]), y=min(field_vecs[1]),
+            x2=max(field_vecs[2]), y2=max(field_vecs[3]))
 
-    def get_rectangles(self):
-        """Retrieve a shallow copy of the internal list of rectangles"""
-        return self._rects[:]
+    # TODO: Counterpart to get_clipbox which returns the largest usable
+    #       internal rectangle and test it with constrain_to_rect as a way
+    #       to get usable rects for heterogeneous monitors.
+    #       Also, test with panels in interior edges of the desktop.
 
-    def is_empty(self):
-        return len(self._rects) == 0
+    def __and__(self, rect):  # type: (Rectangle) -> Region
+        """Constrain this region to a clipping Rectangle"""
+        if not isinstance(rect, Rectangle):
+            return NotImplemented
 
-    def union_with_rect(self, rect):
-        """Add a copy of the given Rectangle to this Region"""
+        out_rects = []
+        for inner_rect in self._rects:
+            new_rect = inner_rect & rect
+            if new_rect:
+                out_rects.append(new_rect)
+
+        return Region(out_rects)
+
+    def __bool__(self):  # type: () -> bool
+        """A Region is truthy if it has a non-zero area"""
+        return bool(len(self._rects) > 0 and all(self._rects))
+
+    def __eq__(self, other):  # type: (Any) -> bool
+        """Deep compare for equality"""
+        if self is other:
+            return True
+        elif not isinstance(other, Region):
+            return False
+        elif len(self._rects) != len(other._rects):
+            return False
+        else:
+            return all(x == y for x, y in zip(self._rects, other._rects))
+
+    def __ior__(self, rect):  # type: (Rectangle) -> Region
+        """In-place union of the given Rectangle and this Region"""
+        if not isinstance(rect, Rectangle):
+            return NotImplemented
+
         self._rects.append(copy.deepcopy(rect))
-        # TODO: Simplify the list of rects
-        # (eg. eliminate rects with no areas that don't overlap other rects)
-        # (Use https://www.widelands.org/~sirver/wl/141229_devail_rects.pdf)
+        self._clean_up()
+
+        return self
+
+    def __repr__(self):  # type: () -> str
+        return "Region({})".format(', '.join(repr(x) for x in self._rects))
 
 
 class XInitError(Exception):

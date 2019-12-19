@@ -353,6 +353,113 @@ class TestRectangle(unittest.TestCase):
         self.assertEqual(self.rect1.y2, self.rect1.y + self.rect1.height)
 
 
+class TestRegion(unittest.TestCase):
+    """Tests for my custom Region class"""
+
+    def _check_copy(self, region1, region2):
+        """Helper for checking for a deep copy"""
+        self.assertEqual(region1, region2)
+        self.assertIsNot(region1, region2)
+
+        for rect1, rect2 in zip(region1._rects, region2._rects):
+            self.assertEqual(rect1, rect2)
+            self.assertIsNot(rect1, rect2)
+
+    # TODO: Test __and__
+
+    def test_bool(self):
+        """Region: __bool__"""
+        # Empty regions are falsy
+        test_region = Region()
+        self.assertFalse(test_region)
+
+        # Force a denormalized region to verify that empty rectangles are still
+        # treated as falsy
+        test_region._rects.append(Rectangle(0, 0, 0, 0))
+        self.assertFalse(test_region)
+
+        # Regions containing at least one empty rectangle are truthy
+        self.assertTrue(Region(Rectangle(0, 0, 0, 0), Rectangle(0, 0, 1, 1)))
+
+    def test_construction(self):
+        """Region: copy"""
+        test_rects = [Rectangle(1, 2, 3, 4), Rectangle(5, 6, 7, 8)]
+        test_region_1 = Region(*test_rects)
+        test_region_2 = Region(*test_rects)
+
+        self._check_copy(test_region_1, test_region_2)
+
+    def test_copy(self):
+        """Region: copy"""
+        test_region_1 = Region(Rectangle(1, 2, 3, 4))
+        test_region_2 = test_region_1.copy()
+
+        self._check_copy(test_region_1, test_region_2)
+
+    def test_eq(self):
+        """Region: __eq__"""
+        test_rect = Rectangle(1, 2, 3, 4)
+        test_region_1 = Region(test_rect)
+        test_region_2 = test_region_1.copy()
+
+        self.assertEqual(test_region_1, test_region_1)
+        self.assertEqual(test_region_1, test_region_2)
+        self.assertNotEqual(test_region_1, test_rect)
+
+        test_region_3 = Region(Rectangle(1, 2, 3, 4))
+        test_region_4 = Region(Rectangle(1, 2, 3, 5))
+        test_region_5 = Region(Rectangle(1, 2, 3, 4), Rectangle(1, 2, 3, 5))
+        self.assertEqual(test_region_1, test_region_3)
+        self.assertNotEqual(test_region_1, test_region_4)
+        self.assertNotEqual(test_region_1, test_region_5)
+
+    def test_get_clipbox(self):
+        """Region: get_clipbox"""
+        # one rect
+        self.assertEqual(Rectangle(0, 0, 2, 1),
+            Region(Rectangle(0, 0, 2, 1)).get_clipbox())
+
+        # Top-left and bottom-right (contiguous)
+        self.assertEqual(Rectangle(0, 0, 2, 5),
+            Region(Rectangle(0, 0, 2, 1), Rectangle(1, 0, 1, 5)).get_clipbox())
+
+        # Top-left and bottom-right (non-contiguous)
+        self.assertEqual(Rectangle(0, 0, 6, 6),
+            Region(Rectangle(0, 0, 1, 1), Rectangle(5, 5, 1, 1)).get_clipbox())
+
+        # Bottom-left and top-right (non-contiguous)
+        self.assertEqual(Rectangle(0, 0, 6, 6),
+            Region(Rectangle(0, 5, 1, 1), Rectangle(5, 0, 1, 1)).get_clipbox())
+
+        # Short and tall (non-contiguous)
+        self.assertEqual(Rectangle(0, 0, 6, 5),
+            Region(Rectangle(0, 3, 1, 1), Rectangle(5, 0, 1, 5)).get_clipbox())
+
+        # Empty rects should be eliminated
+        test_region = Region(Rectangle(0, 0, 1, 1), Rectangle(5, 5, 0, 1))
+        self.assertEqual(Rectangle(0, 0, 1, 1), test_region.get_clipbox())
+
+        # Force a denormalized region to verify empty rects don't clipbox
+        test_region._rects.append(Rectangle(3, 8, 1, 0))
+        self.assertEqual(Rectangle(0, 0, 1, 1), test_region.get_clipbox())
+
+    # TODO: Test __ior__
+
+    def test_repr(self):
+        """Region: __repr__"""
+        self.assertEqual(repr(Region()), "Region()")
+        self.assertEqual(repr(Region(Rectangle(0, 0, 0, 0))), "Region()")
+        self.assertEqual(
+            repr(Region(Rectangle(0, 0, 0, 0), Rectangle(0, 0, 1, 1))),
+            "Region(Rectangle(x=0, y=0, width=1, height=1))")
+        self.assertIn(
+            repr(Region(Rectangle(0, 2, 1, 1), Rectangle(0, 0, 1, 1))), (
+                "Region(Rectangle(x=0, y=2, width=1, height=1), "
+                "Rectangle(x=0, y=0, width=1, height=1))",
+                "Region(Rectangle(x=0, y=0, width=1, height=1), "
+                "Rectangle(x=0, y=2, width=1, height=1))"))
+
+
 class TestWindowGravity(unittest.TestCase):
     """Test the equivalence and correctness of L{wm.GRAVITY} values."""
 
@@ -363,7 +470,7 @@ class TestWindowGravity(unittest.TestCase):
         # TODO: Also work in some fake panel struts
         self.desktop = Region()
         for rect in MOCK_SCREENS:
-            self.desktop.union_with_rect(rect)
+            self.desktop |= rect
 
     def test_gravity_equivalence(self):  # type: () -> None
         """Gravity Lookup Table: text/GDK/WNCK constants are equivalent"""
@@ -398,7 +505,7 @@ class TestWindowManagerDetached(unittest.TestCase):
         # TODO: Also work in some fake panel struts
         self.desktop = Region()
         for rect in MOCK_SCREENS:
-            self.desktop.union_with_rect(rect)
+            self.desktop |= rect
 
     def test_win_gravity_noop(self):  # type: () -> None
         """WindowManager.calc_win_gravity: north-west should be a no-op
