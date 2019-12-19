@@ -19,8 +19,8 @@ gi.require_version('Wnck', '3.0')
 from gi.repository import Gdk, Wnck  # pylint: disable=E0611
 
 from quicktile import commands, wm
-from quicktile.util import (powerset, EnumSafeDict, Rectangle, Region,
-                            XInitError)
+from quicktile.util import (clamp_idx, powerset, EnumSafeDict, Rectangle,
+                            Region, XInitError)
 
 # Ensure code coverage is accurate
 from quicktile import __main__  # pylint: disable=unused-import
@@ -157,6 +157,37 @@ class TestEnumSafeDict(unittest.TestCase):
             with self.assertRaises(KeyError):
                 self.empty[key]  # pylint: disable=pointless-statement
 
+    def test_iteritems(self):
+        """EnumSafeDict: iteritems"""
+        tests = dict(self.test_mappings)
+        items = dict(self.full.iteritems())
+
+        # Workaround to dodge the "can't check unlike types for equality"
+        # (which is normally desired) in this one instance
+        for key, val in tests.items():
+            self.assertEqual(items[key], val)
+        for key, val in items.items():
+            self.assertEqual(tests[key], val)
+
+    def test_keys(self):
+        """EnumSafeDict: keys"""
+        keys = self.full.keys()
+        tests = dict(self.test_mappings)
+
+        for key in keys:
+            tests[key]  # pylint: disable=pointless-statement
+        for key in tests.keys():
+            self.assertIn(key, keys)
+
+    def test_repr(self):  # type: () -> None
+        """EnumSafeDict: Test basic repr() function"""
+        # Can't use self.full because it contains memory addresses and dicts
+        # don't have a deterministic order
+        stably_named = EnumSafeDict({'a': 1})
+
+        self.assertEqual(repr(self.empty), "EnumSafeDict()")
+        self.assertEqual(repr(stably_named), "EnumSafeDict({'a': 1})")
+
     # TODO: Complete set of tests which try to trick EnumSafeDict into
     #       comparing thing1 and thing2.
 
@@ -172,6 +203,26 @@ class TestHelpers(unittest.TestCase):
     @todo: Switch to pytest to get the assertEqual readout from assert in
            bare functions.
     """
+
+    def test_clamp_idx_default(self):
+        """Test that clamp_idx defaults to wrapping behaviour"""
+        for x in range(-5, 15):
+            self.assertEqual(clamp_idx(x, 10), clamp_idx(x, 10, wrap=True))
+
+    def test_clamp_idx_wrap(self):  # type: () -> None
+        """Test that clamp_idx(wrap=True) wraps as expected"""
+        self.assertEqual(clamp_idx(5, 10, wrap=True), 5)
+        self.assertEqual(clamp_idx(-1, 10, wrap=True), 9)
+        self.assertEqual(clamp_idx(11, 10, wrap=True), 1)
+        self.assertEqual(clamp_idx(15, 10, wrap=True), 5)
+
+    def test_clamp_idx(self):  # type: () -> None
+        """Test that clamp_idx(wrap=False) saturates as expected"""
+        self.assertEqual(clamp_idx(5, 10, wrap=False), 5)
+        self.assertEqual(clamp_idx(-1, 10, wrap=False), 0)
+        self.assertEqual(clamp_idx(11, 10, wrap=False), 9)
+        self.assertEqual(clamp_idx(15, 10, wrap=False), 9)
+
     def test_powerset(self):  # type: () -> None
         """Test that powerset() behaves as expected"""
         src_set = (1, 2, 3)
