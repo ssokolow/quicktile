@@ -21,6 +21,7 @@ from .env_general import env_vars
 
 log = logging.getLogger(__name__)
 
+
 def _init_x_server(argv, display_num, magic_cookie, verbose=False):
     """Wrapper for starting an X server with the given command line
 
@@ -90,6 +91,7 @@ def _init_x_server(argv, display_num, magic_cookie, verbose=False):
         log.critical('Failed to call %s: exit code %s', argv, xproc.returncode)
         raise subprocess.CalledProcessError(xproc.returncode, repr(argv), '')
 
+
 @contextmanager
 def x_server(argv, screens):
     """Context manager to launch and then clean up an X server.
@@ -114,7 +116,8 @@ def x_server(argv, screens):
     x_server = None
     tempdir = tempfile.mkdtemp()
     try:
-        magic_cookie = hex(random.getrandbits(128))[2:-1]
+        magic_cookie = hex(random.getrandbits(128))[2:34].encode('ascii')
+        assert len(magic_cookie) == 32
         xauthfile = os.path.join(tempdir, 'Xauthority')
         env = {'XAUTHORITY': xauthfile}
 
