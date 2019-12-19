@@ -9,16 +9,17 @@ from itertools import chain, combinations
 
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
+#
+# TODO: Just import typing normally once I no longer need to remain compatible
+#       with ePyDoc.
 MYPY = False
-if MYPY:
+if MYPY:  # pragma: nocover
     # pylint: disable=unused-import
-    from typing import (Any, Callable, Dict, Iterable, Iterator, List,  # NOQA
-                        Optional, Sequence, Tuple, Union)
-    from mypy_extensions import VarArg, KwArg  # NOQA
+    from typing import (AbstractSet, Any, Callable, Dict, Iterable,  # NOQA
+                        Iterator, List, Optional, Sequence, Tuple, Union)
 
     # pylint: disable=C0103
-    PercentRect = Tuple[float, float, float, float]
-    Strut = Tuple[int, int, int, int, int, int, int, int, int, int, int, int]
+    PercentRectTuple = Tuple[float, float, float, float]
     GeomTuple = Tuple[int, int, int, int]
 
     # FIXME: Replace */** with a dict so I can be strict here
@@ -88,7 +89,7 @@ def fmt_table(rows,          # type: Any
         maxlen = max(len(x[pos]) for x in rows if len(x) > pos)
         col_maxlens.append(max(maxlen, len(header)))
 
-    def fmt_row(row, pad=' ', indent=0, min_width=0):
+    def fmt_row(row, pad=' ', indent=0, min_width=0):  # TODO: Type signature
         """Format a fmt_table row"""
         result = []
         for width, label in zip(col_maxlens, row):
@@ -129,7 +130,7 @@ class EnumSafeDict(MutableMapping):
             for key, val in in_dict.items():
                 self[key] = val
 
-    def __contains__(self, key):
+    def __contains__(self, key):  # type: (Any) -> bool
         ktype = type(key)
         return ktype in self._contents and key in self._contents[ktype]
 
@@ -149,15 +150,15 @@ class EnumSafeDict(MutableMapping):
         else:
             raise KeyError(key)
 
-    def __iter__(self):
+    def __iter__(self):  # type: () -> Iterator[Any]
         for section in self._contents.values():
             for key in section.keys():
                 yield key
 
-    def __len__(self):
+    def __len__(self):  # type: () -> int
         return len(self._contents)
 
-    def __repr__(self):
+    def __repr__(self):  # type: () -> str
         return "%s(%s)" % (self.__class__.__name__,
             ', '.join(repr(x) for x in self._contents.values()))
 
@@ -165,12 +166,12 @@ class EnumSafeDict(MutableMapping):
         ktype = type(key)
         self._contents.setdefault(ktype, {})[key] = value
 
-    def iteritems(self):
+    def iteritems(self):  # TODO: Type signature
         return [(key, self[key]) for key in self]
 
-    def keys(self):  # type: () -> List[Any]
+    def keys(self):  # type: () -> AbstractSet[Any]
         """D.keys() -> list of D's keys"""
-        return list(self)
+        return set(self)
 
 
 class Rectangle(namedtuple('Rectangle', 'x y width height')):
@@ -183,18 +184,18 @@ class Region(object):
 
     def __init__(self, *initial_rects):
         """Initialze a new region, optionally with a shallow copy of a rect."""
+        # TODO: Support taking a Region as an input
         self._rects = copy.deepcopy(list(initial_rects))
+        self._clean_up()
 
-    def _clean_up(self):
-        """Simplify the internal list of rectangles"""
-        out_list = []
-        self._rects.sort(key)
+    def _clean_up(self):  # type: () -> None
+        self._rects.sort()
 
-    def copy(self):
+    def copy(self):  # type: () -> Region
         """Porting shim for things expecting cairo.Region.copy"""
         return copy.deepcopy(self)
 
-    def get_clipbox(self):
+    def get_clipbox(self):  # type: () -> Rectangle
         """Return the smallest rectangle which encompasses the region"""
         return Rectangle(*[sum(x) for x in zip(*self._rects)])
 

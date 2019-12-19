@@ -19,8 +19,8 @@ _Rect = Rectangle
 MYPY = False
 if MYPY:
     # pylint: disable=unused-import
-    from typing import Any, List, Optional, Sequence, Tuple, Union  # NOQA
-    from .util import Strut  # NOQA
+    from typing import (Any, Iterable, List, Optional, Sequence, Tuple,  # NOQA
+                        Union)
 del MYPY
 
 #: Lookup table for internal window gravity support.
@@ -85,6 +85,7 @@ class WorkArea(object):
         """Retrieve the struts from the root window if supported."""
         _net_wm_strut_partial = Gdk.Atom.intern("_NET_WM_STRUT_PARTIAL", True)
         if not self.gdk_screen.supports_net_wm_hint(_net_wm_strut_partial):
+            # TODO: Try falling back to _NET_WM_STRUT instead
             return []
 
         # Gather all struts

@@ -16,7 +16,7 @@ if MYPY:
 
     # pylint: disable=import-error, no-name-in-module
     from gi.repository.Gdk import Rectangle
-    from .util import GeomTuple, PercentRect  # NOQA
+    from .util import GeomTuple, PercentRectTuple  # NOQA
 
     Geom = Union[Rectangle, GeomTuple]  # pylint: disable=invalid-name
 del MYPY
@@ -163,7 +163,7 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
 
 
 def make_winsplit_positions(columns):
-    # type: (int) -> Dict[str, List[PercentRect]]
+    # type: (int) -> Dict[str, List[PercentRectTuple]]
     """Generate the classic WinSplit Revolution tiling presets
 
     @todo: Figure out how best to put this in the config file.
