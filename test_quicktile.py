@@ -253,6 +253,106 @@ class TestHelpers(unittest.TestCase):
         self.assertIn("Testing 123", str(XInitError("Testing 123")))
 
 
+class TestRectangle(unittest.TestCase):
+    """Tests for my custom Rectangle class"""
+
+    def setUp(self):
+        """Implicitly test positional and keyword construction during setup"""
+        self.rect1 = Rectangle(1, 2, 3, 4)
+        self.rect2 = Rectangle(x=2, y=3, width=4, height=5)
+        self.rect3 = Rectangle(-1, -2, x2=3, y2=4)
+
+    def test_member_access(self):
+        """Rectangle: quacks like a namedtuple"""
+        self.assertEqual(self.rect1[0], 1)
+        self.assertEqual(self.rect1.y, 2)
+        self.assertEqual(self.rect1, (1, 2, 3, 4))
+
+    def test_negative_size(self):
+        """Rectangle: test normalization of negative sizes"""
+        self.assertEqual(Rectangle(3, 2, -2, 2), (1, 2, 2, 2))
+        self.assertEqual(Rectangle(1, 4, 2, -2), (1, 2, 2, 2))
+        self.assertEqual(Rectangle(3, 4, -2, -2), (1, 2, 2, 2))
+
+    def test_twopoint_construction(self):
+        """Rectangle: test construction using two-point form"""
+        # Regular
+        self.assertEqual(Rectangle(1, 2, x2=3, y2=4), (1, 2, 2, 2))
+
+        # Origin-crossing
+        self.assertEqual(self.rect3, (-1, -2, 4, 6))
+
+        # Negative width and/or height
+        self.assertEqual(Rectangle(3, 2, x2=1, y2=4), (1, 2, 2, 2))
+        self.assertEqual(Rectangle(1, 4, x2=3, y2=2), (1, 2, 2, 2))
+        self.assertEqual(Rectangle(3, 4, x2=1, y2=2), (1, 2, 2, 2))
+
+        self.assertEqual(Rectangle(-3, -4, x2=-1, y2=-2), (-3, -4, 2, 2))
+        self.assertEqual(Rectangle(-3, -4, x2=-1, y2=-2), (-3, -4, 2, 2))
+        self.assertEqual(Rectangle(-3, -4, x2=-1, y2=-2), (-3, -4, 2, 2))
+
+        self.assertEqual(Rectangle(3, 4, x2=-1, y2=-2), (-1, -2, 4, 6))
+        self.assertEqual(Rectangle(-1, 4, x2=3, y2=-2), (-1, -2, 4, 6))
+        self.assertEqual(Rectangle(3, -2, x2=-1, y2=4), (-1, -2, 4, 6))
+
+        # Bad argument combinations
+        with self.assertRaises(ValueError):
+            Rectangle(1, 2, 3, 4, 5)
+        with self.assertRaises(ValueError):
+            Rectangle(1, 2, 3, 4, 5, 6)
+        with self.assertRaises(ValueError):
+            Rectangle(x=1, y=2, width=3, height=4, x2=5)
+        with self.assertRaises(ValueError):
+            Rectangle(x=1, y=2, width=3, height=4, y2=6)
+
+    def test_and(self):
+        """Rectangle: bitwise & performs intersection correctly"""
+        self.assertEqual(self.rect1 & self.rect2, Rectangle(2, 3, 2, 3))
+        self.assertEqual(self.rect2 & self.rect1, Rectangle(2, 3, 2, 3))
+
+        # Basic test that unrecognized types fail properly
+        with self.assertRaises(TypeError):
+            print(self.rect1 & 5)
+
+    def test_bool(self):
+        """Rectangle: only truthy if area is nonzero"""
+        self.assertTrue(self.rect1)
+        self.assertTrue(self.rect2)
+        self.assertTrue(Rectangle(-1, -2, 1, 1))  # Negative
+        self.assertTrue(Rectangle(-1, -2, 5, 5))  # Origin-crossing
+        self.assertTrue(Rectangle(0, 0, 5, 5))  # (0, 0) start
+        self.assertFalse(Rectangle(0, 0, 0, 0))
+        self.assertFalse(Rectangle(1, 2, 0, 0))
+        self.assertFalse(Rectangle(1, 2, 1, 0))
+        self.assertFalse(Rectangle(1, 2, 0, 1))
+        self.assertFalse(Rectangle(-1, -2, 0, 0))
+        self.assertFalse(Rectangle(-1, -2, 1, 0))
+        self.assertFalse(Rectangle(-1, -2, 0, 1))
+
+    def test_or(self):
+        """Rectangle: bitwise | finds bounding box for two rectangles"""
+        # TODO: two-point-form constructor for Rectangle
+        self.assertEqual(self.rect1 | self.rect2, Rectangle(
+            self.rect1.x, self.rect1.y,
+            self.rect2.x2 - self.rect1.x,
+            self.rect2.y2 - self.rect1.y))
+        self.assertEqual(self.rect2 | self.rect1, Rectangle(
+            self.rect1.x, self.rect1.y,
+            self.rect2.x2 - self.rect1.x,
+            self.rect2.y2 - self.rect1.y))
+        self.assertEqual(Rectangle(-2, -5, 1, 1) | Rectangle(2, 5, 1, 1),
+                         Rectangle(-2, -5, x2=3, y2=6))
+
+        # Basic test that unrecognized types fail properly
+        with self.assertRaises(TypeError):
+            print(self.rect1 | 5)
+
+    def test_two_point_form(self):
+        """Rectangle: two-point-form properties function properly"""
+        self.assertEqual(self.rect1.x2, self.rect1.x + self.rect1.width)
+        self.assertEqual(self.rect1.y2, self.rect1.y + self.rect1.height)
+
+
 class TestWindowGravity(unittest.TestCase):
     """Test the equivalence and correctness of L{wm.GRAVITY} values."""
 

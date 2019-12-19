@@ -174,9 +174,77 @@ class EnumSafeDict(MutableMapping):
         return set(self)
 
 
-class Rectangle(namedtuple('Rectangle', 'x y width height')):
-    """A replacement for broken Gdk.Rectangle constructor in *buntu 16.04"""
+# Internal Rectangle parent. Exposed so ePyDoc doesn't complain
+_Rectangle = namedtuple('_Rectangle', 'x y width height')
+
+
+class Rectangle(_Rectangle):
+    """A representation of a rectangle with some useful methods
+
+    (Originally replaces broken Gdk.Rectangle constructor in *buntu 16.04)
+    """
     __slots__ = ()
+
+    def __new__(cls, x, y, width=None, height=None, x2=None, y2=None):
+        # Validate that we got a correct number of arguments
+        if (width, x2).count(None) != 1:
+            raise ValueError("Either width or x2 must be None and not both")
+        if (height, y2).count(None) != 1:
+            raise ValueError("Either height or y2 must be None and not both")
+
+        # If given a rectangle in two-point form, convert to width/height form
+        if x2:
+            width = x2 - x
+        if y2:
+            height = y2 - y
+
+        # Swap (x1, y1) and (x2, y2) as appropriate to invert negative sizes
+        if width < 0:
+            x = x + width
+            width = -width
+        if height < 0:
+            y = y + height
+            height = -height
+
+        return cls.__bases__[0].__new__(cls, x, y, width, height)
+
+    @property
+    def x2(self):  # type: () -> int
+        """X coordinate of the bottom-right corner"""
+        return self.x + self.width
+
+    @property
+    def y2(self):  # type: () -> int
+        """Y coordinate of the bottom-right corner"""
+        return self.y + self.height
+
+    def __and__(self, other):  # type: (Rectangle) -> Rectangle
+        """The intersection of two rectangles"""
+        # TODO: Unit test for this check
+        if not isinstance(other, Rectangle):
+            return NotImplemented
+
+        # pylint: disable=invalid-name
+        x1, y1 = max(self.x, other.x), max(self.y, other.y)
+        x2, y2 = min(self.x2, other.x2), min(self.y2, other.y2)
+
+        return Rectangle(x1, y1, max(0, x2 - x1), max(0, y2 - y1))
+
+    def __bool__(self):  # type: () -> bool
+        """A rectangle is truthy if it has a nonzero area"""
+        return bool(self.width and self.height)
+
+    def __or__(self, other):  # type: (Rectangle) -> Rectangle
+        """The bounding box of two rectangles"""
+        # TODO: Unit test for this check
+        if not isinstance(other, Rectangle):
+            return NotImplemented
+
+        # pylint: disable=invalid-name
+        x1, y1 = min(self.x, other.x), min(self.y, other.y)
+        x2, y2 = max(self.x2, other.x2), max(self.y2, other.y2)
+
+        return Rectangle(x1, y1, max(0, x2 - x1), max(0, y2 - y1))
 
 
 class Region(object):
