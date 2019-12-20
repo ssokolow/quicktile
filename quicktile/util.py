@@ -198,6 +198,10 @@ class Rectangle(_Rectangle):
         if y2:
             height = y2 - y
 
+        # Ensure width and height are not None beyond this point
+        width = width or 0
+        height = height or 0
+
         # Swap (x1, y1) and (x2, y2) as appropriate to invert negative sizes
         if width < 0:
             x = x + width
@@ -220,7 +224,6 @@ class Rectangle(_Rectangle):
 
     def __and__(self, other):  # type: (Rectangle) -> Rectangle
         """The intersection of two rectangles"""
-        # TODO: Unit test for this check
         if not isinstance(other, Rectangle):
             return NotImplemented
 
@@ -236,7 +239,6 @@ class Rectangle(_Rectangle):
 
     def __or__(self, other):  # type: (Rectangle) -> Rectangle
         """The bounding box of two rectangles"""
-        # TODO: Unit test for this check
         if not isinstance(other, Rectangle):
             return NotImplemented
 

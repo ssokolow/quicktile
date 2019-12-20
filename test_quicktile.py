@@ -262,6 +262,10 @@ class TestRectangle(unittest.TestCase):
         self.rect2 = Rectangle(x=2, y=3, width=4, height=5)
         self.rect3 = Rectangle(-1, -2, x2=3, y2=4)
 
+    def test_none_safe(self):
+        """Rectangle: __new__ doesn't attempt to compare None and int"""
+        Rectangle(0, 0, width=None, height=None, x2=0, y2=0)
+
     def test_member_access(self):
         """Rectangle: quacks like a namedtuple"""
         self.assertEqual(self.rect1[0], 1)
@@ -331,7 +335,6 @@ class TestRectangle(unittest.TestCase):
 
     def test_or(self):
         """Rectangle: bitwise | finds bounding box for two rectangles"""
-        # TODO: two-point-form constructor for Rectangle
         self.assertEqual(self.rect1 | self.rect2, Rectangle(
             self.rect1.x, self.rect1.y,
             self.rect2.x2 - self.rect1.x,
