@@ -7,6 +7,10 @@ import copy
 from collections import MutableMapping, namedtuple
 from itertools import chain, combinations
 
+import gi
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk, Wnck
+
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
 #
@@ -247,6 +251,21 @@ class Rectangle(_Rectangle):
         x2, y2 = max(self.x2, other.x2), max(self.y2, other.y2)
 
         return Rectangle(x1, y1, max(0, x2 - x1), max(0, y2 - y1))
+
+    @classmethod
+    def from_gdk(cls, gdk_rect):
+        """Factory function to convert from a Gdk.Rectangle"""
+        return cls(x=gdk_rect.x, y=gdk_rect.y,
+                   width=gdk_rect.width, height=gdk_rect.height)
+
+    def to_gdk(self):
+        """Helper to work around awkward broken GIR metadata in *buntu 16.04"""
+        gdk_rect = Gdk.Rectangle()
+        gdk_rect.x = self.x
+        gdk_rect.y = self.y
+        gdk_rect.width = self.width
+        gdk_rect.height = self.height
+        return gdk_rect
 
 
 class Region(object):

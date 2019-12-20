@@ -350,6 +350,22 @@ class TestRectangle(unittest.TestCase):
         with self.assertRaises(TypeError):
             print(self.rect1 | 5)
 
+    def test_gdk_round_tripping(self):
+        """Rectangle: from_gdk/to_gdk"""
+
+        test_rect1 = Rectangle(1, 2, 3, 4)
+        test_rect2 = Rectangle(5, 6, 7, 8)
+
+        gdk_rect1 = test_rect1.to_gdk()
+        gdk_rect2 = test_rect2.to_gdk()
+
+        # To make sure we're not just setting dummy properties, test the
+        # results of GdkRectangle's union operator against ours.
+        result = Rectangle.from_gdk(gdk_rect1.union(gdk_rect2))
+        control = test_rect1 | test_rect2
+
+        self.assertEqual(result, control)
+
     def test_two_point_form(self):
         """Rectangle: two-point-form properties function properly"""
         self.assertEqual(self.rect1.x2, self.rect1.x + self.rect1.width)
