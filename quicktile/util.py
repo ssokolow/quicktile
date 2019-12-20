@@ -278,6 +278,9 @@ class Region(object):
         self._clean_up()
 
     def _clean_up(self):  # type: () -> None
+        for rect in self._rects:
+            assert isinstance(rect, Rectangle)  # nosec
+
         self._rects.sort()
 
         # Strip out empty rects
@@ -324,7 +327,7 @@ class Region(object):
             if new_rect:
                 out_rects.append(new_rect)
 
-        return Region(out_rects)
+        return Region(*out_rects)
 
     def __bool__(self):  # type: () -> bool
         """A Region is truthy if it has a non-zero area"""
