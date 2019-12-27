@@ -9,18 +9,11 @@ __license__ = "GNU GPL 2.0 or later"
 
 # TODO: I need a functional test to make sure issue #25 doesn't regress
 
-import logging, operator, sys
+import logging, sys
 
-import gi
-gi.require_version('cairo', '1.0')
-gi.require_version('Gdk', '3.0')
-gi.require_version('Gtk', '3.0')
-gi.require_version('Wnck', '3.0')
-from gi.repository import Gdk, Wnck  # pylint: disable=E0611
-
-from quicktile import commands, wm
-from quicktile.util import (clamp_idx, powerset, EnumSafeDict, Rectangle,
-                            Region, XInitError)
+from quicktile import commands
+from quicktile.util import (clamp_idx, powerset, Gravity, Rectangle,
+                            StrutPartial, UsableRegion, XInitError)
 
 # Ensure code coverage is accurate
 from quicktile import __main__  # pylint: disable=unused-import
@@ -35,6 +28,11 @@ if sys.version_info[0] == 2 and sys.version_info[1] < 7:  # pragma: no cover
 else:                                                     # pragma: no cover
     import unittest
 
+MYPY = False
+if MYPY:  # pragma: nocover
+    # pylint: disable=unused-import
+    from typing import Tuple  # NOQA
+
 # Set up a nice, oddly-shaped fake desktop made from screens
 # I actually have access to (though not all on the same PC)
 MOCK_SCREENS = [
@@ -45,36 +43,6 @@ MOCK_SCREENS = [
 ]
 
 # pylint: disable=too-few-public-methods
-
-
-class ComplainingEnum(object):
-    """A parent class for classes which should raise C{TypeError} when compared
-
-    (A stricter version of the annoyance I observed in Glib enums.)
-    """
-    def __hash__(self):
-        """Use the identity of the object for its hash"""
-        return id(self)
-
-    def __eq__(self, other):
-        """Raises an exception if comparing against another type.
-        @raises TypeError: C{type(self) != type(other)}
-        @returns: C{id(self) == id(other)}
-        @rtype: C{bool}
-        """
-        if not isinstance(self, type(other)):
-            raise TypeError("Should not be comparing heterogeneous enums: "
-                    "%s != %s" % (type(self), type(other)))
-        else:
-            return id(self) == id(other)
-
-
-class Thing1(ComplainingEnum):
-    """See L{ComplainingEnum}"""
-
-
-class Thing2(ComplainingEnum):
-    """See L{ComplainingEnum}"""
 
 
 class TestCommandRegistry(unittest.TestCase):
@@ -95,101 +63,6 @@ class TestCommandRegistry(unittest.TestCase):
 # TODO: Implement tests for workspace_send_window
 
 # TODO: Move tests for util.py into tests/util.py
-
-
-class TestEnumSafeDict(unittest.TestCase):
-    """Tests to ensure EnumSafeDict never compares enums of different types"""
-    def setUp(self):  # type: () -> None
-        self.thing1 = Thing1()
-        self.thing2 = Thing2()
-
-        self.test_mappings = [
-            (self.thing1, 'a'),
-            (self.thing2, 'b'),
-            (1, self.thing1),
-            (2, self.thing2)
-        ]
-
-        self.empty = EnumSafeDict()
-        self.full = EnumSafeDict(
-                *[dict([x]) for x in self.test_mappings])
-
-    def test_testing_shims(self):  # type: () -> None
-        """EnumSafeDict: Testing shims function correctly"""
-        for oper in ('lt', 'le', 'eq', 'ne', 'ge', 'gt'):
-            with self.assertRaises(TypeError):
-                print("Testing %s..." % oper)
-                getattr(operator, oper)(self.thing1, self.thing2)
-
-    def test_init_with_content(self):  # type: () -> None
-        """EnumSafeDict: Initialization with content"""
-
-        test_map = self.test_mappings[:]
-
-        while test_map:
-            key, val = test_map.pop()
-            self.assertEqual(self.full[key], val,
-                "All things in the input must make it into EnumSafeDict: " +
-                 str(key))
-
-        self.assertFalse(test_map, "EnumSafeDict must contain ONLY things from"
-                " the input.")
-
-    def test_get_set_del(self):  # type: () -> None
-        """EnumSafeDict: get/set/delitem"""
-
-        # Test the "no matching key" branch of __getitem__
-        with self.assertRaises(KeyError):
-            self.empty['nonexist']  # pylint: disable=pointless-statement
-
-        # Test the "no matching key" branch of __delitem__
-        with self.assertRaises(KeyError):
-            del self.empty['nonexist']
-
-        # Let Thing1 and Thing2 error out if they're compared in __setitem__
-        for key, val in self.test_mappings:
-            self.empty[key] = val
-
-        # Test the "matching key" branch of __getitem__ and __delitem__
-        for key, val in self.test_mappings:
-            assert self.empty[key] == val
-            del self.empty[key]
-            with self.assertRaises(KeyError):
-                self.empty[key]  # pylint: disable=pointless-statement
-
-    def test_iteritems(self):
-        """EnumSafeDict: iteritems"""
-        tests = dict(self.test_mappings)
-        items = dict(self.full.iteritems())
-
-        # Workaround to dodge the "can't check unlike types for equality"
-        # (which is normally desired) in this one instance
-        for key, val in tests.items():
-            self.assertEqual(items[key], val)
-        for key, val in items.items():
-            self.assertEqual(tests[key], val)
-
-    def test_keys(self):
-        """EnumSafeDict: keys"""
-        keys = self.full.keys()
-        tests = dict(self.test_mappings)
-
-        for key in keys:
-            tests[key]  # pylint: disable=pointless-statement
-        for key in tests.keys():
-            self.assertIn(key, keys)
-
-    def test_repr(self):  # type: () -> None
-        """EnumSafeDict: Test basic repr() function"""
-        # Can't use self.full because it contains memory addresses and dicts
-        # don't have a deterministic order
-        stably_named = EnumSafeDict({'a': 1})
-
-        self.assertEqual(repr(self.empty), "EnumSafeDict()")
-        self.assertEqual(repr(stably_named), "EnumSafeDict({'a': 1})")
-
-    # TODO: Complete set of tests which try to trick EnumSafeDict into
-    #       comparing thing1 and thing2.
 
 
 # TODO: Implement tests for GravityLayout
@@ -237,7 +110,8 @@ class TestHelpers(unittest.TestCase):
 
             # Check that only subsets are returned
             for subset in expected:
-                for item in subset:
+                # Workaround for MyPy thinking `expected` isn't a list
+                for item in subset:  # type: ignore
                     self.assertIn(item, test_set)
 
             # Check that ALL subsets are returned
@@ -253,6 +127,79 @@ class TestHelpers(unittest.TestCase):
         self.assertIn("Testing 123", str(XInitError("Testing 123")))
 
 
+class TestStrutPartial(unittest.TestCase):
+    """Tests for my custom _NET_WM_STRUT_PARTIAL wrapper class"""
+
+    def test_construction(self):
+        """StrutPartial: construction"""
+        self.assertEqual(StrutPartial(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
+            StrutPartial(left=1, right=2, top=3, bottom=4,
+            left_start_y=5, left_end_y=6, right_start_y=7, right_end_y=8,
+            top_start_x=9, top_end_x=10, bottom_start_x=11, bottom_end_x=12))
+
+    def test_as_rects(self):
+        """StrutPartial: as_rects (basic function)"""
+        test_struts = [
+            StrutPartial(left=1, right=2, top=3, bottom=4),
+            StrutPartial(
+                left=1, right=2, top=3, bottom=4,
+                left_start_y=5, left_end_y=6, right_start_y=7, right_end_y=8,
+                top_start_x=9, top_end_x=10,
+                bottom_start_x=11, bottom_end_x=12),
+            StrutPartial(left=5000, right=6000, top=7000, bottom=8000),
+            StrutPartial(
+                left=1, right=2, top=3, bottom=4,
+                left_start_y=-2000, left_end_y=3000,
+                right_start_y=-4000, right_end_y=5000,
+                top_start_x=-6000, top_end_x=7000,
+                bottom_start_x=-8000, bottom_end_x=9000),
+            StrutPartial(
+                left=1, right=2, top=3, bottom=4,
+                left_start_y=2000, left_end_y=-3000,
+                right_start_y=4000, right_end_y=-5000,
+                top_start_x=6000, top_end_x=-7000,
+                bottom_start_x=8000, bottom_end_x=-9000),
+        ]
+
+        for dtop_rect in (Rectangle(0, 0, 20, 30), Rectangle(40, 50, 70, 80)):
+            print("Desktop Rectangle: ", dtop_rect)
+            for strut in test_struts:
+                print("Desktop Rectangle: ", dtop_rect, " | Strut: ", strut)
+                self.assertEqual(strut.as_rects(dtop_rect), [x for x in (
+                    # Left
+                    Rectangle(x=dtop_rect.x, y=strut.left_start_y,
+                        width=strut.left, y2=strut.left_end_y
+                              ).intersect(dtop_rect),
+                    # Right
+                    Rectangle(x=dtop_rect.x2, y=strut.right_start_y,
+                        width=-strut.right, y2=strut.right_end_y
+                              ).intersect(dtop_rect),
+                    # Top
+                    Rectangle(x=strut.top_start_x, y=dtop_rect.y,
+                        x2=strut.top_end_x, height=strut.top
+                              ).intersect(dtop_rect),
+                    # Bottom
+                    Rectangle(x=strut.bottom_start_x, y=dtop_rect.y2,
+                        x2=strut.bottom_end_x, height=-strut.bottom
+                              ).intersect(dtop_rect)) if x])
+
+    def test_as_rects_pruning(self):
+        """StrutPartial: as_rects doesn't return empty rects"""
+        dtop_rect = Rectangle(1, 2, 30, 40)
+        self.assertEqual(
+            StrutPartial(5, 0, 0, 0).as_rects(dtop_rect),
+            [Rectangle(x=1, y=2, width=5, height=40)])
+        self.assertEqual(
+            StrutPartial(0, 6, 0, 0).as_rects(dtop_rect),
+            [Rectangle(x=dtop_rect.x2 - 6, y=2, width=6, height=40)])
+        self.assertEqual(
+            StrutPartial(0, 0, 7, 0).as_rects(dtop_rect),
+            [Rectangle(x=1, y=2, width=30, height=7)])
+        self.assertEqual(
+            StrutPartial(0, 0, 0, 8).as_rects(dtop_rect),
+            [Rectangle(x=1, y=dtop_rect.y2 - 8, width=30, height=8)])
+
+
 class TestRectangle(unittest.TestCase):
     """Tests for my custom Rectangle class"""
 
@@ -261,10 +208,6 @@ class TestRectangle(unittest.TestCase):
         self.rect1 = Rectangle(1, 2, 3, 4)
         self.rect2 = Rectangle(x=2, y=3, width=4, height=5)
         self.rect3 = Rectangle(-1, -2, x2=3, y2=4)
-
-    def test_none_safe(self):
-        """Rectangle: __new__ doesn't attempt to compare None and int"""
-        Rectangle(0, 0, width=None, height=None, x2=0, y2=0)
 
     def test_member_access(self):
         """Rectangle: quacks like a namedtuple"""
@@ -277,6 +220,22 @@ class TestRectangle(unittest.TestCase):
         self.assertEqual(Rectangle(3, 2, -2, 2), (1, 2, 2, 2))
         self.assertEqual(Rectangle(1, 4, 2, -2), (1, 2, 2, 2))
         self.assertEqual(Rectangle(3, 4, -2, -2), (1, 2, 2, 2))
+
+    def test_float_input(self):
+        """Rectangle: test truncating of float inputs to integers"""
+        test_rect = Rectangle(1.0, 0.5, 1.3, 2.8)
+        self.assertIsInstance(test_rect.x, int)
+        self.assertIsInstance(test_rect.y, int)
+        self.assertIsInstance(test_rect.width, int)
+        self.assertIsInstance(test_rect.height, int)
+        self.assertEqual(test_rect.x, 1)
+        self.assertEqual(test_rect.y, 0)
+        self.assertEqual(test_rect.width, 1)
+        self.assertEqual(test_rect.height, 2)
+
+    def test_none_safe(self):  # pylint: disable=no-self-use
+        """Rectangle: __new__ doesn't attempt to compare None and int"""
+        Rectangle(0, 0, width=None, height=None, x2=0, y2=0)
 
     def test_twopoint_construction(self):
         """Rectangle: test construction using two-point form"""
@@ -309,15 +268,6 @@ class TestRectangle(unittest.TestCase):
         with self.assertRaises(ValueError):
             Rectangle(x=1, y=2, width=3, height=4, y2=6)
 
-    def test_and(self):
-        """Rectangle: bitwise & performs intersection correctly"""
-        self.assertEqual(self.rect1 & self.rect2, Rectangle(2, 3, 2, 3))
-        self.assertEqual(self.rect2 & self.rect1, Rectangle(2, 3, 2, 3))
-
-        # Basic test that unrecognized types fail properly
-        with self.assertRaises(TypeError):
-            print(self.rect1 & 5)
-
     def test_bool(self):
         """Rectangle: only truthy if area is nonzero"""
         self.assertTrue(self.rect1)
@@ -333,22 +283,150 @@ class TestRectangle(unittest.TestCase):
         self.assertFalse(Rectangle(-1, -2, 1, 0))
         self.assertFalse(Rectangle(-1, -2, 0, 1))
 
-    def test_or(self):
-        """Rectangle: bitwise | finds bounding box for two rectangles"""
-        self.assertEqual(self.rect1 | self.rect2, Rectangle(
+    def test_contains(self):
+        """Rectangle: __contains__"""
+        # Wholly-contained == True
+        self.assertTrue(Rectangle(2, 2, 1, 1) in Rectangle(1, 1, 3, 3))
+        self.assertTrue(Rectangle(1, 1, 3, 1) in Rectangle(1, 1, 3, 3))
+        self.assertTrue(Rectangle(1, 1, 1, 3) in Rectangle(1, 1, 3, 3))
+        # ...including for empty rectangles
+        self.assertTrue(Rectangle(1, 1, 0, 0) in Rectangle(1, 1, 0, 0))
+        self.assertTrue(Rectangle(1, 1, 0, 0) in Rectangle(1, 1, 3, 3))
+        self.assertTrue(Rectangle(4, 4, 0, 0) in Rectangle(1, 1, 3, 3))
+
+        # Mere overlap isn't enough
+        self.assertFalse(Rectangle(0, 0, 3, 3) in Rectangle(1, 1, 3, 3))
+        self.assertFalse(Rectangle(2, 0, 3, 3) in Rectangle(1, 1, 3, 3))
+        self.assertFalse(Rectangle(0, 2, 3, 3) in Rectangle(1, 1, 3, 3))
+        self.assertFalse(Rectangle(2, 2, 3, 3) in Rectangle(1, 1, 3, 3))
+
+        # Type mismatches don't cause errors
+        self.assertNotIn(1, Rectangle(0, 0, 2, 2))
+
+    def test_intersect(self):
+        """Rectangle: intersection"""
+        self.assertEqual(self.rect1.intersect(self.rect2),
+                         Rectangle(2, 3, 2, 3))
+        self.assertEqual(self.rect2.intersect(self.rect1),
+                         Rectangle(2, 3, 2, 3))
+
+        # Basic test that unrecognized types fail properly
+        with self.assertRaises(TypeError):
+            print(self.rect1.intersect(5))
+
+    def test_to_point(self):
+        """Rectangle: to_point"""
+        for rectangle in (self.rect1, self.rect2, self.rect3):
+            point = rectangle.to_point()
+
+            self.assertEqual(point, (rectangle.x, rectangle.y, 0, 0))
+
+    def test_union(self):
+        """Rectangle: union finds bounding box for two rectangles"""
+        self.assertEqual(self.rect1.union(self.rect2), Rectangle(
             self.rect1.x, self.rect1.y,
             self.rect2.x2 - self.rect1.x,
             self.rect2.y2 - self.rect1.y))
-        self.assertEqual(self.rect2 | self.rect1, Rectangle(
+        self.assertEqual(self.rect2.union(self.rect1), Rectangle(
             self.rect1.x, self.rect1.y,
             self.rect2.x2 - self.rect1.x,
             self.rect2.y2 - self.rect1.y))
-        self.assertEqual(Rectangle(-2, -5, 1, 1) | Rectangle(2, 5, 1, 1),
+        self.assertEqual(Rectangle(-2, -5, 1, 1).union(Rectangle(2, 5, 1, 1)),
                          Rectangle(-2, -5, x2=3, y2=6))
 
         # Basic test that unrecognized types fail properly
         with self.assertRaises(TypeError):
-            print(self.rect1 | 5)
+            print(self.rect1.union(5))
+
+    def test_subtract(self):
+        """Rectangle: subtract"""
+        # Subtracting a non-intersecting rectangle returns self
+        self.assertIs(self.rect1.subtract(Rectangle(10, 10, 1, 1)), self.rect1)
+
+        # Basic checks that subtracting chops off the correct edge
+        rect = Rectangle(x=2, y=4, x2=8, y2=12)
+        print("Testing subtracting from ", rect)
+        for length, thickness in ((5, 2), (7, 2), (5, 10), (10, 10)):
+            print(length, thickness)
+            self.assertEqual(rect.subtract(
+                Rectangle(x=rect.x + 5, y=rect.y + 2,
+                          width=-length, height=-thickness)),
+                Rectangle(x=2, y=4 + 2, x2=8, y2=12))
+            self.assertEqual(rect.subtract(
+                Rectangle(x=rect.x2 - 5, y=rect.y2 - 2,
+                          width=length, height=thickness)),
+                Rectangle(x=2, y=4, x2=8, y2=12 - 2))
+            self.assertEqual(rect.subtract(
+                Rectangle(x=rect.x + 2, y=rect.y + 5,
+                          width=-thickness, height=-length)),
+                Rectangle(x=2 + 2, y=4, x2=8, y2=12))
+            self.assertEqual(rect.subtract(
+                Rectangle(x=rect.x2 - 2, y=rect.y2 - 5,
+                          width=thickness, height=length)),
+                Rectangle(x=2, y=4, x2=8 - 2, y2=12))
+
+    def test_relative_conversion_basic(self):
+        """Rectangle: converting to/from relative coordinates works"""
+        # Test with explicit, known values
+        ref_rect = Rectangle(-10, 5, 0, 0)
+        start_rect = Rectangle(1, 2, 3, 4)
+        expected_rect = Rectangle(11, -3, 3, 4)
+
+        rel_rect = start_rect.to_relative(ref_rect)
+        self.assertEqual(rel_rect, expected_rect)
+        self.assertEqual(rel_rect.from_relative(ref_rect), start_rect)
+
+    def test_rel_conversion_symmetry(self):
+        """Rectangle: converting to/from relative coordinates is symmetrical"""
+        # Test a variety of combinations
+        for ref_rect in (Rectangle(0, 0, 100, 200), Rectangle(-30, -40, 0, 0),
+                Rectangle(300, 400, 0, 0), Rectangle(-200, -200, 1000, 1000)):
+            for test_rect in (Rectangle(0, 0, 3, 0), Rectangle(-1000, 0, 1, 2),
+                    Rectangle(1000, 1000, 100, 100), Rectangle(10, 10, 10, 1)):
+                rel_rect = test_rect.to_relative(ref_rect)
+                self.assertEqual(test_rect, rel_rect.from_relative(ref_rect))
+
+    def test_gravity_noop(self):  # type: () -> None
+        """Rectangle: gravity conversions on top-left corner are no-ops."""
+        start_rect = Rectangle(x=2, y=4, width=8, height=6)
+        self.assertEqual(start_rect, start_rect.to_gravity(Gravity.TOP_LEFT))
+        self.assertEqual(start_rect,
+            start_rect.from_gravity(Gravity.TOP_LEFT))
+
+    def test_gravity_conversion(self):
+        """Rectangle: basic gravity conversions"""
+
+        # Basic test with center gravity and an even width and height
+        start_rect = Rectangle(x=2, y=4, width=8, height=6)
+        grav_rect = start_rect.to_gravity(Gravity.CENTER)
+        self.assertEqual(grav_rect, Rectangle(x=6, y=7, width=8, height=6))
+        self.assertEqual(grav_rect.from_gravity(Gravity.CENTER), start_rect)
+
+        # Test all combinations in a slightly less transparent manner
+        for edge in (100, 200):
+            ehalf = edge / 2
+            for gravity, expect in (
+                    (Gravity.TOP_LEFT, (0, 0)),
+                    (Gravity.TOP, (ehalf, 0)),
+                    (Gravity.TOP_RIGHT, (edge, 0)),
+                    (Gravity.LEFT, (0, ehalf)),
+                    (Gravity.CENTER, (ehalf, ehalf)),
+                    (Gravity.RIGHT, (edge, ehalf)),
+                    (Gravity.BOTTOM_LEFT, (0, edge)),
+                    (Gravity.BOTTOM, (ehalf, edge)),
+                    (Gravity.BOTTOM_RIGHT, (edge, edge))):
+                rect = Rectangle(0, 0, edge, edge)
+
+                grav_rect = rect.to_gravity(gravity)
+                self.assertEqual(grav_rect.to_point(),
+                    Rectangle(rect.x + expect[0], rect.y + expect[1], 0, 0))
+                self.assertEqual(rect, grav_rect.from_gravity(gravity))
+
+    def test_gravity_rounding(self):
+        """Rectangle: gravity conversions truncate predictably"""
+        self.assertEqual(
+            Rectangle(3, 5, 7, 9).to_gravity(Gravity.CENTER),
+            Rectangle(6, 9, 7, 9))
 
     def test_gdk_round_tripping(self):
         """Rectangle: from_gdk/to_gdk"""
@@ -362,7 +440,7 @@ class TestRectangle(unittest.TestCase):
         # To make sure we're not just setting dummy properties, test the
         # results of GdkRectangle's union operator against ours.
         result = Rectangle.from_gdk(gdk_rect1.union(gdk_rect2))
-        control = test_rect1 | test_rect2
+        control = test_rect1.union(test_rect2)
 
         self.assertEqual(result, control)
 
@@ -372,185 +450,155 @@ class TestRectangle(unittest.TestCase):
         self.assertEqual(self.rect1.y2, self.rect1.y + self.rect1.height)
 
 
-class TestRegion(unittest.TestCase):
-    """Tests for my custom Region class"""
-
-    def _check_copy(self, region1, region2):
-        """Helper for checking for a deep copy"""
-        self.assertEqual(region1, region2)
-        self.assertIsNot(region1, region2)
-
-        for rect1, rect2 in zip(region1._rects, region2._rects):
-            self.assertEqual(rect1, rect2)
-            self.assertIsNot(rect1, rect2)
-
-    # TODO: Test __and__
+class TestUsableRegion(unittest.TestCase):
+    """Tests for my per-monitor _NET_WORKAREA calculation class"""
 
     def test_bool(self):
-        """Region: __bool__"""
+        """UsableRegion: __bool__"""
         # Empty regions are falsy
-        test_region = Region()
+        test_region = UsableRegion()
+        self.assertFalse(test_region)
+
+        # Regions containing non-empty monitors are truthy
+        test_region.set_monitors([Rectangle(0, 0, 1920, 1080)])
+        test_region.set_monitors([Rectangle(1280, 1024, 1920, 1080)])
+        self.assertTrue(test_region)
+
+        # Regions containing only empty monitors are falsy
+        mon1 = Rectangle(5, 10, 0, 0)
+        test_region.set_monitors([Rectangle(0, 0, 0, 0)])
         self.assertFalse(test_region)
 
         # Force a denormalized region to verify that empty rectangles are still
         # treated as falsy
-        test_region._rects.append(Rectangle(0, 0, 0, 0))
+        # pylint: disable=protected-access
+        test_region._monitors = [mon1]
+        test_region._usable = {mon1: mon1}
         self.assertFalse(test_region)
 
-        # Regions containing at least one empty rectangle are truthy
-        self.assertTrue(Region(Rectangle(0, 0, 0, 0), Rectangle(0, 0, 1, 1)))
+        # TODO: Figure out how `Virtual` settings larger than the physical
+        #       resolution look to these APIs and then pin down and test the
+        #       behaviour for setting desktop rectangles that aren't the union
+        #       of the monitor rectangles.
+        #       (`Virtual` is the Xorg.conf setting which allows you to scroll
+        #       around a desktop bigger that what the monitors show.)
 
-    def test_construction(self):
-        """Region: copy"""
-        test_rects = [Rectangle(1, 2, 3, 4), Rectangle(5, 6, 7, 8)]
-        test_region_1 = Region(*test_rects)
-        test_region_2 = Region(*test_rects)
+    def test_find_usable_rect(self):
+        """UsableRegion: find_usable_rect"""
+        test_region = UsableRegion()
 
-        self._check_copy(test_region_1, test_region_2)
+        # Actual rectangles of my monitors
+        # TODO: Double-check that this matches the real-world API outputs
+        #       (eg. make sure there are no lurking off-by-one errors)
+        test_region.set_monitors([
+            Rectangle(0, 56, 1280, 1024),
+            Rectangle(1280, 0, 1920, 1080),
+            Rectangle(3200, 56, 1280, 1024)])
 
-    def test_copy(self):
-        """Region: copy"""
-        test_region_1 = Region(Rectangle(1, 2, 3, 4))
-        test_region_2 = test_region_1.copy()
+        # Actual struts harvested from my desktop's panels
+        # (Keep the empty struts at the beginning and end. One from an
+        #  auto-hiding Plasma 5 panel caught an early bug where
+        #  only the last strut subtracted from a monitor was retained)
+        test_region.set_panels([
+            StrutPartial(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+            StrutPartial(0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 3200, 4479),
+            StrutPartial(0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 1280, 3199),
+            StrutPartial(0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 1279),
+            StrutPartial(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        ])
 
-        self._check_copy(test_region_1, test_region_2)
+        # Out-of-bounds Space
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(-3, 1, 1, 1)), None)
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(200, -5, 1, 1)), None)
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(5000, 200, 1, 1)), None)
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(200, 5000, 1, 1)), None)
 
-    def test_eq(self):
-        """Region: __eq__"""
-        test_rect = Rectangle(1, 2, 3, 4)
-        test_region_1 = Region(test_rect)
-        test_region_2 = test_region_1.copy()
+        # Dead Space
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(1, 1, 1, 1)), None)
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(3203, 1, 1, 1)), None)
 
-        self.assertEqual(test_region_1, test_region_1)
-        self.assertEqual(test_region_1, test_region_2)
-        self.assertNotEqual(test_region_1, test_rect)
+        # Reserved Space
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(0, 1277, 1, 1)), None)
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(0, 2000, 1, 1)), None)
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(3400, 1277, 1, 1)), None)
 
-        test_region_3 = Region(Rectangle(1, 2, 3, 4))
-        test_region_4 = Region(Rectangle(1, 2, 3, 5))
-        test_region_5 = Region(Rectangle(1, 2, 3, 4), Rectangle(1, 2, 3, 5))
-        self.assertEqual(test_region_1, test_region_3)
-        self.assertNotEqual(test_region_1, test_region_4)
-        self.assertNotEqual(test_region_1, test_region_5)
+        # Available Space
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(10, 640, 1, 1)),
+            Rectangle(x=0, y=56, width=1280, height=994))
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(3000, 640, 1, 1)),
+            Rectangle(x=1280, y=0, width=1920, height=1050))
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(3300, 640, 1, 1)),
+            Rectangle(x=3200, y=56, width=1280, height=994))
 
-    def test_get_clipbox(self):
-        """Region: get_clipbox"""
-        # one rect
-        self.assertEqual(Rectangle(0, 0, 2, 1),
-            Region(Rectangle(0, 0, 2, 1)).get_clipbox())
+        # TODO: Test edge pixels for off-by-one errors
 
-        # Top-left and bottom-right (contiguous)
-        self.assertEqual(Rectangle(0, 0, 2, 5),
-            Region(Rectangle(0, 0, 2, 1), Rectangle(1, 0, 1, 5)).get_clipbox())
+    def test_update_typecheck(self):
+        """UsableRegion: type enforcement for internal _update function"""
+        test_region = UsableRegion()
+        with self.assertRaises(TypeError):
+            # Must be a *list* of Rectangles
+            test_region.set_monitors(Rectangle(0, 0, 1280, 1024))
 
-        # Top-left and bottom-right (non-contiguous)
-        self.assertEqual(Rectangle(0, 0, 6, 6),
-            Region(Rectangle(0, 0, 1, 1), Rectangle(5, 5, 1, 1)).get_clipbox())
+        test_region = UsableRegion()
+        with self.assertRaises(TypeError):
+            # Use a tuple as a test because, just because it's a namedtuple
+            # doesn't mean we want *any* tuple with the right arity
+            test_region.set_monitors([(0, 0, 1280, 1024)])
 
-        # Bottom-left and top-right (non-contiguous)
-        self.assertEqual(Rectangle(0, 0, 6, 6),
-            Region(Rectangle(0, 5, 1, 1), Rectangle(5, 0, 1, 1)).get_clipbox())
+        test_region = UsableRegion()
+        with self.assertRaises(TypeError):
+            # Must be a *list* of StrutPartials
+            test_region.set_panels(
+                StrutPartial(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12))
 
-        # Short and tall (non-contiguous)
-        self.assertEqual(Rectangle(0, 0, 6, 5),
-            Region(Rectangle(0, 3, 1, 1), Rectangle(5, 0, 1, 5)).get_clipbox())
+        test_region = UsableRegion()
+        with self.assertRaises(TypeError):
+            # Use a tuple as a test because, just because it's a namedtuple
+            # doesn't mean we want *any* tuple with the right arity
+            test_region.set_panels([(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)])
 
-        # Empty rects should be eliminated
-        test_region = Region(Rectangle(0, 0, 1, 1), Rectangle(5, 5, 0, 1))
-        self.assertEqual(Rectangle(0, 0, 1, 1), test_region.get_clipbox())
+    def test_update_nonempty(self):
+        """UsableRegion: only add non-empty entries to _usable"""
 
-        # Force a denormalized region to verify empty rects don't clipbox
-        test_region._rects.append(Rectangle(3, 8, 1, 0))
-        self.assertEqual(Rectangle(0, 0, 1, 1), test_region.get_clipbox())
+        mon1 = Rectangle(1280, 0, 1280, 1024)
+        test_region = UsableRegion()
+        test_region.set_monitors([mon1,
+            Rectangle(0, 0, 100, 0),
+            Rectangle(0, 0, 0, 100),
+            Rectangle(0, 0, 0, 0)])
 
-    # TODO: Test __ior__
+        # pylint: disable=protected-access
+        self.assertEqual(list(test_region._usable.keys()),
+            [Rectangle(1280, 0, 1280, 1024)])
 
     def test_repr(self):
-        """Region: __repr__"""
-        self.assertEqual(repr(Region()), "Region()")
-        self.assertEqual(repr(Region(Rectangle(0, 0, 0, 0))), "Region()")
-        self.assertEqual(
-            repr(Region(Rectangle(0, 0, 0, 0), Rectangle(0, 0, 1, 1))),
-            "Region(Rectangle(x=0, y=0, width=1, height=1))")
-        self.assertIn(
-            repr(Region(Rectangle(0, 2, 1, 1), Rectangle(0, 0, 1, 1))), (
-                "Region(Rectangle(x=0, y=2, width=1, height=1), "
-                "Rectangle(x=0, y=0, width=1, height=1))",
-                "Region(Rectangle(x=0, y=0, width=1, height=1), "
-                "Rectangle(x=0, y=2, width=1, height=1))"))
+        """UsableRegion: __repr__"""
+        test_region = UsableRegion()
+        self.assertEqual(repr(test_region), "Region(<Monitors=[], Struts=[]>)")
 
+        test_region.set_monitors([Rectangle(1, 2, 3, 4)])
+        self.assertEqual(repr(test_region), "Region("
+            "<Monitors=[Rectangle(x=1, y=2, width=3, height=4)], Struts=[]>)")
 
-class TestWindowGravity(unittest.TestCase):
-    """Test the equivalence and correctness of L{wm.GRAVITY} values."""
-
-    def setUp(self):  # type: () -> None
-        # Set up a nice, oddly-shaped fake desktop made from screens
-        # I actually have access to (though not all on the same PC)
-
-        # TODO: Also work in some fake panel struts
-        self.desktop = Region()
-        for rect in MOCK_SCREENS:
-            self.desktop |= rect
-
-    def test_gravity_equivalence(self):  # type: () -> None
-        """Gravity Lookup Table: text/GDK/WNCK constants are equivalent"""
-        for alignment in ('CENTER', 'NORTH', 'NORTH_WEST', 'SOUTH_EAST',
-                          'EAST', 'NORTH_EAST', 'SOUTH', 'SOUTH_WEST', 'WEST'):
-            self.assertEqual(wm.GRAVITY[alignment],
-                wm.GRAVITY[getattr(Gdk.Gravity, alignment)])
-            self.assertEqual(
-                wm.GRAVITY[getattr(Wnck.WindowGravity,
-                                   alignment.replace('_', ''))],
-                wm.GRAVITY[getattr(Gdk.Gravity, alignment)])
-
-    def test_gravity_correctness(self):  # type: () -> None
-        """Gravity Lookup Table: Constants have correct percentage values"""
-        for alignment, coords in (
-                ('NORTH_WEST', (0, 0)), ('NORTH', (0.5, 0)),
-                ('NORTH_EAST', (1.0, 0.0)), ('WEST', (0.0, 0.5)),
-                ('CENTER', (0.5, 0.5)), ('EAST', (1, 0.5)),
-                ('SOUTH_WEST', (0.0, 1.0)), ('SOUTH', (0.5, 1.0)),
-                ('SOUTH_EAST', (1.0, 1.0))):
-            self.assertEqual(wm.GRAVITY[
-                getattr(Gdk.Gravity, alignment)], coords)
-
-
-class TestWindowManagerDetached(unittest.TestCase):
-    """Tests which exercise L{wm.WindowManager} without needing X11."""
-
-    def setUp(self):  # type: () -> None
-        # Shorthand
-        self.WM = wm.WindowManager  # pylint: disable=invalid-name
-
-        # TODO: Also work in some fake panel struts
-        self.desktop = Region()
-        for rect in MOCK_SCREENS:
-            self.desktop |= rect
-
-    def test_win_gravity_noop(self):  # type: () -> None
-        """WindowManager.calc_win_gravity: north-west should be a no-op
-
-        (Might as well use the screen shapes to test this. It saves effort.)
-        """
-        for rect in [self.desktop.get_clipbox()] + MOCK_SCREENS:
-            self.assertEqual((rect.x, rect.y),
-                self.WM.calc_win_gravity(rect, Gdk.Gravity.NORTH_WEST),
-                "NORTHWEST gravity should be a no-op.")
-
-    def test_win_gravity_results(self):  # type: () -> None
-        """WindowManager.calc_win_gravity: proper results"""
-        for edge in (100, 200):
-            ehalf = edge / 2
-            for gravity, expect in (
-                    ('NORTH_WEST', (0, 0)), ('NORTH', (-ehalf, 0)),
-                    ('NORTH_EAST', (-edge, 0)), ('WEST', (0, -ehalf)),
-                    ('CENTER', (-ehalf, -ehalf)), ('EAST', (-edge, -ehalf)),
-                    ('SOUTH_WEST', (0, -edge)), ('SOUTH', (-ehalf, -edge)),
-                    ('SOUTH_EAST', (-edge, -edge))):
-                rect = Rectangle(0, 0, edge, edge)
-                grav = getattr(Gdk.Gravity, gravity)
-
-                self.assertEqual(self.WM.calc_win_gravity(rect, grav), expect)
-
-    # TODO: Test the rest of the functionality
+        test_region.set_panels(
+            [StrutPartial(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)])
+        self.assertEqual(repr(test_region), "Region(<"
+            "Monitors=[Rectangle(x=1, y=2, width=3, height=4)], "
+            "Struts=[StrutPartial(left=1, right=2, top=3, bottom=4, "
+            "left_start_y=5, left_end_y=6, right_start_y=7, right_end_y=8, "
+            "top_start_x=9, top_end_x=10, bottom_start_x=11, bottom_end_x=12)]"
+            ">)")
 
 # vim: set sw=4 sts=4 expandtab :

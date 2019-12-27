@@ -3,13 +3,15 @@
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
-import copy
-from collections import MutableMapping, namedtuple
+import sys
+from collections import namedtuple
+from enum import Enum
 from itertools import chain, combinations
 
 import gi
+from functools import reduce  # pylint: disable=redefined-builtin
 gi.require_version('Gdk', '3.0')
-from gi.repository import Gdk, Wnck
+from gi.repository import Gdk
 
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
@@ -29,6 +31,21 @@ if MYPY:  # pragma: nocover
     # FIXME: Replace */** with a dict so I can be strict here
     CommandCB = Callable[..., Any]
 del MYPY
+
+# TODO: Re-add log.debug() calls in strategic places
+
+
+class Gravity(Enum):  # pylint: disable=too-few-public-methods
+    """Gravity definitions used by Rectangle"""
+    TOP_LEFT = (0.0, 0.0)
+    TOP = (0.5, 0.0)
+    TOP_RIGHT = (1.0, 0.0)
+    LEFT = (0.0, 0.5)
+    CENTER = (0.5, 0.5)
+    RIGHT = (1.0, 0.5)
+    BOTTOM_LEFT = (0.0, 1.0)
+    BOTTOM = (0.5, 1.0)
+    BOTTOM_RIGHT = (1.0, 1.0)
 
 
 def clamp_idx(idx, stop, wrap=True):
@@ -120,62 +137,76 @@ def fmt_table(rows,          # type: Any
 
     return ''.join(output)
 
+# Internal StrutPartial parent. Exposed so ePyDoc doesn't complain
+_StrutPartial = namedtuple('StrutPartial', 'left right top bottom '
+        'left_start_y left_end_y right_start_y right_end_y '
+        'top_start_x top_end_x bottom_start_x bottom_end_x')
 
-class EnumSafeDict(MutableMapping):
-    """A dict-like object which avoids comparing objects of different types
-    to avoid triggering spurious Glib "comparing different enum types"
-    warnings.
+
+class StrutPartial(_StrutPartial):
+    """A simple wrapper for the sequence retrieved from _NET_WM_STRUT_PARTIAL.
+    (or _NET_WM_STRUT thanks to default parameters)
+
+    Purpose:
+    Minimize the chances of screwing up indexing into _NET_WM_STRUT_PARTIAL
+
+    Method:
+        - This namedtuple was created by copy-pasting the definition string
+          from https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html
+          and then manually deleting the commas from it if necessary.
+        - A __new__ was added to create StrutPartial instances from
+          _NET_WM_STRUT data by providing default values for the missing fields
     """
+    __slots__ = ()
 
-    def __init__(self, *args):
-        self._contents = {}
+    def __new__(cls, left, right, top, bottom,  # pylint: disable=R0913
+            left_start_y=0, left_end_y=sys.maxsize,
+            right_start_y=0, right_end_y=sys.maxsize,
+            top_start_x=0, top_end_x=sys.maxsize,
+            bottom_start_x=0, bottom_end_x=sys.maxsize):
 
-        for in_dict in args:
-            for key, val in in_dict.items():
-                self[key] = val
+        return cls.__bases__[0].__new__(cls, left, right, top, bottom,
+            left_start_y, left_end_y, right_start_y, right_end_y,
+            top_start_x, top_end_x, bottom_start_x, bottom_end_x)
 
-    def __contains__(self, key):  # type: (Any) -> bool
-        ktype = type(key)
-        return ktype in self._contents and key in self._contents[ktype]
+    def as_rects(self, desktop_rect):  # type: (Rectangle) -> List[Rectangle]
+        """Resolve self into absolute coordinates relative to desktop_rect
 
-    def __delitem__(self, key):  # type: (Any) -> None
-        if key in self:
-            ktype = type(key)
-            section = self._contents[ktype]
-            del section[key]
-            if not section:
-                del self._contents[ktype]
-        else:
-            raise KeyError(key)
+        Note that struts are relative to bounding box of the whole desktop,
+        not the edges of individual screens.
 
-    def __getitem__(self, key):  # type: (Any) -> Any
-        if key in self:
-            return self._contents[type(key)][key]
-        else:
-            raise KeyError(key)
-
-    def __iter__(self):  # type: () -> Iterator[Any]
-        for section in self._contents.values():
-            for key in section.keys():
-                yield key
-
-    def __len__(self):  # type: () -> int
-        return len(self._contents)
-
-    def __repr__(self):  # type: () -> str
-        return "%s(%s)" % (self.__class__.__name__,
-            ', '.join(repr(x) for x in self._contents.values()))
-
-    def __setitem__(self, key, value):  # type: (Any, Any) -> None
-        ktype = type(key)
-        self._contents.setdefault(ktype, {})[key] = value
-
-    def iteritems(self):  # TODO: Type signature
-        return [(key, self[key]) for key in self]
-
-    def keys(self):  # type: () -> AbstractSet[Any]
-        """D.keys() -> list of D's keys"""
-        return set(self)
+        (ie. if you have two 1280x1024 monitors and a 1920x1080 monitor in a
+        row, with all the tops lined up and a 22px panel spanning all of them
+        on the bottom, the strut reservations for the 1280x1024 monitors will
+        be 22 + (1080 - 1024) = 56px to account for the dead space below the
+        1024px-tall monitors too.)
+        """
+        return [x for x in (
+            # Left
+            Rectangle(
+                x=desktop_rect.x,
+                y=self.left_start_y,
+                width=self.left,
+                y2=self.left_end_y).intersect(desktop_rect),
+            # Right
+            Rectangle(
+                x=desktop_rect.x2,
+                y=self.right_start_y,
+                width=-self.right,
+                y2=self.right_end_y).intersect(desktop_rect),
+            # Top
+            Rectangle(
+                x=self.top_start_x,
+                y=desktop_rect.y,
+                x2=self.top_end_x,
+                height=self.top).intersect(desktop_rect),
+            # Bottom
+            Rectangle(
+                x=self.bottom_start_x,
+                y=desktop_rect.y2,
+                x2=self.bottom_end_x,
+                height=-self.bottom).intersect(desktop_rect),
+        ) if x]
 
 
 # Internal Rectangle parent. Exposed so ePyDoc doesn't complain
@@ -183,12 +214,10 @@ _Rectangle = namedtuple('_Rectangle', 'x y width height')
 
 
 class Rectangle(_Rectangle):
-    """A representation of a rectangle with some useful methods
-
-    (Originally replaces broken Gdk.Rectangle constructor in *buntu 16.04)
-    """
+    """A representation of a rectangle with some useful methods"""
     __slots__ = ()
 
+    # pylint: disable=too-many-arguments
     def __new__(cls, x, y, width=None, height=None, x2=None, y2=None):
         # Validate that we got a correct number of arguments
         if (width, x2).count(None) != 1:
@@ -202,34 +231,36 @@ class Rectangle(_Rectangle):
         if y2:
             height = y2 - y
 
-        # Ensure width and height are not None beyond this point
-        width = width or 0
-        height = height or 0
+        # Ensure values are integers, and that width and height are
+        # not None beyond this point
+        x, y, width, height = int(x), int(y), int(width or 0), int(height or 0)
 
         # Swap (x1, y1) and (x2, y2) as appropriate to invert negative sizes
         if width < 0:
             x = x + width
-            width = -width
+            width = abs(width)
         if height < 0:
             y = y + height
-            height = -height
+            height = abs(height)
 
         return cls.__bases__[0].__new__(cls, x, y, width, height)
 
     @property
-    def x2(self):  # type: () -> int
-        """X coordinate of the bottom-right corner"""
+    def x2(self):  # pylint: disable=invalid-name
+        # type: () -> int
+        """X coordinate of the bottom-right corner assuming top-left gravity"""
         return self.x + self.width
 
     @property
-    def y2(self):  # type: () -> int
-        """Y coordinate of the bottom-right corner"""
+    def y2(self):  # pylint: disable=invalid-name
+        # type: () -> int
+        """Y coordinate of the bottom-right corner assuming top-left gravity"""
         return self.y + self.height
 
-    def __and__(self, other):  # type: (Rectangle) -> Rectangle
-        """The intersection of two rectangles"""
+    def intersect(self, other):  # type: (Rectangle) -> Rectangle
+        """The intersection of two rectangles, assuming top-left gravity."""
         if not isinstance(other, Rectangle):
-            return NotImplemented
+            raise TypeError("Can only intersect with Rectangles")
 
         # pylint: disable=invalid-name
         x1, y1 = max(self.x, other.x), max(self.y, other.y)
@@ -237,14 +268,78 @@ class Rectangle(_Rectangle):
 
         return Rectangle(x1, y1, max(0, x2 - x1), max(0, y2 - y1))
 
+    def subtract(self, other):
+        """Subtract a rectangle from this one.
+
+        This is implemented by shrinking the width/height of `self` away from
+        `other` until they no longer overlap.
+
+        When the overlap crosses more than one edge of `self`, it will be
+        shrunk in whichever direction requires less loss of area.
+
+        Whether to chop left/up or right/down is resolved by comparing the
+        center point of the intersecting region with the center point of the
+        Rectangle being subtracted from.
+
+        In the case of `other` chopping `self` into two disjoint regions,
+        the smaller one will be cut away as if it were covered by `other`.
+
+        @note: If there is no overlap, this will return a reference to `self`
+               without making a copy.
+
+        @todo: This will misbehave in the unlikely event that a panel is
+               thicker than it is long. I'll want to revisit the algorithm
+               once I've cleared out more pressing things.
+        """
+        overlap = self.intersect(other)
+
+        # If there's no overlap, just trust in a tuple's immutability
+        if not overlap:
+            return self
+
+        # Compare centers as the least insane way to handle the possibility of
+        # one Rectangle splitting the other in half when we don't want to
+        # support returning multiple rectangles at this time.
+        self_center = self.to_gravity(Gravity.CENTER).to_point()
+        overlap_center = overlap.to_gravity(Gravity.CENTER).to_point()
+
+        if overlap.width < overlap.height:  # If we're shrinking left/right
+            new_width = self.width - overlap.width
+            if overlap_center.x < self_center.x:  # `other` is left of center
+                return self._replace(x=other.x2, width=new_width)
+            else:
+                return self._replace(width=new_width)
+        else:  # If we're shrinking up/down
+            new_height = self.height - overlap.height
+            if overlap_center.y < self_center.y:
+                return self._replace(y=other.y2, height=new_height)
+            else:
+                return self._replace(height=new_height)
+
     def __bool__(self):  # type: () -> bool
         """A rectangle is truthy if it has a nonzero area"""
         return bool(self.width and self.height)
 
-    def __or__(self, other):  # type: (Rectangle) -> Rectangle
-        """The bounding box of two rectangles"""
+    def __contains__(self, other):
+        """A Rectangle is `in` another if one is *entirely* within the other.
+
+        If you need to check for overlap, check whether
+        C{self.intersect(other)} is truthy.
+
+        @note: This assumes top-left gravity.
+        """
         if not isinstance(other, Rectangle):
-            return NotImplemented
+            return False
+
+        # Assume __new__ normalized for non-negative width and height to allow
+        # a simple, clean formulation of this test
+        return ((self.x <= other.x <= other.x2 <= self.x2) and
+                (self.y <= other.y <= other.y2 <= self.y2))
+
+    def union(self, other):  # type: (Rectangle) -> Rectangle
+        """The bounding box of two rectangles, assuming top-left gravity"""
+        if not isinstance(other, Rectangle):
+            raise TypeError("Can only intersect with Rectangles")
 
         # pylint: disable=invalid-name
         x1, y1 = min(self.x, other.x), min(self.y, other.y)
@@ -252,14 +347,80 @@ class Rectangle(_Rectangle):
 
         return Rectangle(x1, y1, max(0, x2 - x1), max(0, y2 - y1))
 
+    def from_relative(self, other_rect):
+        # type: (Rectangle) -> Rectangle
+        """Interpret self as relative to other_rect and make it absolute
+
+        (eg. Convert a window position that's relative to a given monitor's
+        top-left corner into one that's relative to the desktop as a whole)
+
+        @note: This assumes top-left gravity.
+        """
+        return self._replace(x=self.x + other_rect.x,
+                             y=self.y + other_rect.y)
+
+    def to_relative(self, other_rect):
+        # type: (Rectangle) -> Rectangle
+        """Interpret self as absolute and make it relative to other_rect
+
+        (eg. Convert a window position that's relative to the top-left corner
+        of the desktop as a whole into one that's relative to a single monitor)
+
+        @note: This assumes top-left gravity.
+        """
+        return self._replace(x=self.x - other_rect.x,
+                             y=self.y - other_rect.y)
+
+    def to_point(self):
+        # type: () -> Rectangle
+        """Return a new Rectangle with zero width and height"""
+        return self._replace(width=0, height=0)
+
+    def from_gravity(self, gravity):  # (Gravity) -> Rectangle
+        """Treat x and y as not referring to top-left corner and translate
+
+        @note: Almost every C{Rectangle} method assumes top-left gravity, so
+               this should be the first thing done.
+
+        @todo: Think about how to refactor to guard against that error.
+        """
+        return self._replace(
+            x=int(self.x - (self.width * gravity.value[0])),
+            y=int(self.y - (self.height * gravity.value[1]))
+        )
+
+    def to_gravity(self, gravity):  # (Gravity) -> Rectangle
+        """Reverse the effect of from_gravity
+
+        Less concisely, this will interpret `self`'s `x` and `y` members as
+        referring to the top-left corner of the rectangle and then translate
+        them to refer to another point.
+
+        @note: Almost every C{Rectangle} method assumes top-left gravity, so
+               this should be the last thing done.
+
+        @note: This is intended for working in pixel values and will truncate
+               any decimal component.
+        """
+        return self._replace(
+            x=int(self.x + (self.width * gravity.value[0])),
+            y=int(self.y + (self.height * gravity.value[1]))
+        )
+
     @classmethod
     def from_gdk(cls, gdk_rect):
-        """Factory function to convert from a Gdk.Rectangle"""
+        """Factory function to convert from a Gdk.Rectangle
+
+        @note: This assumes top-left gravity.
+        """
         return cls(x=gdk_rect.x, y=gdk_rect.y,
                    width=gdk_rect.width, height=gdk_rect.height)
 
     def to_gdk(self):
-        """Helper to work around awkward broken GIR metadata in *buntu 16.04"""
+        """Helper to easily create a Gdk.Rectangle from a Rectangle
+
+        @note: This assumes top-left gravity.
+        """
         gdk_rect = Gdk.Rectangle()
         gdk_rect.x = self.x
         gdk_rect.y = self.y
@@ -268,100 +429,91 @@ class Rectangle(_Rectangle):
         return gdk_rect
 
 
-class Region(object):
-    """A replacement for broken cairo.Region constructor in *buntu 16.04"""
+class UsableRegion(object):
+    """A representation of the usable portion of a desktop
 
-    def __init__(self, *initial_rects):
-        """Initialze a new region, optionally with a shallow copy of a rect."""
-        # TODO: Support taking a Region as an input
-        self._rects = copy.deepcopy(list(initial_rects))
-        self._clean_up()
+    (In essence, this calculates per-monitor _NET_WORKAREA rectangles
+    and allows lookup of the correct one for a given target rectangle)
+    """
 
-    def _clean_up(self):  # type: () -> None
-        for rect in self._rects:
-            assert isinstance(rect, Rectangle)  # nosec
+    def __init__(self):
+        self._monitors = []
+        self._struts = []
 
-        self._rects.sort()
+        # NOTE: Invalidated by resolution changes unless watching notify events
+        self._usable = {}  # type: Mapping[Rectangle, Rectangle]
 
-        # Strip out empty rects
-        self._rects = [x for x in self._rects if x]
+    # TODO: Subscribe to monitor hotplugging in the code which calls this
+    def set_monitors(self, monitor_rects):
+        # type: (Iterable[Rectangle]) -> None
+        """Set the list of monitors from which to calculate usable regions"""
+        self._monitors = list(monitor_rects)
+        self._update()
 
-        # TODO: Simplify the list of rects
-        # (eg. eliminate rects with no areas that don't overlap other rects)
-        #
-        # TODO: Once I have something basic that works, use
-        # https://www.widelands.org/~sirver/wl/141229_devail_rects.pdf to
-        # do it with lower algorithmic complexity.
-        #
-        # Other resources to consider if, for some reason, that's unsuitable:
-        # - https://stackoverflow.com/a/40673354
-        # - https://stackoverflow.com/a/30307841
-        # - https://mathematica.stackexchange.com/a/58939
+    # TODO: Subscribe to changes to panel geometry in the code which calls this
+    def set_panels(self, panel_struts):
+        # type: (Iterable[StrutPartial]) -> None
+        """Set the list of rectangles to be excluded from the usable regions"""
+        self._struts = list(panel_struts)
+        self._update()
 
-    def copy(self):  # type: () -> Region
-        """Porting shim for things expecting cairo.Region.copy"""
-        return copy.deepcopy(self)
+    def _update(self):  # type: () -> None
+        """Check input values and regenerate internal caches"""
+        # Assert that all monitors are Rectangles
+        # and all Struts are StrutPartials
+        for rect in self._monitors:
+            if not isinstance(rect, Rectangle):
+                raise TypeError("monitors must be of type Rectangle")
+        for strut in self._struts:
+            if not isinstance(strut, StrutPartial):
+                raise TypeError("struts must be of type StrutPartial")
+                # ...so they can be re-calculated on resolution change
 
-    def get_clipbox(self):  # type: () -> Rectangle
-        """Return the smallest rectangle which encompasses the region"""
-        # TODO: Unit tests
-        field_vecs = list(zip(*((r.x, r.y, r.x2, r.y2)
-            for r in self._rects if r)))
-        return Rectangle(
-            x=min(field_vecs[0]), y=min(field_vecs[1]),
-            x2=max(field_vecs[2]), y2=max(field_vecs[3]))
+        # Calculate the desktop rectangle (and ensure it extends to (0, 0))
+        desktop_rect = reduce(lambda x, y: x.union(y), self._monitors)
+        desktop_rect = desktop_rect.union(Rectangle(0, 0, 0, 0))
 
-    # TODO: Counterpart to get_clipbox which returns the largest usable
-    #       internal rectangle and test it with constrain_to_rect as a way
-    #       to get usable rects for heterogeneous monitors.
-    #       Also, test with panels in interior edges of the desktop.
+        # Resolve the struts to Rectangles relative to desktop_rect
+        strut_rects = []  # type: List[Rectangle]
+        for strut in self._struts:
+            # TODO: Test for off-by-one bugs
+            strut_rects.extend(strut.as_rects(desktop_rect))
 
-    def __and__(self, rect):  # type: (Rectangle) -> Region
-        """Constrain this region to a clipping Rectangle"""
-        if not isinstance(rect, Rectangle):
-            return NotImplemented
+        # Calculate the *usable* monitor regions by subtracting the strut rects
+        self._usable = {}
+        for monitor in self._monitors:
+            usable = monitor
+            for panel in strut_rects:
+                usable = usable.subtract(panel)
 
-        out_rects = []
-        for inner_rect in self._rects:
-            new_rect = inner_rect & rect
-            if new_rect:
-                out_rects.append(new_rect)
+            # Only add non-empty entries to _usable
+            if usable:
+                self._usable[monitor] = usable
 
-        return Region(*out_rects)
+    def find_usable_rect(self, rect):
+        # type: (Rectangle) -> Optional[Rectangle]
+        """Find the usable Rectangle for the monitor containing rect"""
+        window_center = rect.to_gravity(Gravity.CENTER).to_point()
+        for monitor in self._usable:
+            if window_center in monitor:
+                return self._usable[monitor]
+        return None
 
     def __bool__(self):  # type: () -> bool
         """A Region is truthy if it has a non-zero area"""
-        return bool(len(self._rects) > 0 and all(self._rects))
-
-    def __eq__(self, other):  # type: (Any) -> bool
-        """Deep compare for equality"""
-        if self is other:
-            return True
-        elif not isinstance(other, Region):
-            return False
-        elif len(self._rects) != len(other._rects):
-            return False
-        else:
-            return all(x == y for x, y in zip(self._rects, other._rects))
-
-    def __ior__(self, rect):  # type: (Rectangle) -> Region
-        """In-place union of the given Rectangle and this Region"""
-        if not isinstance(rect, Rectangle):
-            return NotImplemented
-
-        self._rects.append(copy.deepcopy(rect))
-        self._clean_up()
-
-        return self
+        return bool(len(self._usable) > 0 and
+            all(self._usable.values()))
 
     def __repr__(self):  # type: () -> str
-        return "Region({})".format(', '.join(repr(x) for x in self._rects))
+        return "Region(<Monitors={!r}, Struts={!r}>)".format(
+            self._monitors, self._struts)
 
 
 class XInitError(Exception):
     """Raised when something outside our control causes the X11 connection to
        fail.
     """
+    # TODO: Rework the use of this to use `raise XInitError(...) from err`
 
     def __str__(self):
         return ("%s\n\t(The cause of this error lies outside of QuickTile)" %
