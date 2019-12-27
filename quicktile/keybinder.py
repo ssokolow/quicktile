@@ -42,14 +42,14 @@ class KeyBinder(object):
     #: Used to pass state from L{cb_xerror}
     keybind_failed = False
 
-    def __init__(self, xdisplay=None):  # type: (Optional[Display]) -> None
+    def __init__(self, x_display):  # type: (Optional[Display]) -> None
         """Connect to X11 and the GLib event loop.
 
-        @param xdisplay: A C{python-xlib} display handle.
-        @type xdisplay: C{Xlib.display.Display}
+        @param x_display: A C{python-xlib} display handle.
+        @type x_display: C{Xlib.display.Display}
         """
         try:
-            self.xdisp = xdisplay or Display()
+            self.xdisp = x_display
         except (UnicodeDecodeError, DisplayConnectionError) as err:
             raise XInitError("python-xlib failed with %s when asked to open"
                              " a connection to the X server. Cannot bind keys."
@@ -218,7 +218,7 @@ def init(modmask,   # type: Optional[str]
         modmask = ''
 
     try:
-        keybinder = KeyBinder()
+        keybinder = KeyBinder(x_display=winman.x_display)
     except XInitError as err:
         logging.error("%s", err)
         return None

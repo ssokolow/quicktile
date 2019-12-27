@@ -8,14 +8,17 @@ __license__ = "GNU GPL 2.0 or later"
 import errno, logging, os, signal, sys
 from configparser import ConfigParser
 
+from Xlib.display import Display as XDisplay
+from Xlib.error import DisplayConnectionError
+
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Wnck', '3.0')
 from gi.repository import Gtk, Wnck  # pylint: disable=no-name-in-module
 
-# TODO: Port gtkexcepthook to GTK+ 3.x
-# from . import gtkexcepthook
-# gtkexcepthook.enable()
+# TODO: Make gtkexcepthook disable-able for functional testing
+from . import gtkexcepthook
+gtkexcepthook.enable()
 
 from . import commands, layout
 from .util import fmt_table, XInitError
@@ -50,7 +53,7 @@ DEFAULTS = {
         "KP_2": "bottom",
         "KP_3": "bottom-right",
         "KP_4": "left",
-        "KP_5": "middle",
+        "KP_5": "center",
         "KP_6": "right",
         "KP_7": "top-left",
         "KP_8": "top",
@@ -60,6 +63,11 @@ DEFAULTS = {
         "C": "move-to-center",
     }
 }  # type: Dict[str, Dict[str, Union[str, int, float, bool, None]]]
+# TODO: Porting helper which identifies "middle" in the config file and changes
+#       it to "center"
+#
+#       (But also warn heavily on the README, since it can be passed in other
+#       ways that a porting helper can't find and fix.)
 
 KEYLOOKUP = {
     ',': 'comma',
@@ -261,9 +269,6 @@ def main():  # type: () -> None
     first_run = not os.path.exists(cfg_path)
     config = load_config(cfg_path)
 
-    ignore_workarea = ((not config.getboolean('general', 'UseWorkarea')) or
-                       opts.no_workarea)
-
     # TODO: Rearchitect so this hack isn't needed
     commands.cycle_dimensions = commands.commands.add_many(
         layout.make_winsplit_positions(config.getint('general', 'ColumnCount'))
@@ -271,7 +276,17 @@ def main():  # type: () -> None
     commands.commands.extra_state = {'config': config}
 
     try:
-        winman = WindowManager(ignore_workarea=ignore_workarea)
+        x_display = XDisplay()
+    except (UnicodeDecodeError, DisplayConnectionError) as err:
+        raise XInitError("python-xlib failed with %s when asked to open"
+                        " a connection to the X server. Cannot bind keys."
+                        "\n\tIt's unclear why this happens, but it is"
+                        " usually fixed by deleting your ~/.Xauthority"
+                        " file and rebooting."
+                        % err.__class__.__name__)
+
+    try:
+        winman = WindowManager(x_display=x_display)
     except XInitError as err:
         logging.critical("%s", err)
         sys.exit(1)

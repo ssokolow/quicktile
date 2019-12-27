@@ -169,7 +169,6 @@ def analyse(exctyp,           # type: Type[BaseException]
             fname, lineno, funcname, inspect.formatargvalues(*args_tuple,
             formatvalue=lambda v: '=' + pydoc.text.repr(v)))
 
-        print(type(context), repr(context))
         trace.write(frame_wrapper.fill(trace_frame) + '\n')
         trace.write(''.join(['    ' + x.replace('\t', '  ')
             for x in filter(lambda a: a.strip(), context or [])]))

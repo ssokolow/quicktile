@@ -6,6 +6,8 @@ __license__ = "GNU GPL 2.0 or later"
 import math
 from heapq import heappop, heappush
 
+from .util import Gravity, Rectangle
+
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
 MYPY = False
@@ -15,13 +17,13 @@ if MYPY:
                         Sequence, Sized, Tuple, Union)
 
     # pylint: disable=import-error, no-name-in-module
-    from gi.repository.Gdk import Rectangle
     from .util import GeomTuple, PercentRectTuple  # NOQA
 
     Geom = Union[Rectangle, GeomTuple]  # pylint: disable=invalid-name
 del MYPY
 
 
+# TODO: MyPy type annotations
 def check_tolerance(distance, monitor_geom, tolerance=0.1):
     """Check whether a distance is within tolerance, adjusted for window size.
 
@@ -37,6 +39,7 @@ def check_tolerance(distance, monitor_geom, tolerance=0.1):
     return float(distance) / math.hypot(*tuple(monitor_geom)[2:4]) < tolerance
 
 
+# TODO: Rewrite to use Rectangle
 def closest_geom_match(needle, haystack):
     # type: (Geom, Sequence[Geom]) -> Tuple[int, int]
     """Find the geometry in C{haystack} that most closely matches C{needle}.
@@ -60,27 +63,24 @@ def closest_geom_match(needle, haystack):
     return closest_distance, closest_idx
 
 
-def resolve_fractional_geom(geom_tuple, monitor_geom, win_geom=None):
-    # type: (Optional[Geom], Geom, Optional[Geom]) -> Geom
+def resolve_fractional_geom(fract_geom, monitor_rect):
+    # type: (Union[Rectangle, Geom], Rectangle) -> Rectangle
     """Resolve proportional (eg. 0.5) and preserved (None) coordinates.
 
-    @param geom_tuple: An (x, y, w, h) tuple with monitor-relative values in
-                       the range from 0.0 to 1.0, inclusive.
-
-                       If C{None}, then the value of C{win_geom} will be used.
-    @param monitor_geom: An (x, y, w, h) tuple defining the bounding box of the
+    @param fract_geom: An (x, y, w, h) tuple with monitor-relative values in
+                       the range from 0.0 to 1.0, inclusive, or a C{Rectangle}
+                       which will be passed through without modification.
+    @param monitor_rect: A C{Rectangle} defining the bounding box of the
                        monitor (or other desired region) within the desktop.
-    @param win_geom: An (x, y, w, h) tuple defining the current shape of the
-                       window, in absolute desktop pixel coordinates.
     """
-    monitor_geom = tuple(monitor_geom)
-
-    if geom_tuple is None:
-        return win_geom
+    if isinstance(fract_geom, Rectangle):
+        return fract_geom
     else:
-        # Multiply x and w by monitor.w, y and h by monitor.h
-        return tuple(int(i * j) for i, j in
-                     zip(geom_tuple, monitor_geom[2:4] + monitor_geom[2:4]))
+        return Rectangle(
+            x=fract_geom[0] * monitor_rect.width,
+            y=fract_geom[1] * monitor_rect.height,
+            width=fract_geom[2] * monitor_rect.width,
+            height=fract_geom[3] * monitor_rect.height)
 
 
 class GravityLayout(object):  # pylint: disable=too-few-public-methods
@@ -91,19 +91,8 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
     Expects to operate on decimal percentage values. (0 <= x <= 1)
     """
     #: Possible window alignments relative to the monitor/desktop.
-    #: @todo 1.0.0: Normalize these to X11 or CSS terminology for 1.0
-    #:     (API-breaking change)
-    GRAVITIES = {
-        'top-left': (0.0, 0.0),
-        'top': (0.5, 0.0),
-        'top-right': (1.0, 0.0),
-        'left': (0.0, 0.5),
-        'middle': (0.5, 0.5),
-        'right': (1.0, 0.5),
-        'bottom-left': (0.0, 1.0),
-        'bottom': (0.5, 1.0),
-        'bottom-right': (1.0, 1.0),
-    }  # type: Dict[str, Tuple[float, float]]
+    GRAVITIES = dict((x.lower().replace('_', '-'), getattr(Gravity, x)) for
+        x in Gravity.__members__)  # type: Dict[str, Gravity]
 
     def __init__(self, margin_x=0, margin_y=0):  # type: (int, int) -> None
         """
@@ -151,11 +140,13 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
         C{0 <= x <= 1}.
         """
 
-        x = x or self.GRAVITIES[gravity][0]
-        y = y or self.GRAVITIES[gravity][1]
-        offset_x = width * self.GRAVITIES[gravity][0]
-        offset_y = height * self.GRAVITIES[gravity][1]
+        x = x or self.GRAVITIES[gravity].value[0]
+        y = y or self.GRAVITIES[gravity].value[1]
+        offset_x = width * self.GRAVITIES[gravity].value[0]
+        offset_y = height * self.GRAVITIES[gravity].value[1]
 
+        # TODO: Check whether this returns pixel values and, if so, switch to
+        #       using Rectangle as the return type
         return (round(x - offset_x + self.margin_x, 3),
                 round(y - offset_y + self.margin_y, 3),
                 round(width - (self.margin_x * 2), 3),
@@ -175,15 +166,15 @@ def make_winsplit_positions(columns):
     cycle_steps = tuple(round(col_width * x, 3)
                         for x in range(1, columns))
 
-    middle_steps = (1.0,) + cycle_steps
+    center_steps = (1.0,) + cycle_steps
     edge_steps = (0.5,) + cycle_steps
 
     positions = {
-        'middle': [gvlay(width, 1, 'middle') for width in middle_steps],
+        'center': [gvlay(width, 1, 'center') for width in center_steps],
     }
 
     for grav in ('top', 'bottom'):
-        positions[grav] = [gvlay(width, 0.5, grav) for width in middle_steps]
+        positions[grav] = [gvlay(width, 0.5, grav) for width in center_steps]
     for grav in ('left', 'right'):
         positions[grav] = [gvlay(width, 1, grav) for width in edge_steps]
     for grav in ('top-left', 'top-right', 'bottom-left', 'bottom-right'):

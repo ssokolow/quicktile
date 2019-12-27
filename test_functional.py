@@ -41,7 +41,7 @@ bottom
 bottom-left
 bottom-right
 left
-middle
+center
 right
 top
 top-left
