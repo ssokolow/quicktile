@@ -100,11 +100,12 @@ workspace-go-next
 workspace-go-prev
 """
 
-import logging, shlex, subprocess
+import logging, shlex, subprocess  # nosec
 
 from functional_harness.x_server import x_server
 
 log = logging.getLogger(__name__)
+
 
 def run_tests():
     """Run the old bank of 'commands don't crash' tests"""
@@ -113,6 +114,7 @@ def run_tests():
     for pos, command in enumerate(lines):
         log.info("Testing command %d of %d: %s", pos + 1, len(lines), command)
         subprocess.check_call(['quicktile', command])
+
 
 def main():
     """The main entry point, compatible with setuptools entry points."""
