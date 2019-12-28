@@ -15,7 +15,7 @@ gi.require_version('Wnck', '3.0')
 from gi.repository import Gdk, GdkX11, Wnck
 from gi.repository.Wnck import MotionDirection
 
-from .layout import resolve_fractional_geom
+from .layout import resolve_fractional_geom, GravityLayout
 from .util import Gravity, Rectangle, clamp_idx, fmt_table
 
 # Allow MyPy to work without depending on the `typing` package
@@ -319,35 +319,14 @@ def cycle_monitors_all(winman, win, state, step=1, force_wrap=False):
     for window in winman.get_relevant_windows(curr_workspace):
         cycle_monitors(winman, window, state, step, force_wrap, n_monitors)
 
-# TODO: Figure out how to tidy up this WindowMoveResizeMask lookup
-MOVE_TO_COMMANDS = {
-    'move-to-{}'.format(x[0].name.lower().replace('_', '-')): x
-    for x in [
-        [Gravity.TOP_LEFT,
-            Wnck.WindowMoveResizeMask.X | Wnck.WindowMoveResizeMask.Y],
-        [Gravity.TOP, Wnck.WindowMoveResizeMask.Y],
-        [Gravity.TOP_RIGHT,
-            Wnck.WindowMoveResizeMask.X | Wnck.WindowMoveResizeMask.Y],
-        [Gravity.LEFT, Wnck.WindowMoveResizeMask.X],
-        [Gravity.CENTER,
-            Wnck.WindowMoveResizeMask.X | Wnck.WindowMoveResizeMask.Y],
-        [Gravity.RIGHT, Wnck.WindowMoveResizeMask.X],
-        [Gravity.BOTTOM_LEFT,
-            Wnck.WindowMoveResizeMask.X | Wnck.WindowMoveResizeMask.Y],
-        [Gravity.BOTTOM, Wnck.WindowMoveResizeMask.Y],
-        [Gravity.BOTTOM_RIGHT,
-            Wnck.WindowMoveResizeMask.X | Wnck.WindowMoveResizeMask.Y],
-    ]
-}
 
-
-@commands.add_many(MOVE_TO_COMMANDS)
+@commands.add_many({'move-to-{}'.format(name): [variant]
+    for name, variant in GravityLayout.GRAVITIES.items()})
 def move_to_position(winman,       # type: WindowManager
-                     win,          # type: Any  # TODO: Make this specific
+                     win,          # type: Wnck.Window
                      state,        # type: Dict[str, Any]
                      gravity,      # type: Gravity
-                     gravity_mask  # type: Wnck.WindowMoveResizeMask
-                     ):  # type: (...) -> None  # TODO: Decide on a return type
+                     ):  # type: (...) -> None
     """Move window to a position on the screen, preserving its dimensions."""
     usable_rect = state['usable_rect']
 
@@ -363,7 +342,8 @@ def move_to_position(winman,       # type: WindowManager
 
     winman.reposition(win, target, usable_rect,
         gravity=gravity,
-        geometry_mask=gravity_mask)
+        geometry_mask=Wnck.WindowMoveResizeMask.X |
+                      Wnck.WindowMoveResizeMask.Y)
 
 
 @commands.add('bordered')
