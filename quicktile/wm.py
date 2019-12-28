@@ -320,13 +320,14 @@ class WindowManager(object):
         old_geom = Rectangle(*win.get_geometry()).to_relative(
             self.get_monitor(win)[1])
 
+        new_args = {}
         if geom:
             for attr in ('x', 'y', 'width', 'height'):
-                if not geometry_mask & getattr(Wnck.WindowMoveResizeMask,
+                if geometry_mask & getattr(Wnck.WindowMoveResizeMask,
                         attr.upper()):
-                    setattr(geom, attr, getattr(old_geom, attr))
-        else:
-            geom = old_geom
+                    new_args[attr] = getattr(geom, attr)
+
+        geom = old_geom._replace(**new_args)
 
         # Apply gravity and resolve to absolute desktop coordinates.
         geom = geom.from_gravity(gravity).from_relative(monitor)
