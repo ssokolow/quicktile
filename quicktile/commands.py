@@ -352,9 +352,12 @@ def move_to_position(winman,       # type: WindowManager
     usable_rect = state['usable_rect']
 
     # TODO: Think about ways to refactor scaling for better maintainability
+    win_rect = Rectangle(*win.get_geometry())
     target = Rectangle(
         x=gravity.value[0] * usable_rect.width,
-        y=gravity.value[1] * usable_rect.height)
+        y=gravity.value[1] * usable_rect.height,
+        width=win_rect.width,
+        height=win_rect.height)
     logging.debug("Calling reposition() with %r gravity and dimensions %r",
                   gravity, tuple(target))
 
