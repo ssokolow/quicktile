@@ -16,20 +16,20 @@ from gi.repository import Gdk, GdkX11, Wnck
 from gi.repository.Wnck import MotionDirection
 
 from .layout import resolve_fractional_geom, GravityLayout
-from .util import Gravity, Rectangle, clamp_idx, fmt_table
+from .util import Rectangle, clamp_idx, fmt_table
 
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
 MYPY = False
 if MYPY:
-    # pylint: disable=unused-import,wrong-import-order
+    # pylint: disable=unused-import
     from typing import (Any, Callable, Dict, Iterable, Iterator, List,  # NOQA
                         Optional, Sequence, Tuple)
-    from typing import Mapping as Map
+    from typing import Mapping as Map  # NOQA
     from mypy_extensions import VarArg, KwArg  # NOQA
 
     from .wm import WindowManager  # NOQA
-    from .util import CommandCB    # NOQA
+    from .util import CommandCB, Gravity    # NOQA
 
     # FIXME: Replace */** with a dict so I can be strict here
     CommandCBWrapper = Callable[..., Any]  # pylint: disable=invalid-name
@@ -58,8 +58,8 @@ class CommandRegistry(object):
 
     @staticmethod
     def get_window_meta(window,  # type: Wnck.Window
-            state,  # type: Dict[str, Any]
-            winman  # type: WindowManager
+                        state,  # type: Dict[str, Any]
+                        winman  # type: WindowManager
                         ):  # type: (...) -> bool
         # Bail out early on None or things like the desktop window
         if not winman.is_relevant(window):

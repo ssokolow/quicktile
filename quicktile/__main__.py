@@ -29,7 +29,7 @@ from .wm import WindowManager
 # (And silence complaints from only using the imported types in comments)
 MYPY = False
 if MYPY:
-    # pylint: disable=unused-import
+    # pylint: disable=unused-import,invalid-name
     from typing import Callable, Dict, Union  # NOQA
     JSONDict = Dict[str, Union[str, int, float, bool, None]]
 del MYPY
@@ -38,6 +38,8 @@ del MYPY
 XDG_CONFIG_DIR = os.environ.get('XDG_CONFIG_HOME',
                                 os.path.expanduser('~/.config'))
 
+# TODO: Support adding modifiers to individual keys so I can use <C-A-S>KP_...
+#       for move-to-*
 #: Default content for the config file
 DEFAULTS = {
     'general': {
@@ -166,7 +168,7 @@ def load_config(path):  # type: (str) -> ConfigParser
     """
     first_run = not os.path.exists(path)
 
-    config = ConfigParser(interpolation=None)
+    config = ConfigParser(interpolation=None)  # pylint: disable=E1123
 
     # Make keys case-sensitive because keysyms must be
     config.optionxform = str  # type: ignore # (Cannot assign to a method)

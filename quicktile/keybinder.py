@@ -4,7 +4,7 @@ __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
 import logging
-from functools import reduce
+from functools import reduce  # pylint: disable=redefined-builtin
 
 from gi.repository import GLib, Gtk, Gdk
 from Xlib import X

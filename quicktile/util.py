@@ -255,7 +255,7 @@ class Rectangle(_Rectangle):
         return cls.__bases__[0].__new__(cls, x, y, width, height)
 
     @property
-    def xy(self):
+    def xy(self):  # pylint: disable=invalid-name
         """Convenience helper to retrieve an (x, y) tuple"""
         return (self.x, self.y)
 

@@ -89,6 +89,7 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
 
     Expects to operate on decimal percentage values. (0 <= x <= 1)
     """
+    # pylint: disable=no-member
     #: Possible window alignments relative to the monitor/desktop.
     GRAVITIES = dict((x.lower().replace('_', '-'), getattr(Gravity, x)) for
         x in Gravity.__members__)  # type: Dict[str, Gravity]

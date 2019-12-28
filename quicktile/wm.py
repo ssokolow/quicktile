@@ -5,7 +5,6 @@ __license__ = "GNU GPL 2.0 or later"
 
 import logging
 from contextlib import contextmanager
-from operator import isub
 
 from Xlib.display import Display as XDisplay
 from Xlib.error import DisplayConnectionError
@@ -106,7 +105,7 @@ class WindowManager(object):
         for idx in range(0, self.n_screens):
             monitors.append(Rectangle.from_gdk(
                 self.gdk_screen.get_monitor_geometry(idx)))
-                # TODO: Look into using python-xlib to match x_root use
+            # TODO: Look into using python-xlib to match x_root use
 
         usable_region = UsableRegion()
         usable_region.set_monitors(monitors)
@@ -239,7 +238,7 @@ class WindowManager(object):
         return result.value if result else empty
         # TODO: Verify that python-xlib will call XFree for us when appropriate
 
-    def set_property(self, win, name, value,
+    def set_property(self, win, name, value,  # pylint: disable=R0913
             prop_type=Xatom.STRING, format_size=8):
         """Helper to make setting X11 properties cleaner"""
         win, name = self._property_prep(win, name)
