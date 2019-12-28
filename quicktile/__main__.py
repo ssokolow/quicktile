@@ -216,14 +216,16 @@ def load_config(path):  # type: (str) -> ConfigParser
             config.set('keys', KEYLOOKUP[key], keymap[key])
             dirty = True
 
+    # Automatically update the old 'middle' command to 'center'
+    for key in keymap:
+        if keymap[key] == 'middle':
+            keymap[key] = 'center'
+            config.set('keys', key, keymap[key])
+            dirty = True
+
     if dirty:
-        cfg_file = open(path, 'w')
-
-        # TODO: REPORT: Argument 1 to "write" of "ConfigParser" has
-        #               incompatible type BinaryIO"; expected "file"
-        config.write(cfg_file)
-
-        cfg_file.close()
+        with open(path, 'w') as cfg_file:
+            config.write(cfg_file)
         if first_run:
             logging.info("Wrote default config file to %s", path)
 
