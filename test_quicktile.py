@@ -12,8 +12,8 @@ __license__ = "GNU GPL 2.0 or later"
 import logging, sys
 
 from quicktile import commands
-from quicktile.util import (clamp_idx, powerset, Gravity, Rectangle,
-                            StrutPartial, UsableRegion, XInitError)
+from quicktile.util import (clamp_idx, euclidean_dist, powerset, Gravity,
+                            Rectangle, StrutPartial, UsableRegion, XInitError)
 
 # Ensure code coverage is accurate
 from quicktile import __main__  # pylint: disable=unused-import
@@ -95,6 +95,32 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(clamp_idx(-1, 10, wrap=False), 0)
         self.assertEqual(clamp_idx(11, 10, wrap=False), 9)
         self.assertEqual(clamp_idx(15, 10, wrap=False), 9)
+
+    def test_euclidean_dist(self):  # type: () -> None
+        """euclidean_dist: basic functionality"""
+        # TODO: Improve type signature
+
+        # Length of 0, commutative
+        for x in range(-2, 3):
+            for y in range(-2, 3):
+                self.assertEqual(euclidean_dist((x, y), (x, y)), 0)
+
+        # Length of 1, commutative
+        for vec_a, vec_b in (
+                ((0, 0), (1, 0)),
+                ((0, 0), (0, 1)),
+                ((0, 0), (-1, 0)),
+                ((0, 0), (0, -1)),
+                ((0, -1), (0, -2)),
+                ((0, -5), (0, -6)),
+                ((2, 1), (3, 1)),
+                ((0, 5), (0, 4))):
+            self.assertEqual(euclidean_dist(vec_b, vec_a), 1)
+            self.assertEqual(euclidean_dist(vec_a, vec_b), 1)
+
+        # Integer input, floating-point output
+        self.assertAlmostEqual(euclidean_dist((1, 2), (4, 5)), 4.24264068)
+        self.assertAlmostEqual(euclidean_dist((4, 5), (1, 2)), 4.24264068)
 
     def test_powerset(self):  # type: () -> None
         """Test that powerset() behaves as expected"""
@@ -214,6 +240,13 @@ class TestRectangle(unittest.TestCase):
         self.assertEqual(self.rect1[0], 1)
         self.assertEqual(self.rect1.y, 2)
         self.assertEqual(self.rect1, (1, 2, 3, 4))
+
+    def test_properties(self):
+        """Rectangle: convenience properties"""
+        for rect in (self.rect1, self.rect2, self.rect3):
+            self.assertEqual(rect.x2, rect.x + rect.width)
+            self.assertEqual(rect.y2, rect.y + rect.height)
+            self.assertEqual(rect.xy, (rect.x, rect.y))
 
     def test_negative_size(self):
         """Rectangle: test normalization of negative sizes"""
@@ -507,29 +540,57 @@ class TestUsableRegion(unittest.TestCase):
             StrutPartial(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
         ])
 
-        # Out-of-bounds Space
+        # Out-of-bounds Space (no fallback)
         self.assertEqual(test_region.find_usable_rect(
-            Rectangle(-3, 1, 1, 1)), None)
+            Rectangle(-3, 1, 1, 1), fallback=False), None)
         self.assertEqual(test_region.find_usable_rect(
-            Rectangle(200, -5, 1, 1)), None)
+            Rectangle(200, -5, 1, 1), fallback=False), None)
         self.assertEqual(test_region.find_usable_rect(
-            Rectangle(5000, 200, 1, 1)), None)
+            Rectangle(5000, 200, 1, 1), False), None)
         self.assertEqual(test_region.find_usable_rect(
-            Rectangle(200, 5000, 1, 1)), None)
+            Rectangle(200, 5000, 1, 1), False), None)
 
-        # Dead Space
+        # Out-of-bounds Space (fallback)
         self.assertEqual(test_region.find_usable_rect(
-            Rectangle(1, 1, 1, 1)), None)
+            Rectangle(-3, 1, 1, 1)), Rectangle(0, 56, 1280, 994))
         self.assertEqual(test_region.find_usable_rect(
-            Rectangle(3203, 1, 1, 1)), None)
+            Rectangle(200, -5, 1, 1)), Rectangle(0, 56, 1280, 994))
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(5000, 200, 1, 1)), Rectangle(3200, 56, 1280, 994))
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(200, 5000, 1, 1)), Rectangle(0, 56, 1280, 994))
 
-        # Reserved Space
+        # Dead Space (no fallback)
         self.assertEqual(test_region.find_usable_rect(
-            Rectangle(0, 1277, 1, 1)), None)
+            Rectangle(1, 1, 1, 1), fallback=False), None)
         self.assertEqual(test_region.find_usable_rect(
-            Rectangle(0, 2000, 1, 1)), None)
+            Rectangle(3203, 1, 1, 1), False), None)
+
+        # Dead Space (fallback)
         self.assertEqual(test_region.find_usable_rect(
-            Rectangle(3400, 1277, 1, 1)), None)
+            Rectangle(1, 1, 1, 1)), Rectangle(0, 56, 1280, 994))
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(3203, 1, 1, 1)), Rectangle(3200, 56, 1280, 994))
+
+        # Reserved Space (no fallback)
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(0, 1277, 1, 1), fallback=False), None)
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(0, 2000, 1, 1), False), None)
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(3000, 2000, 1, 1), False), None)
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(3400, 1277, 1, 1), False), None)
+
+        # Reserved Space (fallback)
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(0, 1277, 1, 1)), Rectangle(0, 56, 1280, 994))
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(0, 2000, 1, 1)), Rectangle(0, 56, 1280, 994))
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(3000, 2000, 1, 1)), Rectangle(1280, 0, 1920, 1050))
+        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(3400, 1277, 1, 1)), Rectangle(3200, 56, 1280, 994))
 
         # Available Space
         self.assertEqual(test_region.find_usable_rect(

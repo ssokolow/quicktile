@@ -3,7 +3,7 @@
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
-import sys
+import math, sys
 from collections import namedtuple
 from enum import Enum
 from itertools import chain, combinations
@@ -60,6 +60,15 @@ def clamp_idx(idx, stop, wrap=True):
         return idx % stop
     else:
         return max(min(idx, stop - 1), 0)
+
+
+def euclidean_dist(vec1, vec2):  # type: (Iterable, Iterable) -> float
+    """Calculate the euclidean distance between two points"""
+    return math.sqrt(sum(
+        (coord1 - coord2) ** 2
+        for (coord1, coord2)
+        in zip(tuple(vec1), tuple(vec2))
+    ))
 
 
 def powerset(iterable):  # type: (Iterable[Any]) -> Iterator[Sequence[Any]]
@@ -244,6 +253,11 @@ class Rectangle(_Rectangle):
             height = abs(height)
 
         return cls.__bases__[0].__new__(cls, x, y, width, height)
+
+    @property
+    def xy(self):
+        """Convenience helper to retrieve an (x, y) tuple"""
+        return (self.x, self.y)
 
     @property
     def x2(self):  # pylint: disable=invalid-name
@@ -490,13 +504,30 @@ class UsableRegion(object):
             if usable:
                 self._usable[monitor] = usable
 
-    def find_usable_rect(self, rect):
-        # type: (Rectangle) -> Optional[Rectangle]
-        """Find the usable Rectangle for the monitor containing rect"""
+    def find_usable_rect(self, rect, fallback=True):
+        # type: (Rectangle, bool) -> Optional[Rectangle]
+        """Find the usable Rectangle for the monitor containing rect
+
+        Fall back to the nearest monitor if fallback=True
+        """
         window_center = rect.to_gravity(Gravity.CENTER).to_point()
         for monitor in self._usable:
             if window_center in monitor:
                 return self._usable[monitor]
+
+        if fallback:
+            distances = []
+            for monitor in self._usable:
+                mon_center = monitor.to_gravity(Gravity.CENTER).to_point()
+                distances.append(
+                    (euclidean_dist(window_center.xy, mon_center.xy), monitor))
+
+            # Sort by the first tuple field (the euclidean distance)
+            distances.sort()
+            # Return usable region corresponding to second field (monitor)
+            # corresponding to smallest euc. distance.
+            return self._usable[distances[0][1]]
+
         return None
 
     def __bool__(self):  # type: () -> bool

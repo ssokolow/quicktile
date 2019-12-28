@@ -6,7 +6,7 @@ __license__ = "GNU GPL 2.0 or later"
 import math
 from heapq import heappop, heappush
 
-from .util import Gravity, Rectangle
+from .util import euclidean_dist, Gravity, Rectangle
 
 # Allow MyPy to work without depending on the `typing` package
 # (And silence complaints from only using the imported types in comments)
@@ -51,8 +51,7 @@ def closest_geom_match(needle, haystack):
     # and all presets and store them in a min heap.
     euclid_distance = []  # type: List[Tuple[int, int]]
     for haystack_pos, haystack_val in enumerate(haystack):
-        distance = sum([(needle_i - haystack_i) ** 2 for (needle_i, haystack_i)
-                        in zip(tuple(needle), tuple(haystack_val))]) ** 0.5
+        distance = euclidean_dist(needle, haystack_val)
 
         # MyPy disabled until I figure out why the type annotation on
         # euclid_distance doesn't prevent "Cannot infer type argument 1"
