@@ -28,7 +28,6 @@ if MYPY:
     from Xlib.protocol.event import KeyPress as XKeyPress  # NOQA
     from .commands import CommandRegistry                  # NOQA
     from .wm import WindowManager                          # NOQA
-    from .util import CommandCB                            # NOQA
 del MYPY
 
 
@@ -49,7 +48,7 @@ class KeyBinder(object):
         @type x_display: C{Xlib.display.Display}
         """
         try:
-            self.xdisp = x_display
+            self.xdisp = x_display or Display()
         except (UnicodeDecodeError, DisplayConnectionError) as err:
             raise XInitError("python-xlib failed with %s when asked to open"
                              " a connection to the X server. Cannot bind keys."
@@ -208,7 +207,7 @@ class KeyBinder(object):
 
 
 def init(modmask,   # type: Optional[str]
-         mappings,  # type: Dict[str, CommandCB]
+         mappings,  # type: Dict[str, str]
          commands,  # type: CommandRegistry
          winman     # type: WindowManager
          ):         # type: (...) -> Optional[KeyBinder]

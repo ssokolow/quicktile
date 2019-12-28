@@ -31,6 +31,7 @@ MYPY = False
 if MYPY:
     # pylint: disable=unused-import
     from typing import Callable, Dict, Union  # NOQA
+    JSONDict = Dict[str, Union[str, int, float, bool, None]]
 del MYPY
 
 #: Location for config files (determined at runtime).
@@ -42,7 +43,6 @@ DEFAULTS = {
     'general': {
         # Use Ctrl+Alt as the default base for key combinations
         'ModMask': '<Ctrl><Alt>',
-        'UseWorkarea': True,
         'MovementsWrap': True,
         'ColumnCount': 3
     },
@@ -62,7 +62,7 @@ DEFAULTS = {
         "H": "horizontal-maximize",
         "C": "move-to-center",
     }
-}  # type: Dict[str, Dict[str, Union[str, int, float, bool, None]]]
+}  # type: Dict[str, JSONDict]
 # TODO: Porting helper which identifies "middle" in the config file and changes
 #       it to "center"
 #
@@ -92,7 +92,7 @@ class QuickTileApp(object):
 
     def __init__(self, winman,  # type: WindowManager
                  commands,      # type: commands.CommandRegistry
-                 keys=None,     # type: Dict[str, Callable]
+                 keys=None,     # type: Dict[str, str]
                  modmask=None   # type: str
                  ):             # type: (...) -> None
         """Populate the instance variables.
@@ -197,12 +197,16 @@ def load_config(path):  # type: (str) -> ConfigParser
 
     # Either load the keybindings or use and save the defaults
     if config.has_section('keys'):
-        keymap = dict(config.items('keys'))
+        keymap = dict(config.items('keys'))  # type: JSONDict
     else:
         keymap = DEFAULTS['keys']
         config.add_section('keys')
-        for row in keymap.items():
-            config.set('keys', row[0], row[1])
+        for key, cmd in keymap.items():
+            if not isinstance(key, str):
+                raise TypeError("Hotkey name must be a str: {!r}".format(key))
+            if not isinstance(cmd, str):
+                raise TypeError("Command name must be a str: {!r}".format(cmd))
+            config.set('keys', key, cmd)
         dirty = True
 
     # Migrate from the deprecated syntax for punctuation keysyms
@@ -210,17 +214,23 @@ def load_config(path):  # type: (str) -> ConfigParser
         # Look up unrecognized shortkeys in a hardcoded dict and
         # replace with valid names like ',' -> 'comma'
         if key in KEYLOOKUP:
+            cmd = keymap[key]
+            if not isinstance(cmd, str):
+                raise TypeError("Command name must be a str: {!r}".format(cmd))
+
             logging.warn("Updating config file from deprecated keybind syntax:"
                     "\n\t%r --> %r", key, KEYLOOKUP[key])
             config.remove_option('keys', key)
-            config.set('keys', KEYLOOKUP[key], keymap[key])
+            config.set('keys', KEYLOOKUP[key], cmd)
             dirty = True
 
     # Automatically update the old 'middle' command to 'center'
     for key in keymap:
         if keymap[key] == 'middle':
-            keymap[key] = 'center'
-            config.set('keys', key, keymap[key])
+            keymap[key] = cmd = 'center'
+            logging.warn("Updating old command in config file:"
+                    "\n\tmiddle --> center")
+            config.set('keys', key, cmd)
             dirty = True
 
     if dirty:
@@ -292,6 +302,7 @@ def main():  # type: () -> None
     except XInitError as err:
         logging.critical("%s", err)
         sys.exit(1)
+
     app = QuickTileApp(winman,
                        commands.commands,
                        keys=dict(config.items('keys')),
