@@ -12,7 +12,7 @@ import gi
 gi.require_version('Gdk', '3.0')
 gi.require_version('Wnck', '3.0')
 
-from gi.repository import Gdk, Wnck
+from gi.repository import Gdk, GdkX11, Wnck
 from gi.repository.Wnck import MotionDirection
 
 from .layout import resolve_fractional_geom
@@ -371,8 +371,11 @@ def toggle_decorated(winman, win, state):  # pylint: disable=unused-argument
     # type: (WindowManager, Wnck.Window, Any) -> None
     """Toggle window decoration state on the active window."""
 
-    win = Gdk.window_foreign_new(win.get_xid())
-    win.set_decorations(not win.get_decorations())
+    # TODO: Switch to setting this via python-xlib
+    display = winman.gdk_screen.get_display()
+    win = GdkX11.X11Window.foreign_new_for_display(display, win.get_xid())
+    win.set_decorations(Gdk.WMDecoration(0) if win.get_decorations()[1]
+        else Gdk.WMDecoration.ALL)
 
 
 @commands.add('show-desktop', windowless=True)
