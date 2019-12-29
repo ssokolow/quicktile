@@ -28,29 +28,38 @@ QuickTile
 
 Keyboard-driven Window Tiling for your existing X11 window manager
 
-------------------------------------
-Important Message For Existing Users
-------------------------------------
+-------------------------------------------------
+Important Message For Users of GTK+ 2.x QuickTile
+-------------------------------------------------
 
-As of QuickTile 0.3.0, the installation process has changed.
+As of QuickTile 0.4.0...
 
-This was necessary to allow QuickTile to be split across multiple files so I
-could get past some mental blocks and start to clean up the code and implement
-new features.
+* The list of dependencies has changed significantly from PyGTK to PyGI
+* The Xlib binding is now a required dependency due to regressions in the
+  usability of certain GDK APIs.
+* The ``middle`` command has been renamed to ``center`` for consistency with
+  ``move-to-center``. While ``quicktile.cfg`` will be updated automatically,
+  you will have to manually adjust any scripts which rely on calling
+  ``quicktile middle`` as a subprocess or using it via the
+  ``com.ssokolow.QuickTile.doCommand`` D-Bus API.
+* If you are modifying QuickTile's internals, please contact me.
+  I have begun a major refactoring and want to make sure that your
+  modifications get updated accordingly.
 
 -------------
 Requirements:
 -------------
 
-* An X11-based desktop (The code expects NETWM hints and X11-style window decorations)
-* Python (currently tested under 2.7)
+* An X11-based desktop (The code expects NETWM hints and X11-style window
+  decorations)
+* Python 3.5+
 * Python GI and its API definitions for the following libraries:
-  * Gdk 2.x
-  * Gtk+ 3.x
-  * Wnck 3.x
-* ``python-setuptools``
-* ``python-xlib`` (optional, required for key-binding)
-* ``dbus-python`` (optional, required for D-Bus service)
+
+  * Gdk and GdkX11 3.x (``gir1.2-gtk-3.0``)
+  * Wnck 3.x (``gir1.2-wnck-3.0``)
+* setuptools
+* python-xlib
+* dbus-python (optional, required for D-Bus service)
 
 
 Depending on the distro you are using, you may be able to use one of the
@@ -58,59 +67,42 @@ following commands to easily install them:
 
 **Debian and derivatives (Ubuntu, Mint, etc.):**
 
-**FIXME:** Update these instructions.
-
 .. code:: sh
 
-    sudo apt-get install python python-gtk2 python-xlib python-dbus python-wnck python-setuptools
+    sudo apt-get install python3 python3-pip python3-setuptools python3-gi python3-xlib python3-dbus gir1.2-gtk-3.0 gir1.2-wnck-3.0
 
-**Fedora 22 and above:**
-
-**FIXME:** Update these instructions.
-
-.. code:: sh
-
-    sudo dnf install python pygtk2 pygobject2 dbus-python gnome-python2-libwnck
-
-**Fedora 21 and below:**
-
-**FIXME:** Update or remove these instructions.
-
-.. code:: sh
-
-    sudo yum install python pygtk2 pygobject2 dbus-python gnome-python2-libwnck
+**TODO:** Determine the equivalent packages on Fedora
 
 --------------------------
 Installation (Typical Use)
 --------------------------
 
-After you have installed the above requirements (including ``python-xlib``)
-via your system package manager, you can install QuickTile using either of the
-following methods:
+After you have installed the above requirements via your system package
+manager, you can install QuickTile using any of the following methods:
 
-A. If you have ``pip2`` installed, just run this:
+A. If you have ``pip3`` installed, just run this:
 
  .. code:: sh
 
-     sudo pip2 install https://github.com/ssokolow/quicktile/archive/master.zip
+     sudo pip3 install https://github.com/ssokolow/quicktile/archive/master.zip
 
  **NOTE:** If you attempt to use the ``--upgrade`` option and it fails to
- properly ignore system-provided dependencies, just use these commands instead:
+ properly ignore system-provided dependencies, use the following commands to
+ remove the old version, then reinstall.
 
  .. code:: sh
 
-     sudo pip2 uninstall quicktile
-     sudo rm /usr/local/bin/quicktile /usr/local/bin/quicktile.py
-     sudo pip2 install https://github.com/ssokolow/quicktile/archive/master.zip
+     sudo pip3 uninstall quicktile
+     sudo rm /usr/local/bin/quicktile{,.py}
 
-B. Without ``pip2``, download and unpack the zip file and run the following:
+B. Without ``pip3``, download and unpack the zip file and run the following:
 
  .. code:: sh
 
      cd /path/to/local/copy
      ./install.sh
 
- Technically speaking, an ordinary ``sudo python2 setup.py install`` will also
+ Technically speaking, an ordinary ``sudo python3 setup.py install`` will also
  work, but ``install.sh`` has three advantages:
 
  1. It runs the ``setup.py build`` step without root privileges to avoid
@@ -121,7 +113,7 @@ B. Without ``pip2``, download and unpack the zip file and run the following:
     (``setup.py`` can't do this because it has no mechanism for adding files
     to ``/etc``.)
 
-C. Without ``pip2``, if you don't want a system-wide install:
+C. Without ``pip3``, if you don't want a system-wide install:
 
  1. Download and unpack the zip file.
  2. Copy the ``quicktile`` folder and the ``quicktile.sh`` script into a folder
@@ -129,7 +121,11 @@ C. Without ``pip2``, if you don't want a system-wide install:
  3. Make sure ``quicktile.sh`` is marked executable.
 
  **NOTE:** If you'd rather roll your own, the ``quicktile.sh`` shell script is
- just three simple lines.
+ just three simple lines:
+
+ 1. The shebang
+ 2. A line to ``cd`` to wherever ``quicktile.sh`` is
+ 3. A line to run ``python3 -m quicktile "$@"``
 
 **AFTER INSTALLING:**
 
@@ -139,13 +135,13 @@ C. Without ``pip2``, if you don't want a system-wide install:
    ``No module named __main__`` error, you probably have an old
    ``quicktile.py`` file in ``/usr/local/bin`` that needs to be deleted. If
    that doesn't fix the problem, you should still be able to run QuickTile as
-   ``python2 -m quicktile`` instead.
+   ``python3 -m quicktile`` instead.
 2. Edit ``~/.config/quicktile.cfg`` to customize your keybinds
 
    **Note:** Customizing the available window shapes currently requires editing
    the source code (though it's quite simple). This will be remedied when I
-   have time to decide between extending the standard Python rcfile
-   parser and replacing ``quicktile.cfg`` with ``quicktile.json``.
+   have time to develop a new config file format that supports hierarchical
+   data.
 3. Set your desktop to run ``quicktile --daemonize`` if you didn't use
    ``install.sh``.
 
@@ -157,9 +153,6 @@ Important Notes:
   make sure you've used CCSM to disable the grid plugin or the fight between
   it and QuickTile for the same type of functionality may cause unpredictable
   problems.
-* Some systems may not provide a Python 2.x binary under the name ``python2``.
-  If this is the case on yours, ``install.sh`` must be edited if you choose
-  to use it.
 * You can list your current keybindings by running
   ``quicktile --show-bindings``
 * You can get a list of valid actions for the configuration file by running
@@ -287,13 +280,7 @@ see ``--help``.
 Known Bugs
 ----------
 
-* libwnck tries to flood the logging output with
-  ``Unhandled action type _OB_WM_ACTION_UNDECORATE\n\n`` messages, which is
-  `a bug <https://icculus.org/pipermail/openbox/2009-January/006025.html>`_,
-  and PyGTK doesn't expose the function needed to filter them away. As a
-  result, the best QuickTile can do is pipe its output through grep, leaving a
-  flood of blank lines since grep is finicky about matching them.
-* ``pip2 uninstall`` doesn't remove the ``quicktile`` and/or ``quicktile.py``
+* ``pip3 uninstall`` doesn't remove the ``quicktile`` and/or ``quicktile.py``
   files from ``/usr/local/bin``, which can cause subsequent installs to
   break.
 
@@ -306,18 +293,18 @@ Removal
 As QuickTile does not yet have a one-command uninstall script, you will need to
 do the following.
 
-A. If you installed via ``pip2``...
+A. If you installed via ``pip3``...
 
 
 .. code:: sh
 
-    sudo pip2 uninstall quicktile
+    sudo pip3 uninstall quicktile
     sudo rm /usr/local/bin/quicktile
 
 
 B. If you installed via ``install.sh``...
 
- ``install.sh`` doesn't yet log what it installed the way ``pip2`` does, so
+ ``install.sh`` doesn't yet log what it installed the way ``pip3`` does, so
  this will be a bit more involved.
 
  First, remove the system integration files:
@@ -342,4 +329,4 @@ B. If you installed via ``install.sh``...
 
  .. code:: sh
 
-    find /usr/local/lib/python2.7 -iname 'quicktile*'
+    find /usr/local/lib -iname 'quicktile*'
