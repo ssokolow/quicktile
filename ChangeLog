@@ -5,6 +5,7 @@
 - Ensure monitor-* commands don't place windows off-screen
 - Make move-to-* commands center non-corner destinations for consistency
 - Have move-to-* preserve horizontal/vertical maximization state
+- Add default keybindings for move-to-* commands
 - Significant internal reworking to make the codebase more maintainable
 
 0.3.0:

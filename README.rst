@@ -176,7 +176,11 @@ Usage (Typical Use)
 
 The default keybindings are:
 
-* ``1`` through ``9`` on the numeric keypad represent regions of your screen
+* ``1`` through ``9`` on the numeric keypad resize windows to the corresponding
+  regions of whichever monitor it's currently on.
+* ``Shift-1`` through ``Shift-9`` on the numeric keypad move windows to the
+  corresponding regions without altering their dimensions.
+* ``C`` is an alias for ``move-to-center`` which may be more memorable.
 * ``0`` on the numeric keypad will fully maximize the active window.
 * ``H`` and ``V`` will maximize a window horizontally or vertically.
 * ``Enter`` on the numeric keypad will cycle the active window to the next
