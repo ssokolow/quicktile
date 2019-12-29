@@ -3,6 +3,7 @@
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "MIT"
+__docformat__ = "restructuredtext en"
 
 import logging, os, random, shutil, subprocess, tempfile  # nosec
 from contextlib import contextmanager
@@ -25,13 +26,13 @@ def _init_x_server(argv, verbose=False):
     # type: (List[str], bool) -> Tuple[subprocess.Popen, bytes]
     """Wrapper for starting an X server with the given command line
 
-    @param argv: The command-line to execute
-    @type argv: C{list(str)}
+    :param argv: The command-line to execute
+    :type argv: ``list(str)``
 
-    @raises CalledProcessError: The X server exited with an unexpected error
-    @returns: The process object for the X server on success or C{None} if
-        C{display_num} was already in use.
-    @rtype: C{(subprocess.Popen, bytes)}
+    :raises CalledProcessError: The X server exited with an unexpected error
+    :returns: The process object for the X server on success or ``None`` if
+        ``display_num`` was already in use.
+    :rtype: ``(subprocess.Popen, bytes)``
     """
 
     # Launch the X server
@@ -54,12 +55,12 @@ def x_server(argv, screens):
     # type: (List[str], Dict[int, str])-> Generator[Dict[str, str], None, None]
     """Context manager to launch and then clean up an X server.
 
-    @param argv: The command to launch the test X server and any arguments
-        not relating to defining the attached screens.
-    @param screens: A dict mapping screen numbers to WxHxDEPTH strings.
-        (eg. C{{0: '1024x768x32'}})
-    @type argv: C{list(str)}
-    @type screens: C{dict((int, str))}
+    argv
+        The command to launch the test X server and
+        any arguments not relating to defining the attached screens.
+    screens
+        A ``dict`` mapping screen numbers to
+        ``WxHxDEPTH`` strings. (eg. ``{0: '1024x768x32'``})
     """
     # Check for missing requirements
     for cmd in ['xauth', argv[0]]:

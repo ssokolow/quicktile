@@ -2,6 +2,7 @@
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "MIT"
+__docformat__ = "restructuredtext en"
 
 import os, subprocess  # nosec
 from contextlib import contextmanager
@@ -18,7 +19,10 @@ del MYPY
 @contextmanager
 def background_proc(*args, **kwargs):
     # type: (*Any, **Any) -> Generator[None, None, None]
-    """Context manager for scoping the lifetime of a subprocess.Popen call"""
+    """Context manager for scoping the lifetime of a ``subprocess.Popen`` call
+
+    Arguments will be passed directly to the ``Popen`` constructor.
+    """
     popen_obj = subprocess.Popen(*args, **kwargs)  # nosec
     try:
         yield
@@ -29,7 +33,10 @@ def background_proc(*args, **kwargs):
 @contextmanager
 def env_vars(new):
     # type: (Dict[str, str]) -> Generator[None, None, None]
-    """Context manager to temporarily change environment variables"""
+    """Context manager to temporarily change environment variables
+
+    Takes one argument: A dict to temporarily ``update`` ``os.environ`` with.
+    """
     old_vals = {}
     try:
         for key, val in new.items():
