@@ -121,11 +121,6 @@ def main():
     # If we're running on Python 2, take responsibility for preventing
     # output from causing UnicodeEncodeErrors. (Done here so it should only
     # happen when not being imported by some other program.)
-    import sys
-    if sys.version_info.major < 3:
-        reload(sys)
-        sys.setdefaultencoding('utf-8')  # pylint: disable=no-member
-
     from argparse import ArgumentParser, RawDescriptionHelpFormatter
     parser = ArgumentParser(formatter_class=RawDescriptionHelpFormatter,
             description=__doc__.replace('\r\n', '\n').split('\n--snip--\n')[0],
