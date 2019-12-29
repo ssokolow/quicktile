@@ -200,7 +200,6 @@ def analyse(exctyp,           # type: Type[BaseException]
 
 class ExceptionHandler(object):
     """GTK-based graphical exception handler"""
-    cached_tb = None
 
     def __init__(self, reporting_cb=None):
         # type: (Optional[Callable[[str], None]]) -> None
@@ -270,18 +269,19 @@ class ExceptionHandler(object):
         # type: (Type[BaseException], BaseException, Any) -> None
         """Custom sys.excepthook callback which displays a GTK+ dialog"""
 
+        cached_tb = None
         dialog = self.make_info_dialog()
         while True:
             resp = dialog.run()
 
             if resp == 3 and self.reporting_cb:
-                if self.cached_tb is None:
-                    self.cached_tb = analyse(exctyp, value, tback).getvalue()
-                self.reporting_cb(self.cached_tb)
+                if cached_tb is None:
+                    cached_tb = analyse(exctyp, value, tback).getvalue()
+                self.reporting_cb(cached_tb)
             elif resp == 2:
-                if self.cached_tb is None:
-                    self.cached_tb = analyse(exctyp, value, tback).getvalue()
-                details = self.make_details_dialog(dialog, self.cached_tb)
+                if cached_tb is None:
+                    cached_tb = analyse(exctyp, value, tback).getvalue()
+                details = self.make_details_dialog(dialog, cached_tb)
                 details.run()
                 details.destroy()
             elif resp == 1 and Gtk.main_level() > 0:
@@ -294,11 +294,12 @@ class ExceptionHandler(object):
         dialog.destroy()
 
 
-def enable(feedback_email=None, smtp_server=None):  # type: (str, str) -> None
+def enable(reporting_cb=None):
+    # type: (Optional[Callable[[str], None]]) -> None
     """Call this to set gtkexcepthook as the default exception handler"""
 
     # MyPy disabled pending a release of the fix to #797
-    sys.excepthook = ExceptionHandler(None)  # type: ignore
+    sys.excepthook = ExceptionHandler(reporting_cb)  # type: ignore
 
 if __name__ == '__main__':
     class TestFodder(object):  # pylint: disable=too-few-public-methods
