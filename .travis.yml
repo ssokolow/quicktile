@@ -18,13 +18,10 @@ addons:
       - python3-xlib
       - gir1.2-gtk-3.0
       - gir1.2-wnck-3.0
-      - python-epydoc
-      - python-docutils
 install: "pip3 install mypy coveralls"
 env:
   - MYPYPATH="quicktile"
 script:
   - mypy quicktile ./*.py functional_harness
   - nosetests3
-  - epydoc --config setup.cfg quicktile ./*.py functional_harness
 after_success: coveralls
