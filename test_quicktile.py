@@ -6,12 +6,13 @@ from __future__ import print_function
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
+__docformat__ = "restructuredtext en"
 
 # TODO: I need a functional test to make sure issue #25 doesn't regress
 
 import logging, sys
 
-from quicktile import commands
+# from quicktile import commands
 from quicktile.util import (clamp_idx, euclidean_dist, powerset, Gravity,
                             Rectangle, StrutPartial, UsableRegion, XInitError)
 
@@ -32,25 +33,17 @@ MYPY = False
 if MYPY:  # pragma: nocover
     # pylint: disable=unused-import
     from typing import Tuple  # NOQA
-
-# Set up a nice, oddly-shaped fake desktop made from screens
-# I actually have access to (though not all on the same PC)
-MOCK_SCREENS = [
-    Rectangle(0, 0, 1280, 1024),
-    Rectangle(1280, 0, 1280, 1024),
-    Rectangle(0, 1024, 1680, 1050),
-    Rectangle(1680, 1024, 1440, 900)
-]
+del MYPY
 
 # pylint: disable=too-few-public-methods
 
 
-class TestCommandRegistry(unittest.TestCase):
-    """Tests for the CommandRegistry class"""
-    def setUp(self):  # type: () -> None
-        self.registry = commands.CommandRegistry()
-
-    # TODO: Implement tests for CommandRegistry
+# class TestCommandRegistry(unittest.TestCase):
+#     """Tests for the `CommandRegistry` class"""
+#     def setUp(self):  # type: () -> None
+#         self.registry = commands.CommandRegistry()
+#
+#     # TODO: Implement tests for CommandRegistry
 
 # TODO: Implement tests for cycle_dimensions
 # TODO: Implement tests for cycle_monitors
@@ -72,8 +65,9 @@ class TestCommandRegistry(unittest.TestCase):
 # TODO: Implement tests for QuickTileApp
 
 class TestHelpers(unittest.TestCase):
-    """
-    @todo: Switch to pytest to get the assertEqual readout from assert in
+    """Tests for loose functions
+
+    :todo: Switch to pytest to get the assertEqual readout from assert in
            bare functions.
     """
 
@@ -154,7 +148,7 @@ class TestHelpers(unittest.TestCase):
 
 
 class TestStrutPartial(unittest.TestCase):
-    """Tests for my custom _NET_WM_STRUT_PARTIAL wrapper class"""
+    """Tests for my custom ``_NET_WM_STRUT_PARTIAL`` wrapper class"""
 
     def test_construction(self):
         """StrutPartial: construction"""
@@ -227,7 +221,7 @@ class TestStrutPartial(unittest.TestCase):
 
 
 class TestRectangle(unittest.TestCase):
-    """Tests for my custom Rectangle class"""
+    """Tests for my custom `Rectangle` class"""
 
     def setUp(self):
         """Implicitly test positional and keyword construction during setup"""
@@ -525,7 +519,7 @@ class TestRectangle(unittest.TestCase):
 
 
 class TestUsableRegion(unittest.TestCase):
-    """Tests for my per-monitor _NET_WORKAREA calculation class"""
+    """Tests for my per-monitor ``_NET_WORKAREA`` calculation class"""
 
     def test_bool(self):
         """UsableRegion: __bool__"""

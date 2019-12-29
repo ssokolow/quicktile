@@ -2,6 +2,7 @@
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
+__docformat__ = "restructuredtext en"
 
 import logging
 
@@ -21,13 +22,14 @@ if MYPY:
     from .wm import WindowManager  # NOQA
 del MYPY
 
+
 class QuickTile(Object):
     """D-Bus endpoint definition"""
     def __init__(self, bus, commands, winman):
         # type: (SessionBus, CommandRegistry, WindowManager) -> None
         """
-        @param bus: The connection on which to export this object.
-            See the C{dbus.service.Object} documentation for details.
+        :param bus: The connection on which to export this object.
+            See the ``dbus.service.Object`` documentation for details.
         """
         Object.__init__(self, bus, '/com/ssokolow/QuickTile')
         self.commands = commands
@@ -38,9 +40,10 @@ class QuickTile(Object):
     def doCommand(self, command):  # type: (str) -> bool
         """Execute a QuickTile tiling command
 
-        @todo 1.0.0: Expose a proper, introspectable D-Bus API"""
+        :todo 1.0.0: Expose a proper, introspectable D-Bus API"""
         return self.commands.call(command, self.winman)
         # FIXME: self.commands.call always returns None
+
 
 def init(commands,  # type: CommandRegistry
          winman     # type: WindowManager

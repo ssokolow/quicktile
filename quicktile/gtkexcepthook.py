@@ -1,37 +1,46 @@
 #!/usr/bin/env python3
 """Graphical exception handler for PyGTK applications
 
-(c) 2003 Gustavo J A M Carneiro gjc at inescporto.pt
-(c) 2004-2005 Filip Van Raemdonck
-(c) 2009, 2011, 2017, 2019 Stephan Sokolow
+| (c) 2003 Gustavo J A M Carneiro gjc at inescporto.pt
+| (c) 2004-2005 Filip Van Raemdonck
+| (c) 2009, 2011, 2017, 2019 Stephan Sokolow
 
-Contains changes merged back from qtexcepthook.py, a Qt 5 port of
+::
+
+    http://www.daa.com.au/pipermail/pygtk/2003-August/005775.html
+    Message-ID: <1062087716.1196.5.camel@emperor.homelinux.net>
+    "The license is whatever you want."
+
+Contains changes merged back from `qtexcepthook.py`_, a Qt 5 port of
 gtkexcepthook.py by Stephan Sokolow (c) 2019.
 
-http://www.daa.com.au/pipermail/pygtk/2003-August/005775.html
-Message-ID: <1062087716.1196.5.camel@emperor.homelinux.net>
-"The license is whatever you want."
+**Instructions**::
 
-Instructions: import gtkexcepthook; gtkexcepthook.enable()
+    import gtkexcepthook
+    gtkexcepthook.enable()
 
 Changes from Van Raemdonck version:
+ - Ported to PyGI and GTK 3.x
  - Refactored code for maintainability and added MyPy type annotations
- - Switched from auto-enable to gtkexcepthook.enable() to silence PyFlakes
+ - Switched from auto-enable to ``gtkexcepthook.enable()`` to silence PyFlakes
    false positives. (Borrowed naming convention from cgitb)
  - Split out traceback import to silence PyFlakes warning.
  - Started to resolve PyLint complaints
 
-@todo: Polish this up to meet my code formatting and clarity standards.
-@todo: Clean up the SMTP support. It's a mess.
-@todo: Confirm there isn't any other generally-applicable information that
+:todo: Polish this up to meet my code formatting and clarity standards.
+:todo: Confirm there isn't any other generally-applicable information that
        could be included in the debugging dump.
-@todo: Consider the pros and cons of offering a function which allows
-       app-specific debugging information to be registered for inclusion.
-"""
 
-__author__ = "Filip Van Daemdonck; Stephan Sokolow"
-__authors__ = ["Filip Van Daemdonck", "Stephan Sokolow"]
+.. _qtexcepthook.py: https://gist.github.com/ssokolow/f5219e4c8e4bddbba4d08101969445d1
+"""  # NOQA
+
+__author__ = "Gustavo J A M Carneiro; Filip Van Daemdonck; Stephan Sokolow"
+__authors__ = [
+    "Gustavo J A M Carneiro",
+    "Filip Van Daemdonck",
+    "Stephan Sokolow"]
 __license__ = "whatever you want"
+__docformat__ = "restructuredtext en"
 
 import enum, inspect, linecache, logging, pydoc, textwrap, tokenize, keyword
 import sys
@@ -65,6 +74,7 @@ class Scope(enum.Enum):
     NONE = None
 
     def __str__(self):
+        """Override str() to return either the variant name or '?' for NONE"""
         if self.value is Scope.NONE:
             return '?'
         else:
@@ -194,6 +204,9 @@ class ExceptionHandler(object):
 
     def __init__(self, reporting_cb=None):
         # type: (Optional[Callable[[str], None]]) -> None
+        """
+        :param reporting_cb: A callback to be exposed via a 'Report...' button
+        """
         self.reporting_cb = reporting_cb
 
     def make_info_dialog(self):

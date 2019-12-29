@@ -2,6 +2,7 @@
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
+__docformat__ = "restructuredtext en"
 
 import math, sys
 from collections import namedtuple
@@ -36,7 +37,7 @@ del MYPY
 
 
 class Gravity(Enum):  # pylint: disable=too-few-public-methods
-    """Gravity definitions used by Rectangle"""
+    """Gravity definitions used by `Rectangle`"""
     TOP_LEFT = (0.0, 0.0)
     TOP = (0.5, 0.0)
     TOP_RIGHT = (1.0, 0.0)
@@ -54,7 +55,7 @@ def clamp_idx(idx, stop, wrap=True):
 
     Uses the same half-open range convention as Python slices.
 
-    @param wrap: If C{True}, wrap around rather than saturating.
+    :param wrap: If ``True``, wrap around rather than saturating.
     """
     if wrap:
         return idx % stop
@@ -72,12 +73,14 @@ def euclidean_dist(vec1, vec2):  # type: (Iterable, Iterable) -> float
 
 
 def powerset(iterable):  # type: (Iterable[Any]) -> Iterator[Sequence[Any]]
-    """C{powerset([1,2,3])} --> C{() (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)}
+    """``powerset([1,2,3])`` -> ``() (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)``
 
-    @rtype: iterable
+    :rtype: iterable
     """
     i = list(iterable)
     return chain.from_iterable(combinations(i, j) for j in range(len(i) + 1))
+
+# TODO: Narrow down the type signature
 
 
 def fmt_table(rows,          # type: Any
@@ -86,16 +89,16 @@ def fmt_table(rows,          # type: Any
               ):  # type: (...) -> str
     """Format a collection as a textual table.
 
-    @param headers: Header labels for the columns
-    @param group_by: Index of the column to group results by.
-    @type rows: C{dict} or iterable of iterables
-    @type headers: C{list(str)}
-    @type group_by: C{int}
+    :param headers: Header labels for the columns
+    :param group_by: Index of the column to group results by.
+    :type rows: ``dict`` or iterable of iterables
+    :type headers: ``list(str)``
+    :type group_by: ``int``
 
-    @attention: This uses C{zip()} to combine things. The number of columns
+    :attention: This uses ``zip()`` to combine things. The number of columns
         displayed will be defined by the narrowest of all rows.
 
-    @rtype: C{str}
+    :rtype: ``str``
     """
     output = []  # type: List[str]
 
@@ -147,24 +150,25 @@ def fmt_table(rows,          # type: Any
     return ''.join(output)
 
 # Internal StrutPartial parent. Exposed so ePyDoc doesn't complain
-_StrutPartial = namedtuple('StrutPartial', 'left right top bottom '
+_StrutPartial = namedtuple('_StrutPartial', 'left right top bottom '
         'left_start_y left_end_y right_start_y right_end_y '
         'top_start_x top_end_x bottom_start_x bottom_end_x')
 
 
 class StrutPartial(_StrutPartial):
-    """A simple wrapper for the sequence retrieved from _NET_WM_STRUT_PARTIAL.
-    (or _NET_WM_STRUT thanks to default parameters)
+    """A simple wrapper for a sequence taken from ``_NET_WM_STRUT_PARTIAL``.
+    (or ``_NET_WM_STRUT`` thanks to default parameters)
 
     Purpose:
-    Minimize the chances of screwing up indexing into _NET_WM_STRUT_PARTIAL
+    Minimize the chances of screwing up indexing into ``_NET_WM_STRUT_PARTIAL``
 
     Method:
         - This namedtuple was created by copy-pasting the definition string
           from https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html
           and then manually deleting the commas from it if necessary.
-        - A __new__ was added to create StrutPartial instances from
-          _NET_WM_STRUT data by providing default values for the missing fields
+        - A ``__new__`` was added to create ``StrutPartial`` instances from
+          ``_NET_WM_STRUT`` data by providing default values for the
+          missing fields
     """
     __slots__ = ()
 
@@ -179,7 +183,7 @@ class StrutPartial(_StrutPartial):
             top_start_x, top_end_x, bottom_start_x, bottom_end_x)
 
     def as_rects(self, desktop_rect):  # type: (Rectangle) -> List[Rectangle]
-        """Resolve self into absolute coordinates relative to desktop_rect
+        """Resolve self into absolute coordinates relative to ``desktop_rect``
 
         Note that struts are relative to bounding box of the whole desktop,
         not the edges of individual screens.
@@ -217,6 +221,8 @@ class StrutPartial(_StrutPartial):
                 height=-self.bottom).intersect(desktop_rect),
         ) if bool(x)]
 
+# Keep _StrutPartial from showing up in ePyDoc listings
+del _StrutPartial
 
 # Internal Rectangle parent. Exposed so ePyDoc doesn't complain
 _Rectangle = namedtuple('_Rectangle', 'x y width height')
@@ -256,7 +262,7 @@ class Rectangle(_Rectangle):
 
     @property
     def xy(self):  # pylint: disable=invalid-name
-        """Convenience helper to retrieve an (x, y) tuple"""
+        """Convenience helper to retrieve an ``(x, y)`` tuple"""
         return (self.x, self.y)
 
     @property
@@ -273,7 +279,7 @@ class Rectangle(_Rectangle):
 
     def moved_into(self, other, clip=True):
         # type: (Rectangle, bool) -> Rectangle
-        """Return a new Rectangle that does not exceed the bounds of `other`
+        """Return a new `Rectangle` that does not exceed the bounds of `other`
 
         (i.e. make a copy that has been slid to the nearest position within
         `other` and only resized if it was larger in one dimension)
@@ -319,7 +325,7 @@ class Rectangle(_Rectangle):
         return Rectangle(x1, y1, max(0, x2 - x1), max(0, y2 - y1))
 
     def subtract(self, other):
-        """Subtract a rectangle from this one.
+        """Subtract a `Rectangle` from this one.
 
         This is implemented by shrinking the width/height of `self` away from
         `other` until they no longer overlap.
@@ -329,15 +335,15 @@ class Rectangle(_Rectangle):
 
         Whether to chop left/up or right/down is resolved by comparing the
         center point of the intersecting region with the center point of the
-        Rectangle being subtracted from.
+        `Rectangle` being subtracted from.
 
         In the case of `other` chopping `self` into two disjoint regions,
         the smaller one will be cut away as if it were covered by `other`.
 
-        @note: If there is no overlap, this will return a reference to `self`
+        :note: If there is no overlap, this will return a reference to `self`
                without making a copy.
 
-        @todo: This will misbehave in the unlikely event that a panel is
+        :todo: This will misbehave in the unlikely event that a panel is
                thicker than it is long. I'll want to revisit the algorithm
                once I've cleared out more pressing things.
         """
@@ -371,12 +377,12 @@ class Rectangle(_Rectangle):
         return bool(self.width and self.height)
 
     def __contains__(self, other):
-        """A Rectangle is `in` another if one is *entirely* within the other.
+        """A Rectangle is ``in`` another if one is *entirely* within the other.
 
         If you need to check for overlap, check whether
-        C{self.intersect(other)} is truthy.
+        ``self.intersect(other)`` is truthy.
 
-        @note: This assumes top-left gravity.
+        :note: This assumes top-left gravity.
         """
         if not isinstance(other, Rectangle):
             return False
@@ -399,40 +405,40 @@ class Rectangle(_Rectangle):
 
     def from_relative(self, other_rect):
         # type: (Rectangle) -> Rectangle
-        """Interpret self as relative to other_rect and make it absolute
+        """Interpret self as relative to ``other_rect`` and make it absolute
 
         (eg. Convert a window position that's relative to a given monitor's
         top-left corner into one that's relative to the desktop as a whole)
 
-        @note: This assumes top-left gravity.
+        :note: This assumes top-left gravity.
         """
         return self._replace(x=self.x + other_rect.x,
                              y=self.y + other_rect.y)
 
     def to_relative(self, other_rect):
         # type: (Rectangle) -> Rectangle
-        """Interpret self as absolute and make it relative to other_rect
+        """Interpret self as absolute and make it relative to ``other_rect``
 
         (eg. Convert a window position that's relative to the top-left corner
         of the desktop as a whole into one that's relative to a single monitor)
 
-        @note: This assumes top-left gravity.
+        :note: This assumes top-left gravity.
         """
         return self._replace(x=self.x - other_rect.x,
                              y=self.y - other_rect.y)
 
     def to_point(self):
         # type: () -> Rectangle
-        """Return a new Rectangle with zero width and height"""
+        """Return a new `Rectangle` with zero width and height"""
         return self._replace(width=0, height=0)
 
     def from_gravity(self, gravity):  # (Gravity) -> Rectangle
         """Treat x and y as not referring to top-left corner and translate
 
-        @note: Almost every C{Rectangle} method assumes top-left gravity, so
+        :note: Almost every ``Rectangle`` method assumes top-left gravity, so
                this should be the first thing done.
 
-        @todo: Think about how to refactor to guard against that error.
+        :todo: Think about how to refactor to guard against that error.
         """
         return self._replace(
             x=int(self.x - (self.width * gravity.value[0])),
@@ -440,16 +446,16 @@ class Rectangle(_Rectangle):
         )
 
     def to_gravity(self, gravity):  # (Gravity) -> Rectangle
-        """Reverse the effect of from_gravity
+        """Reverse the effect of ``from_gravity``
 
         Less concisely, this will interpret `self`'s `x` and `y` members as
         referring to the top-left corner of the rectangle and then translate
         them to refer to another point.
 
-        @note: Almost every C{Rectangle} method assumes top-left gravity, so
+        :note: Almost every ``Rectangle`` method assumes top-left gravity, so
                this should be the last thing done.
 
-        @note: This is intended for working in pixel values and will truncate
+        :note: This is intended for working in pixel values and will truncate
                any decimal component.
         """
         return self._replace(
@@ -459,17 +465,17 @@ class Rectangle(_Rectangle):
 
     @classmethod
     def from_gdk(cls, gdk_rect):
-        """Factory function to convert from a Gdk.Rectangle
+        """Factory function to convert from a ``Gdk.Rectangle``
 
-        @note: This assumes top-left gravity.
+        :note: This assumes top-left gravity.
         """
         return cls(x=gdk_rect.x, y=gdk_rect.y,
                    width=gdk_rect.width, height=gdk_rect.height)
 
     def to_gdk(self):
-        """Helper to easily create a Gdk.Rectangle from a Rectangle
+        """Helper to easily create a ``Gdk.Rectangle`` from a `Rectangle`
 
-        @note: This assumes top-left gravity.
+        :note: This assumes top-left gravity.
         """
         gdk_rect = Gdk.Rectangle()
         gdk_rect.x = self.x
@@ -478,11 +484,14 @@ class Rectangle(_Rectangle):
         gdk_rect.height = self.height
         return gdk_rect
 
+# Keep _Rectangle from showing up in ePyDoc listings
+del _Rectangle
+
 
 class UsableRegion(object):
     """A representation of the usable portion of a desktop
 
-    (In essence, this calculates per-monitor _NET_WORKAREA rectangles
+    (In essence, this calculates per-monitor ``_NET_WORKAREA`` rectangles
     and allows lookup of the correct one for a given target rectangle)
     """
 
@@ -542,9 +551,10 @@ class UsableRegion(object):
 
     def find_usable_rect(self, rect, fallback=True):
         # type: (Rectangle, bool) -> Optional[Rectangle]
-        """Find the usable Rectangle for the monitor containing rect
+        """Find the usable `Rectangle` for the monitor containing ``rect``
 
-        Fall back to the nearest monitor if fallback=True
+        Fall back to the nearest monitor if the window's center is outside
+        all known monitors and ``fallback=True``.
         """
         window_center = rect.to_gravity(Gravity.CENTER).to_point()
         for monitor in self._usable:
@@ -567,11 +577,12 @@ class UsableRegion(object):
         return None
 
     def __bool__(self):  # type: () -> bool
-        """A Region is truthy if it has a non-zero area"""
+        """A `UsableRegion` is truthy if it has a non-zero area"""
         return bool(len(self._usable) > 0 and
             all(self._usable.values()))
 
     def __repr__(self):  # type: () -> str
+        """Override ``repr()`` to be more useful for debugging"""
         return "Region(<Monitors={!r}, Struts={!r}>)".format(
             self._monitors, self._struts)
 

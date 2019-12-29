@@ -4,6 +4,7 @@ from __future__ import print_function
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
+__docformat__ = "restructuredtext en"
 
 import errno, logging, os, signal, sys
 from configparser import ConfigParser
@@ -31,7 +32,9 @@ MYPY = False
 if MYPY:
     # pylint: disable=unused-import,invalid-name
     from typing import Callable, Dict, Union  # NOQA
-    JSONDict = Dict[str, Union[str, int, float, bool, None]]
+
+    #: MyPy type alias for fields loaded from config files
+    CfgDict = Dict[str, Union[str, int, float, bool, None]]
 del MYPY
 
 #: Location for config files (determined at runtime).
@@ -73,7 +76,7 @@ DEFAULTS = {
         "H": "horizontal-maximize",
         "C": "move-to-center",
     }
-}  # type: Dict[str, JSONDict]
+}  # type: Dict[str, CfgDict]
 # TODO: Porting helper which identifies "middle" in the config file and changes
 #       it to "center"
 #
@@ -108,11 +111,12 @@ class QuickTileApp(object):
                  ):             # type: (...) -> None
         """Populate the instance variables.
 
-        @param keys: A dict mapping X11 keysyms to L{CommandRegistry}
+        :param keys: A dict mapping X11 keysyms to `CommandRegistry`
             command names.
-        @param modmask: A modifier mask to prefix to all keybindings.
-        @type winman: The L{WindowManager} instance to use.
-        @type keys: C{dict}
+        :param modmask: A modifier mask to prefix to all keybindings.
+        :type winman: The `WindowManager` instance to use.
+        :type keys: `dict`
+
         """
         self.winman = winman
         self.commands = commands
@@ -121,12 +125,12 @@ class QuickTileApp(object):
 
     def run(self):  # type: () -> bool
         """Initialize keybinding and D-Bus if available, then call
-        C{Gtk.main()}.
+        ``Gtk.main()``.
 
-        @returns: C{False} if none of the supported backends were available.
-        @rtype: C{bool}
+        :returns: ``False`` if none of the supported backends were available.
+        :rtype: ``bool``
 
-        @todo 1.0.0: Retire the C{doCommand} name. (API-breaking change)
+        :todo 1.0.0: Retire the ``doCommand`` name. (API-breaking change)
         """
 
         # Attempt to set up the global hotkey support
@@ -162,7 +166,7 @@ class QuickTileApp(object):
         """Print a formatted readout of defined keybindings and the modifier
         mask to stdout.
 
-        @todo: Look into moving this into L{KeyBinder}
+        :todo: Look into moving this into `KeyBinder`
         """
 
         print("Keybindings defined for use with --daemonize:\n")
@@ -173,7 +177,7 @@ class QuickTileApp(object):
 def load_config(path):  # type: (str) -> ConfigParser
     """Load the config file from the given path, applying fixes as needed.
 
-    @todo: Refactor all this
+    :todo: Refactor all this
     """
     first_run = not os.path.exists(path)
 
@@ -208,7 +212,7 @@ def load_config(path):  # type: (str) -> ConfigParser
 
     # Either load the keybindings or use and save the defaults
     if config.has_section('keys'):
-        keymap = dict(config.items('keys'))  # type: JSONDict
+        keymap = dict(config.items('keys'))  # type: CfgDict
     else:
         keymap = DEFAULTS['keys']
         config.add_section('keys')

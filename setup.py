@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""
+"""Standard setuptools build/install script
 
 @todo:
  - Identify minimum dependency versions properly.
@@ -9,6 +9,7 @@ from __future__ import print_function
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
+__docformat__ = "restructuredtext en"
 
 import io, os, re
 from setuptools import setup
@@ -27,6 +28,7 @@ else:
             print("WARNING: Could not load the PyGI bindings for %s. You will "
                   "need to install them before you will be able to run "
                   "QuickTile." % name)
+    del name
 
 # TODO: Switch to PyGI-based D-Bus support
 
@@ -35,14 +37,14 @@ else:
 
 
 def read(*names, **kwargs):
-    """Convenience wrapper for read()ing a file"""
+    """Convenience wrapper for ``read()``-ing a file in one call"""
     with io.open(os.path.join(os.path.dirname(__file__), *names),
               encoding=kwargs.get("encoding", "utf8")) as fobj:
         return fobj.read()
 
 
 def find_version(*file_paths):
-    """Extract the value of __version__ from the given file"""
+    """Extract the value of ``__version__`` from the given file"""
     version_file = read(*file_paths)
     version_match = re.search(r"^__version__\s*=\s*['\"]([^'\"]*)['\"]",
                               version_file, re.M)

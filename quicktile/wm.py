@@ -2,6 +2,7 @@
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
+__docformat__ = "restructuredtext en"
 
 import logging
 from contextlib import contextmanager
@@ -31,7 +32,7 @@ del MYPY
 def persist_maximization(win, keep_maximize=True):
     """Context manager to persist maximization state after a reposition
 
-    If C{keep_maximize=False}, this becomes a no-op to ease writing
+    If ``keep_maximize=False``, this becomes a no-op to ease writing
     clean code which needs to support both behaviours.
     """
     # Unmaximize and record the types we may need to restore
@@ -55,17 +56,18 @@ class WindowManager(object):
     def __init__(self, screen=None, x_display=None):
         # type: (Gdk.Screen, XDisplay) -> None
         """
-        Initializes C{WindowManager}.
+        Initializes ``WindowManager``.
 
-        @param screen: The Gdk.Screen to operate on. If C{None}, the default
-            screen as retrieved by C{Gdk.Screen.get_default} will be used.
-        @type screen: C{Gdk.Screen}
+        :param screen: The ``Gdk.Screen`` to operate on. If ``None``, the
+            default screen as retrieved by ``Gdk.Screen.get_default`` will
+            be used.
+        :type screen: ``Gdk.Screen``
 
-        @param x_display: The X11 display to operate on. If C{None}, a new
+        :param x_display: The X11 display to operate on. If ``None``, a new
             X connection will be created.
-        @type x_display: C{Xlib.display.Display}
+        :type x_display: ``Xlib.display.Display``
 
-        @todo: Confirm that the root window only changes on X11 server
+        :todo: Confirm that the root window only changes on X11 server
                restart. (Something which will crash QuickTile anyway since
                PyGTK makes X server disconnects uncatchable.)
 
@@ -92,17 +94,17 @@ class WindowManager(object):
 
         self.screen = Wnck.Screen.get(self.gdk_screen.get_number())
 
-        self.n_screens = None
         self.usable_region = self._load_desktop_geometry()
         # TODO: Hook monitor-added and monitor-removed and regenerate this
         # TODO: Hook changes to strut reservations and regenerate this
 
     def _load_desktop_geometry(self):
-        """Retrieve and process monitor and panel shapes into a UsableRegion"""
+        # type: () -> UsableRegion
+        """Retrieve and process monitor & panel shapes into ``UsableRegion``"""
         # Gather the screen rectangles
-        self.n_screens = self.x_root.xinerama_get_screen_count().screen_count
+        n_screens = self.x_root.xinerama_get_screen_count().screen_count
         monitors = []
-        for idx in range(0, self.n_screens):
+        for idx in range(0, n_screens):
             monitors.append(Rectangle.from_gdk(
                 self.gdk_screen.get_monitor_geometry(idx)))
             # TODO: Look into using python-xlib to match x_root use
@@ -141,11 +143,12 @@ class WindowManager(object):
 
     def get_monitor(self, win):
         # type: (Wnck.Window) -> Tuple[int, Rectangle]
-        """Given a C{Wnck.Window}, retrieve the monitor ID and geometry.
+        """Given a ``Wnck.Window``, retrieve the monitor ID and geometry.
 
-        @type win: C{Wnck.Window}
-        @returns: A tuple containing the monitor ID and geometry.
-        @rtype: C{(int, Rectangle)}
+        :param win: The window to find the containing monitor for.
+        :type win: ``Wnck.Window``
+        :returns: A tuple containing the monitor ID and geometry.
+        :rtype: ``(int, Rectangle)``
         """
         # TODO: Look for a way to get the monitor ID without having
         #       to instantiate a Gdk.Window. Doing so would also remove
@@ -165,7 +168,7 @@ class WindowManager(object):
 
     def get_relevant_windows(self, workspace):
         # type: (Wnck.Workspace) -> Iterable[Wnck.Window]
-        """C{Wnck.Screen.get_windows} without WINDOW_DESKTOP/DOCK windows."""
+        """``Wnck.Screen.get_windows`` without ``WINDOW_DESKTOP``/``DOCK``."""
 
         for window in self.screen.get_windows():
             # Skip windows on other virtual desktops for intuitiveness
@@ -186,19 +189,21 @@ class WindowManager(object):
                       ):                # type: (...) -> Wnck.Workspace
         """Get a workspace relative to either a window or the active one.
 
-        @param window: The point of reference. C{None} for the active workspace
-        @param direction: The direction in which to look, relative to the point
+        :param window: The point of reference. ``None`` for the
+                       active workspace
+        :param direction: The direction in which to look, relative to the point
             of reference. Accepts the following types:
-             - C{Wnck.MotionDirection}: Non-cycling direction
-             - C{int}: Relative index in the list of workspaces
-             - C{None}: Just get the workspace object for the point of
-               reference
-        @param wrap_around: Whether relative indexes should wrap around.
 
-        @type window: C{Wnck.Window} or C{None}
-        @type wrap_around: C{bool}
-        @rtype: C{Wnck.Workspace} or C{None}
-        @returns: The workspace object or C{None} if no match could be found.
+             - ``Wnck.MotionDirection``: Non-cycling direction
+             - ``int``: Relative index in the list of workspaces
+             - ``None``: Just get the workspace object for the point of
+               reference
+        :param wrap_around: Whether relative indexes should wrap around.
+
+        :type window: ``Wnck.Window`` or ``None``
+        :type wrap_around: ``bool``
+        :rtype: ``Wnck.Workspace`` or ``None``
+        :returns: The workspace object or ``None`` if no match could be found.
         """
         if window:
             cur = window.get_workspace()
@@ -226,7 +231,8 @@ class WindowManager(object):
         return nxt
 
     def _property_prep(self, win, name):
-        """Common code for get_property and set_property"""
+        # TODO: MyPy type annotations
+        """Common code for `get_property` and `set_property`"""
         if isinstance(win, (Gdk.Window, Wnck.Window)):
             win = win.get_xid()
 
@@ -237,7 +243,8 @@ class WindowManager(object):
         return win, name
 
     def get_property(self, win, name, prop_type, empty=None):
-        """Helper to make querying X11 properties cleaner"""
+        # TODO: MyPy type annotations
+        """Get the value of the property ``name`` on window ``win``"""
         win, name = self._property_prep(win, name)
 
         result = win.get_full_property(name, prop_type)
@@ -246,7 +253,8 @@ class WindowManager(object):
 
     def set_property(self, win, name, value,  # pylint: disable=R0913
             prop_type=Xatom.STRING, format_size=8):
-        """Helper to make setting X11 properties cleaner"""
+        # TODO: MyPy type annotations
+        """Set the property ``name`` on window ``win``"""
         win, name = self._property_prep(win, name)
         win.change_property(name, prop_type, format_size, value)
         # TODO: Set an `onerror` handler and at least log an error to console
@@ -254,7 +262,7 @@ class WindowManager(object):
     # XXX: Move `if not window` into a decorator and use it everywhere?
     @staticmethod
     def is_relevant(window):  # type: (Wnck.Window) -> bool
-        """Return False if the window should be ignored.
+        """Return ``False`` if the window should be ignored.
 
         (eg. If it's the desktop or a panel)
         """
@@ -295,28 +303,28 @@ class WindowManager(object):
         If no monitor rectangle is specified, position relative to the desktop
         as a whole.
 
-        @param win: The C{Wnck.Window} to operate on.
-        @param geom: The new geometry for the window. Can be left unspecified
+        :param win: The ``Wnck.Window`` to operate on.
+        :param geom: The new geometry for the window. Can be left unspecified
             if the intent is to move the window to another monitor without
             repositioning it.
-        @param monitor: The frame relative to which C{geom} should be
+        :param monitor: The frame relative to which ``geom`` should be
             interpreted. The whole desktop if unspecified.
-        @param keep_maximize: Whether to re-maximize a maximized window after
+        :param keep_maximize: Whether to re-maximize a maximized window after
             un-maximizing it to move it.
-        @param gravity: A constant specifying which point on the window is
-            referred to by the X and Y coordinates in C{geom}.
-        @param geometry_mask: A set of flags determining which aspects of the
+        :param gravity: A constant specifying which point on the window is
+            referred to by the X and Y coordinates in ``geom``.
+        :param geometry_mask: A set of flags determining which aspects of the
             requested geometry should actually be applied to the window.
             (Allows the same geometry definition to easily be shared between
             operations like move and resize.)
-        @type win: C{Wnck.Window}
-        @type geom: L{Rectangle} or C{None}
-        @type monitor: L{Rectangle}
-        @type keep_maximize: C{bool}
-        @type gravity: C{Gravity}
-        @type geometry_mask: U{WnckWindowMoveResizeMask<https://developer.gnome.org/libwnck/2.30/WnckWindow.html#WnckWindowMoveResizeMask>}
+        :type win: ``Wnck.Window``
+        :type geom: `Rectangle` or ``None``
+        :type monitor: `Rectangle`
+        :type keep_maximize: ``bool``
+        :type gravity: `Gravity`
+        :type geometry_mask: `WnckWindowMoveResizeMask <https://developer.gnome.org/libwnck/2.30/WnckWindow.html#WnckWindowMoveResizeMask>`_
 
-        @todo 1.0.0: Look for a way to accomplish this with a cleaner method
+        :todo 1.0.0: Look for a way to accomplish this with a cleaner method
             signature. This is getting a little hairy. (API-breaking change)
         """  # NOQA
 
@@ -343,7 +351,7 @@ class WindowManager(object):
         #       (Ideally, re-derive from the tiling preset if set)
         if bool(monitor) and not geom:
             new_geom = new_geom.moved_into(
-                self.usable_region.find_usable_rect(monitor))
+                self.usable_region.find_usable_rect(monitor))  # type: ignore
 
         logging.debug(" Repositioning to %s)\n", new_geom)
         with persist_maximization(win, keep_maximize):

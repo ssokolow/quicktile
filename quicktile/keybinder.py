@@ -2,6 +2,7 @@
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
+__docformat__ = "restructuredtext en"
 
 import logging
 from functools import reduce  # pylint: disable=redefined-builtin
@@ -32,20 +33,22 @@ del MYPY
 
 
 class KeyBinder(object):
-    """A convenience class for wrapping C{XGrabKey}."""
+    """A convenience class for wrapping ``XGrabKey``."""
 
-    #: @todo: Figure out how to set the modifier mask in X11 and use
-    #:        C{gtk.accelerator_get_default_mod_mask()} to feed said code.
+    #: Modifiers whose state should not affect whether a binding fires
+    #:
+    #: :todo: Figure out how to set the modifier mask in X11 and use
+    #:        ``gtk.accelerator_get_default_mod_mask()`` to feed said code.
     ignored_modifiers = ['Mod2Mask', 'LockMask']
 
-    #: Used to pass state from L{cb_xerror}
+    #: Used to pass state from `cb_xerror`
     keybind_failed = False
 
     def __init__(self, x_display):  # type: (Optional[Display]) -> None
         """Connect to X11 and the GLib event loop.
 
-        @param x_display: A C{python-xlib} display handle.
-        @type x_display: C{Xlib.display.Display}
+        :param x_display: A ``python-xlib`` display handle.
+        :type x_display: ``Xlib.display.Display``
         """
         try:
             self.xdisp = x_display or Display()
@@ -78,18 +81,19 @@ class KeyBinder(object):
     def bind(self, accel, callback):  # type: (str, Callable[[], None]) -> bool
         """Bind a global key combination to a callback.
 
-        @param accel: An accelerator as either a string to be parsed by
-            C{gtk.accelerator_parse()} or a tuple as returned by it.)
-        @param callback: The function to call when the key is pressed.
+        :param accel: An accelerator as either a string to be parsed by
+            ``gtk.accelerator_parse()`` or a tuple as returned by it.)
+        :param callback: The function to call when the key is pressed.
 
-        @type accel: C{str} or C{(int, gtk.gdk.ModifierType)} or C{(int, int)}
-        @type callback: C{function}
+        :type accel: ``str`` or ``(int, gtk.gdk.ModifierType)``
+                     or ``(int, int)``
+        :type callback: ``function``
 
-        @returns: A boolean indicating whether the provided keybinding was
+        :returns: A boolean indicating whether the provided keybinding was
             parsed successfully. (But not whether it was registered
-            successfully due to the asynchronous nature of the C{XGrabKey}
+            successfully due to the asynchronous nature of the ``XGrabKey``
             request.)
-        @rtype: C{bool}
+        :rtype: ``bool``
         """
         keycode, modmask = self.parse_accel(accel)
         if keycode is None or modmask is None:
@@ -117,7 +121,8 @@ class KeyBinder(object):
 
     def cb_xerror(self, err, _):  # type: (XError, Any) -> None
         """Used to identify when attempts to bind keys fail.
-        @note: If you can make python-xlib's C{CatchError} actually work or if
+
+        :note: If you can make python-xlib's ``CatchError`` actually work or if
                you can retrieve more information to show, feel free.
         """
         if isinstance(err, BadAccess):
@@ -129,9 +134,9 @@ class KeyBinder(object):
         # type: (Any, Any, Optional[Display]) -> bool
         """Callback to dispatch X events to more specific handlers.
 
-        @rtype: C{True}
+        :rtype: ``True``
 
-        @todo: Make sure uncaught exceptions are prevented from making
+        :todo: Make sure uncaught exceptions are prevented from making
             quicktile unresponsive in the general case.
         """
         handle = handle or self.xroot.display
@@ -145,7 +150,7 @@ class KeyBinder(object):
         return True
 
     def handle_keypress(self, xevent):  # type: (XKeyPress) -> None
-        """Dispatch C{XKeyPress} events to their callbacks."""
+        """Dispatch ``XKeyPress`` events to their callbacks."""
         keysig = (xevent.detail, xevent.state)
         if keysig not in self._keys:
             logging.error("Received an event for an unrecognized keybind: "
@@ -188,17 +193,17 @@ class KeyBinder(object):
     @staticmethod
     def _vary_modmask(modmask, ignored):
         # type: (int, Sequence[int]) -> Iterator[int]
-        """Generate all possible variations on C{modmask} that need to be
+        """Generate all possible variations on ``modmask`` that need to be
         taken into consideration if we can't properly ignore the modifiers in
-        C{ignored}. (Typically NumLock and CapsLock)
+        ``ignored``. (Typically NumLock and CapsLock)
 
-        @param modmask: A bitfield to be combinatorically grown.
-        @param ignored: Modifiers to be combined with C{modmask}.
+        :param modmask: A bitfield to be combinatorically grown.
+        :param ignored: Modifiers to be combined with ``modmask``.
 
-        @type modmask: C{int} or C{gtk.gdk.ModifierType}
-        @type ignored: C{list(int)}
+        :type modmask: ``int`` or ``gtk.gdk.ModifierType``
+        :type ignored: ``list(int)``
 
-        @rtype: generator of C{type(modmask)}
+        :rtype: generator of ``type(modmask)``
         """
 
         for ignored in powerset(ignored):

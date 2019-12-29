@@ -2,6 +2,7 @@
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
+__docformat__ = "restructuredtext en"
 
 import json, logging, time
 from functools import wraps
@@ -32,17 +33,15 @@ if MYPY:
     from .util import CommandCB, Gravity    # NOQA
 
     # FIXME: Replace */** with a dict so I can be strict here
+    #: MyPy type alias for what gets stored in `CommandRegistry`
     CommandCBWrapper = Callable[..., Any]  # pylint: disable=invalid-name
 del MYPY
 
 
 class CommandRegistry(object):
-    """Handles lookup and boilerplate for window management commands.
+    """Handles lookup and boilerplate for window management commands."""
 
-    Separated from WindowManager so its lifecycle is not tied to a specific
-    GDK Screen object.
-    """
-
+    #: Fields to be added to the ``state`` argument when calling commands
     extra_state = {}  # type: Dict[str, Any]
 
     def __init__(self):     # type: () -> None
@@ -54,6 +53,7 @@ class CommandRegistry(object):
             yield name
 
     def __str__(self):   # type: () -> str
+        """Override str() to pretty-print a table of known commands"""
         return fmt_table(self.help, ('Known Commands', 'desc'), group_by=1)
 
     @staticmethod
@@ -61,6 +61,7 @@ class CommandRegistry(object):
                         state,  # type: Dict[str, Any]
                         winman  # type: WindowManager
                         ):  # type: (...) -> bool
+        """Gather information about ``window`` to pass to the command"""
         # Bail out early on None or things like the desktop window
         if not winman.is_relevant(window):
             return False
@@ -95,16 +96,16 @@ class CommandRegistry(object):
         """Decorator to wrap a function in boilerplate and add it to the
             command registry under the given name.
 
-            NOTE: The `windowless` parameter allows a command to be registered
-            as not requiring and active window.
+            :note: The ``windowless`` parameter allows a command to be
+                registered as not requiring an active window.
 
-            @param name: The name to know the command by.
-            @param p_args: Positional arguments to prepend to all calls made
-                via C{name}.
-            @param p_kwargs: Keyword arguments to prepend to all calls made
-                via C{name}.
+            :param name: The name to know the command by.
+            :param p_args: Positional arguments to prepend to all calls made
+                via ``name``.
+            :param p_kwargs: Keyword arguments to prepend to all calls made
+                via ``name``.
 
-            @type name: C{str}
+            :type name: ``str``
             """
 
         def decorate(func):  # type: (CommandCB) -> CommandCB
@@ -165,8 +166,8 @@ class CommandRegistry(object):
         """Convenience decorator to allow many commands to be defined from
            the same function with different arguments.
 
-           @param command_map: A dict mapping command names to argument lists.
-           @type command_map: C{dict}
+           :param command_map: A dict mapping command names to argument lists.
+           :type command_map: ``dict``
            """
         # TODO: Refactor and redesign for better maintainability
         def decorate(func):
@@ -193,15 +194,15 @@ class CommandRegistry(object):
             return False
 
 
-#: The instance of L{CommandRegistry} to be used in 99.9% of use cases.
+#: The instance of `CommandRegistry` to be used in 99.9% of use cases.
 commands = CommandRegistry()
 
 
 def cycle_dimensions(winman,      # type: WindowManager
-                     win,         # type: Any  # TODO: Consistent Window type
+                     win,         # type: Wnck.Window
                      state,       # type: Dict[str, Any]
                      *dimensions  # type: Any
-                     ):  # type: (...) -> Optional[Gdk.Rectangle]
+                     ):  # type: (...) -> Optional[Rectangle]
     # TODO: Standardize on what kind of window object to pass around
     """Cycle the active window through a list of positions and shapes.
 
@@ -210,13 +211,14 @@ def cycle_dimensions(winman,      # type: WindowManager
     If the window's dimensions are not within 100px (by euclidean distance)
     of an entry in the list, set them to the first list entry.
 
-    @param dimensions: A list of tuples representing window geometries as
+    :param dimensions: A list of tuples representing window geometries as
         floating-point values between 0 and 1, inclusive.
-    @type dimensions: C{[(x, y, w, h), ...]}
-    @type win: C{Gdk.Window}
+    :type dimensions: ``[(x, y, w, h), ...]``
+    :param win: The window to be manipulated
+    :type win: ``Wnck.Window``
 
-    @returns: The new window dimensions.
-    @rtype: C{Gdk.Rectangle}
+    :returns: The new window dimensions.
+    :rtype: `Rectangle`
     """
     win_geom = Rectangle(*win.get_geometry()).to_relative(
         state['monitor_geom'])
@@ -285,9 +287,12 @@ def cycle_monitors(winman,            # type: WindowManager
                    force_wrap=False,  # type: bool
                    n_monitors=None    # type: Optional[int]
                    ):                 # type: (...) -> None
-    """Cycle the active window between monitors while preserving position.
+    """Cycle the active window between monitors.
 
-    @todo 1.0.0: Remove C{monitor-switch} in favor of C{monitor-next}
+    Attempts to preserve the window's position but will ensure that it doesn't
+    get placed outside the available space on the target monitor.
+
+    :todo 1.0.0: Remove ``monitor-switch`` in favor of ``monitor-next``
         (API-breaking change)
     """
     old_mon_id, _ = winman.get_monitor(win)
@@ -309,7 +314,11 @@ def cycle_monitors(winman,            # type: WindowManager
 @commands.add('monitor-next-all', 1)
 def cycle_monitors_all(winman, win, state, step=1, force_wrap=False):
     # type: (WindowManager, Wnck.Window, Dict[str, Any], int, bool) -> None
-    """Cycle all windows between monitors while preserving position."""
+    """Cycle all windows between monitors.
+
+    Attempts to preserve each window's position but will ensure that it doesn't
+    get placed outside the available space on the target monitor.
+    """
     n_monitors = winman.gdk_screen.get_n_monitors()
     curr_workspace = win.get_workspace()
 
@@ -385,18 +394,19 @@ def toggle_state(winman, win, state, command, check, takes_bool=False):
     # type: (WindowManager, Wnck.Window, Map[str, Any], str, str, bool) -> None
     """Toggle window state on the active window.
 
-    @param command: The C{Wnck.Window} method name to be conditionally prefixed
-        with "un", resolved, and called.
-    @param check: The C{Wnck.Window} method name to be called to check
-        whether C{command} should be prefixed with "un".
-    @param takes_bool: If C{True}, pass C{True} or C{False} to C{check} rather
-        thank conditionally prefixing it with C{un} before resolving.
-    @type command: C{str}
-    @type check: C{str}
-    @type takes_bool: C{bool}
+    :param command: The ``Wnck.Window`` method name to be conditionally
+        prefixed with ``un``, resolved, and called.
+    :param check: The ``Wnck.Window`` method name to be called to check
+        whether ``command`` should be prefixed with ``un``.
+    :param takes_bool: If ``True``, pass ``True`` or ``False`` to ``check``
+        rather thank conditionally prefixing it with ``un`` before resolving.
+    :type command: ``str``
+    :type check: ``str``
+    :type takes_bool: ``bool``
 
-    @todo 1.0.0: Rename C{vertical-maximize} and C{horizontal-maximize} to
-        C{maximize-vertical} and C{maximize-horizontal}. (API-breaking change)
+    :todo 1.0.0: Rename ``vertical-maximize`` and ``horizontal-maximize`` to
+        ``maximize-vertical`` and ``maximize-horizontal``.
+        (API-breaking change)
     """
     target = not getattr(win, check)()
 

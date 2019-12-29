@@ -4,16 +4,8 @@
 
 --snip--
 
-This script replicates some of the algorithms implemented in the unattributed
-/usr/bin/xvfb-run script included in the xvfb package provided by
-Ubuntu Linux 14.04.5 LTS.
+:todo: Don't forget to test unusual configurations such as:
 
-It is my belief that the commonalities between these two scripts are inherent
-to the process of implementing an algorithm which satisfies the requirements
-and, thus, not meeting the criteria to be eligible for protection under
-copyright law.
-
-TODO: Don't forget to test unusual configurations such as:
     1. Having screens 1, 2, and 4 but not 0 or 3 (eg. hotplug aftermath)
     2. Having no windows on the desktop
     3. Having no window manager (with and without windows)
@@ -25,7 +17,9 @@ from __future__ import (absolute_import, division, print_function,
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "MIT"
+__docformat__ = "restructuredtext en"
 
+#: The sequence of commands to call QuickTile with
 TEST_SCRIPT = """
 monitor-next-all
 monitor-prev-all
@@ -113,7 +107,7 @@ def run_tests():
     lines = [x for x in lines if x]
     for pos, command in enumerate(lines):
         log.info("Testing command %d of %d: %s", pos + 1, len(lines), command)
-        subprocess.check_call(['quicktile', command])
+        subprocess.check_call(['./quicktile.sh', command])  # nosec
 
 
 def main():
