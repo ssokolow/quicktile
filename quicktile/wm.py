@@ -342,7 +342,8 @@ class WindowManager(object):
         #       on each monitor-next call as long as the window hasn't changed
         #       (Ideally, re-derive from the tiling preset if set)
         if bool(monitor) and not geom:
-            new_geom = new_geom.moved_into(monitor)
+            new_geom = new_geom.moved_into(
+                self.usable_region.find_usable_rect(monitor))
 
         logging.debug(" Repositioning to %s)\n", new_geom)
         with persist_maximization(win, keep_maximize):
