@@ -1,6 +1,9 @@
 0.4.0 (git HEAD):
-- Port to Python 3.x and GTK+ 3.x
+- Port to Python 3.x and GTK 3.x
 - Rename the `middle` command to `center` for consistency with `move-to-*`
+- Ensure off-screen windows can be manipulated relative to the nearest monitor
+- Make move-to-* commands center non-corner destinations for consistency
+- Have move-to-* preserve horizontal/vertical maximization state
 - Significant internal reworking to make the codebase more maintainable
 
 0.3.0:

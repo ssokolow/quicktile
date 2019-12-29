@@ -124,9 +124,15 @@ class WindowManager(object):
                 win, '_NET_WM_STRUT_PARTIAL', Xatom.CARDINAL)
             if result:
                 struts.append(StrutPartial(*result))
-            # TODO: Fall back to checking for a _NET_WM_STRUT instead
-        logging.debug("Gathered _NET_WM_STRUT_PARTIAL values:\n\t%s",
-                      struts)
+                logging.debug("Gathered _NET_WM_STRUT_PARTIAL value: %s",
+                              struts)
+            else:
+                # TODO: Unit test this fallback
+                result = self.get_property(
+                    win, '_NET_WM_STRUT', Xatom.CARDINAL)
+                if result:
+                    struts.append(StrutPartial(*result))
+                    logging.debug("Gathered _NET_WM_STRUT value: %s", struts)
 
         # Get the list of struts from the root window
         usable_region.set_panels(struts)
