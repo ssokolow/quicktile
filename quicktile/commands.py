@@ -341,6 +341,7 @@ def move_to_position(winman,       # type: WindowManager
                   gravity, tuple(target))
 
     winman.reposition(win, target, usable_rect,
+        keep_maximize=True,
         gravity=gravity,
         geometry_mask=Wnck.WindowMoveResizeMask.X |
                       Wnck.WindowMoveResizeMask.Y)
