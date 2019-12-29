@@ -10,10 +10,6 @@ QuickTile
    :target: https://scrutinizer-ci.com/g/ssokolow/quicktile/?branch=master
    :alt: Scrutinizer Code Quality
 
-.. image:: https://api.codacy.com/project/badge/Grade/5a3450aa0d2e429796a836580b1fef32
-   :target: https://www.codacy.com/app/from_github/quicktile
-   :alt: Codacy
-
 .. image:: https://codeclimate.com/github/ssokolow/quicktile/badges/gpa.svg
    :target: https://codeclimate.com/github/ssokolow/quicktile
    :alt: Code Climate
