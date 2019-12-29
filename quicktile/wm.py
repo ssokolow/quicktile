@@ -341,7 +341,7 @@ class WindowManager(object):
         # TODO: Make this remember the original position and re-derive from it
         #       on each monitor-next call as long as the window hasn't changed
         #       (Ideally, re-derive from the tiling preset if set)
-        if monitor and not geom:
+        if bool(monitor) and not geom:
             new_geom = new_geom.moved_into(monitor)
 
         logging.debug(" Repositioning to %s)\n", new_geom)

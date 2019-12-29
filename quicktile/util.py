@@ -215,7 +215,7 @@ class StrutPartial(_StrutPartial):
                 y=desktop_rect.y2,
                 x2=self.bottom_end_x,
                 height=-self.bottom).intersect(desktop_rect),
-        ) if x]
+        ) if bool(x)]
 
 
 # Internal Rectangle parent. Exposed so ePyDoc doesn't complain
@@ -263,13 +263,13 @@ class Rectangle(_Rectangle):
     def x2(self):  # pylint: disable=invalid-name
         # type: () -> int
         """X coordinate of the bottom-right corner assuming top-left gravity"""
-        return self.x + self.width
+        return int(self.x + self.width)
 
     @property
     def y2(self):  # pylint: disable=invalid-name
         # type: () -> int
         """Y coordinate of the bottom-right corner assuming top-left gravity"""
-        return self.y + self.height
+        return int(self.y + self.height)
 
     def moved_into(self, other, clip=True):
         # type: (Rectangle, bool) -> Rectangle
@@ -549,7 +549,7 @@ class UsableRegion(object):
         window_center = rect.to_gravity(Gravity.CENTER).to_point()
         for monitor in self._usable:
             if window_center in monitor:
-                return self._usable[monitor]
+                return self._usable[monitor]  # type: ignore
 
         if fallback:
             distances = []
@@ -562,7 +562,7 @@ class UsableRegion(object):
             distances.sort()
             # Return usable region corresponding to second field (monitor)
             # corresponding to smallest euc. distance.
-            return self._usable[distances[0][1]]
+            return self._usable[distances[0][1]]  # type: ignore
 
         return None
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "-- MyPy --"
-MYPYPATH="quicktile" mypy --strict-optional --ignore-missing-imports quicktile test_quicktile.py test_functional.py
+MYPYPATH="quicktile" mypy quicktile test_quicktile.py test_functional.py
 echo "-- Nose (unit tests) --"
 nosetests3 "$@"
 echo "-- ePyDoc (documentation syntax) --"
