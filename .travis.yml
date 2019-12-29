@@ -1,20 +1,30 @@
-dist: trusty
+dist: xenial
 sudo: false
-cache: pip
 language: python
+cache: pip
+python:
+  - 3.5
+before_install:
+  - python --version
+  - pip install -U pip
 virtualenv:
   system_site_packages: true
 addons:
   apt:
     packages:
-    - python-dbus
-    - python-epydoc
-    - python-gtk2
-    - python-wnck
-    - python-xlib
-    - python-docutils
-install: "pip install coveralls"
+      - python3-dbus
+      - python3-gi
+        python3-nose
+      - python3-xlib
+      - gir1.2-gtk-3.0
+      - gir1.2-wnck-3.0
+      - python-epydoc
+      - python-docutils
+install: "pip3 install mypy coveralls"
+env:
+  - MYPYPATH="quicktile"
 script:
-  - epydoc --config setup.cfg quicktile *.py
-  - nosetests
+  - mypy quicktile ./*.py functional_harness
+  - nosetests3
+  - epydoc --config setup.cfg quicktile ./*.py functional_harness
 after_success: coveralls
