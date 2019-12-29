@@ -332,13 +332,21 @@ class WindowManager(object):
                         attr.upper()):
                     new_args[attr] = getattr(geom, attr)
 
-        geom = old_geom._replace(**new_args)
+        new_geom = old_geom._replace(**new_args)
 
         # Apply gravity and resolve to absolute desktop coordinates.
-        geom = geom.from_gravity(gravity).from_relative(monitor)
+        new_geom = new_geom.from_gravity(gravity).from_relative(monitor)
 
-        logging.debug(" Repositioning to %s)\n", geom)
+        # Ensure the window is fully within the monitor
+        # TODO: Make this remember the original position and re-derive from it
+        #       on each monitor-next call as long as the window hasn't changed
+        #       (Ideally, re-derive from the tiling preset if set)
+        if monitor and not geom:
+            new_geom = new_geom.moved_into(monitor)
+
+        logging.debug(" Repositioning to %s)\n", new_geom)
         with persist_maximization(win, keep_maximize):
             # Always use STATIC because either WMs implement window gravity
             # incorrectly or it's not applicable to this problem
-            win.set_geometry(Wnck.WindowGravity.STATIC, geometry_mask, *geom)
+            win.set_geometry(Wnck.WindowGravity.STATIC,
+                             geometry_mask, *new_geom)

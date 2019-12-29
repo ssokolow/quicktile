@@ -371,6 +371,47 @@ class TestRectangle(unittest.TestCase):
         with self.assertRaises(TypeError):
             print(self.rect1.union(5))
 
+    def test_moved_into(self):
+        """Rectangle: moved_into"""
+
+        display = Rectangle(0, 0, 1280, 1024)
+
+        # Clipping
+        self.assertEqual(Rectangle(0, 0, 100, 200).moved_into(display),
+                         Rectangle(0, 0, 100, 200))
+        self.assertEqual(Rectangle(-1, -1, 100, 200).moved_into(display),
+                         Rectangle(0, 0, 100, 200))
+        self.assertEqual(Rectangle(1200, -1, 100, 200).moved_into(display),
+                         Rectangle(1280 - 100, 0, 100, 200))
+        self.assertEqual(Rectangle(-1, 1000, 100, 200).moved_into(display),
+                         Rectangle(0, 1024 - 200, 100, 200))
+        self.assertEqual(Rectangle(1200, -1, 2000, 200).moved_into(display),
+                         Rectangle(0, 0, 1280, 200))
+        self.assertEqual(Rectangle(-1, 1000, 100, 2000).moved_into(display),
+                         Rectangle(0, 0, 100, 1024))
+        self.assertEqual(Rectangle(-1200, 1, 2000, 200).moved_into(display),
+                         Rectangle(0, 1, 1280, 200))
+        self.assertEqual(Rectangle(1, -1000, 100, 2000).moved_into(display),
+                         Rectangle(1, 0, 100, 1024))
+
+        # No Clipping
+        self.assertEqual(Rectangle(0, 0, 100, 200).moved_into(display, False),
+                         Rectangle(0, 0, 100, 200))
+        self.assertEqual(Rectangle(-1, -1, 10, 20).moved_into(display, False),
+                         Rectangle(0, 0, 10, 20))
+        self.assertEqual(Rectangle(1200, -1, 100, 200).moved_into(display,
+                         False), Rectangle(1280 - 100, 0, 100, 200))
+        self.assertEqual(Rectangle(-1, 1000, 100, 200).moved_into(display,
+                         False), Rectangle(0, 1024 - 200, 100, 200))
+        self.assertEqual(Rectangle(1200, -1, 2000, 200).moved_into(display,
+                         False), Rectangle(0, 0, 2000, 200))
+        self.assertEqual(Rectangle(-1, 1000, 100, 2000).moved_into(display,
+                         False), Rectangle(0, 0, 100, 2000))
+        self.assertEqual(Rectangle(-1200, 1, 2000, 200).moved_into(display,
+                         False), Rectangle(0, 1, 2000, 200))
+        self.assertEqual(Rectangle(1, -1000, 100, 2000).moved_into(display,
+                         False), Rectangle(1, 0, 100, 2000))
+
     def test_subtract(self):
         """Rectangle: subtract"""
         # Subtracting a non-intersecting rectangle returns self

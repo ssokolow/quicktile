@@ -271,6 +271,42 @@ class Rectangle(_Rectangle):
         """Y coordinate of the bottom-right corner assuming top-left gravity"""
         return self.y + self.height
 
+    def moved_into(self, other, clip=True):
+        # type: (Rectangle, bool) -> Rectangle
+        """Return a new Rectangle that does not exceed the bounds of `other`
+
+        (i.e. make a copy that has been slid to the nearest position within
+        `other` and only resized if it was larger in one dimension)
+        """
+        assert isinstance(other, Rectangle)
+        new = self
+
+        # Slide left or right (prefer aligning left edges if too wide)
+        if new.x < other.x:
+            new = new._replace(x=other.x)
+        elif new.x2 > other.x2:
+            # TODO: Rework Rectangle so x can be omitted as long as width
+            #       and x2 are supplied.
+            new = Rectangle(
+                x=max(other.x2 - new.width, 0), y=new.y,
+                width=new.width, height=new.height)
+
+        # Slide up or down (prefer aligning tops if too tall)
+        if new.y < other.y:
+            new = new._replace(y=other.y)
+        elif new.y2 > other.y2:
+            # TODO: Rework Rectangle so y can be omitted as long as height
+            #       and y2 are supplied.
+            new = Rectangle(
+                x=new.x, y=max(other.y2 - new.height, 0),
+                width=new.width, height=new.height)
+
+        # Clip to `other` if it was wider/taller
+        if clip:
+            new = new.intersect(other)
+
+        return new
+
     def intersect(self, other):  # type: (Rectangle) -> Rectangle
         """The intersection of two rectangles, assuming top-left gravity."""
         if not isinstance(other, Rectangle):
