@@ -4,7 +4,7 @@ __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 __docformat__ = "restructuredtext en"
 
-import json, logging, time
+import logging, time
 from functools import wraps
 
 from Xlib import Xatom
@@ -239,12 +239,11 @@ def cycle_dimensions(winman,      # type: WindowManager
 
     # TODO: Rewrite this position-getting code
     try:
-        cmd_idx, pos = json.loads(winman.get_property(
-            win, '_QUICKTILE_CYCLE_POS', Xatom.STRING))
+        cmd_idx, pos = winman.get_property(win, '_QUICKTILE_CYCLE_POS',
+                                           Xatom.INTEGER)
+        logging.debug("Got saved cycle position: %r, %r", cmd_idx, pos)
     except (ValueError, TypeError):  # TODO: Is TypeError still possible?
-        # TODO: Restructure so get_property and json.loads can be checked
-        # separately and an error can be logged for anything other than
-        # "property is not set".
+        logging.debug("Restarting cycle position sequence")
         cmd_idx, pos = None, -1
 
     if cmd_idx == state.get('cmd_idx', 0):
@@ -254,7 +253,8 @@ def cycle_dimensions(winman,      # type: WindowManager
 
     # TODO: Rewrite this position-setting code
     winman.set_property(win, '_QUICKTILE_CYCLE_POS',
-                        json.dumps((state.get('cmd_idx', 0), pos)))
+        [int(state.get('cmd_idx', 0)), pos],
+        prop_type=Xatom.INTEGER, format_size=32)
     result = Rectangle(*dims[pos]).from_relative(clip_box)
 
     logging.debug("Target preset is %s relative to monitor %s",

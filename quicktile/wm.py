@@ -257,6 +257,7 @@ class WindowManager(object):
         """Set the property ``name`` on window ``win``"""
         win, name = self._property_prep(win, name)
         win.change_property(name, prop_type, format_size, value)
+        self.x_display.flush()
         # TODO: Set an `onerror` handler and at least log an error to console
 
     # XXX: Move `if not window` into a decorator and use it everywhere?
