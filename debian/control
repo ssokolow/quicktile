@@ -1,0 +1,27 @@
+Source: quicktile
+Maintainer: Stéphane Gourichon <stephane_dpkg@gourichon.org>
+Section: misc
+Priority: optional
+Build-Depends: debhelper-compat (= 12),
+               dh-python,
+               python3,
+               python3-pip,
+               python3-setuptools,
+               python3-gi,
+               python3-xlib,
+               python3-dbus,
+               gir1.2-gtk-3.0,
+               gir1.2-wnck-3.0
+Standards-Version: 4.4.0
+
+Package: quicktile
+Architecture: all
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Description: Keyboard-driven Window Tiling for your existing X11 window manager
+ QuickTile is a simple utility, inspired by WinSplit Revolution for
+ Windows, which adds window-tiling keybindings to your existing X11
+ window manager.
+ .
+ You can also think of it as a standalone alternative to the keyboard-
+ related features of the Compiz Grid plugin.
