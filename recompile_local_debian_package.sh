@@ -61,6 +61,8 @@ else
     sleep 10
 fi
 
+GITREV=$( git describe )
+
 cd "$TMPDIR"
 git clone "$PKGDIR" "${DIRNAMEFORDEB}"
 
@@ -73,6 +75,8 @@ debuild -us -uc
 . /etc/os-release ; DISTRO_ID="${ID}-${VERSION_ID}"
 
 OUTDIR="$PKGDIR/../compiled_packages/${DISTRO_ID}/${NAMEFORTAR}" #_$( date +%Yy%mm%dd_%Hh%Mm%Ss )"
+
+echo "generated from git commit $GITREV" >"${OUTDIR}/${NAMEFORTAR}.gitversion"
 
 mkdir -p "$OUTDIR"
 
