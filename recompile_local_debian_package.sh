@@ -52,12 +52,13 @@ then
 fi
 
 if output=$(git status --porcelain) && [ -z "$output" ]; then
-    echo "* Working directory: git says clean"
+    echo "Working directory clean"
 else
-    echo >&2 "Uncommitted changes. ABORT."
+    echo >&2 "WARNING: uncommitted changes. Consider aborting."
     git status
-    echo >&2 "Uncommitted changes. ABORT."
-    exit 1
+    echo >&2 "WARNING: uncommitted changes. Consider aborting."
+    echo >&2 "Waiting for 10 second."
+    sleep 10
 fi
 
 cd "$TMPDIR"
