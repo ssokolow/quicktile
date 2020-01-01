@@ -3,6 +3,7 @@ Maintainer: Stéphane Gourichon <stephane_dpkg@gourichon.org>
 Section: misc
 Priority: optional
 Build-Depends: debhelper (>= 9),
+               build-essential,
                devscripts,
                dh-python,
                fakeroot,
