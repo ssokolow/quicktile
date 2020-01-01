@@ -70,17 +70,20 @@ cd "${DIRNAMEFORDEB}"
 dpkg-checkbuilddeps
 debuild -us -uc
 
-OUTDIR="$PKGDIR/../build_output_$( date +%Yy%mm%dd_%Hh%Mm%Ss )"
+. /etc/os-release ; DISTRO_ID="${ID}-${VERSION_ID}"
 
-mkdir "$OUTDIR"
+OUTDIR="$PKGDIR/../compiled_packages/${DISTRO_ID}/${NAMEFORTAR}" #_$( date +%Yy%mm%dd_%Hh%Mm%Ss )"
+
+mkdir -p "$OUTDIR"
 
 cd ..
 
-cp -v *.* "$OUTDIR"
+cp -v "${NAMEFORTAR}"?* "$OUTDIR"
 
 echo
 echo ================================================================
 echo "Artifacts available in $OUTDIR:"
+echo "OUTDIR=$OUTDIR"
 echo ================================================================
 
 cd "$OUTDIR"
