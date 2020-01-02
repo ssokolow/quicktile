@@ -76,9 +76,9 @@ debuild -us -uc
 
 OUTDIR="$PKGDIR/../compiled_packages/${DISTRO_ID}/${NAMEFORTAR}" #_$( date +%Yy%mm%dd_%Hh%Mm%Ss )"
 
-echo "generated from git commit $GITREV" >"${OUTDIR}/${NAMEFORTAR}.gitversion"
-
 mkdir -p "$OUTDIR"
+
+echo "generated from git commit $GITREV" >"${OUTDIR}/${NAMEFORTAR}.gitversion"
 
 cd ..
 
