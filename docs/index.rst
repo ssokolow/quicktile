@@ -17,7 +17,7 @@ Contents:
    commands
    config
    faq
-   api/index
+   apidocs/index
 
 * :ref:`modindex`
 * :ref:`genindex`
