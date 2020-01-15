@@ -1,5 +1,6 @@
 0.4.0 (git HEAD):
 - Port to Python 3.x and GTK 3.x
+- Convert the API docs from ePyDoc to Sphinx and add a manual
 - Rename the `middle` command to `center` for consistency with `move-to-*`
 - Ensure off-screen windows can be manipulated relative to the nearest monitor
 - Ensure monitor-* commands don't place windows off-screen
