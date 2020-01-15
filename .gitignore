@@ -1,7 +1,7 @@
 build
 .coverage
 dist
-html
+docs/_build
 .mypy_cache
 _site
 .tox
