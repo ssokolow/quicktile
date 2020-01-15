@@ -51,7 +51,7 @@ Tile the active window to span the left half of the screen. Press the hotkey mul
 
 Tile the active window to fill the screen. Press the hotkey multiple times to cycle through different width presets.
 
-.. image:: diagrams/png/middle.png
+.. image:: diagrams/png/center.png
    :alt: diagram
 
 .. todo:: Rename file to ``center.png``
@@ -92,9 +92,6 @@ Tile the active window to span the bottom-right quarter of the screen. Press the
 Window Movement
 ---------------
 
-.. todo:: Revise the docs for the non-corner ``move-to-*`` entries' new
-          behaviour.
-
 ``move-to-top-left``
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -106,7 +103,8 @@ Move the active window to the top-left corner of the screen without altering its
 ``move-to-top``
 ^^^^^^^^^^^^^^^
 
-Move the active window to the top edge of the screen without altering its shape.
+Move the active window to the center of the top edge of the screen without
+altering its shape.
 
 .. image:: diagrams/png/move-to-top.png
    :alt: diagram
@@ -123,7 +121,8 @@ Move the active window to the top-right corner of the screen without altering it
 ``move-to-left``
 ^^^^^^^^^^^^^^^^
 
-Move the active window to the left edge of the screen without altering its shape.
+Move the active window to the center of the left edge of the screen without
+altering its shape.
 
 .. image:: diagrams/png/move-to-left.png
    :alt: diagram
@@ -139,7 +138,8 @@ Move the active window to the center of the screen without altering its shape.
 ``move-to-right``
 ^^^^^^^^^^^^^^^^^
 
-Move the active window to the right edge of the screen without altering its shape.
+Move the active window to the center of the right edge of the screen without
+altering its shape.
 
 .. image:: diagrams/png/move-to-right.png
    :alt: diagram
@@ -156,7 +156,8 @@ Move the active window to the bottom-left corner of the screen without altering 
 ``move-to-bottom``
 ^^^^^^^^^^^^^^^^^^
 
-Move the active window to the bottom edge of the screen without altering its shape.
+Move the active window to the center of the bottom edge of the screen without
+altering its shape.
 
 .. image:: diagrams/png/move-to-bottom.png
    :alt: diagram
