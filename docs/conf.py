@@ -119,6 +119,8 @@ html_theme_options = {
     'github_user': 'ssokolow',
     'github_repo': 'quicktile',
     'head_font_family': 'sans-serif',
+    'link': '#004B6B',
+    'link_hover': '#004B6B',
     'show_powered_by': False,
     'show_related': True,
     'travis_button': True,
