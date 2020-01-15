@@ -286,4 +286,10 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/3/': None}
+intersphinx_mapping = {
+    'gtk': ('http://lazka.github.io/pgi-docs/Gtk-3.0', None),
+    'gdk': ('https://lazka.github.io/pgi-docs/Gdk-3.0', None),
+    'gdkx11': ('https://lazka.github.io/pgi-docs/GdkX11-3.0', None),
+    'python': ('https://docs.python.org/3/', None),
+    'wnck': ('https://lazka.github.io/pgi-docs/Wnck-3.0', None),
+}
