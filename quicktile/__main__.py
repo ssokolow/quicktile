@@ -1,4 +1,21 @@
-"""Entry point and related functionality"""
+"""Entry point and related functionality
+
+Thanks to Thomas Vander Stichele for some of the documentation cleanups.
+
+:todo:
+ - Complete the automated test suite.
+ - Finish refactoring the code to be cleaner and more maintainable.
+ - Reconsider use of ``--daemonize``. That tends to imply self-backgrounding.
+ - Look into supporting xcffib (the Python equivalent to ``libxcb``) for global
+   keybinding.
+ - Implement the secondary major features of WinSplit Revolution (eg.
+   process-shape associations, locking/welding window edges, etc.)
+ - Consider rewriting :func:`quicktile.commands.cycle_dimensions` to allow
+   command-line use to jump to a specific index without actually flickering the
+   window through all the intermediate shapes.
+
+:todo: Retire `__main__.KEYLOOKUP`. (API-breaking change)
+"""
 
 from __future__ import print_function
 

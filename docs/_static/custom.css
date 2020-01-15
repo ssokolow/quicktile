@@ -1,0 +1,27 @@
+/* csslint ignore:start */
+body {
+  background: #aac;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+div.body h1 {
+  font-weight: bold;
+}
+
+h1 + div.section > h2 {
+  font-size: 150%;
+}
+div.document,
+div.footer {
+  background: white;
+  margin-top: 0;
+  padding: 30px 20px;
+}
+div.document {
+  flex-grow: 1;
+}
+div.footer {
+  margin-bottom: 0;
+}
+/* csslint ignore:end */
