@@ -12,8 +12,9 @@ For more details, see the illustrations in the command reference.
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
+   faq
    api/index
 
 * :ref:`modindex`
