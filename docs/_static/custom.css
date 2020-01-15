@@ -1,3 +1,5 @@
+/* Disable CSSLint because it doesn't play nicely with CSS that's extending
+ * an existing system of selectors that doesn't also follow its rules. */
 /* csslint ignore:start */
 body {
   background: #aac;
@@ -6,11 +8,21 @@ body {
   min-height: 100vh;
 }
 div.body h1 {
+  font-size: 230%;
   font-weight: bold;
 }
 
-h1 + div.section > h2 {
+div.body h2 {
   font-size: 150%;
+}
+div.body h3 {
+  font-size: 130%;
+}
+div.body h4 {
+  font-size: 110%;
+}
+div.body h5 {
+  font-size: 110%;
 }
 div.document,
 div.footer {
