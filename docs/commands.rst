@@ -177,12 +177,19 @@ Window State
 ``always-above``
 ^^^^^^^^^^^^^^^^
 
-Toggle whether the active window is rendered on a layer above normal windows.
+Toggle whether the active window is rendered on a layer above normal windows
+and panels.
+
+.. image:: diagrams/png/always-above.png
+   :alt: diagram
 
 ``always-below``
 ^^^^^^^^^^^^^^^^
 
 Toggle whether the active window is rendered on a layer below normal windows.
+
+.. image:: diagrams/png/always-below.png
+   :alt: diagram
 
 ``bordered``
 ^^^^^^^^^^^^
@@ -274,11 +281,17 @@ Multi-Monitor Operations
 Move the active window to the next monitor, according to the
 :abbr:`WM (Window Manager)`'s internal numbering.
 
+.. image:: diagrams/png/monitor-next.png
+   :alt: diagram
+
 ``monitor-next-all``
 ^^^^^^^^^^^^^^^^^^^^
 
 Move *all* windows to the next monitor, according to the
 :abbr:`WM (Window Manager)`'s internal numbering.
+
+.. image:: diagrams/png/monitor-next-all.png
+   :alt: diagram
 
 ``monitor-switch`` (:kbd:`Ctrl` + :kbd:`Alt` +  :kbd:`Keypad Enter`)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -286,11 +299,17 @@ Move *all* windows to the next monitor, according to the
 An alias for ``monitor-next`` which will wrap around regardless of the value of
 the ``MovementsWrap`` setting in the configuration file.
 
+.. image:: diagrams/png/monitor-next.png
+   :alt: diagram
+
 ``monitor-switch-all``
 ^^^^^^^^^^^^^^^^^^^^^^
 
 An alias for ``monitor-next-all`` which will wrap around regardless of the
 value of the ``MovementsWrap`` setting in the configuration file.
+
+.. image:: diagrams/png/monitor-next-all.png
+   :alt: diagram
 
 ``monitor-prev``
 ^^^^^^^^^^^^^^^^
@@ -298,11 +317,17 @@ value of the ``MovementsWrap`` setting in the configuration file.
 Move the active window to the previous monitor, according to the
 :abbr:`WM (Window Manager)`'s internal numbering.
 
+.. image:: diagrams/png/monitor-prev.png
+   :alt: diagram
+
 ``monitor-prev-all``
 ^^^^^^^^^^^^^^^^^^^^
 
 Move *all* windows to the previous monitor, according to the
 :abbr:`WM (Window Manager)`'s internal numbering.
+
+.. image:: diagrams/png/monitor-prev-all.png
+   :alt: diagram
 
 Workspace-wise Navigation
 -------------------------
@@ -415,13 +440,20 @@ Be warned that some WMs will forget about this (it will degenerate into a
 normal "everything manually minimized" state) if you re-show your windows
 through any means other than triggering this behaviour a second time.
 
+.. image:: diagrams/png/show-desktop.png
+   :alt: diagram
+
 ``trigger-move``
 ^^^^^^^^^^^^^^^^
 
 Ask the :abbr:`WM (Window Manager)` to begin a "keyboard-driven move" operation
 on the active window.
 
-Typically, this is handled via the arrow keys.
+Typically, this is handled via the arrow keys but it's ultimately up to your
+window manager to decide what it means.
+
+.. image:: diagrams/png/trigger-move.png
+   :alt: diagram
 
 ``trigger-resize``
 ^^^^^^^^^^^^^^^^^^
@@ -429,9 +461,13 @@ Typically, this is handled via the arrow keys.
 Ask the :abbr:`WM (Window Manager)` to begin a "keyboard-driven resize"
 operation on the active window.
 
-Typically, this is handled via the arrow keys.
+Typically, this is handled via the arrow keys but it's ultimately up to your
+window manager to decide what it means.
+
+.. image:: diagrams/png/trigger-resize.png
+   :alt: diagram
 
 ----
 
-Special thanks to `David Stygstra <https://github.com/stygstra>`_ for the
-diagrams.
+Special thanks to `David Stygstra <https://github.com/stygstra>`_ for creating
+the initial 25 diagrams and establishing their style.
