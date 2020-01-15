@@ -7,6 +7,9 @@ Configuration
 QuickTile's behaviour is currently controlled by a ``.ini``-like configuration
 file stored at :file:`~/.config/quicktile.cfg`.
 
+It will be generated/regenerated from a set of defaults when QuickTile is run
+if it does not exist.
+
 At present, due to the ``.ini`` format's inability to handle arbitrary
 hierarchical data, configuration beyond what is listed here requires modifying
 QuickTile's source code, though it *is* planned to switch to a new
@@ -28,8 +31,8 @@ the following keys:
 
 This key must be present and set to 1. It was included as a means for QuickTile
 to identify the format of the config file if it becomes necessary to break
-compatibility with the current setup without changing the format more
-radically.
+compatibility with the current setup without changing to an entirely new
+file format.
 
 ``ColumnCount = 3``
 """""""""""""""""""
@@ -45,6 +48,10 @@ There is currently no equivalent for modifying the number of rows because
 each command hard-codes for a row or span of rows, and until QuickTile's
 internals are renovated further, it is not possible to define new commands
 without editing the code.
+
+(However, the code in question is designed to be reasonably simple to edit
+if you need to and can be found in
+:func:`quicktile.layout.make_winsplit_positions`.)
 
 .. todo:: Write a configuration file reference.
 
