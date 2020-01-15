@@ -15,6 +15,7 @@ Contents:
    :maxdepth: 1
 
    commands
+   config
    faq
    api/index
 
