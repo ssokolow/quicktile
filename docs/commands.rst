@@ -278,7 +278,7 @@ Multi-Monitor Operations
 ``monitor-next``
 ^^^^^^^^^^^^^^^^
 
-Move the active window to the next monitor, according to the
+Move the active window to the next monitor, as defined by the
 :abbr:`WM (Window Manager)`'s internal numbering.
 
 .. image:: diagrams/png/monitor-next.png
@@ -287,7 +287,7 @@ Move the active window to the next monitor, according to the
 ``monitor-next-all``
 ^^^^^^^^^^^^^^^^^^^^
 
-Move *all* windows to the next monitor, according to the
+Move *all* windows to the next monitor, as defined by the
 :abbr:`WM (Window Manager)`'s internal numbering.
 
 .. image:: diagrams/png/monitor-next-all.png
@@ -302,6 +302,9 @@ the ``MovementsWrap`` setting in the configuration file.
 .. image:: diagrams/png/monitor-next.png
    :alt: diagram
 
+.. todo:: Brainstorm ways to distinguish ``-next`` and `--switch`` visually
+   that don't overcomplicate the visuals.
+
 ``monitor-switch-all``
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -311,10 +314,12 @@ value of the ``MovementsWrap`` setting in the configuration file.
 .. image:: diagrams/png/monitor-next-all.png
    :alt: diagram
 
+.. todo:: Come up with less ambiguous iconography for ``monitor-*-all``
+
 ``monitor-prev``
 ^^^^^^^^^^^^^^^^
 
-Move the active window to the previous monitor, according to the
+Move the active window to the previous monitor, as defined by the
 :abbr:`WM (Window Manager)`'s internal numbering.
 
 .. image:: diagrams/png/monitor-prev.png
@@ -323,7 +328,7 @@ Move the active window to the previous monitor, according to the
 ``monitor-prev-all``
 ^^^^^^^^^^^^^^^^^^^^
 
-Move *all* windows to the previous monitor, according to the
+Move *all* windows to the previous monitor, as defined by the
 :abbr:`WM (Window Manager)`'s internal numbering.
 
 .. image:: diagrams/png/monitor-prev-all.png
@@ -386,15 +391,20 @@ Workspace-wise Window Manipulation
 
 Toggle whether the active window appears on all desktop/workspaces
 
+.. image:: diagrams/png/all-desktops.png
+   :alt: diagram
+
 ``workspace-send-next``
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Ask the :abbr:`WM (Window Manager)` to move the active window to the next workspace, according to its internal numbering.
+Ask the :abbr:`WM (Window Manager)` to move the active window to the next
+workspace, as defined by internal numbering.
 
 ``workspace-send-prev``
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Ask the :abbr:`WM (Window Manager)` to move the active window to the previous workspace, according to its internal numbering.
+Ask the :abbr:`WM (Window Manager)` to move the active window to the previous
+workspace, as defined by its internal numbering.
 
 ``workspace-send-left``
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -404,6 +414,9 @@ Ask the :abbr:`WM (Window Manager)` to move the active window to the left in the
 For users who have laid out their workspaces in a row, this is equivalent to
 ``workspace-send-prev`` with the possible exception of wrap-around behaviour.
 
+.. image:: diagrams/png/workspace-send-left.png
+   :alt: diagram
+
 ``workspace-send-right``
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -411,6 +424,9 @@ Ask the :abbr:`WM (Window Manager)` to move the active window to the right in th
 
 For users who have laid out their workspaces in a row, this is equivalent to
 ``workspace-send-next`` with the possible exception of wrap-around behaviour.
+
+.. image:: diagrams/png/workspace-send-right.png
+   :alt: diagram
 
 ``workspace-send-up``
 ^^^^^^^^^^^^^^^^^^^^^
@@ -427,6 +443,9 @@ Ask the :abbr:`WM (Window Manager)` to move the active window downward in the gr
 
 For users who have laid out their workspaces in a column, this is equivalent to
 ``workspace-send-next`` with the possible exception of wrap-around behaviour.
+
+.. image:: diagrams/png/workspace-send-down.png
+   :alt: diagram
 
 Miscellaneous Functionality
 ---------------------------
