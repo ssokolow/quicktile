@@ -2,6 +2,8 @@ Command Reference
 =================
 
 .. note:: All keybindings are customizable. This list shows their defaults.
+          You can use :command:`quicktile --show-bindings` to view your current
+          keybindings.
 
 .. contents::
    :local:
@@ -343,11 +345,17 @@ Workspace-wise Navigation
 Switch focus to the next workspace, by the :abbr:`WM (Window Manager)`'s
 internal numbering. Do not move any windows.
 
+.. image:: diagrams/png/workspace-go-next.png
+   :alt: diagram
+
 ``workspace-go-prev``
 ^^^^^^^^^^^^^^^^^^^^^
 
 Switch focus to the previous workspace, by the :abbr:`WM (Window Manager)`'s
 internal numbering. Do not move any windows.
+
+.. image:: diagrams/png/workspace-go-prev.png
+   :alt: diagram
 
 ``workspace-go-left``
 ^^^^^^^^^^^^^^^^^^^^^
@@ -357,6 +365,9 @@ Switch focus to the left in the grid of workspaces. Do not move any windows.
 For users who have laid out their workspaces in a row, this is equivalent to
 ``workspace-go-prev`` with the possible exception of wrap-around behaviour.
 
+.. image:: diagrams/png/workspace-go-left.png
+   :alt: diagram
+
 ``workspace-go-right``
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -364,6 +375,9 @@ Switch focus to the right in the grid of workspaces. Do not move any windows.
 
 For users who have laid out their workspaces in a row, this is equivalent to
 ``workspace-go-next`` with the possible exception of wrap-around behaviour.
+
+.. image:: diagrams/png/workspace-go-right.png
+   :alt: diagram
 
 ``workspace-go-up``
 ^^^^^^^^^^^^^^^^^^^
@@ -373,12 +387,18 @@ Switch focus upward in the grid of workspaces. Do not move any windows.
 For users who have laid out their workspaces in a column, this is equivalent to
 ``workspace-go-prev`` with the possible exception of wrap-around behaviour.
 
+.. image:: diagrams/png/workspace-go-up.png
+   :alt: diagram
+
 ``workspace-go-down``
 ^^^^^^^^^^^^^^^^^^^^^
 
 Switch focus downward in the grid of workspaces. Do not move any windows.
 For users who have laid out their workspaces in a column, this is equivalent to
 ``workspace-go-next`` with the possible exception of wrap-around behaviour.
+
+.. image:: diagrams/png/workspace-go-down.png
+   :alt: diagram
 
 Workspace-wise Window Manipulation
 ----------------------------------
@@ -400,11 +420,17 @@ Toggle whether the active window appears on all desktop/workspaces
 Ask the :abbr:`WM (Window Manager)` to move the active window to the next
 workspace, as defined by internal numbering.
 
+.. image:: diagrams/png/workspace-send-next.png
+   :alt: diagram
+
 ``workspace-send-prev``
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 Ask the :abbr:`WM (Window Manager)` to move the active window to the previous
 workspace, as defined by its internal numbering.
+
+.. image:: diagrams/png/workspace-send-prev.png
+   :alt: diagram
 
 ``workspace-send-left``
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -435,6 +461,9 @@ Ask the :abbr:`WM (Window Manager)` to move the active window upward in the grid
 
 For users who have laid out their workspaces in a column, this is equivalent to
 ``workspace-send-prev`` with the possible exception of wrap-around behaviour.
+
+.. image:: diagrams/png/workspace-send-up.png
+   :alt: diagram
 
 ``workspace-send-down``
 ^^^^^^^^^^^^^^^^^^^^^^^
