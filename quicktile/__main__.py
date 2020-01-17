@@ -276,37 +276,33 @@ def load_config(path):  # type: (str) -> ConfigParser
 
 def main():  # type: () -> None
     """setuptools entry point"""
-    # TODO: Switch to argparse
-    from optparse import OptionParser, OptionGroup
-    parser = OptionParser(usage="%prog [options] [action] ...",
-            version="%%prog v%s" % __version__)
-    parser.add_option('-d', '--daemonize', action="store_true",
-        dest="daemonize", default=False, help="Attempt to set up global "
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    parser.add_argument('-V', '--version', action='version',
+            version="%%(prog)s v%s" % __version__)
+    parser.add_argument('-d', '--daemonize', action="store_true",
+        default=False, help="Attempt to set up global "
         "keybindings using python-xlib and a D-Bus service using dbus-python. "
-        "Exit if neither succeeds")
-    parser.add_option('-b', '--bindkeys', action="store_true",
-        dest="daemonize", default=False,
-        help="Deprecated alias for --daemonize")
-    parser.add_option('--debug', action="store_true", dest="debug",
-        default=False, help="Display debug messages")
-    parser.add_option('--no-workarea', action="store_true", dest="no_workarea",
-        default=False, help="Overlap panels but work better with "
-        "non-rectangular desktops")
+        "Exit if neither succeeds.")
+    parser.add_argument('-b', '--bindkeys', action="store_true",
+        dest="daemonize", default=False, help="Old alias for --daemonize")
+    parser.add_argument('--debug', action="store_true", default=False,
+        help="Display debug messages")
+    parser.add_argument('--no-workarea', action="store_true",
+        default=False, help="No effect. Retained for compatibility.")
+    parser.add_argument('command', action="store", nargs="*",
+        help="Window-tiling command to execute")
 
-    help_group = OptionGroup(parser, "Additional Help")
-    help_group.add_option('--show-bindings', action="store_true",
-        dest="show_binds", default=False, help="List all configured keybinds")
-    help_group.add_option('--show-actions', action="store_true",
-        dest="show_args", default=False, help="List valid arguments for use "
-        "without --daemonize")
-    parser.add_option_group(help_group)
+    help_group = parser.add_argument_group("Additional Help")
+    help_group.add_argument('--show-bindings', action="store_true",
+        default=False, help="List all configured keybinds")
+    help_group.add_argument('--show-actions', action="store_true",
+        default=False, help="List valid arguments for use without --daemonize")
 
-    opts, args = parser.parse_args()
-
-    # TODO: Do we still need to replace attach_glib_log_filter()?
+    args = parser.parse_args()
 
     # Set up the output verbosity
-    logging.basicConfig(level=logging.DEBUG if opts.debug else logging.INFO,
+    logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO,
                         format='%(levelname)s: %(message)s')
 
     cfg_path = os.path.join(XDG_CONFIG_DIR, 'quicktile.cfg')
@@ -340,12 +336,12 @@ def main():  # type: () -> None
                        keys=dict(config.items('keys')),
                        modmask=config.get('general', 'ModMask'))
 
-    if opts.show_binds:
+    if args.show_bindings:
         app.show_binds()
-    if opts.show_args:
+    if args.show_actions:
         print(commands.commands)
 
-    if opts.daemonize:
+    if args.daemonize:
         # Restore PyGTK-like Ctrl+C behaviour for easy development
         signal.signal(signal.SIGINT, signal.SIG_DFL)
 
@@ -357,11 +353,11 @@ def main():  # type: () -> None
         if args:
             winman.screen.force_update()
 
-            for arg in args:
+            for arg in args.command:
                 commands.commands.call(arg, winman)
             while Gtk.events_pending():
                 Gtk.main_iteration()
-        elif not opts.show_args and not opts.show_binds:
+        elif not args.show_actions and not args.show_bindings:
             print(commands.commands)
             print("\nUse --help for a list of valid options.")
             sys.exit(errno.ENOENT)
