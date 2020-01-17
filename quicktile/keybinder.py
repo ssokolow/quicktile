@@ -7,6 +7,9 @@ __docformat__ = "restructuredtext en"
 import logging
 from functools import reduce  # pylint: disable=redefined-builtin
 
+import gi
+gi.require_version('Gtk', '3.0')
+
 from gi.repository import GLib, Gtk, Gdk
 from Xlib import X
 from Xlib.display import Display

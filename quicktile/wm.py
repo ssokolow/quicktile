@@ -11,6 +11,10 @@ from Xlib.display import Display as XDisplay
 from Xlib.error import DisplayConnectionError
 from Xlib import Xatom
 
+import gi
+gi.require_version('Gtk', '3.0')
+gi.require_version('Wnck', '3.0')
+
 from gi.repository import Gdk, GdkX11, Wnck
 
 from .util import (clamp_idx, Gravity, Rectangle, UsableRegion,
