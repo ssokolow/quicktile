@@ -352,8 +352,7 @@ def main():  # type: () -> None
         if not app.run():
             logging.critical("Neither the Xlib nor the D-Bus backends were "
                              "available")
-            sys.exit(errno.ENOENT)
-            # FIXME: What's the proper exit code for "library not found"?
+            sys.exit(errno.ELIBACC)
     elif not first_run:
         if args:
             winman.screen.force_update()
