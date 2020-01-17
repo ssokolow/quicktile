@@ -8,11 +8,6 @@ Command Reference
 .. contents::
    :local:
 
-.. todo:: Write a configuration file reference.
-
-.. todo:: Move the descriptions into the source code and then make this file
-          programmatically generated.
-
 Window Tiling
 -------------
 
@@ -55,8 +50,6 @@ Tile the active window to fill the screen. Press the hotkey multiple times to cy
 
 .. image:: diagrams/png/center.png
    :alt: diagram
-
-.. todo:: Rename file to ``center.png``
 
 ``right`` (:kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 6`)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -304,7 +297,7 @@ the ``MovementsWrap`` setting in the configuration file.
 .. image:: diagrams/png/monitor-next.png
    :alt: diagram
 
-.. todo:: Brainstorm ways to distinguish ``-next`` and `--switch`` visually
+.. todo:: Brainstorm ways to distinguish ``-next`` and ``--switch`` visually
    that don't overcomplicate the visuals.
 
 ``monitor-switch-all``
@@ -516,6 +509,9 @@ window manager to decide what it means.
    :alt: diagram
 
 ----
+
+.. todo:: Move the descriptions into the source code and then make this file
+          programmatically generated.
 
 Special thanks to `David Stygstra <https://github.com/stygstra>`_ for creating
 the initial 25 diagrams and establishing their style.

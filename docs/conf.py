@@ -118,6 +118,10 @@ always_document_param_types = True
 # Uncomment this to enable display of TODOs in the manual and API docs
 #todo_include_todos = True
 
+# No point in confusing people with nonsense filename-line combinations
+# calculated against the *output* of automodule directives.
+todo_link_only = True
+
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

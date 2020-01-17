@@ -53,11 +53,6 @@ without editing the code.
 if you need to and can be found in
 :func:`quicktile.layout.make_winsplit_positions`.)
 
-.. todo:: Write a configuration file reference.
-
-.. todo:: Move the descriptions into the source code and then make this file
-          programmatically generated.
-
 ``ModMask = <Ctrl><Alt>``
 """""""""""""""""""""""""
 
@@ -195,3 +190,8 @@ Troubleshooting :program:`xev`
 
     You can use the :program:`xmodmap` command to view your current modifier
     assignments.
+
+----
+
+.. todo:: Move the descriptions of configuration file fields into the source
+          code and then make the reference ReST programmatically generated.
