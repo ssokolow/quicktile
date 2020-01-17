@@ -1,27 +1,29 @@
-"""Entry point and related functionality
+"""Entry point, configuration parser, and main loop
 
-Thanks to Thomas Vander Stichele for some of the documentation cleanups.
-
-:todo:
+.. todo::
+ - Audit all of my TODOs and API docs for accuracy and staleness.
+ - Move ``set_client_type`` call to a more appropriate place
+   (:mod:`quicktile.wm`?)
  - Complete the automated test suite.
  - Finish refactoring the code to be cleaner and more maintainable.
- - Reconsider use of ``--daemonize``. That tends to imply self-backgrounding.
- - Look into supporting xcffib (the Python equivalent to ``libxcb``) for global
-   keybinding.
+ - Reconsider use of the name ``--daemonize``. That tends to imply
+   self-backgrounding.
+ - Decide whether to replace `python-xlib`_ with `xcffib`_
+   (the Python equivalent to ``libxcb``).
  - Implement the secondary major features of WinSplit Revolution (eg.
    process-shape associations, locking/welding window edges, etc.)
  - Consider rewriting :func:`quicktile.commands.cycle_dimensions` to allow
    command-line use to jump to a specific index without actually flickering the
    window through all the intermediate shapes.
 
-:todo: Retire `__main__.KEYLOOKUP`. (API-breaking change)
+.. _python-xlib: https://pypi.org/project/python-xlib/
+.. _xcffib: https://pypi.org/project/xcffib/
 """
 
 from __future__ import print_function
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
-__docformat__ = "restructuredtext en"
 
 import errno, logging, os, signal, sys
 from configparser import ConfigParser
@@ -32,7 +34,7 @@ from Xlib.error import DisplayConnectionError
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Wnck', '3.0')
-from gi.repository import Gtk, Wnck  # pylint: disable=no-name-in-module
+from gi.repository import Gtk, Wnck
 
 # TODO: Make gtkexcepthook disable-able for functional testing
 from . import gtkexcepthook
@@ -43,24 +45,21 @@ from .util import fmt_table, XInitError
 from .version import __version__
 from .wm import WindowManager
 
-# Allow MyPy to work without depending on the `typing` package
-# (And silence complaints from only using the imported types in comments)
-MYPY = False
-if MYPY:
-    # pylint: disable=unused-import,invalid-name
-    from typing import Callable, Dict, Union  # NOQA
+# -- Type-Annotation Imports --
+from typing import Dict, Union
 
-    #: MyPy type alias for fields loaded from config files
-    CfgDict = Dict[str, Union[str, int, float, bool, None]]
-del MYPY
+#: MyPy type alias for fields loaded from config files
+CfgDict = Dict[str, Union[str, int, float, bool, None]]
+# --
 
 #: Location for config files (determined at runtime).
 XDG_CONFIG_DIR = os.environ.get('XDG_CONFIG_HOME',
                                 os.path.expanduser('~/.config'))
 
-# TODO: Support adding modifiers to individual keys so I can use <C-A-S>KP_...
-#       for move-to-*
-#: Default content for the config file
+#: Default content for the configuration file
+#:
+#: .. todo:: Figure out a way to show :data:`DEFAULTS` documentation but with
+#:    the structure pretty-printed.
 DEFAULTS = {
     'general': {
         # Use Ctrl+Alt as the default base for key combinations
@@ -94,60 +93,47 @@ DEFAULTS = {
         "C": "move-to-center",
     }
 }  # type: Dict[str, CfgDict]
-# TODO: Porting helper which identifies "middle" in the config file and changes
-#       it to "center"
-#
-#       (But also warn heavily on the README, since it can be passed in other
-#       ways that a porting helper can't find and fix.)
 
+#: Used for resolving certain keysyms
+#:
+#: .. todo:: Figure out how to replace :data:`KEYLOOKUP` with a fallback that
+#:      uses something in `Gtk <http://lazka.github.io/pgi-docs/Gtk-3.0/>`_ or
+#:      ``python-xlib`` to look up the keysym from the character it types.
 KEYLOOKUP = {
     ',': 'comma',
     '.': 'period',
     '+': 'plus',
     '-': 'minus',
-}  #: Used for resolving certain keysyms
+}
 
-
-# TODO: Move this to a more appropriate place
 Wnck.set_client_type(Wnck.ClientType.PAGER)
-
-# TODO: Audit all of my TODOs and API docs for accuracy and staleness.
 
 
 class QuickTileApp(object):
-    """The basic Glib application itself."""
+    """The basic Glib application itself.
 
-    keybinder = None
-    dbus_name = None
-    dbus_obj = None
+    :param commands: The command registry to use to resolve command names.
+    :param keys: A dict mapping :func:`Gtk.accelerator_parse` strings to
+        command names.
+    :param modmask: A modifier mask to prepend to all ``keys``.
+    :param winman: The window manager to invoke commands with so they can act.
+    """
 
-    def __init__(self, winman,  # type: WindowManager
-                 commands,      # type: commands.CommandRegistry
-                 keys=None,     # type: Dict[str, str]
-                 modmask=None   # type: str
-                 ):             # type: (...) -> None
-        """Populate the instance variables.
-
-        :param keys: A dict mapping X11 keysyms to `CommandRegistry`
-            command names.
-        :param modmask: A modifier mask to prefix to all keybindings.
-        :type winman: The `WindowManager` instance to use.
-        :type keys: `dict`
-
-        """
+    def __init__(self, winman: WindowManager,
+                 commands: commands.CommandRegistry,
+                 keys: Dict[str, str],
+                 modmask: str='',
+                 ):
         self.winman = winman
         self.commands = commands
         self._keys = keys or {}
         self._modmask = modmask or ''
 
-    def run(self):  # type: () -> bool
+    def run(self) -> bool:
         """Initialize keybinding and D-Bus if available, then call
-        ``Gtk.main()``.
+        :func:`Gtk.main`.
 
         :returns: ``False`` if none of the supported backends were available.
-        :rtype: ``bool``
-
-        :todo 1.0.0: Retire the ``doCommand`` name. (API-breaking change)
         """
 
         # Attempt to set up the global hotkey support
@@ -179,11 +165,12 @@ class QuickTileApp(object):
         else:
             return False
 
-    def show_binds(self):  # type: () -> None
+    def show_binds(self) -> None:
         """Print a formatted readout of defined keybindings and the modifier
         mask to stdout.
 
-        :todo: Look into moving this into `KeyBinder`
+        .. todo:: Look into moving this keybind pretty-printing into
+            :class:`quicktile.keybinder.KeyBinder`
         """
 
         print("Keybindings defined for use with --daemonize:\n")
@@ -191,20 +178,24 @@ class QuickTileApp(object):
         print(fmt_table(self._keys, ('Key', 'Action')))
 
 
-def load_config(path):  # type: (str) -> ConfigParser
+def load_config(path) -> ConfigParser:
     """Load the config file from the given path, applying fixes as needed.
+    If it does not exist, create it from the configuration defaults.
 
-    :todo: Refactor all this
+    :param path: The path to load or initialize.
+
+    .. todo:: Refactor config parsing. It's an ugly blob.
     """
     first_run = not os.path.exists(path)
 
-    config = ConfigParser(interpolation=None)  # pylint: disable=E1123
+    config = ConfigParser(interpolation=None)
 
     # Make keys case-sensitive because keysyms must be
-    config.optionxform = str  # type: ignore # (Cannot assign to a method)
+    #
+    # (``type: ignore`` to squash a false positive for something the Python 3.x
+    # documentation specifically *recommends* over using RawConfigParser)
+    config.optionxform = str  # type: ignore
 
-    # TODO: Maybe switch to two config files so I can have only the keys in the
-    #       keymap case-sensitive?
     config.read(path)
     dirty = False
 
@@ -274,8 +265,15 @@ def load_config(path):  # type: (str) -> ConfigParser
     return config
 
 
-def main():  # type: () -> None
-    """setuptools entry point"""
+def main() -> None:
+    """setuptools-compatible entry point
+
+    .. todo:: :func:`quicktile.__main__.main` is an overly complex blob and
+        needs to be refactored.
+    .. todo:: Rearchitect so the hack with registering
+        :func:`quicktile.commands.cycle_dimensions` inside
+        :func:`quicktile.__main__main` isn't necessary.
+    """
     from argparse import ArgumentParser
     parser = ArgumentParser()
     parser.add_argument('-V', '--version', action='version',
@@ -309,7 +307,6 @@ def main():  # type: () -> None
     first_run = not os.path.exists(cfg_path)
     config = load_config(cfg_path)
 
-    # TODO: Rearchitect so this hack isn't needed
     commands.cycle_dimensions = commands.commands.add_many(
         layout.make_winsplit_positions(config.getint('general', 'ColumnCount'))
     )(commands.cycle_dimensions)
