@@ -109,6 +109,8 @@ autodoc_default_options = {
     'undoc-members': True,
 }
 
+todo_include_todos = True
+
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

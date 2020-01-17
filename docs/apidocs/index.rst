@@ -15,3 +15,4 @@ QuickTile's code is currently divided into the following modules:
    util
    wm
    test_quicktile
+   todo
