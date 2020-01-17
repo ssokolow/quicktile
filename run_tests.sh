@@ -6,4 +6,5 @@ echo "-- Nose (unit tests) --"
 nosetests3 "$@"
 echo "-- Sphinx (documentation syntax) --"
 cd docs
-make html
+make coverage
+cat _build/coverage/python.txt
