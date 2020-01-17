@@ -15,4 +15,13 @@ QuickTile's code is currently divided into the following modules:
    util
    wm
    test_quicktile
-   todo
+
+.. ifconfig:: todo_include_todos
+
+   TODO Annotations Overview
+   =========================
+
+   The following is a complete list of ``.. todo::`` annotations found in the
+   source code.
+
+   .. todolist::

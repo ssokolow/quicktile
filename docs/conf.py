@@ -30,6 +30,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.ifconfig',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
@@ -109,7 +110,8 @@ autodoc_default_options = {
     'undoc-members': True,
 }
 
-todo_include_todos = True
+# Uncomment this to enable display of TODOs in the manual and API docs
+#todo_include_todos = True
 
 # -- Options for HTML output ----------------------------------------------
 
