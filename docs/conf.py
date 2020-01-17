@@ -36,6 +36,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
+    'sphinx_autodoc_typehints',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -102,13 +103,17 @@ pygments_style = 'sphinx'
 # If true, keep warnings as "system message" paragraphs in the built documents.
 #keep_warnings = False
 
+autoclass_content = 'both'
 autodoc_default_options = {
+
     'private-members':
         '_load_desktop_geometry,_property_prep,_update,_vary_modmask',
     'special-members':
-        '__bool__,__call__,__contains__,__init__,__repr__,__str__',
+        '__bool__,__call__,__contains__,__repr__,__str__',
     'undoc-members': True,
 }
+
+always_document_param_types = True
 
 # Uncomment this to enable display of TODOs in the manual and API docs
 #todo_include_todos = True
