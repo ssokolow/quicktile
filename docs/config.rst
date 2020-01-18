@@ -39,9 +39,9 @@ file format.
 ``ColumnCount = 3``
 """""""""""""""""""
 
-This controls the number of steps that commands like ``top-left`` will cycle
-through and is used to derive the column width that steps other than "half of
-the screen" will be multiples of.
+This controls the number of steps that commands like :ref:`top-left <top-left>`
+will cycle through and is used to derive the column width that steps other than
+"half of the screen" will be multiples of.
 
 It defaults to 3 for equivalence to WinSplit Revolution but you will probably
 want to increase it if you have a particularly large or wide monitor.
@@ -70,12 +70,13 @@ For example, setting ``<Mod4>`` would turn a binding to ``KP_0`` into
 ``MovementsWrap = True``
 """"""""""""""""""""""""
 
-This controls whether the ``monitor-*``, ``workspace-go-*``, and
-``workspace-send-*`` commands wrap around when they reach the edge of the
-desktop/workspace.
+This controls whether the :ref:`monitor-* <monitor-*>`,
+:ref:`workspace-go-* <workspace-go-*>`, and
+:ref:`workspace-send-* <workspace-send-*>` commands wrap around when they
+reach the edge of the desktop/workspace.
 
-(eg. Whether ``workspace-go-left`` will take you to the rightmost workspace if
-you call it enough times.)
+(eg. Whether :ref:`workspace-go-left <workspace-go-left>` will take you to the
+rightmost workspace if you call it enough times.)
 
 ``[keys]``
 ^^^^^^^^^^

@@ -312,9 +312,10 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
+    'cairo': ('https://pycairo.readthedocs.io/en/latest/', None),
     'gtk': ('http://lazka.github.io/pgi-docs/Gtk-3.0', None),
-    'gdk': ('https://lazka.github.io/pgi-docs/Gdk-3.0', None),
-    'gdkx11': ('https://lazka.github.io/pgi-docs/GdkX11-3.0', None),
+    'gdk': ('http://lazka.github.io/pgi-docs/Gdk-3.0', None),
+    'gdkx11': ('http://lazka.github.io/pgi-docs/GdkX11-3.0', None),
     'python': ('https://docs.python.org/3/', None),
-    'wnck': ('https://lazka.github.io/pgi-docs/Wnck-3.0', None),
+    'wnck': ('http://lazka.github.io/pgi-docs/Wnck-3.0', None),
 }

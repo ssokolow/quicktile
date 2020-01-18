@@ -28,7 +28,9 @@ terminal.
 
 (However, this isn't 100% reliable because it is possible for your compositor
 to implement global hotkeys by intercepting events before they reach
-``XGrabKey``)
+`XGrabKey`_)
+
+.. _XGrabKey: https://tronche.com/gui/x/xlib/input/XGrabKey.html
 
 QuickTile positions windows over/under my panels
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -43,11 +45,13 @@ status updates.
 Quicktile treats all panels as if they're full-width/height
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In the move from GTK+ 2.x to GTK 3.x, the ``gtk.gdk.Region`` class got replaced
-with ``cairo.Region`` and I've run into so many bugs while attempting to use it
-from Python that I had to settle for implementing my own solution, which
+In the move from GTK+ 2.x to GTK 3.x, the `gtk.gdk.Region`_ class got replaced
+with :class:`cairo.Region` and I've run into so many bugs while attempting to
+use it from Python that I had to settle for implementing my own solution, which
 doesn't yet know how to do anything fancier than calculating a "largest usable
 rectangle" separately for each monitor.
+
+.. _gtk.gdk.Region: https://developer.gnome.org/pygtk/stable/class-gdkregion.html
 
 .. todo:: Open an issue for `#95 (comment) <https://github.com/ssokolow/quicktile/issues/95#issuecomment-570089109>`_ on the tracker.
 

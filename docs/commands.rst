@@ -11,6 +11,8 @@ Command Reference
 Window Tiling
 -------------
 
+.. _top-left:
+
 ``top-left`` (:kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 7`)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -248,6 +250,8 @@ Toggle whether the active window is maximized vertically, but with its width and
 .. image:: diagrams/png/vertical-maximize.png
    :alt: diagram
 
+.. _monitor-*:
+
 Multi-Monitor Operations
 ------------------------
 
@@ -269,6 +273,7 @@ Multi-Monitor Operations
           tracker if you would make use of a configuration file option to
           disable this safety feature.
 
+.. _monitor-next:
 
 ``monitor-next``
 ^^^^^^^^^^^^^^^^
@@ -278,6 +283,8 @@ Move the active window to the next monitor, as defined by the
 
 .. image:: diagrams/png/monitor-next.png
    :alt: diagram
+
+.. _monitor-next-all:
 
 ``monitor-next-all``
 ^^^^^^^^^^^^^^^^^^^^
@@ -291,8 +298,9 @@ Move *all* windows to the next monitor, as defined by the
 ``monitor-switch`` (:kbd:`Ctrl` + :kbd:`Alt` +  :kbd:`Keypad Enter`)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-An alias for ``monitor-next`` which will wrap around regardless of the value of
-the :ref:`MovementsWrap <MovementsWrap>` setting in the configuration file.
+An alias for :ref:`monitor-next <monitor-next>` which will wrap around
+regardless of the value of the :ref:`MovementsWrap <MovementsWrap>` setting in
+the configuration file.
 
 .. image:: diagrams/png/monitor-next.png
    :alt: diagram
@@ -303,9 +311,9 @@ the :ref:`MovementsWrap <MovementsWrap>` setting in the configuration file.
 ``monitor-switch-all``
 ^^^^^^^^^^^^^^^^^^^^^^
 
-An alias for ``monitor-next-all`` which will wrap around regardless of the
-value of the :ref:`MovementsWrap <MovementsWrap>` setting in the configuration
-file.
+An alias for :ref:`monitor-next-all <monitor-next-all>` which will wrap around
+regardless of the value of the :ref:`MovementsWrap <MovementsWrap>` setting in
+the configuration file.
 
 .. image:: diagrams/png/monitor-next-all.png
    :alt: diagram
@@ -330,8 +338,12 @@ Move *all* windows to the previous monitor, as defined by the
 .. image:: diagrams/png/monitor-prev-all.png
    :alt: diagram
 
+.. _workspace-go-*:
+
 Workspace-wise Navigation
 -------------------------
+
+.. _workspace-go-next:
 
 ``workspace-go-next``
 ^^^^^^^^^^^^^^^^^^^^^
@@ -339,8 +351,14 @@ Workspace-wise Navigation
 Switch focus to the next workspace, by the :abbr:`WM (Window Manager)`'s
 internal numbering. Do not move any windows.
 
+For users who have laid out their workspaces in a row or column, this is
+equivalent to :ref:`workspace-go-right` or :ref:`workspace-go-down`,
+respectively, with the possible exception of wrap-around behaviour.
+
 .. image:: diagrams/png/workspace-go-next.png
    :alt: diagram
+
+.. _workspace-go-prev:
 
 ``workspace-go-prev``
 ^^^^^^^^^^^^^^^^^^^^^
@@ -348,8 +366,14 @@ internal numbering. Do not move any windows.
 Switch focus to the previous workspace, by the :abbr:`WM (Window Manager)`'s
 internal numbering. Do not move any windows.
 
+For users who have laid out their workspaces in a row or column, this is
+equivalent to :ref:`workspace-go-left` or :ref:`workspace-go-up`, respectively,
+with the possible exception of wrap-around behaviour.
+
 .. image:: diagrams/png/workspace-go-prev.png
    :alt: diagram
+
+.. _workspace-go-left:
 
 ``workspace-go-left``
 ^^^^^^^^^^^^^^^^^^^^^
@@ -357,10 +381,12 @@ internal numbering. Do not move any windows.
 Switch focus to the left in the grid of workspaces. Do not move any windows.
 
 For users who have laid out their workspaces in a row, this is equivalent to
-``workspace-go-prev`` with the possible exception of wrap-around behaviour.
+:ref:`workspace-go-prev` with the possible exception of wrap-around behaviour.
 
 .. image:: diagrams/png/workspace-go-left.png
    :alt: diagram
+
+.. _workspace-go-right:
 
 ``workspace-go-right``
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -368,10 +394,12 @@ For users who have laid out their workspaces in a row, this is equivalent to
 Switch focus to the right in the grid of workspaces. Do not move any windows.
 
 For users who have laid out their workspaces in a row, this is equivalent to
-``workspace-go-next`` with the possible exception of wrap-around behaviour.
+:ref:`workspace-go-next` with the possible exception of wrap-around behaviour.
 
 .. image:: diagrams/png/workspace-go-right.png
    :alt: diagram
+
+.. _workspace-go-up:
 
 ``workspace-go-up``
 ^^^^^^^^^^^^^^^^^^^
@@ -379,20 +407,24 @@ For users who have laid out their workspaces in a row, this is equivalent to
 Switch focus upward in the grid of workspaces. Do not move any windows.
 
 For users who have laid out their workspaces in a column, this is equivalent to
-``workspace-go-prev`` with the possible exception of wrap-around behaviour.
+:ref:`workspace-go-prev` with the possible exception of wrap-around behaviour.
 
 .. image:: diagrams/png/workspace-go-up.png
    :alt: diagram
+
+.. _workspace-go-down:
 
 ``workspace-go-down``
 ^^^^^^^^^^^^^^^^^^^^^
 
 Switch focus downward in the grid of workspaces. Do not move any windows.
 For users who have laid out their workspaces in a column, this is equivalent to
-``workspace-go-next`` with the possible exception of wrap-around behaviour.
+:ref:`workspace-go-next` with the possible exception of wrap-around behaviour.
 
 .. image:: diagrams/png/workspace-go-down.png
    :alt: diagram
+
+.. _workspace-send-*:
 
 Workspace-wise Window Manipulation
 ----------------------------------
@@ -408,14 +440,22 @@ Toggle whether the active window appears on all desktop/workspaces
 .. image:: diagrams/png/all-desktops.png
    :alt: diagram
 
+.. _workspace-send-next:
+
 ``workspace-send-next``
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 Ask the :abbr:`WM (Window Manager)` to move the active window to the next
 workspace, as defined by internal numbering.
 
+For users who have laid out their workspaces in a row or column, this is
+equivalent to :ref:`workspace-send-right` or :ref:`workspace-send-down`,
+respectively, with the possible exception of wrap-around behaviour.
+
 .. image:: diagrams/png/workspace-send-next.png
    :alt: diagram
+
+.. _workspace-send-prev:
 
 ``workspace-send-prev``
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -423,49 +463,69 @@ workspace, as defined by internal numbering.
 Ask the :abbr:`WM (Window Manager)` to move the active window to the previous
 workspace, as defined by its internal numbering.
 
+For users who have laid out their workspaces in a row or column, this is
+equivalent to :ref:`workspace-send-left` or :ref:`workspace-send-up`,
+respectively, with the possible exception of wrap-around behaviour.
+
 .. image:: diagrams/png/workspace-send-prev.png
    :alt: diagram
+
+.. _workspace-send-left:
 
 ``workspace-send-left``
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Ask the :abbr:`WM (Window Manager)` to move the active window to the left in the grid of workspaces.
+Ask the :abbr:`WM (Window Manager)` to move the active window to the left in
+the grid of workspaces.
 
 For users who have laid out their workspaces in a row, this is equivalent to
-``workspace-send-prev`` with the possible exception of wrap-around behaviour.
+:ref:`workspace-send-prev` with the possible exception of wrap-around
+behaviour.
 
 .. image:: diagrams/png/workspace-send-left.png
    :alt: diagram
 
+.. _workspace-send-right:
+
 ``workspace-send-right``
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Ask the :abbr:`WM (Window Manager)` to move the active window to the right in the grid of workspaces.
+Ask the :abbr:`WM (Window Manager)` to move the active window to the right in
+the grid of workspaces.
 
 For users who have laid out their workspaces in a row, this is equivalent to
-``workspace-send-next`` with the possible exception of wrap-around behaviour.
+:ref:`workspace-send-next` with the possible exception of wrap-around
+behaviour.
 
 .. image:: diagrams/png/workspace-send-right.png
    :alt: diagram
 
+.. _workspace-send-up:
+
 ``workspace-send-up``
 ^^^^^^^^^^^^^^^^^^^^^
 
-Ask the :abbr:`WM (Window Manager)` to move the active window upward in the grid of workspaces.
+Ask the :abbr:`WM (Window Manager)` to move the active window upward in the
+grid of workspaces.
 
 For users who have laid out their workspaces in a column, this is equivalent to
-``workspace-send-prev`` with the possible exception of wrap-around behaviour.
+:ref:`workspace-send-prev` with the possible exception of wrap-around
+behaviour.
 
 .. image:: diagrams/png/workspace-send-up.png
    :alt: diagram
 
+.. _workspace-send-down:
+
 ``workspace-send-down``
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Ask the :abbr:`WM (Window Manager)` to move the active window downward in the grid of workspaces.
+Ask the :abbr:`WM (Window Manager)` to move the active window downward in the
+grid of workspaces.
 
 For users who have laid out their workspaces in a column, this is equivalent to
-``workspace-send-next`` with the possible exception of wrap-around behaviour.
+:ref:`workspace-send-next` with the possible exception of wrap-around
+behaviour.
 
 .. image:: diagrams/png/workspace-send-down.png
    :alt: diagram
