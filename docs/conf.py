@@ -103,6 +103,8 @@ pygments_style = 'sphinx'
 # If true, keep warnings as "system message" paragraphs in the built documents.
 #keep_warnings = False
 
+manpages_url = 'https://manpages.debian.org/{path}'
+
 autoclass_content = 'both'
 autodoc_default_options = {
 

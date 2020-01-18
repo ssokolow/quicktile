@@ -167,8 +167,8 @@ Valid Key Names
 ^^^^^^^^^^^^^^^
 
 GTK+ key names are just X11 key symbols so the simplest way to identify the
-name for a key is to use the :program:`xev` command. Just run it in a terminal
-and press the key you want. It will print out something like this:
+name for a key is to use the :manpage:`xev(1)` command. Just run it in a
+terminal and press the key you want. It will print out something like this:
 
 .. code-block:: none
 
@@ -185,7 +185,7 @@ third line.
 Troubleshooting :program:`xev`
 """"""""""""""""""""""""""""""
 
-* If nothing happens, make sure the :program:`xev` window (and not the
+* If nothing happens, make sure the :manpage:`xev(1)` window (and not the
   terminal) has focus.
 * If pressing the key triggers some messages but you do not see one which says
   ``KeyPress event``, it's likely that some other program has already grabbed
@@ -194,7 +194,7 @@ Troubleshooting :program:`xev`
 .. note:: QuickTile will fail to bind keys such as ``Super_L`` (left Windows
     key) as normal keys if they have been configured to function as modifiers.
 
-    You can use the :program:`xmodmap` command to view your current modifier
+    You can use the :manpage:`xmodmap(1)` command to view your current modifier
     assignments.
 
 ----
