@@ -34,6 +34,8 @@ to identify the format of the config file if it becomes necessary to break
 compatibility with the current setup without changing to an entirely new
 file format.
 
+.. _ColumnCount:
+
 ``ColumnCount = 3``
 """""""""""""""""""
 
@@ -53,6 +55,8 @@ without editing the code.
 if you need to and can be found in
 :func:`quicktile.layout.make_winsplit_positions`.)
 
+.. _ModMask:
+
 ``ModMask = <Ctrl><Alt>``
 """""""""""""""""""""""""
 
@@ -60,6 +64,8 @@ This provides an easy way to set a shared prefix for all QuickTile keybindings.
 
 For example, setting ``<Mod4>`` would turn a binding to ``KP_0`` into
 :kbd:`Win` + :kbd:`Keypad 0`.
+
+.. _MovementsWrap:
 
 ``MovementsWrap = True``
 """"""""""""""""""""""""

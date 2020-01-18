@@ -292,7 +292,7 @@ Move *all* windows to the next monitor, as defined by the
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 An alias for ``monitor-next`` which will wrap around regardless of the value of
-the ``MovementsWrap`` setting in the configuration file.
+the :ref:`MovementsWrap <MovementsWrap>` setting in the configuration file.
 
 .. image:: diagrams/png/monitor-next.png
    :alt: diagram
@@ -304,7 +304,8 @@ the ``MovementsWrap`` setting in the configuration file.
 ^^^^^^^^^^^^^^^^^^^^^^
 
 An alias for ``monitor-next-all`` which will wrap around regardless of the
-value of the ``MovementsWrap`` setting in the configuration file.
+value of the :ref:`MovementsWrap <MovementsWrap>` setting in the configuration
+file.
 
 .. image:: diagrams/png/monitor-next-all.png
    :alt: diagram
