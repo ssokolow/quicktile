@@ -297,7 +297,7 @@ the :ref:`MovementsWrap <MovementsWrap>` setting in the configuration file.
 .. image:: diagrams/png/monitor-next.png
    :alt: diagram
 
-.. todo:: Brainstorm ways to distinguish ``-next`` and ``--switch`` visually
+.. todo:: Brainstorm ways to distinguish ``-next`` and ``-switch`` visually
    that don't overcomplicate the visuals.
 
 ``monitor-switch-all``

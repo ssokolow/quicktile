@@ -171,6 +171,7 @@ name for a key is to use the :manpage:`xev(1)` command. Just run it in a
 terminal and press the key you want. It will print out something like this:
 
 .. code-block:: none
+  :emphasize-lines: 3
 
   KeyPress event, serial 41, synthetic NO, window 0x8400001,
      root 0x291, subw 0x0, time 2976251798, (149,-352), root:(192,460),
@@ -179,8 +180,7 @@ terminal and press the key you want. It will print out something like this:
      XmbLookupString gives 0 bytes:
      XFilterEvent returns: False
 
-The part you want is the ``Down`` inside the ``(keysym 0xff54, Down)`` on the
-third line.
+The part you want is the ``Down`` inside the ``(keysym 0xff54, Down)``.
 
 Troubleshooting :program:`xev`
 """"""""""""""""""""""""""""""

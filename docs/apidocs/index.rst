@@ -21,7 +21,7 @@ QuickTile's code is currently divided into the following modules:
    TODO Annotations Overview
    =========================
 
-   The following is a complete list of ``.. todo::`` annotations found in the
-   source code.
+   The following is a complete list of :rst:dir:`.. todo::` annotations found
+   in the source code.
 
    .. todolist::
