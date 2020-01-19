@@ -124,6 +124,7 @@ always_document_param_types = True
 # calculated against the *output* of automodule directives.
 todo_link_only = True
 
+modindex_common_prefix = ['quicktile.']
 # -- Hack to work around sphinx-autodoc-typehints#124 and #38
 import inspect, sphinx_autodoc_typehints
 

@@ -1,4 +1,7 @@
-"""Available window-management commands"""
+"""Available window-management commands
+
+.. todo:: Replace varargs with a dict so ``CommandCBWrapper`` can be strict.
+"""
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
@@ -19,64 +22,63 @@ from gi.repository.Wnck import MotionDirection
 from .layout import resolve_fractional_geom, GravityLayout
 from .util import Rectangle, clamp_idx, fmt_table
 
-# Allow MyPy to work without depending on the `typing` package
-# (And silence complaints from only using the imported types in comments)
-MYPY = False
-if MYPY:
-    # pylint: disable=unused-import
-    from typing import (Any, Callable, Dict, Iterable, Iterator, List,  # NOQA
-                        Optional, Sequence, Tuple)
-    from typing import Mapping as Map  # NOQA
-    from mypy_extensions import VarArg, KwArg  # NOQA
+# -- Type-Annotation Imports --
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union
 
-    from .wm import WindowManager  # NOQA
-    from .util import CommandCB, Gravity    # NOQA
+from .wm import WindowManager
+from .util import CommandCB, Gravity
 
-    # FIXME: Replace */** with a dict so I can be strict here
-    #: MyPy type alias for what gets stored in `CommandRegistry`
-    CommandCBWrapper = Callable[..., Any]  # pylint: disable=invalid-name
-del MYPY
+#: MyPy type alias for what gets stored in `CommandRegistry`
+CommandCBWrapper = Callable[..., Any]  # pylint: disable=invalid-name
+# --
 
 
 class CommandRegistry(object):
-    """Handles lookup and boilerplate for window management commands."""
+    """Lookup and dispatch boilerplate for window management commands."""
 
     #: Fields to be added to the ``state`` argument when calling commands
     extra_state = {}  # type: Dict[str, Any]
 
-    def __init__(self):     # type: () -> None
+    def __init__(self):
         self.commands = {}  # type: Dict[str, CommandCBWrapper]
         self.help = {}      # type: Dict[str, str]
 
-    def __iter__(self):  # type: () -> Iterator[str]
+    def __iter__(self) -> Iterator[str]:
         for name in self.commands:
             yield name
 
-    def __str__(self):   # type: () -> str
-        """Override str() to pretty-print a table of known commands"""
+    def __str__(self) -> str:
+        """Pretty-print a table of registered commands"""
         return fmt_table(self.help, ('Known Commands', 'desc'), group_by=1)
 
     @staticmethod
-    def get_window_meta(window,  # type: Wnck.Window
-                        state,  # type: Dict[str, Any]
-                        winman  # type: WindowManager
-                        ):  # type: (...) -> bool
-        """Gather information about ``window`` to pass to the command"""
+    def get_window_meta(
+            window: Wnck.Window, state: Dict[str, Any], winman: WindowManager
+    ) -> bool:
+        """Gather information about ``window`` to pass to the command
+
+        :param window: The window to inspect.
+        :param state: The metadata dict to :meth:`dict.update` with gathered
+            values.
+        :returns: A boolean indicating success or failure.
+
+        .. todo:: Is the MPlayer safety hack in :meth:`get_window_meta` still
+            necessary with the refactored window-handling code?
+        .. todo:: Can the :func:`logging.debug` call in :meth:`get_window_meta`
+            be reworked to call :meth:`Wnck.Window.get_name` lazily?
+        """
         # Bail out early on None or things like the desktop window
         if not winman.is_relevant(window):
             return False
 
         win_rect = Rectangle(*window.get_geometry())
-        # FIXME: Make calls to win.get_* lazy in case --debug
-        #        wasn't passed.
         logging.debug("Operating on window %r with title \"%s\" "
                       "and geometry %r", window, window.get_name(), win_rect)
 
         monitor_id, monitor_geom = winman.get_monitor(window)
         use_rect = winman.usable_region.find_usable_rect(win_rect)
 
-        # TODO: Replace this MPlayer safety hack with a properly
-        #       comprehensive exception catcher.
+        # MPlayer safety hack
         if not use_rect:
             logging.debug("Received a worthless value for largest "
                           "rectangular subset of desktop (%r). Doing "
@@ -90,33 +92,35 @@ class CommandRegistry(object):
         })
         return True
 
-    def add(self, name, *p_args, **p_kwargs):
-        # type: (str, *Any, **Any) -> Callable[[CommandCB], CommandCB]
-        # TODO: Rethink the return value of the command function.
+    def add(self, name: str, *p_args: Any, **p_kwargs: Any
+            ) -> Callable[[CommandCB], CommandCB]:
         """Decorator to wrap a function in boilerplate and add it to the
             command registry under the given name.
 
             :note: The ``windowless`` parameter allows a command to be
                 registered as not requiring an active window.
 
-            :param name: The name to know the command by.
+            :param name: The name to register the command for lookup by.
             :param p_args: Positional arguments to prepend to all calls made
                 via ``name``.
             :param p_kwargs: Keyword arguments to prepend to all calls made
                 via ``name``.
+            :param bool windowless: Allow the command to be invoked when no
+                relevant active window can be retrieved.
 
-            :type name: ``str``
+            .. todo:: Refactor :meth:`add` to make it less of an ugly pile.
+            .. todo:: Rethink the return value expected of command functions.
             """
 
-        def decorate(func):  # type: (CommandCB) -> CommandCB
+        def decorate(func: CommandCB) -> CommandCB:
             """Closure used to allow decorator to take arguments"""
             @wraps(func)
             # pylint: disable=missing-docstring
-            def wrapper(winman,       # type: WindowManager
-                        window=None,  # type: Wnck.Window
+            def wrapper(winman: WindowManager,
+                        window: Wnck.Window=None,
                         *args,
                         **kwargs
-                        ):            # type: (...) -> None
+                        ) -> None:
 
                 window = window or winman.screen.get_active_window()
 
@@ -160,16 +164,19 @@ class CommandRegistry(object):
             return func
         return decorate
 
-    def add_many(self, command_map):
-        # type: (Dict[str, List[Any]]) -> Callable[[CommandCB], CommandCB]
-        # TODO: Make this type signature more strict
-        """Convenience decorator to allow many commands to be defined from
-           the same function with different arguments.
+    def add_many(self, command_map: Dict[str, List[Any]]
+                 ) -> Callable[[CommandCB], CommandCB]:
+        """Convenience decorator to call :meth:`add` repeatedly to assing
+           multiple command names to the same function which differ only in
+           their arguments.
 
-           :param command_map: A dict mapping command names to argument lists.
-           :type command_map: ``dict``
+           :param command_map: A dict mapping command names to lists of
+                arguments.
+
+           .. todo:: Refactor and redesign :meth:`add_many` for better
+              maintainability.
            """
-        # TODO: Refactor and redesign for better maintainability
+        # TODO: What's the type signature on `decorate`?
         def decorate(func):
             """Closure used to allow decorator to take arguments"""
             for pos, (cmd, arglist) in enumerate(command_map.items()):
@@ -177,9 +184,19 @@ class CommandRegistry(object):
             return func
         return decorate
 
-    def call(self, command, winman, *args, **kwargs):
-        # type: (str, WindowManager, *Any, **Any) -> bool
-        """Resolve a textual positioning command and execute it."""
+    def call(self,
+            command: str,
+            winman: WindowManager,
+            *args: Any,
+            **kwargs: Any) -> bool:
+        """Look up a registered command by name and execute it.
+
+        :param command: The name of the command to execute.
+        :param args: Positional arguments to pass to the command.
+        :param kwargs: Keyword arguments to pass to the command.
+
+        .. todo:: Allow commands to report success or failure
+        """
         cmd = self.commands.get(command, None)
 
         if cmd:
@@ -187,38 +204,35 @@ class CommandRegistry(object):
                           command, args, kwargs)
             cmd(winman, *args, **kwargs)
 
-            # TODO: Allow commands to report success or failure
             return True
         else:
             logging.error("Unrecognized command: %s", command)
             return False
 
 
-#: The instance of `CommandRegistry` to be used in 99.9% of use cases.
+#: The instance of :class:`CommandRegistry` to be used in 99.9% of use cases.
 commands = CommandRegistry()
 
 
-def cycle_dimensions(winman,      # type: WindowManager
-                     win,         # type: Wnck.Window
-                     state,       # type: Dict[str, Any]
-                     *dimensions  # type: Any
-                     ):  # type: (...) -> Optional[Rectangle]
-    # TODO: Standardize on what kind of window object to pass around
+def cycle_dimensions(winman: WindowManager,
+                     win: Wnck.Window,
+                     state: Dict[str, Any],
+                     *dimensions: Optional[Tuple[float, float, float, float]]
+                     ) -> Optional[Rectangle]:
     """Cycle the active window through a list of positions and shapes.
 
     Takes one step each time this function is called.
 
-    If the window's dimensions are not within 100px (by euclidean distance)
-    of an entry in the list, set them to the first list entry.
+    Keeps track of its position by storing the index in an X11 property on
+    ``win`` named ``_QUICKTILE_CYCLE_POS``.
 
     :param dimensions: A list of tuples representing window geometries as
         floating-point values between 0 and 1, inclusive.
-    :type dimensions: ``[(x, y, w, h), ...]``
-    :param win: The window to be manipulated
-    :type win: ``Wnck.Window``
-
+    :param win: The window to operate on.
     :returns: The new window dimensions.
-    :rtype: `Rectangle`
+
+    .. todo:: Refactor :func:`cycle_dimensions` to be less of a big pile.
+    .. todo:: Consider replacing ``dimensions`` with a custom type.
     """
     win_geom = Rectangle(*win.get_geometry()).to_relative(
         state['monitor_geom'])
@@ -237,7 +251,6 @@ def cycle_dimensions(winman,      # type: WindowManager
     logging.debug("Selected preset sequence resolves to these monitor-relative"
                   " pixel dimensions:\n\t%r", dims)
 
-    # TODO: Rewrite this position-getting code
     try:
         cmd_idx, pos = winman.get_property(win, '_QUICKTILE_CYCLE_POS',
                                            Xatom.INTEGER)
@@ -251,7 +264,6 @@ def cycle_dimensions(winman,      # type: WindowManager
     else:
         pos = 0
 
-    # TODO: Rewrite this position-setting code
     winman.set_property(win, '_QUICKTILE_CYCLE_POS',
         [int(state.get('cmd_idx', 0)), pos],
         prop_type=Xatom.INTEGER, format_size=32)
@@ -263,7 +275,6 @@ def cycle_dimensions(winman,      # type: WindowManager
     # If we're overlapping a panel, fall back to a monitor-specific
     # analogue to _NET_WORKAREA to prevent overlapping any panels and
     # risking the WM potentially meddling with the result of resposition()
-    # TODO: Rewrite this to not use Regions
     test_result = result.intersect(clip_box)
     if not test_result == result:
         result = test_result
@@ -280,20 +291,22 @@ def cycle_dimensions(winman,      # type: WindowManager
 @commands.add('monitor-switch', force_wrap=True)
 @commands.add('monitor-next', 1)
 @commands.add('monitor-prev', -1)
-def cycle_monitors(winman,            # type: WindowManager
-                   win,               # type: Wnck.Window
-                   state,             # type: Dict[str, Any]
-                   step=1,            # type: int
-                   force_wrap=False,  # type: bool
-                   n_monitors=None    # type: Optional[int]
-                   ):                 # type: (...) -> None
+def cycle_monitors(winman: WindowManager,
+                   win: Wnck.Window,
+                   state: Dict[str, Any],
+                   step: int=1,
+                   force_wrap: bool=False,
+                   n_monitors: Optional[int]=None
+                   ) -> None:
     """Cycle the active window between monitors.
 
-    Attempts to preserve the window's position but will ensure that it doesn't
+    Attempts to preserve each window's position but will ensure that it doesn't
     get placed outside the available space on the target monitor.
 
-    :todo 1.0.0: Remove ``monitor-switch`` in favor of ``monitor-next``
-        (API-breaking change)
+    :param win: The window to operate on.
+    :param step: How many monitors to step forward or backward.
+    :param force_wrap: If ``True``, this will override setting
+        :ref:`MovementsWrap <MovementsWrap>` to ``False``.
     """
     old_mon_id, _ = winman.get_monitor(win)
     n_monitors = n_monitors or winman.gdk_screen.get_n_monitors()
@@ -312,13 +325,27 @@ def cycle_monitors(winman,            # type: WindowManager
 @commands.add('monitor-switch-all', force_wrap=True)
 @commands.add('monitor-prev-all', -1)
 @commands.add('monitor-next-all', 1)
-def cycle_monitors_all(winman, win, state, step=1, force_wrap=False):
-    # type: (WindowManager, Wnck.Window, Dict[str, Any], int, bool) -> None
+def cycle_monitors_all(
+        winman: WindowManager,
+        win: Wnck.Window,
+        state: Dict[str, Any],
+        step: int=1,
+        force_wrap: bool=False
+) -> None:
     """Cycle all windows between monitors.
+
+    (Apply :func:`cycle_monitors` to all windows.)
 
     Attempts to preserve each window's position but will ensure that it doesn't
     get placed outside the available space on the target monitor.
+
+    :param win: The window to operate on.
+    :param step: Passed to :func:`cycle_monitors`
+    :param force_wrap: Passed to :func:`cycle_monitors`
     """
+    # Have to specify types in the description pending a fix for
+    # https://github.com/agronholm/sphinx-autodoc-typehints/issues/124
+
     n_monitors = winman.gdk_screen.get_n_monitors()
     curr_workspace = win.get_workspace()
 
@@ -332,12 +359,19 @@ def cycle_monitors_all(winman, win, state, step=1, force_wrap=False):
 
 @commands.add_many({'move-to-{}'.format(name): [variant]
     for name, variant in GravityLayout.GRAVITIES.items()})
-def move_to_position(winman,       # type: WindowManager
-                     win,          # type: Wnck.Window
-                     state,        # type: Dict[str, Any]
-                     gravity,      # type: Gravity
-                     ):  # type: (...) -> None
-    """Move window to a position on the screen, preserving its dimensions."""
+def move_to_position(winman: WindowManager,
+                     win: Wnck.Window,
+                     state: Dict[str, Any],
+                     gravity: Gravity,
+                     ) -> None:
+    """Move the active window to a position on the screen, preserving its
+    dimensions.
+
+    :param win: The window to operate on.
+    """
+    # Have to specify types in the description pending a fix for
+    # https://github.com/agronholm/sphinx-autodoc-typehints/issues/124
+
     usable_rect = state['usable_rect']
 
     # TODO: Think about ways to refactor scaling for better maintainability
@@ -358,9 +392,18 @@ def move_to_position(winman,       # type: WindowManager
 
 
 @commands.add('bordered')
-def toggle_decorated(winman, win, state):  # pylint: disable=unused-argument
-    # type: (WindowManager, Wnck.Window, Any) -> None
-    """Toggle window decoration state on the active window."""
+def toggle_decorated(
+    winman: WindowManager,
+    win: Wnck.Window,
+    state: Dict[str, Any]  # pylint: disable=unused-argument
+) -> None:
+    """Toggle window decoration state on the active window.
+
+    :param win: The window to operate on.
+    :param state: Unused
+    """
+    # Have to specify types in the description pending a fix for
+    # https://github.com/agronholm/sphinx-autodoc-typehints/issues/124
 
     # TODO: Switch to setting this via python-xlib
     display = winman.gdk_screen.get_display()
@@ -370,9 +413,16 @@ def toggle_decorated(winman, win, state):  # pylint: disable=unused-argument
 
 
 @commands.add('show-desktop', windowless=True)
-def toggle_desktop(winman, win, state):  # pylint: disable=unused-argument
-    # type: (WindowManager, Any, Any) -> None
-    """Toggle "all windows minimized" to view the desktop"""
+def toggle_desktop(
+        winman: WindowManager,
+        win: Wnck.Window,      # pylint: disable=unused-argument
+        state: Dict[str, Any]  # pylint: disable=unused-argument
+) -> None:
+    """Toggle "all windows minimized" to view the desktop.
+
+    :param win: Unused
+    :param state: Unused
+    """
 
     target = not winman.screen.get_showing_desktop()
     winman.screen.toggle_showing_desktop(target)
@@ -389,24 +439,32 @@ def toggle_desktop(winman, win, state):  # pylint: disable=unused-argument
 @commands.add('always-above', 'make_above', 'is_above')
 @commands.add('always-below', 'make_below', 'is_below')
 @commands.add('shade', 'shade', 'is_shaded')
-# pylint: disable=unused-argument,too-many-arguments
-def toggle_state(winman, win, state, command, check, takes_bool=False):
-    # type: (WindowManager, Wnck.Window, Map[str, Any], str, str, bool) -> None
+# pylint: disable=too-many-arguments
+def toggle_state(
+        winman: WindowManager,  # pylint: disable=unused-argument
+        win: Wnck.Window,
+        state: Dict[str, Any],  # pylint: disable=unused-argument
+        command: str,
+        check: str,
+        takes_bool: bool=False) -> None:
     """Toggle window state on the active window.
 
-    :param command: The ``Wnck.Window`` method name to be conditionally
-        prefixed with ``un``, resolved, and called.
-    :param check: The ``Wnck.Window`` method name to be called to check
+    This is an abstraction to unify a bunch of different :class:`Wnck.Window`
+    methods behind a common wrapper.
+
+    :param winman: Unused
+    :param win: The window to operate on.
+    :param state: Unused
+    :param command: The method name to be conditionally
+        prefixed with ``un``, resolved from ``win``, and called.
+    :param check: The method name to be called on ``win`` to check
         whether ``command`` should be prefixed with ``un``.
     :param takes_bool: If ``True``, pass ``True`` or ``False`` to ``check``
         rather thank conditionally prefixing it with ``un`` before resolving.
-    :type command: ``str``
-    :type check: ``str``
-    :type takes_bool: ``bool``
 
-    :todo 1.0.0: Rename ``vertical-maximize`` and ``horizontal-maximize`` to
-        ``maximize-vertical`` and ``maximize-horizontal``.
-        (API-breaking change)
+    .. todo:: When I'm willing to break the external API (command names),
+        rename ``vertical-maximize`` and ``horizontal-maximize`` to
+        ``maximize-vertical`` and ``maximize-horizontal`` for consistency.
     """
     target = not getattr(win, check)()
 
@@ -419,10 +477,19 @@ def toggle_state(winman, win, state, command, check, takes_bool=False):
 
 @commands.add('trigger-move', 'move')
 @commands.add('trigger-resize', 'size')
-# pylint: disable=unused-argument
-def trigger_keyboard_action(winman, win, state, command):
-    # type: (WindowManager, Wnck.Window, Map[str, Any], str) -> None
-    """Ask the Window Manager to begin a keyboard-driven operation."""
+def trigger_keyboard_action(
+        winman: WindowManager,  # pylint: disable=unused-argument
+        win: Wnck.Window,
+        state: Dict[str, Any],  # pylint: disable=unused-argument
+        command: str) -> None:
+    """Ask the Window Manager to begin a keyboard-driven operation.
+
+    :param winman: Unused
+    :param win: The window to operate on.
+    :param state: Unused
+    :param command: The string to be appended to ``keyboard_`` and used as a
+        method name to look up on ``win``.
+    """
 
     getattr(win, 'keyboard_' + command)()
 
@@ -433,9 +500,25 @@ def trigger_keyboard_action(winman, win, state, command):
 @commands.add('workspace-go-down', MotionDirection.DOWN, windowless=True)
 @commands.add('workspace-go-left', MotionDirection.LEFT, windowless=True)
 @commands.add('workspace-go-right', MotionDirection.RIGHT, windowless=True)
-def workspace_go(winman, win, state, motion):  # pylint: disable=W0613
-    # type: (WindowManager, Wnck.Window, Map[str,Any], MotionDirection) -> None
-    """Switch the active workspace (next/prev wrap around)"""
+def workspace_go(
+        winman: WindowManager,
+        win: Optional[Wnck.Window],  # pylint: disable=unused-argument
+        state: Dict[str, Any],
+        motion: MotionDirection) -> None:
+    """Switch the active workspace.
+
+    (Integer values for ``motion`` may cause wrap-around behaviour depending
+    on the value of :ref:`MovementsWrap <MovementsWrap>`.)
+
+    :param state: Used to access the :ref:`MovementsWrap <MovementsWrap>`
+        configuration key.
+    :param motion: The direction to move the window on the workspace grid or
+        the distance to move it by numerical ordering. Accepts
+        :class:`Wnck.MotionDirection` or :any:`int`.
+    :param win: Unused but required by the command API.
+    """
+    # Have to specify types in the description pending a fix for
+    # https://github.com/agronholm/sphinx-autodoc-typehints/issues/124
 
     target = winman.get_workspace(None, motion,
         wrap_around=state['config'].getboolean('general', 'MovementsWrap'))
@@ -454,16 +537,33 @@ def workspace_go(winman, win, state, motion):  # pylint: disable=W0613
 @commands.add('workspace-send-down', MotionDirection.DOWN)
 @commands.add('workspace-send-left', MotionDirection.LEFT)
 @commands.add('workspace-send-right', MotionDirection.RIGHT)
-# pylint: disable=unused-argument
-def workspace_send_window(winman, win, state, motion):
-    # type: (WindowManager, Wnck.Window, Map[str,Any], MotionDirection) -> None
-    """Move the active window to another workspace (next/prev wrap around)"""
+def workspace_send_window(
+        winman: WindowManager,
+        win: Wnck.Window,
+        state: Dict[str, Any],
+        motion: Union[MotionDirection, int]) -> None:
+    """Move the active window to another workspace.
+
+    (Integer values for ``motion`` may cause wrap-around behaviour depending
+    on the value of :ref:`MovementsWrap <MovementsWrap>`.)
+
+    :param state: Used to access the :ref:`MovementsWrap <MovementsWrap>`
+        configuration key.
+    :param motion: The direction to move the window on the workspace grid or
+        the distance to move it by numerical ordering. Accepts
+        :class:`Wnck.MotionDirection` or :any:`int`.
+    :param win: The window to operate on.
+    """
+    # Have to specify types in the description pending a fix for
+    # https://github.com/agronholm/sphinx-autodoc-typehints/issues/124
 
     target = winman.get_workspace(win, motion,
         wrap_around=state['config'].getboolean('general', 'MovementsWrap'))
 
     if not target:
-        return  # It's either pinned, on no workspaces, or there is no match
+        # `target` will be None if `win` is pinned or on no workspaces or if
+        # there is no workspace matching `motion`.
+        return
 
     win.move_to_workspace(target)
 
