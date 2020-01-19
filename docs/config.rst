@@ -43,8 +43,16 @@ This controls the number of steps that commands like :ref:`top-left <top-left>`
 will cycle through and is used to derive the column width that steps other than
 "half of the screen" will be multiples of.
 
+Each preset will have :samp:`1 + {columns}` steps with the first step occupying
+either half the monitor width or the full width, as appropriate.
+
 It defaults to 3 for equivalence to WinSplit Revolution but you will probably
 want to increase it if you have a particularly large or wide monitor.
+
+At present, no provision is made to deduplicate this in the ``columns=2`` case
+and, for larger multiples of 2, it is considered desirable to have "half
+width" present both at the beginning of the sequence and at its natural
+position in the progression.
 
 There is currently no equivalent for modifying the number of rows because
 each command hard-codes for a row or span of rows, and until QuickTile's

@@ -8,31 +8,28 @@ from heapq import heappop, heappush
 
 from .util import euclidean_dist, Gravity, Rectangle
 
-# Allow MyPy to work without depending on the `typing` package
-# (And silence complaints from only using the imported types in comments)
-MYPY = False
-if MYPY:
-    # pylint: disable=unused-import
-    from typing import (Any, Dict, Iterable, Iterator, List, Optional,  # NOQA
-                        Sequence, Sized, Tuple, Union)
+# -- Type-Annotation Imports --
+from typing import Dict, List, Sequence, Tuple, Union
+from .util import GeomTuple, PercentRectTuple
 
-    # pylint: disable=import-error, no-name-in-module
-    from .util import GeomTuple, PercentRectTuple  # NOQA
-
-    #: MyPy type alias for either `Rectangle` or `GeomTuple`
-    Geom = Union[Rectangle, GeomTuple]  # pylint: disable=invalid-name
-del MYPY
+#: MyPy type alias for either `Rectangle` or `GeomTuple`
+Geom = Union[Rectangle, GeomTuple]
+# --
 
 
-def check_tolerance(distance, monitor_geom, tolerance=0.1):
-    # type: (int, Rectangle, float) -> float
-    # TODO: Is this dead code now?
-    """Check whether a distance is within tolerance, adjusted for window size.
+def check_tolerance(distance: int, monitor_geom: Rectangle,
+        tolerance: float=0.1) -> float:
+    """Check whether a distance is within a tolerance value calculated as a
+        percentage of a monitor's size.
 
     :param distance: A distance in pixels.
     :param monitor_geom: A ``Rectangle`` representing the monitor geometry.
     :param tolerance: A value between 0.0 and 1.0, inclusive, which represents
         a percentage of the monitor size.
+
+    .. note:: This is not currently in use but is retained for when future
+        plans make it necessary to design reliable "invalidate cached data if
+        the window was repositioned/resized without QuickTile" code.
     """
 
     # Take the euclidean distance of the monitor's width and height and convert
@@ -42,14 +39,27 @@ def check_tolerance(distance, monitor_geom, tolerance=0.1):
             ) < tolerance
 
 
-def closest_geom_match(needle, haystack):
-    # type: (Geom, Sequence[Geom]) -> Tuple[int, int]
-    # TODO: Rewrite to use Rectangle
-    # TODO: Is this dead code now?
+def closest_geom_match(needle: Geom,
+        haystack: Sequence[Geom]) -> Tuple[int, int]:
     """Find the geometry in ``haystack`` that most closely matches ``needle``.
+
+    :param needle: The :class:`quicktile.util.Rectangle` or 4-integer tuple to
+        search out a match for.
+    :param haystack: The set of :class:`quicktile.util.Rectangle` or 4-integer
+        tuples to search within.
 
     :return: A tuple of the euclidean distance and index in ``haystack`` for
         the best match.
+
+    .. note:: This is not currently used by any existing commands. If you are
+        using it in your own patched QuickTile versions, please
+        `file an issue`_ to prevent the possibility of it being removed.
+    .. todo:: Decide whether to get rid of :func:`closest_geom_match`
+    .. todo:: If I decide to keep :func:`closest_geom_match`, rewrite it to use
+        :class:`quicktile.util.Rectangle`-specific stuff for more readable
+        and maintainable code.
+
+    .. _file an issue: https://github.com/ssokolow/quicktile/issues/
     """
     # Calculate euclidean distances between the window's current geometry
     # and all presets and store them in a min heap.
@@ -66,15 +76,19 @@ def closest_geom_match(needle, haystack):
     return closest_distance, closest_idx
 
 
-def resolve_fractional_geom(fract_geom, monitor_rect):
-    # type: (Union[PercentRectTuple, Rectangle], Rectangle) -> Rectangle
+def resolve_fractional_geom(fract_geom: Union[PercentRectTuple, Rectangle],
+        monitor_rect: Rectangle) -> Rectangle:
     """Resolve proportional (eg. ``0.5``) and preserved (``None``) coordinates.
 
-    :param fract_geom: An ``(x, y, w, h)`` tuple with monitor-relative values
-        in the range from 0.0 to 1.0, inclusive, or a ``Rectangle`` which will
-        be passed through without modification.
-    :param monitor_rect: A ``Rectangle`` defining the bounding box of the
-        monitor (or other desired region) within the desktop.
+    :param fract_geom: An ``(x, y, w, h)`` tuple containing monitor-relative
+        values in the range from 0.0 to 1.0, inclusive, or a
+        :class:`quicktile.util.Rectangle` which will be passed through without
+        modification.
+    :param monitor_rect: A :class:`quicktile.util.Rectangle` defining the
+        bounding box of the monitor (or other desired region) within the
+        desktop.
+    :returns: A rectangle with absolute coordinates derived from
+        ``monitor_rect``.
     """
     if isinstance(fract_geom, Rectangle):
         return fract_geom
@@ -89,38 +103,41 @@ def resolve_fractional_geom(fract_geom, monitor_rect):
 class GravityLayout(object):  # pylint: disable=too-few-public-methods
     """Helper for translating top-left relative dimensions to other corners.
 
-    Used to generate `commands.cycle_dimensions` presets.
+    Used to generate :func:`quicktile.commands.cycle_dimensions` presets.
 
-    Expects to operate on decimal percentage values. (``0 <= x <= 1``)
+    Expects to operate on decimal percentage values. (0 ≤ x ≤ 1)
+
+    :param margin_x: Horizontal margin to apply when calculating window
+        positions, as decimal percentage of screen width.
+    :param margin_y: Vertical margin to apply when calculating window
+        positions, as decimal percentage of screen height.
+
     """
     # pylint: disable=no-member
-    #: Possible window alignments relative to the monitor/desktop.
+    #: A mapping of possible window alignments relative to the monitor/desktop
+    #: as a mapping from formerly manually specified command names to values
+    #: the :any:`quicktile.util.Gravity` enum can take on.
+    #:
+    #: .. todo:: Look into whether I can refactor this away entirely.
     GRAVITIES = dict((x.lower().replace('_', '-'), getattr(Gravity, x)) for
         x in Gravity.__members__)  # type: Dict[str, Gravity]
 
     def __init__(self, margin_x=0, margin_y=0):  # type: (int, int) -> None
-        """Initializer for GravityLayout
-
-        :param margin_x: Horizontal margin to apply when calculating window
-            positions, as decimal percentage of screen width.
-        :param margin_y: Vertical margin to apply when calculating window
-            positions, as decimal percentage of screen height.
-        """
         self.margin_x = margin_x
         self.margin_y = margin_y
 
     # pylint: disable=too-many-arguments
     def __call__(self,
-                 width,               # type: float
-                 height,              # type: float
-                 gravity='top-left',  # type: str
-                 x=None,              # type: Optional[float]
-                 y=None               # type: Optional[float]
-                 ):  # type: (...) -> PercentRectTuple
-        """Return an ``(x, y, w, h)`` tuple relative to ``gravity``.
+                 width: float,
+                 height: float,
+                 gravity: str='top-left',
+                 x: float=None,
+                 y: float=None
+                 ) -> PercentRectTuple:
+        """Return a relative ``(x, y, w, h)`` tuple relative to ``gravity``.
 
         This function takes and returns percentages, represented as decimals
-        in the range ``0 <= x <= 1``, which can be multiplied by width and
+        in the range ``0 ≤ x ≤ 1``, which can be multiplied by width and
         height values in actual units to produce actual window geometry.
 
         It can be used in two ways:
@@ -135,16 +152,15 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
 
         :param width: Desired width as a decimal-form percentage
         :param height: Desired height as a decimal-form percentage
-        :param gravity: Desired window alignment from `GRAVITIES`
+        :param gravity: Desired window alignment from :any:`GRAVITIES`
         :param x: Desired horizontal position if not the same as ``gravity``
         :param y: Desired vertical position if not the same as ``gravity``
 
-        :returns: ``(x, y, w, h)`` represented as decimal-form percentages
+        :returns: ``(x, y, w, h)`` with all values represented as decimal-form
+            percentages.
 
-        :note: All parameters except ``gravity`` are decimal values in the
-               range ``0 <= x <= 1``.
-
-        :todo: Consider writing a percentage-based equivalent to `Rectangle`
+        .. todo:: Consider writing a percentage-based equivalent to
+            :class:`quicktile.util.Rectangle`.
         """
 
         x = x or self.GRAVITIES[gravity].value[0]
@@ -158,14 +174,22 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
                 round(height - (self.margin_y * 2), 3))
 
 
-def make_winsplit_positions(columns):
-    # type: (int) -> Dict[str, List[PercentRectTuple]]
+def make_winsplit_positions(columns: int) -> Dict[str, List[PercentRectTuple]]:
     """Generate the classic WinSplit Revolution tiling presets
 
-    :todo: Figure out how best to put this in the config file.
+    :params columns: The number of columns that each tiling preset should be
+        built around.
+    :return: A dict of presets ready to feed into
+        :meth:`quicktile.commands.CommandRegistry.add_many`.
+
+    See :ref:`ColumnCount <ColumnCount>` in the configuration section of the
+    manual for further details.
+
+    .. todo:: Plumb :meth:`GravityLayout` arguments into the config
+        file and figure out how to generalize func:`make_winsplit_positions`
+        into user-customizable stuff as much as possible.
     """
 
-    # TODO: Plumb GravityLayout.__init__'s arguments into the config file
     gvlay = GravityLayout()
     col_width = 1.0 / columns
     cycle_steps = tuple(round(col_width * x, 3)
