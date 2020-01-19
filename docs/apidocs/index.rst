@@ -4,7 +4,7 @@ API Documentation
 QuickTile's code is currently divided into the following modules:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    __main__
    commands
