@@ -1,4 +1,4 @@
-Unit Tests (``test_py``)
+Unit Tests (``test_quicktile.py``)
 ==================================
 
 .. automodule:: test_quicktile
