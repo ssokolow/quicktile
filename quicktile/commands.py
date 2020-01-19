@@ -108,6 +108,9 @@ class CommandRegistry(object):
             :param bool windowless: Allow the command to be invoked when no
                 relevant active window can be retrieved.
 
+            :raises AssertionError: Raised if the wrapped function has no
+                docstring.
+
             .. todo:: Refactor :meth:`add` to make it less of an ugly pile.
             .. todo:: Rethink the return value expected of command functions.
             """

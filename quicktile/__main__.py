@@ -185,6 +185,10 @@ def load_config(path) -> ConfigParser:
 
     :param path: The path to load or initialize.
 
+    :raises TypeError: Raised if the keys or values in the :ref:`[keys]`
+        section of the configuration file or what they resolve to via
+        :any:`KEYLOOKUP` are not :any:`str` instances.
+
     .. todo:: Refactor config parsing. It's an ugly blob.
     """
     first_run = not os.path.exists(path)
@@ -268,6 +272,8 @@ def load_config(path) -> ConfigParser:
 
 def main() -> None:
     """setuptools-compatible entry point
+
+    :raises XInitError: Failed to connect to the X server.
 
     .. todo:: :func:`quicktile.__main__.main` is an overly complex blob and
         needs to be refactored.

@@ -78,6 +78,8 @@ reach the edge of the desktop/workspace.
 (eg. Whether :ref:`workspace-go-left <workspace-go-left>` will take you to the
 rightmost workspace if you call it enough times.)
 
+.. _[keys]:
+
 ``[keys]``
 ^^^^^^^^^^
 
@@ -85,7 +87,9 @@ This section has no specific field names but, rather, allows you to map hotkey
 sequences in to QuickTile commands.
 
 A list of valid commands is available either in the :doc:`commands` section
-or by running :command:`quicktile --show-actions` in a terminal.
+or by running QuickTile with the :option:`--show-actions` option in a terminal.
+
+Both the keys and values must parse as :any:`str`.
 
 As an example of the correct format, here is the default contents of the
 ``[keys]`` section as of QuickTile 0.4:
