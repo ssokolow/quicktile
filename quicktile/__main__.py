@@ -272,7 +272,7 @@ def main() -> None:
         needs to be refactored.
     .. todo:: Rearchitect so the hack with registering
         :func:`quicktile.commands.cycle_dimensions` inside
-        :func:`quicktile.__main__main` isn't necessary.
+        :func:`quicktile.__main__.main` isn't necessary.
     """
     from argparse import ArgumentParser
     parser = ArgumentParser()
