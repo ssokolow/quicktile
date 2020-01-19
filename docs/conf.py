@@ -125,10 +125,23 @@ always_document_param_types = True
 todo_link_only = True
 
 modindex_common_prefix = ['quicktile.']
+# Nitpick every broken reference except ones I whitelist because they *have*
+# no intersphinx-compatible documentation.
+#
+# TODO: Investigate how much work it would be to contribute intersphinx
+#       generation to python-xlib's documentation pipeline.
 nitpicky = True
 nitpick_ignore = [
     ('py:class', 'inspect.FrameInfo'),
-    ('py:class', 'tokenize.TokenInfo')
+    ('py:class', 'tokenize.TokenInfo'),
+    ('py:class', 'Xlib.display.Display'),
+    ('py:meth', 'Xlib.display.Display.create_resource_object'),
+    ('py:meth', 'Xlib.display.Display.keycode_to_keysym'),
+    ('py:meth', 'Xlib.display.Display.sync'),
+    ('py:class', 'Xlib.error.CatchError'),
+    ('py:class', 'Xlib.error.XError'),
+    ('py:class', 'Xlib.protocol.event.KeyPress'),
+    ('py:mod', 'Xlib.Xatom'),
 ]
 
 
@@ -353,9 +366,10 @@ texinfo_documents = [
 intersphinx_mapping = {
     'cairo': ('https://pycairo.readthedocs.io/en/latest/', None),
     'dbus': ('https://dbus.freedesktop.org/doc/dbus-python/', None),
-    'gtk': ('http://lazka.github.io/pgi-docs/Gtk-3.0', None),
-    'gdk': ('http://lazka.github.io/pgi-docs/Gdk-3.0', None),
-    'gdkx11': ('http://lazka.github.io/pgi-docs/GdkX11-3.0', None),
+    'gtk': ('https://lazka.github.io/pgi-docs/Gtk-3.0', None),
+    'gdk': ('https://lazka.github.io/pgi-docs/Gdk-3.0', None),
+    'gdkx11': ('https://lazka.github.io/pgi-docs/GdkX11-3.0', None),
+    'glib': ('https://lazka.github.io/pgi-docs/GLib-2.0', None),
     'python': ('https://docs.python.org/3/', None),
-    'wnck': ('http://lazka.github.io/pgi-docs/Wnck-3.0', None),
+    'wnck': ('https://lazka.github.io/pgi-docs/Wnck-3.0', None),
 }

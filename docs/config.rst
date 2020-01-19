@@ -121,12 +121,14 @@ As an example of the correct format, here is the default contents of the
     H = horizontal-maximize
     C = move-to-center
 
+.. _keybinding-syntax:
+
 Keybinding Syntax
 -----------------
 
-Both the ``ModMask`` field and the ``[keys]`` section use GTK+ accelerator
-syntax and you can use modifier keys in both places. (``ModMask`` is prepended
-to each ``[keys]`` value before parsing it.)
+Both the ``ModMask`` field and the ``[keys]`` section use the syntax accepted
+by :func:`Gtk.accelerator_parse` and you can use modifier keys in both places.
+(``ModMask`` is prepended to each ``[keys]`` value before parsing it.)
 
 GTK+ modifier syntax looks like this::
 

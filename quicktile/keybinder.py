@@ -2,7 +2,6 @@
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
-__docformat__ = "restructuredtext en"
 
 import logging
 from functools import reduce  # pylint: disable=redefined-builtin
@@ -17,42 +16,40 @@ from Xlib.error import BadAccess, DisplayConnectionError
 
 from .util import powerset, XInitError
 
-# TODO: Check whether the X11 APIs available through PyGI remove the need for
-# python-xlib. If so, then use that as my avenue for porting to Python 3.x.
+# -- Type-Annotation Imports --
+from typing import (Any, Callable, Dict, Iterable, Iterator, List,
+                    Optional, Sequence, Sized, Tuple, Union)
 
-# Allow MyPy to work without depending on the `typing` package
-# (And silence complaints from only using the imported types in comments)
-MYPY = False
-if MYPY:
-    # pylint: disable=unused-import
-    from typing import (Any, Callable, Dict, Iterable, Iterator, List,  # NOQA
-                        Optional, Sequence, Sized, Tuple)
-
-    from Xlib.error import XError                          # NOQA
-    from Xlib.protocol.event import KeyPress as XKeyPress  # NOQA
-    from .commands import CommandRegistry                  # NOQA
-    from .wm import WindowManager                          # NOQA
-del MYPY
+from Xlib.error import XError
+from Xlib.protocol.event import KeyPress as XKeyPress
+from .commands import CommandRegistry
+from .wm import WindowManager
+# --
 
 
 class KeyBinder(object):
-    """A convenience class for wrapping ``XGrabKey``."""
+    """A convenience class for wrapping `XGrabKey`_.
+
+    :param x_display: An Xlib display handle. If :any:`None`, a new connection
+        will be opened.
+
+    :raises XInitError: Failed to open a new X connection.
+
+    .. _XGrabKey: https://tronche.com/gui/x/xlib/input/XGrabKey.html
+    """
 
     #: Modifiers whose state should not affect whether a binding fires
     #:
-    #: :todo: Figure out how to set the modifier mask in X11 and use
-    #:        ``gtk.accelerator_get_default_mod_mask()`` to feed said code.
+    #: .. todo:: Figure out how to set the modifier mask in X11 and use
+    #:    :func:`Gtk.accelerator_get_default_mod_mask` to feed said code.
     ignored_modifiers = ['Mod2Mask', 'LockMask']
 
-    #: Used to pass state from `cb_xerror`
+    #: Used in concert with :meth:`Xlib.display.Display.sync` to pass state
+    #: from :meth:`cb_xerror` to :meth:`bind` so XGrabKey_ failure can be
+    #: reported.
     keybind_failed = False
 
-    def __init__(self, x_display):  # type: (Optional[Display]) -> None
-        """Connect to X11 and the GLib event loop.
-
-        :param x_display: A ``python-xlib`` display handle.
-        :type x_display: ``Xlib.display.Display``
-        """
+    def __init__(self, x_display: Display=None):
         try:
             self.xdisp = x_display or Display()
         except (UnicodeDecodeError, DisplayConnectionError) as err:
@@ -81,25 +78,22 @@ class KeyBinder(object):
         GLib.io_add_watch(self.xroot.display, GLib.PRIORITY_DEFAULT,
                          GLib.IO_IN, self.cb_xevent)
 
-    def bind(self, accel, callback):  # type: (str, Callable[[], None]) -> bool
+    def bind(self, accel: str, callback: Callable[[], None]) -> bool:
         """Bind a global key combination to a callback.
 
         :param accel: An accelerator as either a string to be parsed by
-            ``gtk.accelerator_parse()`` or a tuple as returned by it.)
+            :func:`Gtk.accelerator_parse` or a tuple as returned by it.)
         :param callback: The function to call when the key is pressed.
 
-        :type accel: ``str`` or ``(int, gtk.gdk.ModifierType)``
-                     or ``(int, int)``
-        :type callback: ``function``
-
         :returns: A boolean indicating whether the provided keybinding was
-            parsed successfully. (But not whether it was registered
-            successfully due to the asynchronous nature of the ``XGrabKey``
-            request.)
-        :rtype: ``bool``
+            parsed successfully and didn't provoke an error from XGrabKey_.
+
+        .. _XGrabKey: https://tronche.com/gui/x/xlib/input/XGrabKey.html
         """
-        keycode, modmask = self.parse_accel(accel)
-        if keycode is None or modmask is None:
+        parsed = self.parse_accel(accel)
+        if parsed:
+            keycode, modmask = parsed
+        else:
             return False
 
         # Ignore modifiers like Mod2 (NumLock) and Lock (CapsLock)
@@ -122,25 +116,41 @@ class KeyBinder(object):
 
         return True
 
-    def cb_xerror(self, err, _):  # type: (XError, Any) -> None
-        """Used to identify when attempts to bind keys fail.
+    def cb_xerror(self, err: XError, request: Any):
+        """Callback used to identify when attempts to bind keys fail.
 
-        :note: If you can make python-xlib's ``CatchError`` actually work or if
-               you can retrieve more information to show, feel free.
+        :param err: The error that was asynchronously returned.
+        :param request: Unused. Just to match the required function signature.
+
+        .. todo:: Make another attempt to get :class:`Xlib.error.CatchError`
+            working or to retrieve more diagnostic information another way.
         """
         if isinstance(err, BadAccess):
             self.keybind_failed = True
         else:
             self.xdisp.display.default_error_handler(err)
 
-    def cb_xevent(self, src, cond, handle=None):  # pylint: disable=W0613
-        # type: (Any, Any, Optional[Display]) -> bool
-        """Callback to dispatch X events to more specific handlers.
+    def cb_xevent(self, src: GLib.IOChannel, cond: GLib.IOCondition,
+            handle: Optional[Display]=None) -> bool:
+        """:func:`GLib.io_add_watch` callback to dispatch X events to more
+        specific handlers.
 
-        :rtype: ``True``
+        :param src: Not used. Just needed to satisfy ``GIOFunc`` signature.
+        :param cond: Not used. Just to needed to satisfy ``GIOFunc`` signature.
+        :param handle: A handle to the Xlib display object with pending events.
+            A cached reference will be used if it is :any:`None`.
+        :rtype: :any:`True`
+        :returns: Always returns :any:`True` to prevent GLib from unsetting
+            the watch.
 
-        :todo: Make sure uncaught exceptions are prevented from making
-            quicktile unresponsive in the general case.
+        .. todo:: Make sure uncaught exceptions in :meth:`cb_xevent` are
+            prevented from making QuickTile unresponsive in the general case.
+        .. todo:: Switch to using :data:`python:typing.Literal` in the return
+            signature once it's no longer necessary to support Python
+            versions prior to 3.8.
+        .. todo:: Move :meth:`cb_xevent` out of keybinder into the core since
+            Xlib is no longer optional and dispatch should be shared with
+            :mod:`quicktile.wm` for responding to panel reservation changes.
         """
         handle = handle or self.xroot.display
 
@@ -152,8 +162,18 @@ class KeyBinder(object):
         # Necessary for proper function
         return True
 
-    def handle_keypress(self, xevent):  # type: (XKeyPress) -> None
-        """Dispatch ``XKeyPress`` events to their callbacks."""
+    def handle_keypress(self, xevent: XKeyPress):
+        """Resolve :class:`Xlib.protocol.event.KeyPress` events to the
+        :class:`quicktile.commands.CommandRegistry` commands associated with
+        them and then call the commands.
+
+
+        .. todo:: Use a proper ``index`` argument for
+            :meth:`Xlib.display.Display.keycode_to_keysym` in
+            :meth:`handle_keypress`'s debug messaging.
+        .. todo:: Only call the code to look up a human-readable name for a
+            key event if the log level is high enough that it won't be wasted.
+        """
         keysig = (xevent.detail, xevent.state)
         if keysig not in self._keys:
             logging.error("Received an event for an unrecognized keybind: "
@@ -161,8 +181,6 @@ class KeyBinder(object):
             return
 
         # Display a meaningful debug message
-        # FIXME: Only call this code if --debug
-        # FIXME: Proper "index" arg for keycode_to_keysym
         ksym = self.xdisp.keycode_to_keysym(keysig[0], 0)
         gmod = Gdk.ModifierType(keysig[1])
         kbstr = Gtk.accelerator_name(ksym, gmod)
@@ -171,20 +189,24 @@ class KeyBinder(object):
         # Call the associated callback
         self._keys[keysig]()
 
-    def parse_accel(self, accel  # type: str
-                    ):  # type: (...) -> Tuple[Optional[int], Optional[int]]
-        """Convert an accelerator string into the form XGrabKey needs."""
+    def parse_accel(self, accel: str) -> Optional[Tuple[int, int]]:
+        """Convert an :ref:`accelerator string <keybinding-syntax>` into the
+        form XGrabKey_ needs.
+
+        :param accel: The accelerator string.
+        :returns: ``(keycode, modifier_mask)`` or :any:`None` on failure.
+        """
 
         keysym, modmask = Gtk.accelerator_parse(accel)
         if not Gtk.accelerator_valid(keysym, modmask):
             logging.error("Invalid keybinding: %s", accel)
-            return None, None
+            return None
 
         if modmask > 2**16 - 1:
             logging.error("Modifier out of range for XGrabKey "
                           "(int(modmask) > 65535). "
                           "Did you use <Super> instead of <Mod4>?")
-            return None, None
+            return None
 
         # Convert to what XGrabKey expects
         keycode = self.xdisp.keysym_to_keycode(keysym)
@@ -194,23 +216,28 @@ class KeyBinder(object):
         return keycode, modmask
 
     @staticmethod
-    def _vary_modmask(modmask, ignored):
-        # type: (int, Sequence[int]) -> Iterator[int]
+    def _vary_modmask(
+            modmask: Union[int, Gdk.ModifierType],
+            ignored: Iterable[Union[int, Gdk.ModifierType]]
+    ) -> Iterator[int]:
         """Generate all possible variations on ``modmask`` that need to be
         taken into consideration if we can't properly ignore the modifiers in
         ``ignored``. (Typically NumLock and CapsLock)
 
-        :param modmask: A bitfield to be combinatorically grown.
-        :param ignored: Modifiers to be combined with ``modmask``.
+        :param modmask: An integer or :any:`Gdk.ModifierType` bitfield to be
+            combinatorically grown.
+        :param ignored: Integer or :any:`Gdk.ModifierType` modifiers to be
+            combined with ``modmask``.
 
-        :type modmask: ``int`` or ``gtk.gdk.ModifierType``
-        :type ignored: ``list(int)``
+        :returns: The :any:`power set <quicktile.util.powerset>` of ``ignored``
+            with ``modmask`` bitwise ORed onto each entry.
 
-        :rtype: generator of ``type(modmask)``
+        .. todo:: Decide whether to make this public when I turn off
+            documenting private members.
         """
 
         for ignored in powerset(ignored):
-            imask = reduce(lambda x, y: x | y, ignored, 0)
+            imask = reduce(lambda x, y: int(x | y), ignored, 0)
             yield modmask | imask
 
 
@@ -219,7 +246,20 @@ def init(modmask,   # type: Optional[str]
          commands,  # type: CommandRegistry
          winman     # type: WindowManager
          ):         # type: (...) -> Optional[KeyBinder]
-    """Initialize the keybinder and bind the requested mappings"""
+    """Initialize the keybinder and bind the requested mappings
+
+    :param modmask: A valid set of modifiers as accepted by
+        :func:`Gtk.accelerator_parse`, ``none``, an empty string, or
+        :any:`None`.
+    :param mappings: A dict mapping :ref:`accelerator strings
+        <keybinding-syntax>` to command names.
+    :param commands: The command registry used to map command names to
+        functions.
+    :param winman: The interface commands should use to take action.
+    :returns: An instance of :class:`KeyBinder` or :any:`None` if ``winman``
+        didn't already have an X connection and attempting to open a new one
+        met with failure.
+    """
     # Allow modmask to be empty for keybinds which don't share a common prefix
     if not modmask or modmask.lower() == 'none':
         modmask = ''
