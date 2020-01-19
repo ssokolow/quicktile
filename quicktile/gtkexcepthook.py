@@ -50,7 +50,6 @@ __authors__ = [
     "Filip Van Daemdonck",
     "Stephan Sokolow"]
 __license__ = "whatever you want"
-__docformat__ = "restructuredtext en"
 
 import enum, inspect, linecache, logging, pydoc, textwrap, tokenize, keyword
 import sys

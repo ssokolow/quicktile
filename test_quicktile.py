@@ -6,7 +6,6 @@ from __future__ import print_function
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
-__docformat__ = "restructuredtext en"
 
 # TODO: I need a functional test to make sure issue #25 doesn't regress
 

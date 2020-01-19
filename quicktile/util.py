@@ -2,7 +2,6 @@
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
-__docformat__ = "restructuredtext en"
 
 import math, sys
 from collections import namedtuple

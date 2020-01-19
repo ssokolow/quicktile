@@ -9,6 +9,5 @@ Keyboard-driven Window Tiling for your existing X11 window manager
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __appname__ = "QuickTile"
 __license__ = "GNU GPL 2.0 or later"
-__docformat__ = "restructuredtext en"
 
 # vim: set sw=4 sts=4 expandtab :
