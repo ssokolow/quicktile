@@ -98,13 +98,17 @@ class WindowManager(object):
 
         self.screen = Wnck.Screen.get(self.gdk_screen.get_number())
 
-        self.usable_region = self._load_desktop_geometry()
+        self.usable_region = UsableRegion()
+        self._load_desktop_geometry()
         # TODO: Hook monitor-added and monitor-removed and regenerate this
         # TODO: Hook changes to strut reservations and regenerate this
 
-    def _load_desktop_geometry(self):
-        # type: () -> UsableRegion
-        """Retrieve and process monitor & panel shapes into ``UsableRegion``"""
+    def _load_desktop_geometry(self, first_run=False) -> UsableRegion:
+        """Retrieve and process monitor & panel shapes from the desktop.
+
+        .. todo:: Investigate going back to calling
+            :meth:`_load_desktop_geometry` before every command.
+        """
         # Gather the screen rectangles
         n_screens = self.x_root.xinerama_get_screen_count().screen_count
         monitors = []
@@ -116,10 +120,15 @@ class WindowManager(object):
         usable_region = UsableRegion()
         usable_region.set_monitors(monitors)
 
+        # Try to fail gracefully if UsableRegion is empty
         if not usable_region:
-            logging.error("WorkArea._load_desktop_geometry received "
-                          "an empty monitor region!")
-            # TODO: What should I do at this point?
+            if self.usable_region:
+                logging.error("WorkArea._load_desktop_geometry received "
+                              "an empty monitor region! Using cached value.")
+                return self.usable_region
+            else:
+                # TODO: Use a more specific exception
+                raise Exception("Could not retrieve desktop geometry")
 
         # Gather all struts
         struts = []
