@@ -1,9 +1,20 @@
 #!/usr/bin/env python3
 """Graphical exception handler for PyGTK applications
 
-| (c) 2003 Gustavo J A M Carneiro gjc at inescporto.pt
-| (c) 2004-2005 Filip Van Raemdonck
-| (c) 2009, 2011, 2017, 2019 Stephan Sokolow
+Usage
+-----
+
+::
+
+    import gtkexcepthook
+    gtkexcepthook.enable(optional_reporting_callback)
+
+Notes
+-----
+
+| ©2003 Gustavo J A M Carneiro gjc at inescporto.pt
+| ©2004-2005 Filip Van Raemdonck
+| ©2009, 2011, 2017, 2019 Stephan Sokolow
 
 ::
 
@@ -12,26 +23,25 @@
     "The license is whatever you want."
 
 Contains changes merged back from `qtexcepthook.py`_, a Qt 5 port of
-gtkexcepthook.py by Stephan Sokolow (c) 2019.
-
-**Instructions**::
-
-    import gtkexcepthook
-    gtkexcepthook.enable()
+:file:`gtkexcepthook.py` by Stephan Sokolow ©2019.
 
 Changes from Van Raemdonck version:
  - Ported to PyGI and GTK 3.x
  - Refactored code for maintainability and added MyPy type annotations
- - Switched from auto-enable to ``gtkexcepthook.enable()`` to silence PyFlakes
+ - Switched from auto-enable to :any:`gtkexcepthook.enable` to silence PyFlakes
    false positives. (Borrowed naming convention from cgitb)
  - Split out traceback import to silence PyFlakes warning.
  - Started to resolve PyLint complaints
 
-:todo: Polish this up to meet my code formatting and clarity standards.
-:todo: Confirm there isn't any other generally-applicable information that
-       could be included in the debugging dump.
+.. todo:: Finish polishing :mod:`quicktile.gtkexcepthook` up to meet my code
+    formatting and clarity standards.
+.. todo:: Confirm there isn't any other generally-applicable information that
+       could be included in the :mod:`quicktile.gtkexcepthook` debugging dump.
 
 .. _qtexcepthook.py: https://gist.github.com/ssokolow/f5219e4c8e4bddbba4d08101969445d1
+
+API Documentation
+-----------------
 """  # NOQA
 
 __author__ = "Gustavo J A M Carneiro; Filip Van Daemdonck; Stephan Sokolow"
@@ -54,12 +64,10 @@ gi.require_version('Gdk', '3.0')
 
 from gi.repository import Gdk, Gtk
 
-MYPY = False
-if MYPY:
-    # pylint: disable=unused-import,wrong-import-order
-    from typing import Any, Callable, Optional, Type  # NOQA
-    from types import TracebackType  # NOQA
-del MYPY
+# -- Type-Annotation Imports --
+from typing import Any, Callable, Dict, Generator, Type, Tuple
+from types import FrameType, TracebackType
+# --
 
 log = logging.getLogger(__name__)
 
@@ -67,7 +75,7 @@ log = logging.getLogger(__name__)
 
 
 class Scope(enum.Enum):
-    """The scope of a variable looked up by ``lookup``"""
+    """The scope of a variable looked up by :any:`lookup`"""
     Builtin = 1
     Global = 2
     Local = 3
@@ -81,11 +89,21 @@ class Scope(enum.Enum):
             return str(self.name)[0].upper()
 
 
-def lookup(name, frame, lcls):
-    # TODO: MyPy type signature
-    """Find the value for a given name in the given frame"""
-    if name in lcls:
-        return Scope.Local, lcls[name]
+def lookup(name: str,
+           frame: FrameType,
+           local_vars: Dict[str, Any]
+           ) -> Tuple[Scope, Any]:
+    """Find the value for a given name in the given frame
+
+    :param name: Name of the variable to look up.
+    :param frame: A frame object originally retrieved via
+        :any:`inspect.getinnerframes`.
+    :param local_vars: A cached locals dict originally retrieved via
+        :any:`inspect.getargvalues`.
+    :returns: A tuple of a :any:`Scope` and the requested value.
+    """
+    if name in local_vars:
+        return Scope.Local, local_vars[name]
     elif name in frame.f_globals:
         return Scope.Global, frame.f_globals[name]
     elif '__builtins__' in frame.f_globals:
@@ -98,9 +116,14 @@ def lookup(name, frame, lcls):
     return Scope.NONE, None
 
 
-def tokenize_frame(frame_rec):
-    # TODO: MyPy type signature
-    """Generator which produces a lexical token stream from a frame record"""
+def tokenize_frame(
+        frame_rec: inspect.FrameInfo
+) -> Generator[tokenize.TokenInfo, None, None]:
+    """Generator which produces a lexical token stream from a frame record
+
+    .. todo: Add MyPy type signature for :func:`tokenize_frame`
+
+    """
     fname, lineno = frame_rec[1:3]
     lineno_mut = [lineno]
 
@@ -117,8 +140,17 @@ def tokenize_frame(frame_rec):
         yield token_tup
 
 
-def gather_vars(frame_rec, local_vars):
-    # TODO: MyPy type signature
+def gather_vars(frame_rec: inspect.FrameInfo,
+                local_vars: Dict[str, Any]) -> Dict[str, Any]:
+    """Extract all the local variables from the given traceback frame using
+    :func:`lookup`.
+
+    :param frame_rec: A frame info object originally retrieved via
+        :any:`inspect.getinnerframes`.
+    :param local_vars: A cached locals dict originally retrieved via
+        :any:`inspect.getargvalues`.
+    :returns: A dict of the local variables.
+    """
     frame = frame_rec[0]
     all_vars, prev, name, scope = {}, None, '', None
     for token_tuple in tokenize_frame(frame_rec):
@@ -155,13 +187,27 @@ def gather_vars(frame_rec, local_vars):
     return all_vars
 
 
-def analyse(exctyp,           # type: Type[BaseException]
-            value,            # type: BaseException
-            tracebk,          # type: TracebackType
-            context_lines=3,  # type: int
-            max_width=80      # type: int
-            ):                # type: (...) -> StringIO
-    """Generate a traceback, including the contents of variables"""
+def analyse(exctyp: Type[BaseException],
+            value: BaseException,
+            tracebk: TracebackType,
+            context_lines: int=3,
+            max_width: int=80
+            ) -> StringIO:
+    """Generate a traceback, including the contents of variables in each
+    stack frame.
+
+    :param exctyp: Used for class name.
+    :param value: Used for exception message.
+    :param tracebk: Used for everything else.
+    :param context_lines: See the ``context`` argument to
+        :any:`inspect.getinnerframes`
+    :param max_width: Width to hard word-wrap to.
+    :returns: The formatted traceback
+
+    .. todo:: Rethink ``max_width`` for :any:`quicktile.gtkexcepthook.analyse`.
+        Both it and no hard-wrapping make readability sub-optimal. I really
+        want some form of indent-aware word-wrapping.
+    """
     trace = StringIO()
     frame_records = inspect.getinnerframes(tracebk, context_lines)
 
@@ -199,17 +245,16 @@ def analyse(exctyp,           # type: Type[BaseException]
 
 
 class ExceptionHandler(object):
-    """GTK-based graphical exception handler"""
+    """GTK-based graphical exception handler
 
-    def __init__(self, reporting_cb=None):
-        # type: (Optional[Callable[[str], None]]) -> None
-        """
-        :param reporting_cb: A callback to be exposed via a 'Report...' button
-        """
+    :param reporting_cb: A callback to be exposed via a :guilabel:`Report...`
+        button which will receive the formatted traceback as a string.
+    """
+
+    def __init__(self, reporting_cb: Callable[[str], None]=None) -> None:
         self.reporting_cb = reporting_cb
 
-    def make_info_dialog(self):
-        # type: () -> Gtk.MessageDialog
+    def make_info_dialog(self) -> Gtk.MessageDialog:
         """Initialize and return the top-level dialog"""
         dialog = Gtk.MessageDialog(transient_for=None, flags=0,
                                    message_type=Gtk.MessageType.WARNING,
@@ -238,7 +283,11 @@ class ExceptionHandler(object):
     @staticmethod
     def make_details_dialog(parent, text):
         # type: (Gtk.MessageDialog, str) -> Gtk.MessageDialog
-        """Initialize and return the details dialog"""
+        """Initialize and return the details dialog
+
+        :param parent: A reference to the dialog from :any:`make_info_dialog`.
+        :param text: The contents of the formatted traceback.
+        """
 
         details = Gtk.Dialog(title=_("Bug Details"), transient_for=parent,
                              modal=True, destroy_with_parent=True)
@@ -265,9 +314,11 @@ class ExceptionHandler(object):
 
         return details
 
-    def __call__(self, exctyp, value, tback):
-        # type: (Type[BaseException], BaseException, Any) -> None
-        """Custom sys.excepthook callback which displays a GTK+ dialog"""
+    def __call__(self,
+            exctyp: Type[BaseException],
+            value: BaseException,
+            tback: TracebackType):
+        """Custom :any:`sys.excepthook` callback which displays a GTK dialog"""
 
         cached_tb = None
         dialog = self.make_info_dialog()
@@ -294,9 +345,15 @@ class ExceptionHandler(object):
         dialog.destroy()
 
 
-def enable(reporting_cb=None):
-    # type: (Optional[Callable[[str], None]]) -> None
-    """Call this to set gtkexcepthook as the default exception handler"""
+def enable(reporting_cb: Callable[[str], None]=None):
+    """Call this to set gtkexcepthook as the default exception handler
+
+    :param reporting_cb: If provided, this callback will be exposed in the
+        dialog as a :guilabel:`Report...` button.
+
+        The function will receive the same formatted traceback visible via
+        the :guilabel:`Details...` button.
+    """
 
     # MyPy disabled pending a release of the fix to #797
     sys.excepthook = ExceptionHandler(reporting_cb)  # type: ignore

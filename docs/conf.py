@@ -125,11 +125,25 @@ always_document_param_types = True
 todo_link_only = True
 
 modindex_common_prefix = ['quicktile.']
+nitpicky = True
+nitpick_ignore = [
+    ('py:class', 'inspect.FrameInfo'),
+    ('py:class', 'tokenize.TokenInfo')
+]
+
+
 # -- Hack to work around sphinx-autodoc-typehints#124 and #38
 import inspect, sphinx_autodoc_typehints
 
+qualname_ignored_prefixes = [
+    'gi.repository.',
+    'gi.overrides.'
+]
 qualname_overrides = {
-    'dbus._dbus.SessionBus': 'dbus.SessionBus',
+    'builtins.frame': ('data', 'types.FrameType'),
+    'builtins.traceback': ('class', 'types.TracebackType'),
+    'dbus._dbus.SessionBus': ('class', 'dbus.SessionBus'),
+    '_io.StringIO': ('class', 'io.StringIO'),
 }
 
 fa_orig = sphinx_autodoc_typehints.format_annotation
@@ -139,11 +153,12 @@ def format_annotation(annotation, *args, **kwargs):
     if inspect.isclass(annotation):
         full_name = '{}.{}'.format(
             annotation.__module__, annotation.__qualname__)
-        if full_name.startswith('gi.repository.'):
-            return ':py:class:`' + full_name[14:] + '`'
+        for prefix in qualname_ignored_prefixes:
+            if full_name.startswith(prefix):
+                return ':py:class:`' + full_name[len(prefix):] + '`'
         override = qualname_overrides.get(full_name)
         if override is not None:
-            return ':py:class:`~{}`'.format(override)
+            return ':py:{}:`~{}`'.format(*override)
     return fa_orig(annotation, *args, **kwargs)
 sphinx_autodoc_typehints.format_annotation = format_annotation
 
