@@ -35,9 +35,11 @@ def check_tolerance(distance, monitor_geom, tolerance=0.1):
         a percentage of the monitor size.
     """
 
-    # Take the euclidean distance of the monitor rectangle and convert
+    # Take the euclidean distance of the monitor's width and height and convert
     # `distance` into a percentage of it, then test against `tolerance`.
-    return float(distance) / math.hypot(*tuple(monitor_geom)[2:4]) < tolerance
+    return (float(distance) /
+           math.hypot(monitor_geom.width, monitor_geom.height)
+            ) < tolerance
 
 
 def closest_geom_match(needle, haystack):
