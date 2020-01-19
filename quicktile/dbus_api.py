@@ -39,10 +39,10 @@ class QuickTile(Object):
         """Execute a QuickTile tiling command
 
         .. todo:: Fix :any:`CommandRegistry.call` so our :any:`bool` return
-            isn't always ``False``.
+            isn't always :any:`False`.
         .. todo:: Expose a proper, introspectable D-Bus API.
         .. todo:: When I'm willing to break the external API, retire the
-            ``doCommand`` name.
+            :meth:`doCommand` name.
         """
         return self.commands.call(command, self.winman)
 

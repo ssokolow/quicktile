@@ -2,7 +2,7 @@
 
 .. todo::
  - Audit all of my TODOs and API docs for accuracy and staleness.
- - Move ``set_client_type`` call to a more appropriate place
+ - Move :func:`Wnck.set_client_type` call to a more appropriate place
    (:mod:`quicktile.wm`?)
  - Complete the automated test suite.
  - Finish refactoring the code to be cleaner and more maintainable.
@@ -133,7 +133,8 @@ class QuickTileApp(object):
         """Initialize keybinding and D-Bus if available, then call
         :func:`Gtk.main`.
 
-        :returns: ``False`` if none of the supported backends were available.
+        :returns: :any:`False` if none of the supported backends
+            were available.
         """
 
         # Attempt to set up the global hotkey support

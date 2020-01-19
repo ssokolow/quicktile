@@ -308,8 +308,8 @@ def cycle_monitors(winman: WindowManager,
 
     :param win: The window to operate on.
     :param step: How many monitors to step forward or backward.
-    :param force_wrap: If ``True``, this will override setting
-        :ref:`MovementsWrap <MovementsWrap>` to ``False``.
+    :param force_wrap: If :any`True`, this will override setting
+        :ref:`MovementsWrap <MovementsWrap>` to :any:`False`.
     """
     old_mon_id, _ = winman.get_monitor(win)
     n_monitors = n_monitors or winman.gdk_screen.get_n_monitors()
@@ -462,8 +462,9 @@ def toggle_state(
         prefixed with ``un``, resolved from ``win``, and called.
     :param check: The method name to be called on ``win`` to check
         whether ``command`` should be prefixed with ``un``.
-    :param takes_bool: If ``True``, pass ``True`` or ``False`` to ``check``
-        rather thank conditionally prefixing it with ``un`` before resolving.
+    :param takes_bool: If :any:`True`, pass :any:`True` or :any:`False` to
+        ``check`` rather thank conditionally prefixing it with ``un``
+        before resolving.
 
     .. todo:: When I'm willing to break the external API (command names),
         rename ``vertical-maximize`` and ``horizontal-maximize`` to
