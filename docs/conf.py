@@ -124,6 +124,28 @@ always_document_param_types = True
 # calculated against the *output* of automodule directives.
 todo_link_only = True
 
+# -- Hack to work around sphinx-autodoc-typehints#124 and #38
+import inspect, sphinx_autodoc_typehints
+
+qualname_overrides = {
+    'dbus._dbus.SessionBus': 'dbus.SessionBus',
+}
+
+fa_orig = sphinx_autodoc_typehints.format_annotation
+
+
+def format_annotation(annotation, *args, **kwargs):
+    if inspect.isclass(annotation):
+        full_name = '{}.{}'.format(
+            annotation.__module__, annotation.__qualname__)
+        if full_name.startswith('gi.repository.'):
+            return ':py:class:`' + full_name[14:] + '`'
+        override = qualname_overrides.get(full_name)
+        if override is not None:
+            return ':py:class:`~{}`'.format(override)
+    return fa_orig(annotation, *args, **kwargs)
+sphinx_autodoc_typehints.format_annotation = format_annotation
+
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -314,6 +336,7 @@ texinfo_documents = [
 
 intersphinx_mapping = {
     'cairo': ('https://pycairo.readthedocs.io/en/latest/', None),
+    'dbus': ('https://dbus.freedesktop.org/doc/dbus-python/', None),
     'gtk': ('http://lazka.github.io/pgi-docs/Gtk-3.0', None),
     'gdk': ('http://lazka.github.io/pgi-docs/Gdk-3.0', None),
     'gdkx11': ('http://lazka.github.io/pgi-docs/GdkX11-3.0', None),

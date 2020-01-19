@@ -11,26 +11,24 @@ from dbus import SessionBus
 from dbus.exceptions import DBusException
 from dbus.mainloop.glib import DBusGMainLoop
 
-# Allow MyPy to work without depending on the `typing` package
-# (And silence complaints from only using the imported types in comments)
-MYPY = False
-if MYPY:
-    # pylint: disable=unused-import
-    from typing import Optional, Tuple  # NOQA
-
-    from .commands import CommandRegistry  # NOQA
-    from .wm import WindowManager  # NOQA
-del MYPY
+# -- Type-Annotation Imports --
+from typing import Optional, Tuple
+from .commands import CommandRegistry
+from .wm import WindowManager
+# --
 
 
 class QuickTile(Object):
-    """D-Bus endpoint definition"""
-    def __init__(self, bus, commands, winman):
-        # type: (SessionBus, CommandRegistry, WindowManager) -> None
-        """
-        :param bus: The connection on which to export this object.
-            See the ``dbus.service.Object`` documentation for details.
-        """
+    """D-Bus endpoint definition
+
+    :param bus: The connection on which to export this object.
+        See the :class:`dbus.service.Object` documentation for details.
+    """
+    def __init__(self,
+            bus: SessionBus,
+            commands: CommandRegistry,
+            winman: WindowManager) -> None:
+        """"""  # Silence dbus.service.Object docstring
         Object.__init__(self, bus, '/com/ssokolow/QuickTile')
         self.commands = commands
         self.winman = winman
@@ -40,15 +38,22 @@ class QuickTile(Object):
     def doCommand(self, command):  # type: (str) -> bool
         """Execute a QuickTile tiling command
 
-        :todo 1.0.0: Expose a proper, introspectable D-Bus API"""
+        .. todo:: Fix :any:`CommandRegistry.call` so our :any:`bool` return
+            isn't always ``False``.
+        .. todo:: Expose a proper, introspectable D-Bus API.
+        .. todo:: When I'm willing to break the external API, retire the
+            ``doCommand`` name.
+        """
         return self.commands.call(command, self.winman)
-        # FIXME: self.commands.call always returns None
 
 
-def init(commands,  # type: CommandRegistry
-         winman     # type: WindowManager
+def init(commands: CommandRegistry,
+         winman: WindowManager,
          ):  # type: (...) -> Tuple[Optional[BusName], Optional[QuickTile]]
-    """Initialize the DBus backend"""
+    """Initialize the DBus backend
+
+    This handles hooking D-Bus into the Glib main loop, connecting to the
+    session bus, and creating a :class:`QuickTile` instance."""
     try:
         DBusGMainLoop(set_as_default=True)
         sess_bus = SessionBus()
