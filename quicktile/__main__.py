@@ -140,6 +140,7 @@ class QuickTileApp(object):
         try:
             from . import keybinder
         except ImportError:
+            self.keybinder = None
             logging.error("Could not find python-xlib. Cannot bind keys.")
         else:
             self.keybinder = keybinder.init(
@@ -149,14 +150,14 @@ class QuickTileApp(object):
         try:
             from . import dbus_api
         except ImportError:
+            self.dbus_result = None
             logging.warn("Could not load DBus backend. "
                          "Is python-dbus installed?")
         else:
-            self.dbus_name, self.dbus_obj = dbus_api.init(
-                self.commands, self.winman)
+            self.dbus_result = dbus_api.init(self.commands, self.winman)
 
         # If either persistent backend loaded, start the GTK main loop.
-        if self.keybinder or self.dbus_obj:
+        if self.keybinder or self.dbus_result:
             try:
                 Gtk.main()
             except KeyboardInterrupt:

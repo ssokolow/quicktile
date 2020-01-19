@@ -49,7 +49,7 @@ class QuickTile(Object):
 
 def init(commands: CommandRegistry,
          winman: WindowManager,
-         ):  # type: (...) -> Tuple[Optional[BusName], Optional[QuickTile]]
+         ) -> Optional[Tuple[BusName, QuickTile]]:
     """Initialize the DBus backend
 
     This handles hooking D-Bus into the Glib main loop, connecting to the
@@ -59,7 +59,7 @@ def init(commands: CommandRegistry,
         sess_bus = SessionBus()
     except DBusException:
         logging.warn("Could not connect to the D-Bus Session Bus.")
-        return None, None
+        return None
 
     dbus_name = BusName("com.ssokolow.QuickTile", sess_bus)
     dbus_obj = QuickTile(sess_bus, commands, winman)
