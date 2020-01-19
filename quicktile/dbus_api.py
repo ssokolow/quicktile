@@ -3,6 +3,9 @@
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
+# Silence PyLint about my grouped imports
+# pylint: disable=wrong-import-order
+
 import logging
 
 from dbus.service import BusName, Object, method
@@ -57,7 +60,7 @@ def init(commands: CommandRegistry,
         DBusGMainLoop(set_as_default=True)
         sess_bus = SessionBus()
     except DBusException:
-        logging.warn("Could not connect to the D-Bus Session Bus.")
+        logging.warning("Could not connect to the D-Bus Session Bus.")
         return None
 
     dbus_name = BusName("com.ssokolow.QuickTile", sess_bus)

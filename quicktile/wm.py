@@ -3,6 +3,11 @@
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
+# Silence PyLint being flat-out wrong about MyPy type annotations and
+# complaining about my grouped imports
+# pylint: disable=unsubscriptable-object
+# pylint: disable=wrong-import-order
+
 import logging
 from contextlib import contextmanager
 
@@ -21,7 +26,7 @@ from .util import (clamp_idx, Gravity, Rectangle, UsableRegion,
                    StrutPartial, XInitError)
 
 # -- Type-Annotation Imports --
-from typing import (Any, Iterable, List, Optional, Sequence, Tuple, Union)
+from typing import Any, Iterable, Optional, Tuple, Union
 # ---
 
 
@@ -94,7 +99,7 @@ class WindowManager(object):
         # TODO: Hook monitor-added and monitor-removed and regenerate this
         # TODO: Hook changes to strut reservations and regenerate this
 
-    def _load_desktop_geometry(self, first_run=False) -> UsableRegion:
+    def _load_desktop_geometry(self) -> UsableRegion:
         """Retrieve monitor & panel shapes from the desktop and process them
         into a :class:`quicktile.util.UsableRegion` for easy querying.
 
@@ -239,7 +244,7 @@ class WindowManager(object):
             nxt = cur
         else:
             nxt = None
-            logging.warn("Unrecognized direction: %r", direction)
+            logging.warning("Unrecognized direction: %r", direction)
 
         return nxt
 
@@ -263,6 +268,7 @@ class WindowManager(object):
             name = self.x_display.get_atom(name)
         return win, name
 
+    # pylint: disable=line-too-long
     def get_property(self,
             win: Union[Gdk.Window, Wnck.Window, int],
             name: Union[str, int],
@@ -292,20 +298,19 @@ class WindowManager(object):
             obviates the need to specify anything other than
             ``AnyPropertyType`` for ``prop_type`` and, if so, factor it out.
 
-        """
+        """  # NOQA
         win, name = self._property_prep(win, name)
 
         result = win.get_full_property(name, prop_type)
         return result.value if result else empty
         # TODO: Verify that python-xlib will call XFree for us when appropriate
 
-    def set_property(self,
+    def set_property(self,  # pylint: disable=too-many-arguments
             win: Union[Gdk.Window, Wnck.Window, int],
             name: Union[str, int],
             value,
             prop_type: int=Xatom.STRING,
             format_size: int=8):
-        # TODO: MyPy type annotations
         """Set the value of X11 property ``name`` on window ``win`` to the
         contents of ``value``.
 
@@ -338,7 +343,7 @@ class WindowManager(object):
         think that ``prop_type`` would be enough to describe the data type.
 
         .. _XChangeProperty: https://tronche.com/gui/x/xlib/window-information/XChangeProperty.html
-        """
+        """  # NOQA pylint: disable=line-too-long
         win, name = self._property_prep(win, name)
         win.change_property(name, prop_type, format_size, value)
         self.x_display.flush()
@@ -366,7 +371,7 @@ class WindowManager(object):
 
         return True
 
-    def reposition(self,
+    def reposition(self,  # pylint: disable=too-many-arguments
             win: Wnck.Window,
             geom: Optional[Rectangle]=None,
             monitor: Rectangle=Rectangle(0, 0, 0, 0),
@@ -377,7 +382,7 @@ class WindowManager(object):
                 Wnck.WindowMoveResizeMask.Y |
                 Wnck.WindowMoveResizeMask.WIDTH |
                 Wnck.WindowMoveResizeMask.HEIGHT)
-                   ) -> None:  # pylint: disable=too-many-arguments
+                   ) -> None:
         """
         Move and resize a window, decorations inclusive, according to the
         provided target window and monitor geometry rectangles.

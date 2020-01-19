@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pylint: disable=line-too-long
 """Graphical exception handler for PyGTK applications
 
 Usage
@@ -50,6 +51,11 @@ __authors__ = [
     "Filip Van Daemdonck",
     "Stephan Sokolow"]
 __license__ = "whatever you want"
+
+# Silence PyLint being flat-out wrong about MyPy type annotations and
+# complaining about my grouped imports
+# pylint: disable=unsubscriptable-object
+# pylint: disable=wrong-import-order
 
 import enum, inspect, linecache, logging, pydoc, textwrap, tokenize, keyword
 import sys
@@ -157,7 +163,7 @@ def gather_vars(frame_rec: inspect.FrameInfo,
         if (t_type == tokenize.NAME and  # pylint: disable=no-member
                 t_str not in keyword.kwlist):
             if not name:
-                assert not name and not scope
+                assert not name and not scope  # nosec
                 scope, val = lookup(t_str, frame, local_vars)
                 name = t_str
             elif name[-1] == '.':
@@ -171,7 +177,7 @@ def gather_vars(frame_rec: inspect.FrameInfo,
             try:
                 if val:
                     prev = val
-            except:
+            except:  # pylint: disable=bare-except
                 log.debug('  found %s name %s val %s in %s for token %s',
                           scope, name, val, prev, t_str)
         elif t_str == '.':
@@ -181,7 +187,7 @@ def gather_vars(frame_rec: inspect.FrameInfo,
             if name:
                 all_vars[name] = (scope, prev)
             prev, name, scope = None, '', None
-            if t_type == tokenize.NEWLINE:
+            if t_type == tokenize.NEWLINE:  # pylint: disable=no-member
                 break
     return all_vars
 
@@ -226,7 +232,7 @@ def analyse(exctyp: Type[BaseException],
 
         trace.write(frame_wrapper.fill(trace_frame) + '\n')
         trace.write(''.join(['    ' + x.replace('\t', '  ')
-            for x in filter(lambda a: a.strip(), context or [])]))
+            for x in context or [] if x.strip()]))
 
         if all_vars:
             trace.write('    Variables (B=Builtin, G=Global, L=Local):\n')
@@ -300,7 +306,7 @@ class ExceptionHandler(object):
         swin = Gtk.ScrolledWindow.new()
         swin.show()
         swin.add(textview)
-        details.vbox.pack_start(swin, True, True, 2)
+        details.vbox.pack_start(swin, True, True, 2)  # pylint: disable=E1101
         textbuffer = textview.get_buffer()
         textbuffer.set_text(text)
 

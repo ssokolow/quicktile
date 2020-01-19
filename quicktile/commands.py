@@ -6,6 +6,11 @@
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
+# Silence PyLint being flat-out wrong about MyPy type annotations and
+# complaining about my grouped imports
+# pylint: disable=unsubscriptable-object,invalid-sequence-index
+# pylint: disable=wrong-import-order
+
 import logging, time
 from functools import wraps
 
@@ -278,7 +283,7 @@ def cycle_dimensions(winman: WindowManager,
     # analogue to _NET_WORKAREA to prevent overlapping any panels and
     # risking the WM potentially meddling with the result of resposition()
     test_result = result.intersect(clip_box)
-    if not test_result == result:
+    if test_result != result:
         result = test_result
         logging.debug("Result exceeds usable (non-rectangular) region of "
                       "desktop. (overlapped a non-fullwidth panel?) Reducing "
@@ -293,7 +298,7 @@ def cycle_dimensions(winman: WindowManager,
 @commands.add('monitor-switch', force_wrap=True)
 @commands.add('monitor-next', 1)
 @commands.add('monitor-prev', -1)
-def cycle_monitors(winman: WindowManager,
+def cycle_monitors(winman: WindowManager,  # pylint: disable=too-many-arguments
                    win: Wnck.Window,
                    state: Dict[str, Any],
                    step: int=1,

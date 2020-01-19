@@ -3,6 +3,10 @@
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
+# Silence PyLint being flat-out wrong about MyPy type annotations and
+# complaining about my grouped imports
+# pylint: disable=unsubscriptable-object,wrong-import-order
+
 import logging
 from functools import reduce  # pylint: disable=redefined-builtin
 
@@ -17,8 +21,11 @@ from Xlib.error import BadAccess, DisplayConnectionError
 from .util import powerset, XInitError
 
 # -- Type-Annotation Imports --
-from typing import (Any, Callable, Dict, Iterable, Iterator, List,
-                    Optional, Sequence, Sized, Tuple, Union)
+from typing import (Any, Callable, Dict, Iterable, Iterator, Optional, Tuple,
+                    Union)
+
+# Used only in type comments
+from typing import List  # NOQA pylint: disable=unused-import
 
 from Xlib.error import XError
 from Xlib.protocol.event import KeyPress as XKeyPress
@@ -241,11 +248,11 @@ class KeyBinder(object):
             yield modmask | imask
 
 
-def init(modmask,   # type: Optional[str]
-         mappings,  # type: Dict[str, str]
-         commands,  # type: CommandRegistry
-         winman     # type: WindowManager
-         ):         # type: (...) -> Optional[KeyBinder]
+def init(modmask: Optional[str],
+         mappings: Dict[str, str],
+         commands: CommandRegistry,
+         winman: WindowManager,
+         ) -> Optional[KeyBinder]:
     """Initialize the keybinder and bind the requested mappings
 
     :param modmask: A valid set of modifiers as accepted by

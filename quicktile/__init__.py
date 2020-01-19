@@ -4,7 +4,7 @@
 Keyboard-driven Window Tiling for your existing X11 window manager
 
 :newfield appname: Application Name
-"""  # NOQA
+"""
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __appname__ = "QuickTile"
