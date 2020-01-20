@@ -90,14 +90,21 @@ def fmt_table(rows,          # type: Any
 
     :param headers: Header labels for the columns
     :param group_by: Index of the column to group results by.
-    :type rows: ``dict`` or iterable of iterables
-    :type headers: ``list(str)``
-    :type group_by: ``int``
 
-    :attention: This uses ``zip()`` to combine things. The number of columns
+    .. doctest::
+
+        >>> print(fmt_table([("Foo", "Wun"), ("Bar", "Too")],
+        ...                 ("Things", "Numbers")))
+        Things Numbers
+        ------ -------
+         Foo     Wun
+         Bar     Too
+
+    .. warning:: This uses :func:`zip` to combine things. The number of columns
         displayed will be defined by the narrowest of all rows.
 
-    :rtype: ``str``
+    .. todo:: Refactor :func:`fmt_table`. Even I don't fully understand what
+        my past self wrote by now.
     """
     output = []  # type: List[str]
 
@@ -132,6 +139,7 @@ def fmt_table(rows,          # type: Any
             result[-1] = result[-1][:-1]
             result.append(pad * (min_width - _width + 1))
 
+        result[-1] = result[-1].rstrip()
         result.append('\n')
         return result
 
@@ -146,7 +154,7 @@ def fmt_table(rows,          # type: Any
         for row in groups[group]:
             output.extend(fmt_row(row, indent=1))
 
-    return ''.join(output)
+    return ''.join(output).rstrip('\n')
 
 # Internal StrutPartial parent. Exposed so ePyDoc doesn't complain
 _StrutPartial = namedtuple('_StrutPartial', 'left right top bottom '
