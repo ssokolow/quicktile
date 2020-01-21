@@ -371,5 +371,6 @@ intersphinx_mapping = {
     'gdkx11': ('https://lazka.github.io/pgi-docs/GdkX11-3.0', None),
     'glib': ('https://lazka.github.io/pgi-docs/GLib-2.0', None),
     'python': ('https://docs.python.org/3/', None),
+    'sphinx': ('https://www.sphinx-doc.org/en/master/', None),
     'wnck': ('https://lazka.github.io/pgi-docs/Wnck-3.0', None),
 }
