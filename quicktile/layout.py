@@ -118,7 +118,7 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
     #: as a mapping from formerly manually specified command names to values
     #: the :any:`quicktile.util.Gravity` enum can take on.
     #:
-    #: .. todo:: Look into whether I can refactor this away entirely.
+    #: .. todo:: Look into whether I can :any:`GRAVITIES` away entirely.
     GRAVITIES = dict((x.lower().replace('_', '-'), getattr(Gravity, x)) for
         x in Gravity.__members__)  # type: Dict[str, Gravity]
 

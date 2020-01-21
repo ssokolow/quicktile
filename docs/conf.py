@@ -54,6 +54,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'QuickTile'
+author = u'Stephan Sokolow'
 copyright = u'2009-2020, Stephan Sokolow'
 
 # The version info for the project you're documenting, acts as replacement for
