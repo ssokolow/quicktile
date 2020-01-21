@@ -405,6 +405,10 @@ class TestRectangle(unittest.TestCase):
         self.assertEqual(Rectangle(1, -1000, 100, 2000).moved_into(display,
                          False), Rectangle(1, 0, 100, 2000))
 
+        # Wrong Type
+        with self.assertRaises(TypeError):
+            Rectangle(0, 0, 0, 0).moved_into("hello")
+
     def test_subtract(self):
         """Rectangle: subtract"""
         # Subtracting a non-intersecting rectangle returns self
