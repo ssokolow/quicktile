@@ -106,7 +106,6 @@ pygments_style = 'sphinx'
 
 manpages_url = 'https://manpages.debian.org/{path}'
 
-autoclass_content = 'both'
 autodoc_default_options = {
 
     'private-members':

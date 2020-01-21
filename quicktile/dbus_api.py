@@ -30,7 +30,6 @@ class QuickTile(Object):
             bus: SessionBus,
             commands: CommandRegistry,
             winman: WindowManager) -> None:
-        """"""  # Silence dbus.service.Object docstring
         Object.__init__(self, bus, '/com/ssokolow/QuickTile')
         self.commands = commands
         self.winman = winman
