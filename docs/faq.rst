@@ -99,6 +99,40 @@ Make sure you've disabled the Grid plugin in
 :abbr:`CCSM (CompizConfig Settings Manager)`. If the problem persists, log out
 and back in to ensure that the changes have taken effect.
 
+Tiled windows have huge margins on Elementary OS
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This happens because, from QuickTile's perspective, the pretty shadows are
+part of the window decorations.
+
+I don't know of a proper fix, but you can work around this by removing them. To
+do so, open :file:`/usr/share/themes/elementary/gtk-3.0/gtk-widgets.css` and
+make the following change:
+
+.. code-block:: css
+   :caption: Before
+   :lineno-start: 4033
+
+   decoration {
+       border-radius: 4px 4px 0 0;
+       box-shadow:
+           0 0 0 1px @decoration_border_color,
+           0 14px 28px rgba(0, 0, 0, 0.35),
+           0 10px 10px rgba(0, 0, 0, 0.22);
+       margin: 12px;
+   }
+
+.. code-block:: css
+   :caption: After
+   :lineno-start: 4033
+
+   decoration {
+           box-shadow: none;
+           border: none;
+           padding: 0;
+           margin: 1;
+   }
+
 Other Questions
 ---------------
 

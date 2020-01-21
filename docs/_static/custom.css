@@ -53,4 +53,8 @@ div.body blockquote {
   hyphens: manual;
 }
 
+/* Make code with line numbers consistent width */
+table.highlighttable { width: 100%; }
+table.highlighttable td.linenos { width: 2em; }
+
 /* csslint ignore:end */
