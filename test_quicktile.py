@@ -9,33 +9,16 @@ __license__ = "GNU GPL 2.0 or later"
 
 # TODO: I need a functional test to make sure issue #25 doesn't regress
 
-import logging, sys
+import logging, unittest
 
 # from quicktile import commands
 from quicktile.util import (clamp_idx, euclidean_dist, powerset, Gravity,
                             Rectangle, StrutPartial, UsableRegion, XInitError)
 
-# Ensure code coverage is accurate
-from quicktile import __main__  # pylint: disable=unused-import
-
-# Silence flake8 since PyLint already took the line comment spot
-__main__  # pylint: disable=pointless-statement
+# Ensure code coverage counts modules not yet imported by tests.
+from quicktile import __main__  # NOQA pylint: disable=unused-import
 
 log = logging.getLogger(__name__)
-
-if sys.version_info[0] == 2 and sys.version_info[1] < 7:  # pragma: no cover
-    import unittest2 as unittest
-else:                                                     # pragma: no cover
-    import unittest
-
-MYPY = False
-if MYPY:  # pragma: nocover
-    # pylint: disable=unused-import
-    from typing import Tuple  # NOQA
-del MYPY
-
-# pylint: disable=too-few-public-methods
-
 
 # class TestCommandRegistry(unittest.TestCase):
 #     """Tests for the `CommandRegistry` class"""
@@ -66,7 +49,7 @@ del MYPY
 class TestHelpers(unittest.TestCase):
     """Tests for loose functions
 
-    :todo: Switch to pytest to get the assertEqual readout from assert in
+    .. todo:: Switch to pytest to get the assertEqual readout from assert in
            bare functions.
     """
 
@@ -134,7 +117,6 @@ class TestHelpers(unittest.TestCase):
                     self.assertIn(item, test_set)
 
             # Check that ALL subsets are returned
-            # FIXME: This shouldn't enforce an ordering constraint.
             self.assertEqual(list(powerset([1, 2, 3])), expected)
 
     # TODO: Test fmt_table
@@ -219,7 +201,7 @@ class TestStrutPartial(unittest.TestCase):
             [Rectangle(x=1, y=dtop_rect.y2 - 8, width=30, height=8)])
 
 
-class TestRectangle(unittest.TestCase):
+class TestRectangle(unittest.TestCase):  # pylint: disable=R0904
     """Tests for my custom `Rectangle` class"""
 
     def setUp(self):
