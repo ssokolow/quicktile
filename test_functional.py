@@ -140,6 +140,12 @@ def main():
     logging.basicConfig(level=log_levels[args.verbose],
                         format='%(levelname)s: %(message)s')
 
+    log.warning("This does not currently check the results of the tiling "
+        "operations it requests. As such, it serves only as a way to check "
+        "for uncaught exceptions being raised in code that isn't yet "
+        "unit tested.")
+    log.warning("TODO: Inject a test window into the nested X session so "
+        "non-windowless commands don't bail out in the common code.")
     with x_server(shlex.split(args.x_server), {0: '1024x768x24'}):
         run_tests()
 
