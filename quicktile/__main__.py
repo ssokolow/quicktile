@@ -25,6 +25,11 @@ from __future__ import print_function
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
+# Silence PyLint being flat-out wrong about MyPy type annotations and
+# complaining about my grouped imports
+# pylint: disable=unsubscriptable-object
+# pylint: disable=wrong-import-order
+
 import errno, logging, os, signal, sys
 from argparse import ArgumentParser
 from configparser import ConfigParser
@@ -48,9 +53,10 @@ from .wm import WindowManager
 
 # -- Type-Annotation Imports --
 from typing import Dict, Union
+from typing import Optional  # NOQA pylint: disable=unused-import
 
 #: MyPy type alias for fields loaded from config files
-CfgDict = Dict[str, Union[str, int, float, bool, None]]
+CfgDict = Dict[str, Union[str, int, float, bool, None]]  # pylint:disable=C0103
 # --
 
 #: Location for config files (determined at runtime).
@@ -142,24 +148,24 @@ class QuickTileApp(object):
         try:
             from . import keybinder
         except ImportError:
-            self.keybinder = None
+            o_keybinder = None  # type: Optional[keybinder.KeyBinder]
             logging.error("Could not find python-xlib. Cannot bind keys.")
         else:
-            self.keybinder = keybinder.init(
+            o_keybinder = keybinder.init(
                 self._modmask, self._keys, self.commands, self.winman)
 
         # Attempt to set up the D-Bus API
         try:
             from . import dbus_api
         except ImportError:
-            self.dbus_result = None
-            logging.warn("Could not load DBus backend. "
-                         "Is python-dbus installed?")
+            dbus_result = None
+            logging.warning("Could not load DBus backend. "
+                            "Is python-dbus installed?")
         else:
-            self.dbus_result = dbus_api.init(self.commands, self.winman)
+            dbus_result = dbus_api.init(self.commands, self.winman)
 
         # If either persistent backend loaded, start the GTK main loop.
-        if self.keybinder or self.dbus_result:
+        if o_keybinder or dbus_result:
             try:
                 Gtk.main()
             except KeyboardInterrupt:
@@ -218,9 +224,10 @@ def load_config(path) -> ConfigParser:
             config.set('general', key, str(val))
             dirty = True
 
-    mk_raw = modkeys = config.get('general', 'ModMask')
-    if ' ' in modkeys.strip() and '<' not in modkeys:
-        modkeys = '<%s>' % '><'.join(modkeys.strip().split())
+    mk_raw = config.get('general', 'ModMask')
+    modkeys = mk_raw.strip()  # pylint: disable=E1101
+    if ' ' in modkeys and '<' not in modkeys:
+        modkeys = '<%s>' % '><'.join(modkeys.split())
         logging.info("Updating modkeys format:\n %r --> %r", mk_raw, modkeys)
         config.set('general', 'ModMask', modkeys)
         dirty = True
@@ -248,8 +255,8 @@ def load_config(path) -> ConfigParser:
             if not isinstance(cmd, str):
                 raise TypeError("Command name must be a str: {!r}".format(cmd))
 
-            logging.warn("Updating config file from deprecated keybind syntax:"
-                    "\n\t%r --> %r", key, KEYLOOKUP[key])
+            logging.warning("Updating config file from deprecated keybind "
+                "syntax:\n\t%r --> %r", key, KEYLOOKUP[key])
             config.remove_option('keys', key)
             config.set('keys', KEYLOOKUP[key], cmd)
             dirty = True
@@ -258,7 +265,7 @@ def load_config(path) -> ConfigParser:
     for key in keymap:
         if keymap[key] == 'middle':
             keymap[key] = cmd = 'center'
-            logging.warn("Updating old command in config file:"
+            logging.warning("Updating old command in config file:"
                     "\n\tmiddle --> center")
             config.set('keys', key, cmd)
             dirty = True

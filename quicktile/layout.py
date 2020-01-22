@@ -3,6 +3,11 @@
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
+# Silence PyLint being flat-out wrong about MyPy type annotations and
+# complaining about my grouped imports
+# pylint: disable=unsubscriptable-object
+# pylint: disable=wrong-import-order
+
 import math
 from heapq import heappop, heappush
 
@@ -13,7 +18,7 @@ from typing import Dict, List, Sequence, Tuple, Union
 from .util import GeomTuple, PercentRectTuple
 
 #: MyPy type alias for either `Rectangle` or `GeomTuple`
-Geom = Union[Rectangle, GeomTuple]
+Geom = Union[Rectangle, GeomTuple]  # pylint: disable=invalid-name
 # --
 
 
