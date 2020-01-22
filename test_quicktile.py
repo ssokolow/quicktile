@@ -540,6 +540,12 @@ class TestUsableRegion(unittest.TestCase):
         """UsableRegion: find_usable_rect"""
         test_region = UsableRegion()
 
+        # No monitors set
+        self.assertIsNone(test_region.find_usable_rect(Rectangle(0, 0, 1, 1),
+            fallback=False))
+        self.assertIsNone(test_region.find_usable_rect(Rectangle(0, 0, 1, 1),
+            fallback=True))
+
         # Actual rectangles of my monitors
         # TODO: Double-check that this matches the real-world API outputs
         #       (eg. make sure there are no lurking off-by-one errors)

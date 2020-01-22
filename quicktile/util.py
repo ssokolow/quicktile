@@ -750,7 +750,7 @@ class UsableRegion(object):
             if window_center in monitor:
                 return self._usable[monitor]  # type: ignore
 
-        if fallback:
+        if fallback and self._usable:
             distances = []
             for monitor in self._usable:
                 mon_center = monitor.to_gravity(Gravity.CENTER).to_point()
