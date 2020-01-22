@@ -26,6 +26,7 @@ __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
 
 import errno, logging, os, signal, sys
+from argparse import ArgumentParser
 from configparser import ConfigParser
 
 from Xlib.display import Display as XDisplay
@@ -271,19 +272,12 @@ def load_config(path) -> ConfigParser:
     return config
 
 
-def main() -> None:
-    """setuptools-compatible entry point
-
-    :raises XInitError: Failed to connect to the X server.
-
-    .. todo:: :func:`quicktile.__main__.main` is an overly complex blob and
-        needs to be refactored.
-    .. todo:: Rearchitect so the hack with registering
-        :func:`quicktile.commands.cycle_dimensions` inside
-        :func:`quicktile.__main__.main` isn't necessary.
-    """
-    from argparse import ArgumentParser
-    parser = ArgumentParser()
+def argparser() -> ArgumentParser:
+    """:class:`argparse.ArgumentParser` definition that is compatible with
+        `sphinxcontrib.autoprogram
+        <https://sphinxcontrib-autoprogram.readthedocs.io/en/stable/>`_"""
+    parser = ArgumentParser(description='Window Tiling addon for X11-based '
+        'desktops')
     parser.add_argument('-V', '--version', action='version',
             version="%%(prog)s v%s" % __version__)
     parser.add_argument('-d', '--daemonize', action="store_true",
@@ -305,6 +299,23 @@ def main() -> None:
     help_group.add_argument('--show-actions', action="store_true",
         default=False, help="List valid arguments for use without --daemonize")
 
+    return parser
+
+
+def main() -> None:
+    """setuptools-compatible entry point
+
+    :raises XInitError: Failed to connect to the X server.
+
+    .. todo:: :func:`quicktile.__main__.main` is an overly complex blob and
+        needs to be refactored.
+    .. todo:: Rearchitect so the hack with registering
+        :func:`quicktile.commands.cycle_dimensions` inside
+        :func:`quicktile.__main__.main` isn't necessary.
+    .. todo:: Rework python-xlib failure model so QuickTile will know to exit
+        if all keybinding attempts failed and D-Bus also couldn't be bound.
+    """
+    parser = argparser()
     args = parser.parse_args()
 
     # Set up the output verbosity

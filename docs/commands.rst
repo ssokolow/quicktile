@@ -2,8 +2,9 @@ Command Reference
 =================
 
 .. note:: All keybindings are customizable. This list shows their defaults.
-          You can use :command:`quicktile --show-bindings` to view your current
-          keybindings.
+          You can use the
+          `-\\-show-bindings <cli.html#cmdoption-quicktile-show-bindings>`_
+          option to view your current keybindings.
 
 .. contents::
    :local:

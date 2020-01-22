@@ -14,6 +14,7 @@ Contents:
 .. toctree::
    :maxdepth: 1
 
+   cli
    commands
    config
    faq

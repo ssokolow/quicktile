@@ -95,7 +95,9 @@ This section has no specific field names but, rather, allows you to map hotkey
 sequences in to QuickTile commands.
 
 A list of valid commands is available either in the :doc:`commands` section
-or by running QuickTile with the :option:`--show-actions` option in a terminal.
+or by running QuickTile with the
+`-\\-show-actions <cli.html#cmdoption-quicktile-show-actions>`_ option in a
+terminal.
 
 Both the keys and values must parse as :any:`str`.
 
