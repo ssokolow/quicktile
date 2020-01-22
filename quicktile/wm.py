@@ -99,7 +99,7 @@ class WindowManager(object):
         # TODO: Hook monitor-added and monitor-removed and regenerate this
         # TODO: Hook changes to strut reservations and regenerate this
 
-    def _load_desktop_geometry(self) -> UsableRegion:
+    def _load_desktop_geometry(self):
         """Retrieve monitor & panel shapes from the desktop and process them
         into a :class:`quicktile.util.UsableRegion` for easy querying.
 
@@ -121,15 +121,16 @@ class WindowManager(object):
                 self.gdk_screen.get_monitor_geometry(idx)))
             # TODO: Look into using python-xlib to match x_root use
 
-        usable_region = UsableRegion()
-        usable_region.set_monitors(monitors)
+        logging.debug("Loaded monitor geometry: %r", monitors)
 
-        # Try to fail gracefully if UsableRegion is empty
-        if not usable_region:
+        # Try to fail gracefully if monitors weren't found
+        if monitors:
+            self.usable_region.set_monitors(monitors)
+        else:
             if self.usable_region:
                 logging.error("WorkArea._load_desktop_geometry received "
                               "an empty monitor region! Using cached value.")
-                return self.usable_region
+                return
             else:
                 raise Exception("Could not retrieve desktop geometry")
 
@@ -153,9 +154,10 @@ class WindowManager(object):
                     logging.debug("Gathered _NET_WM_STRUT value: %s", struts)
 
         # Get the list of struts from the root window
-        usable_region.set_panels(struts)
-        logging.debug("Usable desktop region calculated as: %s", usable_region)
-        return usable_region
+        self.usable_region.set_panels(struts)
+        logging.debug("Usable desktop region calculated as: %s",
+            self.usable_region)
+        return
 
     def get_monitor(self, win: Wnck.Window) -> Tuple[int, Rectangle]:
         """Given a window, retrieve the ID and geometry of the monitor it's on.
@@ -180,7 +182,7 @@ class WindowManager(object):
         monitor_geom = self.gdk_screen.get_monitor_geometry(monitor_id)
 
         logging.debug(" Window is on monitor %s, which has geometry %s",
-                      monitor_id, monitor_geom)
+                      monitor_id, Rectangle.from_gdk(monitor_geom))
         return monitor_id, monitor_geom
 
     def get_relevant_windows(self, workspace: Wnck.Workspace
