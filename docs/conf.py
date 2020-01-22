@@ -331,13 +331,11 @@ latex_documents = [
 
 # -- Options for manual page output ---------------------------------------
 
-# TODO: Configure this
-
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'quicktile', u'QuickTile Documentation',
-     [u'Stephan Sokolow'], 1)
+    ('cli', 'quicktile', u'move and resize windows to presets',
+     [u'Stephan Sokolow'], 1),
 ]
 
 # If true, show URL addresses after external links.
@@ -351,7 +349,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     ('index', 'QuickTile', u'QuickTile Documentation',
-   u'Stephan Sokolow', 'QuickTile', 'X11 window-tiling helper',
+   u'Stephan Sokolow', 'QuickTile', 'Move and resize windows to presets',
    'Miscellaneous'),
 ]
 
