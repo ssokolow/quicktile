@@ -134,6 +134,22 @@ make the following change:
            margin: 1;
    }
 
+I get an error when I try to run QuickTile
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You probably either lack a dependency or have bits of a previous installation
+lying around. Follow the :ref:`Removal` instructions, make sure you have all
+required dependencies installed, and try installing again.
+
+If this does not fix it, try running QuickTile via ``./quicktile.sh`` or
+or ``python3 -m quicktile`` instead.
+
+If that works, then your ``setuptools`` is breaking when asked to install
+packages which declare ``console_scripts``.
+
+If it does not work, then `open an issue
+<https://github.com/ssokolow/quicktile/issues>`_ and I'll try to help you.
+
 Other Questions
 ---------------
 
