@@ -14,64 +14,80 @@ Window Tiling
 
 .. _top-left:
 
-``top-left`` (:kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 7`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``top-left``
+^^^^^^^^^^^^
+
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 7`
 
 Tile the active window to span the top-left quarter of the screen. Press the hotkey multiple times to cycle through different width presets.
 
 .. image:: diagrams/png/top-left.png
    :alt: diagram
 
-``top`` (:kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 8`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``top``
+^^^^^^^
+
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 8`
 
 Tile the active window to span the top half of the screen. Press the hotkey multiple times to cycle through different width presets.
 
 .. image:: diagrams/png/top.png
    :alt: diagram
 
-``top-right`` (:kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 9`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``top-right``
+^^^^^^^^^^^^^
+
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 9`
 
 Tile the active window to span the top-right quarter of the screen. Press the hotkey multiple times to cycle through different width presets.
 
 .. image:: diagrams/png/top-right.png
    :alt: diagram
 
-``left`` (:kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 4`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``left``
+^^^^^^^^
+
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 4`
 
 Tile the active window to span the left half of the screen. Press the hotkey multiple times to cycle through different width presets.
 
 .. image:: diagrams/png/left.png
    :alt: diagram
 
-``center`` (:kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 5`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``center``
+^^^^^^^^^^
+
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 5`
 
 Tile the active window to fill the screen. Press the hotkey multiple times to cycle through different width presets.
 
 .. image:: diagrams/png/center.png
    :alt: diagram
 
-``right`` (:kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 6`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``right``
+^^^^^^^^^
+
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 6`
 
 Tile the active window to span the right half of the screen. Press the hotkey multiple times to cycle through different width presets.
 
 .. image:: diagrams/png/right.png
    :alt: diagram
 
-``bottom-left`` (:kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 1`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``bottom-left``
+^^^^^^^^^^^^^^^
+
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 1`
 
 Tile the active window to span the bottom-left quarter of the screen. Press the hotkey multiple times to cycle through different width presets.
 
 .. image:: diagrams/png/bottom-left.png
    :alt: diagram
 
-``bottom`` (:kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 2`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``bottom``
+^^^^^^^^^^
+
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 2`
 
 Tile the active window to span the bottom half of the screen. Press the hotkey multiple times to cycle through different width presets.
 
@@ -79,8 +95,10 @@ Tile the active window to span the bottom half of the screen. Press the hotkey m
    :alt: diagram
 
 
-``bottom-right`` (:kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 3`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``bottom-right``
+^^^^^^^^^^^^^^^^
+
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 3`
 
 Tile the active window to span the bottom-right quarter of the screen. Press the hotkey multiple times to cycle through different width presets.
 
@@ -125,8 +143,10 @@ altering its shape.
 .. image:: diagrams/png/move-to-left.png
    :alt: diagram
 
-``move-to-center`` (:kbd:`Ctrl` + :kbd:`Alt` + :kbd:`C`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``move-to-center``
+^^^^^^^^^^^^^^^^^^
+
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`C`
 
 Move the active window to the center of the screen without altering its shape.
 
@@ -211,16 +231,20 @@ have their rendering bypass the compositor for improved performance.
 .. image:: diagrams/png/fullscreen.png
    :alt: diagram
 
-``horizontal-maximize`` (:kbd:`Ctrl` + :kbd:`Alt` + :kbd:`H`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``horizontal-maximize``
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`H`
 
 Toggle whether the active window is maximized horizontally, but with its height and vertical position unchanged.
 
 .. image:: diagrams/png/horizontal-maximize.png
    :alt: diagram
 
-``maximize`` (:kbd:`Ctrl` + :kbd:`Alt` +  :kbd:`Keypad 0`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``maximize``
+^^^^^^^^^^^^
+
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`0`
 
 Toggle whether the active window is maximized to fill the "work area" of the monitor. (ie. not covering panels unless they're set to allow it.)
 
@@ -243,8 +267,10 @@ Toggle whether the active window is as only a titlebar (like a rolled-up windows
 .. image:: diagrams/png/shade.png
    :alt: diagram
 
-``vertical-maximize`` (:kbd:`Ctrl` + :kbd:`Alt` +  :kbd:`V`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``vertical-maximize``
+^^^^^^^^^^^^^^^^^^^^^
+
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`V`
 
 Toggle whether the active window is maximized vertically, but with its width and horizontal position unchanged.
 
@@ -296,8 +322,10 @@ Move *all* windows to the next monitor, as defined by the
 .. image:: diagrams/png/monitor-next-all.png
    :alt: diagram
 
-``monitor-switch`` (:kbd:`Ctrl` + :kbd:`Alt` +  :kbd:`Keypad Enter`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``monitor-switch``
+^^^^^^^^^^^^^^^^^^
+
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad Enter`
 
 An alias for :ref:`monitor-next <monitor-next>` which will wrap around
 regardless of the value of the :ref:`MovementsWrap <MovementsWrap>` setting in
