@@ -39,8 +39,9 @@ class QuickTile(Object):
     def doCommand(self, command):  # type: (str) -> bool
         """Execute a QuickTile tiling command
 
-        .. todo:: Fix :any:`CommandRegistry.call` so our :any:`bool` return
-            isn't always :any:`False`.
+        :param command: The name of the command to attempt to run.
+        :returns: Whether ``command`` was found in the registry.
+
         .. todo:: Expose a proper, introspectable D-Bus API.
         .. todo:: When I'm willing to break the external API, retire the
             :meth:`doCommand` name.
