@@ -684,7 +684,8 @@ class UsableRegion(object):
 
     # TODO: Subscribe to changes to panel geometry in the code which calls this
     def set_panels(self, panel_struts: Iterable[StrutPartial]):
-        """Set the list of desktop struts to excluded from the usable regions"""
+        """Set the list of desktop struts to excluded from the usable regions
+        """
         self._struts = list(panel_struts)
         self._update()
 
