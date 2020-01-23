@@ -191,7 +191,7 @@ def make_winsplit_positions(columns: int) -> Dict[str, List[PercentRectTuple]]:
     manual for further details.
 
     .. todo:: Plumb :meth:`GravityLayout` arguments into the config
-        file and figure out how to generalize func:`make_winsplit_positions`
+        file and figure out how to generalize :func:`make_winsplit_positions`
         into user-customizable stuff as much as possible.
     """
 

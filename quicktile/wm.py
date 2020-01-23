@@ -296,7 +296,7 @@ class WindowManager(object):
 
         .. _XGetWindowProperty: https://tronche.com/gui/x/xlib/window-information/XGetWindowProperty.html
 
-        .. TODO:: Verify that my ``empty`` argument to :meth`get_property`
+        .. TODO:: Verify that my ``empty`` argument to :meth:`get_property`
             obviates the need to specify anything other than
             ``AnyPropertyType`` for ``prop_type`` and, if so, factor it out.
 
