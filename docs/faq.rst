@@ -51,9 +51,10 @@ use it from Python that I had to settle for implementing my own solution, which
 doesn't yet know how to do anything fancier than calculating a "largest usable
 rectangle" separately for each monitor.
 
-.. _gtk.gdk.Region: https://developer.gnome.org/pygtk/stable/class-gdkregion.html
+Follow `Issue 108 <https://github.com/ssokolow/quicktile/issues/108>`_ for
+status updates.
 
-.. todo:: Open an issue for `#95 (comment) <https://github.com/ssokolow/quicktile/issues/95#issuecomment-570089109>`_ on the tracker.
+.. _gtk.gdk.Region: https://developer.gnome.org/pygtk/stable/class-gdkregion.html
 
 QuickTile resizes windows but doesn't move them
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
