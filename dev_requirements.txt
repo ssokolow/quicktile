@@ -1,3 +1,6 @@
+mypy
+nose
+coverage
 sphinx
 sphinx-autodoc-typehints[type_comment]
 sphinxcontrib-autoprogram
