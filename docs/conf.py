@@ -135,6 +135,7 @@ modindex_common_prefix = ['quicktile.']
 #       generation to python-xlib's documentation pipeline.
 nitpicky = True
 nitpick_ignore = [
+    ('envvar', 'PATH'),
     ('py:class', 'inspect.FrameInfo'),
     ('py:class', 'tokenize.TokenInfo'),
     ('py:class', 'Xlib.display.Display'),
