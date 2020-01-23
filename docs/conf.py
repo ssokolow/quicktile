@@ -21,6 +21,38 @@ import os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
 
+# -- Custom Extension to Achieve Satisfactory Rendering -------------------
+
+from importlib import import_module
+from pprint import pformat
+from docutils.parsers.rst import Directive
+from docutils import nodes
+from sphinx import addnodes
+
+
+class PrettyPrintDirective(Directive):
+    """Render a constant using pprint.pformat and insert into the document"""
+    required_arguments = 1
+
+    def run(self):
+        module_path, member_name = self.arguments[0].rsplit('.', 1)
+
+        member_data = getattr(import_module(module_path), member_name)
+        code = pformat(member_data, 2, width=68)
+
+        literal = nodes.literal_block(code, code)
+        literal['language'] = 'python'
+
+        # TODO: Make this generate a cross-reference target
+        return [
+                addnodes.desc_name(text=member_name),
+                addnodes.desc_content('', literal)
+        ]
+
+
+def setup(app):
+    app.add_directive('pprint', PrettyPrintDirective)
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
