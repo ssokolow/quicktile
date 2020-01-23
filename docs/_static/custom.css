@@ -53,8 +53,28 @@ div.body blockquote {
   hyphens: manual;
 }
 
-/* Make code with line numbers consistent width */
-table.highlighttable { width: 100%; }
-table.highlighttable td.linenos { width: 2em; }
+/* Make GUI labels and Menu Selections stand out again after setting the
+ * default font to sans-serif in conf.py. */
+.guilabel,
+.menuselection {
+  font-weight: bold;
+}
 
+/* Make code with line numbers consistent width */
+table.highlighttable {
+  width: 100%;
+}
+table.highlighttable td.linenos {
+  width: 2em;
+}
+
+/* I don't want to wait for the newer Alabaster with nice <kbd> markup */
+kbd {
+  border: 1px solid gray;
+  border-radius: 0.5ex;
+  font-size: 70%;
+  padding: 0.3ex;
+  box-shadow: inset 0 -1px 0 lightgray;
+  vertical-align: top;
+}
 /* csslint ignore:end */
