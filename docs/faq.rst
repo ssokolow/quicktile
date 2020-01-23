@@ -20,7 +20,7 @@ and back in to ensure that the changes get applied.
 
 To help in diagnosing this problem, QuickTile will attempt to report failure to
 grab hotkeys when you start it with
-`-\\-daemonize <cli.html#cmdoption-quicktile-daemonize>`_ in a terminal.
+`-\\-daemonize <cli.html#cmdoption-quicktile-d>`_ in a terminal.
 
 .. code-block:: none
 
