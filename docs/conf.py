@@ -228,6 +228,7 @@ html_theme_options = {
                    'window manager',
     'fixed_sidebar': True,
     'font_family': 'sans-serif',
+    'footer_text': '#666',  # Match WCAG contrast guidelines
     'github_banner': True,
     'github_button': False,
     'github_user': 'ssokolow',
