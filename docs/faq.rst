@@ -166,6 +166,8 @@ When will you support Wayland?
     may or may not allow it to see other X11 applications running under
     XWayland.
 
+.. _quicktile-macos:
+
 Does QuickTile run on macOS?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     It's not a primary target, since I don't have a Mac to test with, but if
@@ -186,6 +188,8 @@ Does QuickTile run on macOS?
     A list of shareware alternatives with official OSX support is also
     available on `StackOverflow <http://stackoverflow.com/questions/273242/is-there-anything-like-winsplit-revolution-for-mac-os-x>`_
 
+.. _quicktile-windows:
+
 QuickTile doesn't meet my needs. What can I do?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     You could contribute code or `file a feature request
@@ -194,4 +198,8 @@ QuickTile doesn't meet my needs. What can I do?
     If that's not good enough, Wikipedia's `Tiling window manager
     <https://secure.wikimedia.org/wikipedia/en/wiki/Tiling_window_manager>`_
     page does contain a section listing other tools that might meet your needs.
-    (Ones for other plaforms like Windows too, for that matter)
+    (Ones for other platforms like Windows too, for that matter)
+
+    Another useful place for Windows users to look is the `alternativeTo page
+    <https://alternativeto.net/software/winsplit-revolution/?license=free>`_
+    for WinSplit Revolution.

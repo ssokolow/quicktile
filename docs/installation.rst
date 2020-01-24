@@ -24,6 +24,12 @@ A desktop based on the X11 windowing system
     QuickTile relies on NETWM hints and X11-style window decorations to do
     its work and Wayland's security model explicitly prevents tools like
     QuickTile from being written.
+
+    If you are running MacOS, see the :ref:`quicktile-macos` FAQ entry.
+
+    If you are running Windows and don't want to download WinSplit Revolution
+    from an archive of discontinued software, there are some links which
+    include Windows offerings in the :ref:`quicktile-windows` FAQ entry.
 Python_ 3.5+
     QuickTile is developed in Python 3.x with Kubuntu Linux 16.04 LTS as its
     earliest explicitly tested compatibility target.
