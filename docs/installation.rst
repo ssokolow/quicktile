@@ -25,15 +25,22 @@ A desktop based on the X11 windowing system
 Python_ 3.5+
     QuickTile is developed in Python 3.x with Kubuntu Linux 16.04 LTS as its
     earliest explicitly tested compatibility target.
+GTK_ 3.x
+    QuickTile is built around a GLib event loop and also relies on GDK for
+    certain window operations.
+libwnck_
+    QuickTile relies on libwnck for most of its window manipulation to avoid
+    playing whac-a-mole with the quirks of various window managers.
 PyGObject_
-    QuickTile accesses the following GNOME-family libraries via their
-    GObject Introspection APIs and you must also ensure that their GIR
-    definition files are installed on distros which package them separately:
+    QuickTile accesses GNOME-family libraries via their GObject Introspection
+    APIs. If your distro packages the following GIR definition files separately
+    from the corresponding libraries, you must also ensure that they are
+    installed:
 
-    * GLib_ 2.x (``gir1.2-glib-2.0`` on Debian-family distros)
-    * Gdk_ and GdkX11_ 3.x
+    * ``GLib-2.0`` (``gir1.2-glib-2.0`` on Debian-family distros)
+    * ``Gdk-3.0`` and ``GdkX11-3.0``
       (``gir1.2-gtk-3.0`` on Debian-family distros)
-    * Wnck_ 3.x (``gir1.2-wnck-3.0`` on Debian-family distros)
+    * ``Wnck-3.0`` (``gir1.2-wnck-3.0`` on Debian-family distros)
 setuptools_
     Though a fairly standard dependency for modern :file:`setup.py` scripts,
     setuptools is not a part of the Python standard library proper and is often
@@ -47,14 +54,12 @@ dbus-python_
     Optional, but required if you want to interact with QuickTile over D-Bus.
 
 .. _dbus-python: https://pypi.org/project/dbus-python/
-.. _Gdk: https://www.gtk.org/download/index.php
-.. _GdkX11: https://www.gtk.org/download/index.php
-.. _GLib: https://www.gtk.org/download/index.php
+.. _GTK: https://www.gtk.org/download/index.php
+.. _libwnck: https://gitlab.gnome.org/GNOME/libwnck
 .. _PyGObject: https://pygobject.readthedocs.io/en/latest/
 .. _Python: https://www.python.org/
 .. _python-xlib: https://pypi.org/project/python-xlib/
 .. _setuptools: https://pypi.org/project/setuptools/
-.. _Wnck: https://gitlab.gnome.org/GNOME/libwnck
 
 Debian and derivatives (Ubuntu, Mint, etc.)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
