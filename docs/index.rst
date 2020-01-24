@@ -7,6 +7,11 @@ which adds window-tiling keybindings to your existing X11 window manager.
 You can also think of it as a standalone alternative to the keyboard-related
 features of the Compiz Grid plugin.
 
+QuickTile adds no new visible UI elements. No tray icon that just wastes space
+once you're done configuring it. Once it's set up, you've got your choice of
+new global hotkeys, a new D-Bus API, and/or a new command to invoke from shell
+scripts. That's it.
+
 For more details, see the illustrations in the :doc:`commands`.
 
 QuickTile depends on the Python bindings for libraries you :ref:`probably
