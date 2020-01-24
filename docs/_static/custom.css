@@ -87,7 +87,38 @@ div.sphinxsidebarwrapper .badges a {
   border-bottom: 0;
 }
 
+/* Adjust @media for Alabaster to match my changes */
+@media screen and (max-width: 875px) {
+  body {
+    background: #fff;
+    padding: 20px 30px;
+  }
+  div.document,
+  div.footer {
+    padding: 0;
+  }
+  div.sphinxsidebar .badges {
+    display: none;
+  }
+}
+
+/* Workaround for bugs in Alabaster theme's mobile support */
+@media screen and (max-width: 875px) {
+  ul,
+  ol {
+    margin: 10px 0 10px 30px;
+  }
+  div.sphinxsidebar li,
+  div.sphinxsidebar tt,
+  div.sphinxsidebar code {
+    color: #fff;
+  }
+}
+
 /* Button CSS borrowed from the old site */
+div.sphinxsidebar a.btn {
+  color: #3e4349;
+}
 .btn {
   display: inline-block;
   padding: 1px 2px;
