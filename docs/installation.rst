@@ -9,6 +9,8 @@ advantages and disadvantages.
 
 Support for other methods will be provided on a best-effort basis.
 
+.. _Dependencies:
+
 Dependencies
 ------------
 
@@ -16,7 +18,7 @@ Because QuickTile relies on library bindings which are not installable through
 :abbr:`PyPI (the Python Package Index)`, :file:`setup.py` cannot be used to
 automatically retrieve dependencies.
 
-You must install the following separately:
+You must install the following separately (see below for APT and DNF commands):
 
 A desktop based on the X11 windowing system
     QuickTile relies on NETWM hints and X11-style window decorations to do
@@ -166,6 +168,8 @@ You will be prompted for your :command:`sudo` password.
     `checkinstall <https://asic-linux.com.mx/~izto/checkinstall/>`_
     and, if so, suggest it as an option for making QuickTile easily
     uninstallable on platforms that no proper package is provided for.
+
+.. _install_quicktile.sh:
 
 C. Run QuickTile without installing it
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
