@@ -14,9 +14,10 @@ addons:
     packages:
       - python3-dbus
       - python3-gi
-        python3-nose
+      - python3-nose
       - python3-coverage
       - python3-xlib
+      - gir1.2-glib-2.0
       - gir1.2-gtk-3.0
       - gir1.2-wnck-3.0
 install: "pip3 install mypy coveralls"
