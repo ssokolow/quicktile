@@ -223,8 +223,10 @@ html_theme = 'alabaster'
 # documentation.
 html_theme_options = {
     'badge_branch': "master",
+    'canonical_url': 'http://ssokolow.com/quicktile/',
     'description': 'Keyboard-driven Window Tiling for your existing X11 '
                    'window manager',
+    'fixed_sidebar': True,
     'font_family': 'sans-serif',
     'github_banner': True,
     'github_button': False,
@@ -284,6 +286,7 @@ html_sidebars = {
         'about.html',
         'relations.html',
         'searchbox.html',
+        'sidebar_badges.html',
         'donate.html',
     ]
 }

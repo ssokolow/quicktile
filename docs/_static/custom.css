@@ -77,4 +77,98 @@ kbd {
   box-shadow: inset 0 -1px 0 lightgray;
   vertical-align: top;
 }
+
+/* Centering helper for custom badges */
+div.sphinxsidebarwrapper .badges {
+  margin-top: 1em;
+  margin-left: 3px;
+}
+div.sphinxsidebarwrapper .badges a {
+  border-bottom: 0;
+}
+
+/* Button CSS borrowed from the old site */
+.btn {
+  display: inline-block;
+  padding: 1px 2px;
+  margin-bottom: 0;
+  font-size: 10px;
+  font-weight: normal;
+  line-height: 16px;
+  color: #333333;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+  vertical-align: middle;
+  cursor: pointer;
+  background-color: #f5f5f5;
+  background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -webkit-gradient(
+    linear,
+    0 0,
+    0 100%,
+    from(#ffffff),
+    to(#e6e6e6)
+  );
+  background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: linear-gradient(to bottom, #ffffff, #e6e6e6);
+  background-repeat: repeat-x;
+  border: 1px solid #cccccc;
+  border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  border-bottom-color: #b3b3b3;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.05);
+  -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn:hover,
+.btn:focus,
+.btn:active {
+  color: #333333;
+  background-color: #e6e6e6;
+}
+
+.btn:active {
+  background-color: #cccccc;
+}
+
+.btn:hover,
+.btn:focus {
+  color: #333333;
+  text-decoration: none;
+  background-position: 0 -15px;
+  -webkit-transition: background-position 0.1s linear;
+  -moz-transition: background-position 0.1s linear;
+  -o-transition: background-position 0.1s linear;
+  transition: background-position 0.1s linear;
+}
+
+.btn:focus {
+  outline: thin dotted #333;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+.btn.active,
+.btn:active {
+  background-image: none;
+  outline: 0;
+  -webkit-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15),
+    0 1px 2px rgba(0, 0, 0, 0.05);
+  -moz-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15),
+    0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn img {
+  vertical-align: middle;
+}
+
 /* csslint ignore:end */
