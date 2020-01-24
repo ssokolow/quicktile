@@ -71,6 +71,10 @@ dependencies:
 
     sudo apt-get install python3 python3-pip python3-setuptools python3-gi python3-xlib python3-dbus gir1.2-glib-2.0 gir1.2-gtk-3.0 gir1.2-wnck-3.0
 
+If you have `AptURL <https://help.ubuntu.com/community/AptURL>`_ set up,
+you can also `click here <apt:python3,python3-pip,python3-setuptools,python3-gi,python3-xlib,python3-dbus,gir1.2-glib-2.0,gir1.2-gtk-3.0,gir1.2-wnck-3.0>`_
+to trigger an installation prompt.
+
 Fedora and derivatives
 ^^^^^^^^^^^^^^^^^^^^^^
 
