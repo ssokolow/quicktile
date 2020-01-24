@@ -137,7 +137,10 @@ B. :file:`install.sh` from a local folder
 
 **Instructions:**
 
-After installing your dependencies and downloading a copy of QuickTile, run the
+After installing your dependencies and downloading a copy of QuickTile
+(`zip <http://github.com/ssokolow/quicktile/zipball/master>`_,
+`tar <http://github.com/ssokolow/quicktile/tarball/master>`_, or
+`git clone <https://github.com/ssokolow/quicktile.git>`_), run the
 following commands to install it:
 
 .. code:: sh
@@ -185,7 +188,8 @@ C. Run QuickTile without installing it
 
 **Instructions:**
 
- 1. Download and unpack the zip file.
+ 1. `Download <http://github.com/ssokolow/quicktile/zipball/master>`_ or
+    `clone <https://github.com/ssokolow/quicktile.git>`_ QuickTile.
  2. Copy the :file:`quicktile` folder and the :file:`quicktile.sh` script into
      a folder of your choice.
  3. Make sure :file:`quicktile.sh` is marked executable.
