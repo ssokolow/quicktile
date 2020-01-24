@@ -101,6 +101,12 @@ div.sphinxsidebarwrapper .badges a {
     display: none;
   }
 }
+@media print {
+  body {
+    display: block;
+    background: none;
+  }
+}
 
 /* Workaround for bugs in Alabaster theme's mobile support */
 @media screen and (max-width: 875px) {
@@ -112,6 +118,17 @@ div.sphinxsidebarwrapper .badges a {
   div.sphinxsidebar tt,
   div.sphinxsidebar code {
     color: #fff;
+  }
+}
+@media print {
+  img.github {
+    display: none;
+  }
+  div.document {
+    width: auto;
+  }
+  div.section {
+    break-inside: avoid-page;
   }
 }
 

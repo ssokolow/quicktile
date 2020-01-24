@@ -216,5 +216,9 @@ Troubleshooting :program:`xev`
 
 ----
 
-.. todo:: Move the descriptions of configuration file fields into the source
-          code and then make the reference ReST programmatically generated.
+.. todo::
+
+    * Move the descriptions of configuration file fields into the source
+      code and then make the reference ReST programmatically generated.
+    * Decide how the print stylesheet rules should handle code blocks too wide
+      to fit on a portrait page.
