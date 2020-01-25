@@ -107,6 +107,9 @@ div.sphinxsidebarwrapper .badges a {
     display: block;
     background: none;
   }
+  img.animation {
+    display: none;
+  }
 }
 
 /* Workaround for bugs in Alabaster theme's mobile support */

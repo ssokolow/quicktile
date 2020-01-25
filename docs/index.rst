@@ -2,6 +2,7 @@ QuickTile
 =========
 
 .. image:: animation/animation.gif
+   :class: animation
    :alt: demonstration animation
 
 QuickTile is a simple utility, inspired by WinSplit Revolution for Windows,
