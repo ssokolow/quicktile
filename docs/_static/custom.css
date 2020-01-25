@@ -97,7 +97,8 @@ div.sphinxsidebarwrapper .badges a {
   div.footer {
     padding: 0;
   }
-  div.sphinxsidebar .badges {
+  div.sphinxsidebar .badges,
+  div.sphinxsidebar .contrib_box {
     display: none;
   }
 }
@@ -219,4 +220,50 @@ div.sphinxsidebar a.btn {
   vertical-align: middle;
 }
 
+/* Contribution Box CSS from the old site */
+.contrib_box {
+  font-size: 80%;
+  width: 10em;
+  margin-top: 2em;
+  padding: 5px 1ex 0;
+  background: white;
+  color: black;
+  text-align: center;
+
+  border: 1px solid rgb(187, 187, 187);
+  box-shadow: 3px 4px 0px 0px rgb(221, 221, 221);
+  -moz-box-shadow: 3px 4px 0px 0px rgb(221, 221, 221);
+  -webkit-box-shadow: 3px 4px 0px 0px rgb(221, 221, 221);
+}
+
+div.contrib_box h3 {
+  font-size: 125%;
+  font-weight: bold;
+}
+
+div.contrib_box dt {
+  font-weight: bold;
+}
+div.contrib_box dd {
+  margin: 2px 0;
+}
+
+div.sphinxsidebar .contrib_box a {
+  border-bottom: 0;
+}
+div.sphinxsidebar .contrib_box input {
+  border: 0;
+}
+div.sphinxsidebar .contrib_box ul {
+  margin: 4px auto;
+}
+div.sphinxsidebar .contrib_box ul.icons {
+  padding: 0;
+  text-align: center;
+  list-style-type: none;
+}
+.contrib_box ul.icons li,
+ul.icons form {
+  display: inline;
+}
 /* csslint ignore:end */
