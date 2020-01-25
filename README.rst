@@ -154,3 +154,6 @@ of simple TODOs is split across two different mechanisms:
 2. Set ``todo_include_todos = True`` in ``docs/conf.py`` and run
    ``cd docs; make html`` to generate a version of the manual with a TODO
    listing on the top-level API documentation page.
+
+See the `Developer's Guide <http://ssokolow.com/quicktile/developing.html>`_
+for more information.

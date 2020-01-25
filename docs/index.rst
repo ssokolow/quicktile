@@ -33,6 +33,7 @@ Manual Contents:
    cli
    faq
    apidocs/index
+   developing
 
 * :ref:`modindex`
 * :ref:`genindex`

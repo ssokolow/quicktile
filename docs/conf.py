@@ -169,6 +169,7 @@ nitpicky = True
 nitpick_ignore = [
     ('envvar', 'PATH'),
     ('py:class', 'inspect.FrameInfo'),
+    ('py:mod', 'quicktile.version'),
     ('py:class', 'tokenize.TokenInfo'),
     ('py:class', 'Xlib.display.Display'),
     ('py:meth', 'Xlib.display.Display.create_resource_object'),
