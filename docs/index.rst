@@ -1,6 +1,9 @@
 QuickTile
 =========
 
+.. image:: animation/animation.gif
+   :alt: demonstration animation
+
 QuickTile is a simple utility, inspired by WinSplit Revolution for Windows,
 which adds window-tiling keybindings to your existing X11 window manager.
 
