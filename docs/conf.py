@@ -160,6 +160,10 @@ always_document_param_types = True
 todo_link_only = True
 
 modindex_common_prefix = ['quicktile.']
+
+# TODO: Check how this affects the output
+#trim_footnote_reference_space = True
+
 # Nitpick every broken reference except ones I whitelist because they *have*
 # no intersphinx-compatible documentation.
 #
