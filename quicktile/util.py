@@ -229,8 +229,8 @@ class StrutPartial(_StrutPartial):
     :param int bottom_end=sys.maxsize: Position of the bottom panel's right
         edge in pixels.
 
-    .. _`_NET_WM_STRUT`: https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html#idm45126090497216
-    .. _`_NET_WM_STRUT_PARTIAL`: https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html#idm45126090495136
+    .. _`_NET_WM_STRUT`: https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html#NETWMSTRUT
+    .. _`_NET_WM_STRUT_PARTIAL`: https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html#NETWMSTRUTPARTIAL
     """  # NOQA
     __slots__ = ()
 
