@@ -134,6 +134,69 @@ make the following change:
            margin: 1;
    }
 
+Firefox windows have huge margins
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+As with Elementary OS, this is a bug related to how windows draw shadows.
+
+I haven't narrowed down the specific conditions which trigger it yet, but it
+can be worked around by disabling Firefox's support for using
+:abbr:`CSD (Client-Side Decorations)` to put the tabs in the titlebar.
+To do so:
+
+1. Choose :menuselection:`&Customize` from the context menu for any toolbar or
+   tab widget which does not define a custom context menu.
+2. Uncheck the :guilabel:`Title Bar` checkbox in the bottom-left corner.
+3. Click the :guilabel:`Done` button.
+
+(Be aware that, when I enabled CSD for test purposes, it reset all my Firefox
+window positions to my center monitor. I'm not sure if this is because it is my
+primary monitor or if it's because it was the monitor containing the active
+window.)
+
+You can then recover the ability to have the top-most row of pixels on your
+screen pass mouse events to the tab bar by disabling window decorations and
+relying on :kbd:`Alt` and the left and right mouse buttons to move and resize
+your Firefox windows in situations where you want mouse-based window
+manipulation.
+
+Under KDE, this can be accomplished through the :guilabel:`Window Rules`
+control panel, accessible through the titlebar context menu (:kbd:`Alt`
++ :kbd:`F3`) as :menuselection:`&More Actions --> Special &Window Settings...`.
+
+For Openbox-based desktops, the equivalent can be achieved by making this
+modification to your Openbox configuration file:
+
+.. code-block:: xml
+    :caption: ~/.config/openbox/whatever.xml
+
+    <openbox_config>
+      <!-- ... -->
+      <applications>
+        <!-- ... -->
+        <application name="Firefox" title="*Mozilla Firefox*">
+          <decor>no</decor>
+        </application>
+      </applications>
+    </openbox_config>
+
+As a more generic solution, the `Devil's Pie`_ or `Devil's Pie 2`_ utilities
+can retrofit window rules onto any window manager. (Devil's Pie 2 replaces the
+original Devil's Pie's syntax with an embedded Lua runtime.)
+
+The following script will serve the purpose for Devil's Pie:
+
+.. code-block:: lisp
+    :caption: ~/.devilspie/firefox.ds
+
+    if (is (application_name) "Firefox") and (contains (window_name) "Mozilla Firefox")
+                (begin
+                    (undecorate)
+                )
+
+.. _Devil's Pie: https://wiki.gnome.org/Projects/DevilsPie
+.. _Devil's Pie 2: https://www.nongnu.org/devilspie2/
+
 I get an error when I try to run QuickTile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
