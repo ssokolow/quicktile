@@ -37,3 +37,13 @@ Manual Contents:
 
 * :ref:`modindex`
 * :ref:`genindex`
+
+.. |wrench| image:: wrench.png
+
+|wrench| Please report any issues on GitHub at
+`ssokolow/quicktile <https://github.com/ssokolow/quicktile/issues>`_
+
+..
+    bug.png and wrench.png from the Silk Icons set by Mark James, available at
+    http://www.famfamfam.com/lab/icons/silk/
+    are used under the Creative Commons Attribution 2.5 license.
