@@ -38,9 +38,10 @@ from Xlib.display import Display as XDisplay
 from Xlib.error import DisplayConnectionError
 
 import gi
+gi.require_version('GLib', '2.0')
 gi.require_version('Gtk', '3.0')
 gi.require_version('Wnck', '3.0')
-from gi.repository import Gtk, Wnck
+from gi.repository import GLib, Gtk, Wnck
 
 from . import commands, layout
 from .util import fmt_table, XInitError
@@ -275,6 +276,25 @@ def load_config(path) -> ConfigParser:
     return config
 
 
+def wnck_log_filter(domain: str, level: GLib.LogLevelFlags,
+        message: str, userdata: object=None):
+    """A custom function for :func:`GLib.log_set_handler` which filters out
+    the spurious error about ``_OB_WM_ACTION_UNDECORATE`` being un-handled.
+
+    :param domain: The logging domain. Should be ``Wnck``.
+    :param level: The logging level Should be
+        :py:attr:`GLib.LogLevelFlags.LEVEL_WARNING`.
+    :param message: The error message
+    :param userdata: Required by the API but unused.
+    """
+
+    if '_OB_WM_ACTION_UNDECORATE' not in message:
+        # The "or 0" works around a bug where it's documented as accepting
+        # `object` or `None` and says `None` is one of the only valid values
+        # if you try to pass `{}`, but it refuses to accept `None`.
+        GLib.log_default_handler(domain, level, message, userdata or 0)
+
+
 def argparser() -> ArgumentParser:
     """:class:`argparse.ArgumentParser` definition that is compatible with
         `sphinxcontrib.autoprogram
@@ -336,6 +356,9 @@ def main() -> None:
         layout.make_winsplit_positions(config.getint('general', 'ColumnCount'))
     )(commands.cycle_dimensions)
     commands.commands.extra_state = {'config': config}
+
+    GLib.log_set_handler('Wnck', GLib.LogLevelFlags.LEVEL_WARNING,
+        wnck_log_filter)
 
     from . import gtkexcepthook
     if not args.no_excepthook:
