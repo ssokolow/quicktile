@@ -144,7 +144,7 @@ manpages_url = 'https://manpages.debian.org/{path}'
 autodoc_default_options = {
 
     'private-members':
-        '_load_desktop_geometry,_property_prep,_update,_vary_modmask',
+        '_property_prep,_update,_vary_modmask',
     'special-members':
         '__bool__,__call__,__contains__,__repr__,__str__',
     'undoc-members': True,

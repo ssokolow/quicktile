@@ -95,22 +95,20 @@ class WindowManager(object):
         self.screen = Wnck.Screen.get(self.gdk_screen.get_number())
 
         self.usable_region = UsableRegion()
-        self._load_desktop_geometry()
+        self.update_geometry_cache()
         # TODO: Hook monitor-added and monitor-removed and regenerate this
         # TODO: Hook changes to strut reservations and regenerate this
 
-    def _load_desktop_geometry(self):
-        """Retrieve monitor & panel shapes from the desktop and process them
-        into a :class:`quicktile.util.UsableRegion` for easy querying.
+    def update_geometry_cache(self):
+        """Update the internal cache of monitor & panel shapes by querying
+        them from the desktop and processing them into a
+        :class:`quicktile.util.UsableRegion`.
 
         :raises Exception: Unable to retrieve monitor geometries
 
         .. todo:: Use a more specific exception.
-        .. todo:: Either rework :any:`_load_desktop_geometry` into a public
-           "update cached geometry" function or disable display of
-           private members.
         .. todo:: Investigate going back to calling
-           :meth:`_load_desktop_geometry` before every command.
+           :meth:`update_geometry_cache` before every command.
 
         """
 
@@ -134,7 +132,7 @@ class WindowManager(object):
             self.usable_region.set_monitors(monitors)
         else:
             if self.usable_region:
-                logging.error("WorkArea._load_desktop_geometry received "
+                logging.error("WorkArea.update_geometry_cache received "
                               "an empty monitor region! Using cached value.")
                 return
             else:
