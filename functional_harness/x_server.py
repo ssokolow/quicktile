@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-"""Context manager for setting up and tearing down a test X server"""
+"""Wrapper for easily setting up and tearing down a test X server"""
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "MIT"
-__docformat__ = "restructuredtext en"
+
+# Silence PyLint being flat-out wrong about MyPy type annotations
+# complaining about my grouped imports
+# pylint: disable=unsubscriptable-object,invalid-sequence-index
+# pylint: disable=wrong-import-order
 
 import logging, os, random, shutil, subprocess, tempfile  # nosec
 from contextlib import contextmanager
@@ -11,28 +15,23 @@ from distutils.spawn import find_executable
 
 from .env_general import env_vars
 
-# Allow MyPy to work without depending on the `typing` package
-# (And silence complaints from only using the imported types in comments)
-MYPY = False
-if MYPY:
-    # pylint: disable=unused-import
-    from typing import Dict, Generator, List, Tuple  # NOQA
-del MYPY
+# -- Type-Annotation Imports --
+from typing import Dict, Generator, List, Tuple
 
 log = logging.getLogger(__name__)
 
 
-def _init_x_server(argv, verbose=False):
-    # type: (List[str], bool) -> Tuple[subprocess.Popen, bytes]
+def _init_x_server(argv: List[str], verbose: bool=False
+                   ) -> Tuple[subprocess.Popen, bytes]:
     """Wrapper for starting an X server with the given command line
 
     :param argv: The command-line to execute
-    :type argv: ``list(str)``
+    :param verbose: If :any:`False`, redirect the X server's ``stdout`` and
+        ``stderr`` to :file:`/dev/null`
+    :returns: The process object for the X server.
 
-    :raises CalledProcessError: The X server exited with an unexpected error
-    :returns: The process object for the X server on success or ``None`` if
-        ``display_num`` was already in use.
-    :rtype: ``(subprocess.Popen, bytes)``
+    :raises subprocess.CalledProcessError: The X server exited with an
+        unexpected error.
     """
 
     # Launch the X server
@@ -51,16 +50,30 @@ def _init_x_server(argv, verbose=False):
 
 
 @contextmanager
-def x_server(argv, screens):
-    # type: (List[str], Dict[int, str])-> Generator[Dict[str, str], None, None]
+def x_server(argv: List[str], screens: Dict[int, str]
+             ) -> Generator[Dict[str, str], None, None]:
     """Context manager to launch and then clean up an X server.
 
-    argv
-        The command to launch the test X server and
+    :param argv: The command to launch the test X server and
         any arguments not relating to defining the attached screens.
-    screens
-        A ``dict`` mapping screen numbers to
-        ``WxHxDEPTH`` strings. (eg. ``{0: '1024x768x32'``})
+    :param screens: A :any:`dict <dict>` mapping screen numbers to
+        ``WxHxDEPTH`` strings. (eg. ``{0: '1024x768x32'}``)
+
+    :raises subprocess.CalledProcessError: The X server or :command:`xauth`
+        failed unexpectedly.
+    :raises FileNotFoundError: Could not find either the :command:`xauth`
+        command or ``argv[0]``.
+    :raises PermissionError: Somehow, we lack write permission inside a
+        directory created by :func:`tempfile.mkdtemp`.
+    :raises ValueError: ``argv[0]`` was not an X server binary we know how to
+        specify monitor rectangles for.
+        (either :command:`Xvfb` or :command:`Xephyr`)
+    :raises UnicodeDecodeError: The X server's ``-displayfd`` option wrote
+        a value to the given FD which could not be decoded as UTF-8 when it
+        should have been part of the 7-bit ASCII subset of UTF-8.
+
+    .. todo:: Either don't accept an arbitrary string as input or default to a
+        value likely to work with other X servers rather than erroring out.
     """
     # Check for missing requirements
     for cmd in ['xauth', argv[0]]:
@@ -92,9 +105,6 @@ def x_server(argv, screens):
             elif 'Xephyr' in argv[0]:
                 screen_argv.extend(['-screen', screen_geom])
             else:
-                # TODO: Either don't accept an arbitrary string as input or
-                #       default to a value likely to work with other X servers
-                #       rather than erroring out.
                 raise ValueError("Unrecognized X server. Cannot infer format "
                                  "for specifying screen geometry.")
 

@@ -14,7 +14,7 @@ QuickTile's code is currently divided into the following modules:
    layout
    util
    wm
-   test_quicktile
+   tests
 
 .. ifconfig:: todo_include_todos
 

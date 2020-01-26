@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 """Beginnings of a functional test harness for QuickTile
 
---snip--
+.. todo:: Don't forget to test unusual configurations such as:
 
-:todo: Don't forget to test unusual configurations such as:
-
-    1. Having screens 1, 2, and 4 but not 0 or 3 (eg. hotplug aftermath)
-    2. Having no windows on the desktop
-    3. Having no window manager (with and without windows)
-    4. Various Xinerama layouts
+    1. monitor-* commands with only one monitor
+    2. workspace-* commands with only one workspace
+    3. Having screens 1, 2, and 4 but not 0 or 3 (eg. hotplug aftermath)
+    4. Having no windows on the desktop
+    5. Having no window manager (with and without windows)
+    6. Various Xinerama layouts
 """
 
 from __future__ import (absolute_import, division, print_function,
@@ -17,7 +17,6 @@ from __future__ import (absolute_import, division, print_function,
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "MIT"
-__docformat__ = "restructuredtext en"
 
 #: The sequence of commands to call QuickTile with
 TEST_SCRIPT = """
@@ -96,6 +95,7 @@ workspace-go-prev
 
 import logging, shlex, subprocess  # nosec
 
+from functional_harness.env_general import background_proc
 from functional_harness.x_server import x_server
 
 log = logging.getLogger(__name__)
@@ -112,12 +112,9 @@ def run_tests():
 
 def main():
     """The main entry point, compatible with setuptools entry points."""
-    # If we're running on Python 2, take responsibility for preventing
-    # output from causing UnicodeEncodeErrors. (Done here so it should only
-    # happen when not being imported by some other program.)
     from argparse import ArgumentParser, RawDescriptionHelpFormatter
     parser = ArgumentParser(formatter_class=RawDescriptionHelpFormatter,
-            description=__doc__.replace('\r\n', '\n').split('\n--snip--\n')[0],
+            description='Functional test runner for QuickTile',
             epilog="NOTE: Running tests under the Xephyr X server will change "
             "their behaviour if they depend on Xvfb's ability to present "
             "a desktop with non-sequentially numbered screens.")
