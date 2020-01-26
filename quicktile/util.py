@@ -234,7 +234,7 @@ class StrutPartial(_StrutPartial):
     """  # NOQA
     __slots__ = ()
 
-    def __new__(cls, left, right, top, bottom,  # pylint: disable=R0913
+    def __new__(cls, left=0, right=0, top=0, bottom=0,  # pylint: disable=R0913
             left_start_y=0, left_end_y=sys.maxsize,
             right_start_y=0, right_end_y=sys.maxsize,
             top_start_x=0, top_end_x=sys.maxsize,
