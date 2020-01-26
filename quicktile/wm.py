@@ -113,8 +113,14 @@ class WindowManager(object):
            :meth:`_load_desktop_geometry` before every command.
 
         """
-        # Gather the screen rectangles
-        n_screens = self.x_root.xinerama_get_screen_count().screen_count
+
+        # Work around xinerama_get_screen_count not getting registered in
+        # python-xlib under multi-monitor functional test conditions for
+        # some reason by using Gdk instead.
+        #
+        # NOTE: Not using Gdk.Display.get_n_monitors because Kubuntu 16.04 LTS
+        # doesn't have a new enough Gdk to have that API.
+        n_screens = self.gdk_screen.get_n_monitors()
         monitors = []
         for idx in range(0, n_screens):
             monitors.append(Rectangle.from_gdk(
