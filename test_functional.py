@@ -69,29 +69,34 @@ fullscreen
 all-desktops
 all-desktops
 
-maximize
-maximize
-minimize
-
 trigger-move
 trigger-resize
 
-show-desktop
-show-desktop
-
 workspace-send-down
-workspace-send-up
-workspace-send-left
-workspace-send-right
-workspace-send-next
-workspace-send-prev
-
 workspace-go-down
+
+workspace-send-up
 workspace-go-up
+
+workspace-send-left
 workspace-go-left
+
+workspace-send-right
 workspace-go-right
+
+workspace-send-next
 workspace-go-next
+
+workspace-send-prev
 workspace-go-prev
+
+show-desktop
+show-desktop
+
+maximize
+maximize
+
+minimize
 """
 
 import logging, shlex, subprocess  # nosec
