@@ -42,10 +42,6 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('Wnck', '3.0')
 from gi.repository import Gtk, Wnck
 
-# TODO: Make gtkexcepthook disable-able for functional testing
-from . import gtkexcepthook
-gtkexcepthook.enable()
-
 from . import commands, layout
 from .util import fmt_table, XInitError
 from .version import __version__
@@ -295,6 +291,9 @@ def argparser() -> ArgumentParser:
         dest="daemonize", default=False, help="Old alias for --daemonize")
     parser.add_argument('--debug', action="store_true", default=False,
         help="Display debug messages")
+    parser.add_argument('--no-excepthook', action="store_true",
+        default=False, help="Disable the error-handling dialog to allow for "
+        "use in unattended scripting.")
     parser.add_argument('--no-workarea', action="store_true",
         default=False, help="No effect. Retained for compatibility.")
     parser.add_argument('command', action="store", nargs="*",
@@ -337,6 +336,10 @@ def main() -> None:
         layout.make_winsplit_positions(config.getint('general', 'ColumnCount'))
     )(commands.cycle_dimensions)
     commands.commands.extra_state = {'config': config}
+
+    from . import gtkexcepthook
+    if not args.no_excepthook:
+        gtkexcepthook.enable()
 
     try:
         x_display = XDisplay()

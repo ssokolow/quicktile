@@ -107,7 +107,8 @@ def run_tests():
     lines = [x for x in lines if x]
     for pos, command in enumerate(lines):
         log.info("Testing command %d of %d: %s", pos + 1, len(lines), command)
-        subprocess.check_call(['./quicktile.sh', command])  # nosec
+        subprocess.check_call(['./quicktile.sh', '--no-excepthook',
+            command])  # nosec
 
 
 def main():

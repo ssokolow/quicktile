@@ -51,6 +51,11 @@ This is useful for invoking QuickTile from incorporating it into shell scripts
 or binding tiling commands to things `XGrabKey`_ can't see, such as
 LIRC_-based remote controls via :manpage:`irexec(1)`.
 
+If running this in a context where it is undesirable for your script to block
+and display an error dialog on encountering an exception within QuickTile,
+please pass `-\\-no-excepthook <cli.html#cmdoption-quicktile-no-excepthook>`_
+when invoking QuickTile.
+
 For more details on QuickTile's command-line interface, run ``quicktile
 --help`` or see the :doc:`cli` section of this manual.
 
