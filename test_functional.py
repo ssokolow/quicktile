@@ -10,6 +10,7 @@
     4. Having no windows on the desktop
     5. Having no window manager (with and without windows)
     6. Various Xinerama layouts
+    7. Test with Xinerama disabled
 """
 
 from __future__ import (absolute_import, division, print_function,

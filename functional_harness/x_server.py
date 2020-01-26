@@ -36,7 +36,7 @@ def _init_x_server(argv: List[str], verbose: bool=False
 
     # Launch the X server
     read_pipe, write_pipe = os.pipe()
-    argv += ['-displayfd', str(write_pipe)]
+    argv += ['+xinerama', '-displayfd', str(write_pipe)]
 
     # pylint: disable=unexpected-keyword-arg,no-member
     if verbose:

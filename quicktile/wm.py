@@ -115,8 +115,8 @@ class WindowManager(object):
         """
 
         # Work around xinerama_get_screen_count not getting registered in
-        # python-xlib under multi-monitor functional test conditions for
-        # some reason by using Gdk instead.
+        # python-xlib if the XINERAMA extension isn't loaded in the host
+        # X session by using Gdk's API instead, which just returns 1.
         #
         # NOTE: Not using Gdk.Display.get_n_monitors because Kubuntu 16.04 LTS
         # doesn't have a new enough Gdk to have that API.
