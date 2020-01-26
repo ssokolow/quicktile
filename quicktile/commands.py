@@ -209,6 +209,10 @@ class CommandRegistry(object):
         if cmd:
             logging.debug("Executing command '%s' with arguments %r, %r",
                           command, args, kwargs)
+
+            # Workaround for #107 until I'm ready to solve it properly
+            winman.update_geometry_cache()
+
             cmd(winman, *args, **kwargs)
 
             return True
