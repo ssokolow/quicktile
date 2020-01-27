@@ -302,15 +302,13 @@ class Rectangle(_Rectangle):
     Fundamentally, this is a named tuple of the form ``(x, y, width, height)``
     with some extra methods and properties to make it more useful.
 
-    It supports being initialized with any mixture of ``width`` or ``x2`` and
-    ``height`` or ``y2``, and the constructor will ensure that the resulting
-    width and height are always positive by adjusting ``x`` and ``y``
+    It supports being initialized with any mixture of ``x``, ``width``, or
+    ``x2`` and ``y``, ``height`` or ``y2`` as long as sufficient information
+    is provided to define a rectangle, and the constructor will ensure that the
+    resulting width and height are always positive by adjusting ``x`` and ``y``
 
-    However, **one of** ``width`` or ``x2`` and one of ``height`` or ``y2`` is
-    required.
-
-    :param int x:
-    :param int y:
+    :param int x=None:
+    :param int y=None:
     :param int width=None:
     :param int height=None:
     :param int x2=None:
@@ -322,6 +320,10 @@ class Rectangle(_Rectangle):
 
         >>> Rectangle(5, 2, -10, y2=10)
         Rectangle(x=-5, y=2, width=10, height=8)
+        >>> Rectangle(x2=10, y2=12, width=5, height=6)
+        Rectangle(x=5, y=6, width=5, height=6)
+        >>> Rectangle(x2=10, y2=12, width=-5, height=-6)
+        Rectangle(x=10, y=12, width=5, height=6)
 
     .. warning:: Many of the methods on this type assume the correct use of
         :meth:`to_gravity` and :meth:`from_gravity` and may give nonsensical
@@ -331,41 +333,51 @@ class Rectangle(_Rectangle):
         ensure any changes to make it more mistake-proof are made in a
         coordinated fashion.
 
-    .. todo:: Support initializing with ``width`` and ``x2`` or ``height`` and
-        ``y2``. (i.e. Make ``x`` and ``y`` optional so hackery with negative
-        widths is not required to achieve the same effect.)
-
     .. todo:: Figure out how to get :code:`__new__` to auto-apidoc properly.
     """
     __slots__ = ()
 
     # pylint: disable=too-many-arguments
-    def __new__(cls, x: int, y: int, width: int=None, height: int=None,
+    def __new__(cls, x: int=None, y: int=None,
+                width: int=None, height: int=None,
                 x2: int=None, y2: int=None):
 
-        # Validate that we got a correct number of arguments
-        if (width, x2).count(None) != 1:
-            raise ValueError("Either width or x2 must be None and not both")
-        if (height, y2).count(None) != 1:
-            raise ValueError("Either height or y2 must be None and not both")
+        # -- Check for a valid combination of arguments --
+        if (x, width, x2).count(None) != 1:
+            raise ValueError("Exactly one of x, width, or x2 must be None")
+        if (y, height, y2).count(None) != 1:
+            raise ValueError("Exactly one of y, height, or y2 must be None")
 
-        # If given a rectangle in two-point form, convert to width/height form
-        if x2:
+        # -- Ensure we have all parameters present --
+        if x is not None and x2 is not None:
             width = x2 - x
-        if y2:
-            height = y2 - y
+        elif x2 is not None and width is not None:
+            x = x2 - width
+        elif x is not None and width is not None:
+            x2 = x + width
+        else:
+            raise Exception("Unreachable")
 
-        # Ensure values are integers, and that width and height are
-        # not None beyond this point
-        x, y, width, height = int(x), int(y), int(width or 0), int(height or 0)
+        if y is not None and y2 is not None:
+            height = y2 - y
+        elif y2 is not None and height is not None:
+            y = y2 - height
+        elif y is not None and height is not None:
+            y2 = y + height
+        else:
+            raise Exception("Unreachable")
 
         # Swap (x1, y1) and (x2, y2) as appropriate to invert negative sizes
         if width < 0:
-            x = x + width
+            x, x2 = x2, x
             width = abs(width)
         if height < 0:
-            y = y + height
+            y, y2 = y2, y
             height = abs(height)
+
+        # Ensure values are integers, and that width and height are
+        # not None beyond this point
+        x, y, width, height = int(x), int(y), int(width), int(height)
 
         # MyPy complains but this is thoroughly unit-tested as working
         return cls.__bases__[0].__new__(  # type: ignore

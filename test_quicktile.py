@@ -278,6 +278,44 @@ class TestRectangle(unittest.TestCase):  # pylint: disable=R0904
         with self.assertRaises(ValueError):
             Rectangle(x=1, y=2, width=3, height=4, y2=6)
 
+    def test_righthand_construction(self):
+        """Rectangle: test construction using x2/y2 and width/height"""
+        # Regular
+        self.assertEqual(Rectangle(width=2, height=2, x2=3, y2=4),
+                         (1, 2, 2, 2))
+
+        # Origin-crossing
+        self.assertEqual(Rectangle(width=5, height=8, x2=3, y2=4),
+                         (-2, -4, 5, 8))
+
+        # Negative width and/or height
+        self.assertEqual(Rectangle(x2=1, y2=4, width=-2, height=2),
+                         (1, 2, 2, 2))
+        self.assertEqual(Rectangle(x2=3, y2=2, width=2, height=-2),
+                         (1, 2, 2, 2))
+        self.assertEqual(Rectangle(x2=1, y2=2, width=-2, height=-2),
+                         (1, 2, 2, 2))
+
+        self.assertEqual(Rectangle(x2=-3, y2=-2, width=-2, height=2),
+                         (-3, -4, 2, 2))
+        self.assertEqual(Rectangle(x2=-1, y2=-4, width=2, height=-2),
+                         (-3, -4, 2, 2))
+        self.assertEqual(Rectangle(x2=-3, y2=-4, width=-2, height=-2),
+                         (-3, -4, 2, 2))
+
+        self.assertEqual(Rectangle(x2=-1, y2=4, width=-4, height=6),
+                         (-1, -2, 4, 6))
+        self.assertEqual(Rectangle(x2=3, y2=-2, width=4, height=-6),
+                         (-1, -2, 4, 6))
+        self.assertEqual(Rectangle(x2=-1, y2=-2, width=-4, height=-6),
+                         (-1, -2, 4, 6))
+
+        # Bad argument combinations
+        with self.assertRaises(ValueError):
+            Rectangle(x2=1, y2=2, width=3, height=4, x=5)
+        with self.assertRaises(ValueError):
+            Rectangle(x2=1, y2=2, width=3, height=4, y=6)
+
     def test_bool(self):
         """Rectangle: only truthy if area is nonzero"""
         self.assertTrue(self.rect1)
