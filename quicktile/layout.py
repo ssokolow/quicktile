@@ -9,12 +9,11 @@ __license__ = "GNU GPL 2.0 or later"
 # pylint: disable=wrong-import-order
 
 import math
-from heapq import heappop, heappush
 
-from .util import euclidean_dist, Gravity, Rectangle
+from .util import Gravity, Rectangle
 
 # -- Type-Annotation Imports --
-from typing import Dict, List, Sequence, Tuple, Union
+from typing import Dict, List, Union
 from .util import GeomTuple, PercentRectTuple
 
 #: MyPy type alias for either `Rectangle` or `GeomTuple`
@@ -42,43 +41,6 @@ def check_tolerance(distance: int, monitor_geom: Rectangle,
     return (float(distance) /
            math.hypot(monitor_geom.width, monitor_geom.height)
             ) < tolerance
-
-
-def closest_geom_match(needle: Geom,
-        haystack: Sequence[Geom]) -> Tuple[int, int]:
-    """Find the geometry in ``haystack`` that most closely matches ``needle``.
-
-    :param needle: The :class:`quicktile.util.Rectangle` or 4-integer tuple to
-        search out a match for.
-    :param haystack: The set of :class:`quicktile.util.Rectangle` or 4-integer
-        tuples to search within.
-
-    :return: A tuple of the euclidean distance and index in ``haystack`` for
-        the best match.
-
-    .. note:: This is not currently used by any existing commands. If you are
-        using it in your own patched QuickTile versions, please
-        `file an issue`_ to prevent the possibility of it being removed.
-    .. todo:: Decide whether to get rid of :func:`closest_geom_match`
-    .. todo:: If I decide to keep :func:`closest_geom_match`, rewrite it to use
-        :class:`quicktile.util.Rectangle`-specific stuff for more readable
-        and maintainable code.
-
-    .. _file an issue: https://github.com/ssokolow/quicktile/issues/
-    """
-    # Calculate euclidean distances between the window's current geometry
-    # and all presets and store them in a min heap.
-    euclid_distance = []  # type: List[Tuple[int, int]]
-    for haystack_pos, haystack_val in enumerate(haystack):
-        distance = euclidean_dist(needle, haystack_val)
-
-        # MyPy disabled until I figure out why the type annotation on
-        # euclid_distance doesn't prevent "Cannot infer type argument 1"
-        heappush(euclid_distance, (distance, haystack_pos))  # type: ignore
-
-    # to the next configuration. Otherwise, use the first configuration.
-    closest_distance, closest_idx = heappop(euclid_distance)
-    return closest_distance, closest_idx
 
 
 def resolve_fractional_geom(fract_geom: Union[PercentRectTuple, Rectangle],
