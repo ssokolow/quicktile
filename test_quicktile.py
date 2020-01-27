@@ -892,8 +892,8 @@ class TestUsableRegion(unittest.TestCase):
 
         test_region = UsableRegion()
         test_region.set_monitors([Rectangle(0, 0, 1920, 1080)])
-        test_region.set_panels([StrutPartial(bottom=25,
-            bottom_start_x=1400, bottom_end_x=1920)])
+        test_region.set_panels([StrutPartial(bottom=33,
+            bottom_start_x=1022, bottom_end_x=1919)])
 
         # Left half
         self.assertEqual(test_region.clip_to_usable_region(
@@ -903,7 +903,7 @@ class TestUsableRegion(unittest.TestCase):
         # Right half
         self.assertEqual(test_region.clip_to_usable_region(
             Rectangle(960, 0, 960, 1080)),
-            Rectangle(x=960, y=0, width=960, height=1080 - 25))
+            Rectangle(x=960, y=0, width=960, height=1080 - 33))
 
     def test_update_no_valid_monitors(self):
         """UsableRegion: Empty list of monitors doesn't raise exception"""
