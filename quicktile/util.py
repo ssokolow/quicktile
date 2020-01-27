@@ -402,12 +402,53 @@ class Rectangle(_Rectangle):
     def area(self) -> int:
         """Convenience helper for calculating area of the rectangle"""
         return int(self.width * self.height)
-    def moved_into(self, other: 'Rectangle', clip: bool=True) -> 'Rectangle':
-        """Return a new :class:`Rectangle` that does not exceed the bounds of
-        `other`
 
-        (i.e. make a copy that has been slid to the nearest position within
-        `other` and only resized if it was larger in one dimension)
+    def closest_of(self, candidates: 'List[Rectangle]') -> 'Rectangle':
+        """Find and return the rectangle that ``self`` is closest to.
+
+        (Unified definition of how to resolve edge cases in various operations
+        in the most intuitive way possible.)
+
+        Based on empirical testing, the following definition of closeness has
+        been chosen:
+
+        1. Choose the rectangle with the largest area area of
+           overlap. (``self.intersect(candidate).area``)
+        2. To break ties (eg. all motions result in no overlap), choose the
+           motion with the shortest :func:`euclidean_dist` between the two
+           rectangles' centers.
+
+        (Using the center points is important when considering operations which
+        both move and resize a rectangle.)
+
+        :param candidates: Rectangles to consider for closeness.
+
+        .. todo:: Refactor the tests so they don't only test :meth:`closest_of`
+           indirectly and don't engage in needless duplication.
+        """
+        choices = []
+        for candidate in candidates:
+            overlap = candidate.intersect(self)
+
+            p_self = self.to_gravity(Gravity.CENTER).to_point()
+            p_candidate = candidate.to_gravity(Gravity.CENTER).to_point()
+            euc_dist = euclidean_dist(p_self.xy, p_candidate.xy)
+
+            choices.append((overlap.area, -euc_dist, candidate))
+
+        # Return choice with largest overlap, breaking ties with the smallest
+        # euclidean distance
+        return max(choices)[-1]
+
+    def moved_into(self, other: 'Rectangle') -> 'Rectangle':
+        """Attempt to return a new :class:`Rectangle` of the same width and
+        height that does not exceed the bounds of `other`.
+
+        If ``self`` is wider/taller than ``other``, line up the left/top edge
+        as appropriate and allow the rest to overflow right/down-ward.
+
+        It is your responsibility to call :meth:`intersect` afterward if you
+        would like to clip the rectangle to fit.
 
         .. doctest::
 
@@ -417,14 +458,11 @@ class Rectangle(_Rectangle):
             >>> Rectangle(50, 10, 10, 10).moved_into(parent)
             Rectangle(x=30, y=10, width=10, height=10)
             >>> Rectangle(50, 10, 50, 10).moved_into(parent)
-            Rectangle(x=0, y=10, width=40, height=10)
-            >>> Rectangle(50, 10, 50, 10).moved_into(parent, clip=False)
             Rectangle(x=0, y=10, width=50, height=10)
+            >>> Rectangle(50, 10, 10, 50).moved_into(parent)
+            Rectangle(x=30, y=0, width=10, height=50)
 
         :param other: The rectangle to move inside
-        :param clip: Whether to call :meth:`intersect` before returning to
-            ensure that, if ``self`` is larger than ``other`` in either
-            dimension, it will be reduced to match.
         :raises TypeError: ``other`` was not a :class:`Rectangle`
         """
         if not isinstance(other, Rectangle):
@@ -451,11 +489,48 @@ class Rectangle(_Rectangle):
                 x=new.x, y=max(other.y2 - new.height, 0),
                 width=new.width, height=new.height)
 
-        # Clip to `other` if it was wider/taller
-        if clip:
-            new = new.intersect(other)
-
         return new
+
+    def moved_off_of(self, other: 'Rectangle') -> 'Rectangle':
+        """Return a copy of ``self`` that has been moved as little as possible
+        such that it no longer overlaps ``other``.
+
+        This will move the rectangle either horizontally or vertically but not
+        both and will rely on :meth:`closest_of` to choose a direction.
+
+        .. doctest::
+
+           >>> panel = Rectangle(0, 0, 20, 600)
+           >>> Rectangle(10, 10, 600, 400).moved_off_of(panel)
+           Rectangle(x=20, y=10, width=600, height=400)
+
+        .. note:: If no change is needed, this will take advantage of the
+            immutability of tuple subclasses by returning a reference to
+            ``self`` without making a copy.
+
+        .. warning:: This has no conception of "inside/outside the desktop"
+            and may shove a window out of bounds if you don't first ensure that
+            it's mostly on the correct side of a panel using something like
+            :meth:`moved_into`.
+
+        .. todo:: Decide whether it's worth it to add support for some kind of
+            ``constrain_within`` or ``preferred_direction`` argument to
+            :meth:`moved_off_of`.
+        """
+        # If there's no overlap, just trust in a tuple's immutability
+        if not self.intersect(other):
+            return self
+
+        return self.closest_of([
+            Rectangle(  # Push left
+                y=self.y, width=self.width, height=self.height, x2=other.x),
+            Rectangle(  # Push right
+                y=self.y, width=self.width, height=self.height, x=other.x2),
+            Rectangle(  # Push up
+                x=self.x, width=self.width, height=self.height, y2=other.y),
+            Rectangle(  # Push down
+                x=self.x, width=self.width, height=self.height, y=other.y2),
+        ])
 
     def intersect(self, other: 'Rectangle') -> 'Rectangle':
         """The intersection of two rectangles, assuming top-left gravity.
@@ -485,18 +560,12 @@ class Rectangle(_Rectangle):
         """Return a copy of ``self`` which has been shrunk along one axis
         such that it no longer overlaps ``other``.
 
-        This is implemented by shrinking the width/height of ``self`` away from
-        ``other`` until they no longer overlap.
+        The edge to cut away is determined by calling :meth:`moved_off_of` and
+        then :meth:`intersect`-ing ``self`` with the result.
 
-        When the overlap crosses more than one edge of ``self``, it will be
-        shrunk in whichever direction requires less loss of area.
-
-        Whether to chop left/up or right/down is resolved by comparing the
-        center point of the intersecting region with the center point of the
-        :class:`Rectangle` being subtracted from.
-
-        In the case of ``other`` chopping `self` into two disjoint regions,
-        the smaller one will be cut away as if it were covered by ``other``.
+        (In effect, it will generate candidate rectangles for all four possible
+        directions and then use :meth:`closest_of` to choose the one that
+        results in the smallest change.)
 
         .. doctest::
 
@@ -508,36 +577,18 @@ class Rectangle(_Rectangle):
             immutability of tuple subclasses by returning a reference to
             ``self`` without making a copy.
 
-        .. todo:: :meth:`subtract` will misbehave in the unlikely event that a
-               panel is thicker than it is long. I'll want to revisit the
-               algorithm once I've cleared out more pressing things.
+        .. warning:: This has no conception of "inside/outside the desktop"
+            and may make it entirely out-of-bounds rather than entirely
+            in-bounds if you don't first ensure that the target rectangle is
+            more in-bounds than out-of-bounds.
+
+        .. todo:: Decide whether it's worth it to add support for some kind of
+            ``constrain_within`` or ``preferred_direction`` argument to
+            :meth:`subtract`.
         """
-        overlap = self.intersect(other)
+        result = self.intersect(self.moved_off_of(other))
 
-        # If there's no overlap, just trust in a tuple's immutability
-        if not overlap:
-            # My branch test coverage disagrees with MyPy's assessment that
-            # this is unreachable. I guess my custom __bool__ confused it.
-            return self  # type: ignore
-
-        # Compare centers as the least insane way to handle the possibility of
-        # one Rectangle splitting the other in half when we don't want to
-        # support returning multiple rectangles at this time.
-        self_center = self.to_gravity(Gravity.CENTER).to_point()
-        overlap_center = overlap.to_gravity(Gravity.CENTER).to_point()
-
-        if overlap.width < overlap.height:  # If we're shrinking left/right
-            new_width = self.width - overlap.width
-            if overlap_center.x < self_center.x:  # `other` is left of center
-                return self._replace(x=other.x2, width=new_width)
-            else:
-                return self._replace(width=new_width)
-        else:  # If we're shrinking up/down
-            new_height = self.height - overlap.height
-            if overlap_center.y < self_center.y:
-                return self._replace(y=other.y2, height=new_height)
-            else:
-                return self._replace(height=new_height)
+        return result if result != self else self
 
     def __bool__(self) -> bool:
         """A rectangle is truthy if it has a nonzero area"""

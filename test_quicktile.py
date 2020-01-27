@@ -396,45 +396,67 @@ class TestRectangle(unittest.TestCase):  # pylint: disable=R0904
 
         display = Rectangle(0, 0, 1280, 1024)
 
-        # Clipping
         self.assertEqual(Rectangle(0, 0, 100, 200).moved_into(display),
                          Rectangle(0, 0, 100, 200))
-        self.assertEqual(Rectangle(-1, -1, 100, 200).moved_into(display),
-                         Rectangle(0, 0, 100, 200))
+        self.assertEqual(Rectangle(-1, -1, 10, 20).moved_into(display),
+                         Rectangle(0, 0, 10, 20))
         self.assertEqual(Rectangle(1200, -1, 100, 200).moved_into(display),
                          Rectangle(1280 - 100, 0, 100, 200))
         self.assertEqual(Rectangle(-1, 1000, 100, 200).moved_into(display),
                          Rectangle(0, 1024 - 200, 100, 200))
         self.assertEqual(Rectangle(1200, -1, 2000, 200).moved_into(display),
-                         Rectangle(0, 0, 1280, 200))
+                         Rectangle(0, 0, 2000, 200))
         self.assertEqual(Rectangle(-1, 1000, 100, 2000).moved_into(display),
-                         Rectangle(0, 0, 100, 1024))
+                         Rectangle(0, 0, 100, 2000))
         self.assertEqual(Rectangle(-1200, 1, 2000, 200).moved_into(display),
-                         Rectangle(0, 1, 1280, 200))
+                         Rectangle(0, 1, 2000, 200))
         self.assertEqual(Rectangle(1, -1000, 100, 2000).moved_into(display),
-                         Rectangle(1, 0, 100, 1024))
-
-        # No Clipping
-        self.assertEqual(Rectangle(0, 0, 100, 200).moved_into(display, False),
-                         Rectangle(0, 0, 100, 200))
-        self.assertEqual(Rectangle(-1, -1, 10, 20).moved_into(display, False),
-                         Rectangle(0, 0, 10, 20))
-        self.assertEqual(Rectangle(1200, -1, 100, 200).moved_into(display,
-                         False), Rectangle(1280 - 100, 0, 100, 200))
-        self.assertEqual(Rectangle(-1, 1000, 100, 200).moved_into(display,
-                         False), Rectangle(0, 1024 - 200, 100, 200))
-        self.assertEqual(Rectangle(1200, -1, 2000, 200).moved_into(display,
-                         False), Rectangle(0, 0, 2000, 200))
-        self.assertEqual(Rectangle(-1, 1000, 100, 2000).moved_into(display,
-                         False), Rectangle(0, 0, 100, 2000))
-        self.assertEqual(Rectangle(-1200, 1, 2000, 200).moved_into(display,
-                         False), Rectangle(0, 1, 2000, 200))
-        self.assertEqual(Rectangle(1, -1000, 100, 2000).moved_into(display,
-                         False), Rectangle(1, 0, 100, 2000))
+                         Rectangle(1, 0, 100, 2000))
 
         # Wrong Type
         with self.assertRaises(TypeError):
             Rectangle(0, 0, 0, 0).moved_into("hello")
+
+    def test_moved_off_of(self):
+        """Rectangle: moved_off_of"""
+        # Moving off a non-intersecting rectangle returns self
+        self.assertIs(self.rect1.moved_off_of(Rectangle(10, 10, 1, 1)),
+            self.rect1)
+
+        # Basic checks that moved_off_of pushes in the right direction
+        rect = Rectangle(x=2, y=4, x2=8, y2=12)
+        print("Testing moved_off_of ", rect)
+        for length, thickness in ((5, 2), (7, 2), (5, 10), (10, 10)):
+            print(length, thickness)
+            self.assertEqual(rect.moved_off_of(
+                Rectangle(x=rect.x + 5, y=rect.y + 2,
+                          width=-length, height=-thickness)),
+                rect._replace(y=4 + 2))
+            self.assertEqual(rect.moved_off_of(
+                Rectangle(x=rect.x2 - 5, y=rect.y2 - 2,
+                          width=length, height=thickness)),
+                rect._replace(y=4 - 2))
+            self.assertEqual(rect.moved_off_of(
+                Rectangle(x=rect.x + 2, y=rect.y + 5,
+                          width=-thickness, height=-length)),
+                rect._replace(x=2 + 2))
+            self.assertEqual(rect.moved_off_of(
+                Rectangle(x=rect.x2 - 2, y=rect.y2 - 5,
+                          width=thickness, height=length)),
+                rect._replace(x=2 - 2))
+
+        # Regression test for a real-world "pushes in the wrong direction"
+        self.assertEqual(
+            Rectangle(x=0, y=1046, width=6, height=34).moved_off_of(
+                Rectangle(x=0, y=1050, width=1279, height=30)),
+            Rectangle(x=0, y=1016, width=6, height=34))
+
+        # Regression test for "using only area of overlap causes it to go crazy
+        # when the rectangle is entirely within the reserved area"
+        self.assertEqual(
+            Rectangle(x=200, y=1055, width=8, height=9).moved_off_of(
+                Rectangle(x=0, y=1050, width=1279, height=30)),
+            Rectangle(x=200, y=1041, width=8, height=9))
 
     def test_subtract(self):
         """Rectangle: subtract"""
@@ -462,6 +484,11 @@ class TestRectangle(unittest.TestCase):  # pylint: disable=R0904
                 Rectangle(x=rect.x2 - 2, y=rect.y2 - 5,
                           width=thickness, height=length)),
                 Rectangle(x=2, y=4, x2=8 - 2, y2=12))
+
+        # Regression test for a real-world "chops off the right edge" error
+        self.assertEqual(Rectangle(x=0, y=1046, width=6, height=34).subtract(
+                Rectangle(x=0, y=1050, width=1279, height=30)),
+            Rectangle(x=0, y=1046, width=6, height=4))
 
     def test_relative_conversion_basic(self):
         """Rectangle: converting to/from relative coordinates works"""
