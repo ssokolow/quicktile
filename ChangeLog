@@ -9,7 +9,11 @@
 - Make move-to-* commands center non-corner destinations for consistency
 - Have move-to-* preserve horizontal/vertical maximization state
 - Add default keybindings for move-to-* commands
+- Fix issue #45 (support desktops where panels reserve space on interior edges)
 - Significant internal reworking to make the codebase more maintainable
+- More FAQ entries
+- Much more automated testing
+- Create a (basic) icon for QuickTile
 
 0.3.0:
 - Split QuickTile up into multiple files for easier refactoring and improvement
