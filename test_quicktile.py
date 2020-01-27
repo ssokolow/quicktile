@@ -12,7 +12,7 @@ __license__ = "GNU GPL 2.0 or later"
 import logging, unittest
 
 # from quicktile import commands
-from quicktile.util import (clamp_idx, euclidean_dist, powerset, Gravity,
+from quicktile.util import (clamp_idx, euclidean_dist, powerset, Edge, Gravity,
                             Rectangle, StrutPartial, UsableRegion, XInitError)
 
 # Ensure code coverage counts modules not yet imported by tests.
@@ -170,37 +170,41 @@ class TestStrutPartial(unittest.TestCase):
                 print("Desktop Rectangle: ", dtop_rect, " | Strut: ", strut)
                 self.assertEqual(strut.as_rects(dtop_rect), [x for x in (
                     # Left
-                    Rectangle(x=dtop_rect.x, y=strut.left_start_y,
+                    (Edge.LEFT, Rectangle(x=dtop_rect.x, y=strut.left_start_y,
                         width=strut.left, y2=strut.left_end_y
-                              ).intersect(dtop_rect),
+                                          ).intersect(dtop_rect)),
                     # Right
-                    Rectangle(x=dtop_rect.x2, y=strut.right_start_y,
+                    (Edge.RIGHT, Rectangle(
+                        x=dtop_rect.x2, y=strut.right_start_y,
                         width=-strut.right, y2=strut.right_end_y
-                              ).intersect(dtop_rect),
+                              ).intersect(dtop_rect)),
                     # Top
-                    Rectangle(x=strut.top_start_x, y=dtop_rect.y,
+                    (Edge.TOP, Rectangle(x=strut.top_start_x, y=dtop_rect.y,
                         x2=strut.top_end_x, height=strut.top
-                              ).intersect(dtop_rect),
+                                         ).intersect(dtop_rect)),
                     # Bottom
-                    Rectangle(x=strut.bottom_start_x, y=dtop_rect.y2,
+                    (Edge.BOTTOM, Rectangle(
+                        x=strut.bottom_start_x, y=dtop_rect.y2,
                         x2=strut.bottom_end_x, height=-strut.bottom
-                              ).intersect(dtop_rect)) if x])
+                              ).intersect(dtop_rect))) if x[1]])
 
     def test_as_rects_pruning(self):
         """StrutPartial: as_rects doesn't return empty rects"""
         dtop_rect = Rectangle(1, 2, 30, 40)
         self.assertEqual(
             StrutPartial(5, 0, 0, 0).as_rects(dtop_rect),
-            [Rectangle(x=1, y=2, width=5, height=40)])
+            [(Edge.LEFT, Rectangle(x=1, y=2, width=5, height=40))])
         self.assertEqual(
             StrutPartial(0, 6, 0, 0).as_rects(dtop_rect),
-            [Rectangle(x=dtop_rect.x2 - 6, y=2, width=6, height=40)])
+            [(Edge.RIGHT, Rectangle(
+                x=dtop_rect.x2 - 6, y=2, width=6, height=40))])
         self.assertEqual(
             StrutPartial(0, 0, 7, 0).as_rects(dtop_rect),
-            [Rectangle(x=1, y=2, width=30, height=7)])
+            [(Edge.TOP, Rectangle(x=1, y=2, width=30, height=7))])
         self.assertEqual(
             StrutPartial(0, 0, 0, 8).as_rects(dtop_rect),
-            [Rectangle(x=1, y=dtop_rect.y2 - 8, width=30, height=8)])
+            [(Edge.BOTTOM, Rectangle(
+                x=1, y=dtop_rect.y2 - 8, width=30, height=8))])
 
 
 class TestRectangle(unittest.TestCase):  # pylint: disable=R0904

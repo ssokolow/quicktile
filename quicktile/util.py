@@ -10,7 +10,7 @@ __license__ = "GNU GPL 2.0 or later"
 
 import math, sys
 from collections import namedtuple
-from enum import Enum
+from enum import Enum, IntEnum, unique
 from itertools import chain, combinations
 
 import gi
@@ -35,6 +35,21 @@ CommandCB = Callable[..., Any]
 # --
 
 # TODO: Re-add log.debug() calls in strategic places
+
+
+@unique
+class Edge(IntEnum):
+    """Constants used by :meth:`StrutPartial.as_rects` to communicate
+    information :class:`UsableRegion` needs to properly handle panel
+    reservations on interior edges.
+
+    The values of the enum's members correspond to the tuple indexes in
+    StrutPartial.
+    """
+    LEFT = 1
+    RIGHT = 2
+    TOP = 3
+    BOTTOM = 4
 
 
 class Gravity(Enum):  # pylint: disable=too-few-public-methods
@@ -250,7 +265,8 @@ class StrutPartial(_StrutPartial):
             left_start_y, left_end_y, right_start_y, right_end_y,
             top_start_x, top_end_x, bottom_start_x, bottom_end_x)
 
-    def as_rects(self, desktop_rect: 'Rectangle') -> 'List[Rectangle]':
+    def as_rects(self, desktop_rect: 'Rectangle'
+                 ) -> 'List[Tuple[Edge, Rectangle]]':
         """Resolve self into absolute coordinates relative to ``desktop_rect``
 
         Note that struts are relative to the bounding box of the whole desktop,
@@ -264,30 +280,30 @@ class StrutPartial(_StrutPartial):
         """
         return [x for x in (
             # Left
-            Rectangle(
+            (Edge.LEFT, Rectangle(
                 x=desktop_rect.x,
                 y=self.left_start_y,
                 width=self.left,
-                y2=self.left_end_y).intersect(desktop_rect),
+                y2=self.left_end_y).intersect(desktop_rect)),
             # Right
-            Rectangle(
+            (Edge.RIGHT, Rectangle(
                 x=desktop_rect.x2,
                 y=self.right_start_y,
                 width=-self.right,
-                y2=self.right_end_y).intersect(desktop_rect),
+                y2=self.right_end_y).intersect(desktop_rect)),
             # Top
-            Rectangle(
+            (Edge.TOP, Rectangle(
                 x=self.top_start_x,
                 y=desktop_rect.y,
                 x2=self.top_end_x,
-                height=self.top).intersect(desktop_rect),
+                height=self.top).intersect(desktop_rect)),
             # Bottom
-            Rectangle(
+            (Edge.BOTTOM, Rectangle(
                 x=self.bottom_start_x,
                 y=desktop_rect.y2,
                 x2=self.bottom_end_x,
-                height=-self.bottom).intersect(desktop_rect),
-        ) if bool(x)]
+                height=-self.bottom).intersect(desktop_rect)),
+        ) if bool(x[1])]
 
 # Keep _StrutPartial from showing up in automated documentation
 del _StrutPartial
@@ -792,8 +808,47 @@ class UsableRegion(object):
         strut_rects = []  # type: List[Rectangle]
         for strut in self._struts:
             # TODO: Test for off-by-one bugs
-            strut_rects.extend(strut.as_rects(desktop_rect))
+            # TODO: Think of a more efficient way to do this
+            for strut_pair in strut.as_rects(desktop_rect):
+                    strut_rects.append(self._trim_strut(strut_pair))
         self._strut_rects = strut_rects
+
+    def _trim_strut(self, strut: Tuple[Edge, Rectangle]) -> Rectangle:
+        """Trim a strut rectangle to just the monitor it applies to"""
+        edge, strut_rect = strut
+
+        for monitor in self._monitors:
+            overlap = monitor.intersect(strut_rect)
+            if not bool(overlap):
+                continue
+
+            # Gotta do this manually unless I decide to add support for
+            # subtract taking a directional hint so it doesn't chop off the
+            # wrong end.
+            if overlap.width == monitor.width:
+                if edge == Edge.LEFT:
+                    strut_rect = Rectangle(x=monitor.x2, y=strut_rect.y,
+                        width=strut_rect.x2 - monitor.x2,
+                        height=strut_rect.height
+                                           )
+                elif edge == Edge.RIGHT:
+                    strut_rect = Rectangle(x=strut_rect.x, y=strut_rect.y,
+                        width=monitor.x - strut_rect.x,
+                        height=strut_rect.height
+                                           )
+            if overlap.height == monitor.height:
+                if edge == Edge.TOP:
+                    strut_rect = Rectangle(x=strut_rect.x, y=monitor.y2,
+                        width=strut_rect.width,
+                        height=strut_rect.y2 - monitor.y2,
+                                           )
+                elif edge == Edge.BOTTOM:
+                    strut_rect = Rectangle(x=strut_rect.x, y=strut_rect.y,
+                        height=monitor.y - strut_rect.y,
+                        width=strut_rect.width
+                                           )
+
+        return strut_rect
 
     def clip_to_usable_region(self, rect: Rectangle) -> Optional[Rectangle]:
         """Given a rectangle, return a copy that has been shrunk to fit inside
@@ -818,14 +873,9 @@ class UsableRegion(object):
         if not monitor:
             return None
 
-        print("---")
-        print(rect, 'V', monitor)
-
         rect = rect.intersect(monitor)
         for panel in self._strut_rects:
-            print('=', rect, '-', panel)
             rect = rect.subtract(panel)
-        print('=', rect, bool(rect))
 
         # Apparently MyPy can't see through custom __bool__ implementations
         return rect or None  # type: ignore
