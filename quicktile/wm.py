@@ -106,10 +106,8 @@ class WindowManager(object):
 
         :raises Exception: Unable to retrieve monitor geometries
 
-        .. todo:: Use a more specific exception.
-        .. todo:: Investigate going back to calling
-           :meth:`update_geometry_cache` before every command.
-
+        .. todo:: Use a more specific exception when
+           :meth:`update_geometry_cache` fails to retrieve monitor geometries.
         """
 
         # Work around xinerama_get_screen_count not getting registered in
@@ -262,8 +260,6 @@ class WindowManager(object):
         :param win: A GTK or Wnck Window object or a raw X11 window ID.
         :param name: An atom name or a handle returned by
             :meth:`Xlib.display.Display.create_resource_object`.
-
-        .. todo:: Hide :meth:`_property_prep` from the docs
         """
         if isinstance(win, (Gdk.Window, Wnck.Window)):
             win = win.get_xid()
@@ -412,7 +408,7 @@ class WindowManager(object):
             operations like move and resize.)
 
         .. todo:: Look for a way to accomplish this with a cleaner method
-            signature. This is getting a little hairy.
+            signature. :meth:`reposition` is getting a little hairy.
 
         .. todo:: Decide how to refactor :meth:`reposition` to allow for
             smarter handling of position clamping when cycling windows through

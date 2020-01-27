@@ -5,9 +5,9 @@ Developer's Guide
    :local:
 
 .. todo:: Aside from the obvious factor that it exposes a lot of architectural
-   cleanup that needs to be done, something about this document feels sloppy to
-   me. I think reading some O'Reilly books to examine how they're written might
-   help me to figure out what's wrong.
+   cleanup that needs to be done, something about :doc:`developing` feels
+   sloppy to me. I think reading some O'Reilly books to examine how they're
+   written might help me to figure out what's wrong.
 
 Setting up a Development Environment
 ------------------------------------
@@ -163,7 +163,8 @@ Quirks of the Codebase's Structure
 
 .. todo:: Figure out a way to get URLs working in Sphinx's Graphviz_ extension
    that doesn't break when the default CSS downscales the diagram to keep it
-   fitting in the document and then diagram the functional interdependencies.
+   fitting in the document and then diagram QuickTile's functional
+   interdependencies.
 
 Good Development Practice
 -------------------------
@@ -197,8 +198,6 @@ revise them:
   should not decrease. (Enforcing this standard outside of that module will
   not be feasible until further refactoring and test harness work is
   completed.)
-
-.. todo:: Complete this section (eg. MyPy coverage)
 
 Once your changes are ready, the recommended way to submit them is via
 `pull request`_, as this will automatically submit them to the various

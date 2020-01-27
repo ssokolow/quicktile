@@ -49,8 +49,10 @@ log = logging.getLogger(__name__)
 class TestHelpers(unittest.TestCase):
     """Tests for loose functions
 
-    .. todo:: Switch to pytest to get the assertEqual readout from assert in
-           bare functions.
+    .. todo:: Switch to pytest_ to get the ``assertEqual`` readout from assert
+       in bare functions.
+
+    .. _pytest: https://docs.pytest.org/
     """
 
     def test_clamp_idx_default(self):

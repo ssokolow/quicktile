@@ -334,8 +334,8 @@ the configuration file.
 .. image:: diagrams/png/monitor-next.png
    :alt: diagram
 
-.. todo:: Brainstorm ways to distinguish ``-next`` and ``-switch`` visually
-   that don't overcomplicate the visuals.
+.. todo:: Brainstorm ways to distinguish the ``-next`` and ``-switch`` commands
+   visually that don't overcomplicate the illustrations.
 
 ``monitor-switch-all``
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -458,8 +458,9 @@ For users who have laid out their workspaces in a column, this is equivalent to
 Workspace-wise Window Manipulation
 ----------------------------------
 
-.. todo:: Decide whether to rework these to "bring" or add such variants and
-          update the docs accordingly.
+.. todo:: Decide whether to rework the ``workspace-send-*`` commands to *mean*
+    ``workspace-bring-*``, to add such commands, or to rework the internals
+    so it's easy to dispatch a "send, then go" sequence from a single binding.
 
 ``all-desktops``
 ^^^^^^^^^^^^^^^^
@@ -600,8 +601,8 @@ window manager to decide what it means.
 
 ----
 
-.. todo:: Move the descriptions into the source code and then make this file
-          programmatically generated.
+.. todo:: Move the descriptions in :doc:`commands` into the source code and
+          then make it programmatically generated.
 
 Special thanks to `David Stygstra <https://github.com/stygstra>`_ for creating
 the initial 25 diagrams and establishing their style.

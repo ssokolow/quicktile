@@ -239,8 +239,8 @@ class KeyBinder(object):
         :returns: The :any:`power set <quicktile.util.powerset>` of ``ignored``
             with ``modmask`` bitwise ORed onto each entry.
 
-        .. todo:: Decide whether to make this public when I turn off
-            documenting private members.
+        .. todo:: Decide whether to make this :meth:`_vary_modmask` public when
+            I turn off documenting private members.
         """
 
         for ignored in powerset(ignored):

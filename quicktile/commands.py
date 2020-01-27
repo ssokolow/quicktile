@@ -243,7 +243,8 @@ def cycle_dimensions(winman: WindowManager,
     :returns: The new window dimensions.
 
     .. todo:: Refactor :func:`cycle_dimensions` to be less of a big pile.
-    .. todo:: Consider replacing ``dimensions`` with a custom type.
+    .. todo:: Consider replacing the ``dimensions`` argument to
+        :func:`cycle_dimensions` with a custom type.
     """
     win_geom = Rectangle(*win.get_geometry()).to_relative(
         state['monitor_geom'])

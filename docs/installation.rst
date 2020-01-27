@@ -271,8 +271,8 @@ do the following.
     sudo pip3 uninstall quicktile
     sudo rm /usr/local/bin/quicktile
 
-.. todo:: Check whether pip is still failing to remove the ``console_scripts``
-    entry-points that it generates.
+.. todo:: Check whether :command:`pip3` is still failing to remove the
+    ``console_scripts`` entry-points that it generates.
 
 
 **B. If you installed via install.sh...**

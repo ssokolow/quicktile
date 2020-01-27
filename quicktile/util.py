@@ -466,7 +466,8 @@ class Rectangle(_Rectangle):
         return Rectangle(x1, y1, max(0, x2 - x1), max(0, y2 - y1))
 
     def subtract(self, other: 'Rectangle') -> 'Rectangle':
-        """Subtract a :class:`Rectangle` from this one.
+        """Return a copy of ``self`` which has been shrunk along one axis
+        such that it no longer overlaps ``other``.
 
         This is implemented by shrinking the width/height of ``self`` away from
         ``other`` until they no longer overlap.
@@ -546,7 +547,8 @@ class Rectangle(_Rectangle):
                     (self.y <= other.y <= other.y2 <= self.y2))
 
     def union(self, other: 'Rectangle') -> 'Rectangle':
-        """The bounding box of two rectangles, assuming top-left gravity
+        """Assuming top-left gravity, return the smallest rectangle that both
+        ``self`` and ``other`` fit inside. (ie. the bounding box)
 
         :raises TypeError: ``other`` was not a :class:`Rectangle`
 
@@ -799,7 +801,14 @@ class XInitError(Exception):
 
     def __str__(self):
         """Augment :any:`str` output to clarify that a user should look
-        outside QuickTile for the cause."""
+        outside QuickTile for the cause.
+
+
+        .. code-block::
+
+            XInitError: Hello, I am your usual exception message
+                (The cause of this error lies outside of QuickTile)
+        """
         return ("%s\n\t(The cause of this error lies outside of QuickTile)" %
                 Exception.__str__(self))
 

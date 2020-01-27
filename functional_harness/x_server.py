@@ -72,8 +72,9 @@ def x_server(argv: List[str], screens: Dict[int, str]
         a value to the given FD which could not be decoded as UTF-8 when it
         should have been part of the 7-bit ASCII subset of UTF-8.
 
-    .. todo:: Either don't accept an arbitrary string as input or default to a
-        value likely to work with other X servers rather than erroring out.
+    .. todo:: Either don't accept an arbitrary ``argv`` string as input to
+        :func:`x_server` or default to a behaviour likely to work with other X
+        servers rather than erroring out.
     """
     # Check for missing requirements
     for cmd in ['xauth', argv[0]]:

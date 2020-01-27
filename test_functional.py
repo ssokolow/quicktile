@@ -4,8 +4,8 @@
 
 .. todo:: Don't forget to test unusual configurations such as:
 
-    1. monitor-* commands with only one monitor
-    2. workspace-* commands with only one workspace
+    1. ``monitor-*`` commands with only one monitor
+    2. ``workspace-*`` commands with only one workspace
     3. Having screens 1, 2, and 4 but not 0 or 3 (eg. hotplug aftermath)
     4. Having no windows on the desktop
     5. Having no window manager (with and without windows)

@@ -1,15 +1,18 @@
 """Entry point, configuration parser, and main loop
 
 .. todo::
- - Audit all of my TODOs and API docs for accuracy and staleness.
+ - Audit all of my in-code TODOs for accuracy and staleness.
  - Move :func:`Wnck.set_client_type` call to a more appropriate place
    (:mod:`quicktile.wm`?)
  - Complete the automated test suite.
  - Finish refactoring the code to be cleaner and more maintainable.
- - Reconsider use of the name ``--daemonize``. That tends to imply
+ - Reconsider use of the name
+   `-\\-daemonize <../cli.html#cmdoption-quicktile-d>`_. That tends to imply
    self-backgrounding.
  - Decide whether to replace `python-xlib`_ with `xcffib`_
-   (the Python equivalent to ``libxcb``).
+   (the Python equivalent to ``libxcb``). On the one hand, python-xlib looks
+   like it'd probably be easier to write an :file:`objects.inv` for at first
+   glance. On the other hand, `xcffib`_ binds to the newer XCB API.
  - Implement the secondary major features of WinSplit Revolution (eg.
    process-shape associations, locking/welding window edges, etc.)
  - Consider rewriting :func:`quicktile.commands.cycle_dimensions` to allow
@@ -338,8 +341,9 @@ def main() -> None:
     .. todo:: Rearchitect so the hack with registering
         :func:`quicktile.commands.cycle_dimensions` inside
         :func:`quicktile.__main__.main` isn't necessary.
-    .. todo:: Rework python-xlib failure model so QuickTile will know to exit
-        if all keybinding attempts failed and D-Bus also couldn't be bound.
+    .. todo:: Rework ``python-xlib`` failure model so QuickTile will know to
+        exit if all keybinding attempts failed and D-Bus also couldn't
+        be bound.
     """
     parser = argparser()
     args = parser.parse_args()
