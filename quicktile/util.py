@@ -68,14 +68,20 @@ def clamp_idx(idx: int, stop: int, wrap: bool=True) -> int:
 
 
 def euclidean_dist(vec1: Iterable, vec2: Iterable) -> float:
-    """Calculate the euclidean distance between two points
+    """Calculate the `euclidean distance`_ between two points
 
     :param vec1: The first coordinate point.
     :param vec2: The second coordinate point.
     :returns: The euclidean distance between the two points.
 
     .. warning:: This uses :func:`zip`. If one coordinate is of a higher
-        dimensionality than the other, it will be truncated to match.
+        dimensionality than the other, it will be silently truncated to match.
+
+    .. todo:: Consider explicitly supporting :class:`Rectangle` so this can
+        cleanly take two rectangles and compare their centers without
+        boilerplate.
+
+    .. _euclidean distance: https://en.wikipedia.org/wiki/Euclidean_distance
     """
     return math.sqrt(sum(
         (coord1 - coord2) ** 2
@@ -127,7 +133,7 @@ def fmt_table(rows: Union[Dict, Iterable[List]],
          Foo     Wun
 
     .. warning:: This uses :func:`zip` to combine things. The number of columns
-        displayed will be defined by the narrowest of all rows.
+        displayed will be defined by the row with the fewest columns.
 
     .. todo:: Refactor :func:`fmt_table`. Even I don't fully understand what
         my past self wrote by now.
