@@ -608,15 +608,80 @@ class TestUsableRegion(unittest.TestCase):
         #       (`Virtual` is the Xorg.conf setting which allows you to scroll
         #       around a desktop bigger that what the monitors show.)
 
-    def test_find_usable_rect(self):
-        """UsableRegion: find_usable_rect"""
+    def test_find_monitor_for(self):
+        """UsableRegion: find_monitor_for"""
         test_region = UsableRegion()
 
         # No monitors set
-        self.assertIsNone(test_region.find_usable_rect(Rectangle(0, 0, 1, 1),
-            fallback=False))
-        self.assertIsNone(test_region.find_usable_rect(Rectangle(0, 0, 1, 1),
-            fallback=True))
+        self.assertIsNone(test_region.find_monitor_for(Rectangle(0, 0, 1, 1)))
+
+        # Actual rectangles of my monitors
+        # TODO: Double-check that this matches the real-world API outputs
+        #       (eg. make sure there are no lurking off-by-one errors)
+        test_region.set_monitors([
+            Rectangle(0, 56, 1280, 1024),
+            Rectangle(1280, 0, 1920, 1080),
+            Rectangle(3200, 56, 1280, 1024)])
+
+        # Actual struts harvested from my desktop's panels
+        # to verify that it's returning the *monitor* rectangle and not the
+        # largest usable rectangle within.
+        #
+        # (Keep the empty struts at the beginning and end. One from an
+        #  auto-hiding Plasma 5 panel caught an early bug where
+        #  only the last strut subtracted from a monitor was retained)
+        test_region.set_panels([
+            StrutPartial(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+            StrutPartial(0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 3200, 4479),
+            StrutPartial(0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 1280, 3199),
+            StrutPartial(0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 1279),
+            StrutPartial(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        ])
+
+        # Out-of-bounds Space
+        self.assertEqual(test_region.find_monitor_for(
+            Rectangle(-3, 1, 1, 1)), Rectangle(0, 56, 1280, 1024))
+        self.assertEqual(test_region.find_monitor_for(
+            Rectangle(200, -5, 1, 1)), Rectangle(0, 56, 1280, 1024))
+        self.assertEqual(test_region.find_monitor_for(
+            Rectangle(5000, 200, 1, 1)), Rectangle(3200, 56, 1280, 1024))
+        self.assertEqual(test_region.find_monitor_for(
+            Rectangle(200, 5000, 1, 1)), Rectangle(0, 56, 1280, 1024))
+
+        # Dead Space
+        self.assertEqual(test_region.find_monitor_for(
+            Rectangle(1, 1, 1, 1)), Rectangle(0, 56, 1280, 1024))
+        self.assertEqual(test_region.find_monitor_for(
+            Rectangle(3203, 1, 1, 1)), Rectangle(3200, 56, 1280, 1024))
+
+        # Space under panels
+        self.assertEqual(test_region.find_monitor_for(
+            Rectangle(0, 1277, 1, 1)), Rectangle(0, 56, 1280, 1024))
+        self.assertEqual(test_region.find_monitor_for(
+            Rectangle(0, 2000, 1, 1)), Rectangle(0, 56, 1280, 1024))
+        self.assertEqual(test_region.find_monitor_for(
+            Rectangle(3000, 2000, 1, 1)), Rectangle(1280, 0, 1920, 1080))
+        self.assertEqual(test_region.find_monitor_for(
+            Rectangle(3400, 1277, 1, 1)), Rectangle(3200, 56, 1280, 1024))
+
+        # Available Space
+        self.assertEqual(test_region.find_monitor_for(
+            Rectangle(10, 640, 1, 1)),
+            Rectangle(x=0, y=56, width=1280, height=1024))
+        self.assertEqual(test_region.find_monitor_for(
+            Rectangle(3000, 640, 1, 1)),
+            Rectangle(x=1280, y=0, width=1920, height=1080))
+        self.assertEqual(test_region.find_monitor_for(
+            Rectangle(3300, 640, 1, 1)),
+            Rectangle(x=3200, y=56, width=1280, height=1024))
+
+    def test_clip_to_usable_region(self):
+        """UsableRegion: clip_to_usable_region"""
+        test_region = UsableRegion()
+
+        # Quick integration test for internal call to find_monitor_for
+        self.assertIsNone(
+            test_region.clip_to_usable_region(Rectangle(0, 0, 1, 1)))
 
         # Actual rectangles of my monitors
         # TODO: Double-check that this matches the real-world API outputs
@@ -638,70 +703,211 @@ class TestUsableRegion(unittest.TestCase):
             StrutPartial(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
         ])
 
-        # Out-of-bounds Space (no fallback)
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(-3, 1, 1, 1), fallback=False), None)
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(200, -5, 1, 1), fallback=False), None)
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(5000, 200, 1, 1), False), None)
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(200, 5000, 1, 1), False), None)
+        # Out of bounds (no overlap)
+        self.assertIsNone(test_region.clip_to_usable_region(  # top
+            Rectangle(3200, -4, 3, 4)))
+        self.assertIsNone(test_region.clip_to_usable_region(  # right
+            Rectangle(4480, 0, 3, 4)))
+        self.assertIsNone(test_region.clip_to_usable_region(  # bottom
+            Rectangle(3200, 1080, 3, 4)))
+        self.assertIsNone(test_region.clip_to_usable_region(  # left
+            Rectangle(-3, 100, 3, 4)))
 
-        # Out-of-bounds Space (fallback)
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(-3, 1, 1, 1)), Rectangle(0, 56, 1280, 994))
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(200, -5, 1, 1)), Rectangle(0, 56, 1280, 994))
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(5000, 200, 1, 1)), Rectangle(3200, 56, 1280, 994))
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(200, 5000, 1, 1)), Rectangle(0, 56, 1280, 994))
+        # Out of bounds (overlap)
+        # Top
+        bottom = 1024 + 56
+        panel = 30
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(0, -4, 3, 4 + 56 + 4)), Rectangle(0, 56, 3, 4))
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(1920, -4, 3, 4 + 4)), Rectangle(1920, 0, 3, 4))
+        # Right
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(4480 - 3, 56, 3 + 3, 4)), Rectangle(4480 - 3, 56, 3, 4))
+        # Bottom
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(0, bottom - panel - 4, 3, 4 + panel + 4)),
+            Rectangle(0, bottom - panel - 4, 3, 4))
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(1920, 1080 - panel - 4, 3, 4 + panel + 4)),
+            Rectangle(1920, 1080 - panel - 4, 3, 4))
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(3300, bottom - panel - 4, 3, 4 + panel + 4)),
+            Rectangle(3300, bottom - panel - 4, 3, 4))
+        # Left
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(-3, 100, 6, 4)), Rectangle(0, 100, 6 - 3, 4))
 
-        # Dead Space (no fallback)
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(1, 1, 1, 1), fallback=False), None)
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(3203, 1, 1, 1), False), None)
+        # Dead Space (no overlap)
+        self.assertIsNone(test_region.clip_to_usable_region(
+            Rectangle(0, 0, 20, 20)))
+        self.assertIsNone(test_region.clip_to_usable_region(
+            Rectangle(3200, 0, 20, 20)))
 
-        # Dead Space (fallback)
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(1, 1, 1, 1)), Rectangle(0, 56, 1280, 994))
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(3203, 1, 1, 1)), Rectangle(3200, 56, 1280, 994))
+        # Dead Space (overlap)
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(0, 0, 80, 80)), Rectangle(0, 56, 80, 80 - 56))
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(3200, 0, 80, 80)), Rectangle(3200, 56, 80, 80 - 56))
 
-        # Reserved Space (no fallback)
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(0, 1277, 1, 1), fallback=False), None)
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(0, 2000, 1, 1), False), None)
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(3000, 2000, 1, 1), False), None)
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(3400, 1277, 1, 1), False), None)
+        # Reserved Space (no overlap)
+        self.assertIsNone(test_region.clip_to_usable_region(
+            Rectangle(0, 1277, 1, 1)), None)
+        self.assertIsNone(test_region.clip_to_usable_region(
+            Rectangle(1920, 1060, 1, 1)), None)
+        self.assertIsNone(test_region.clip_to_usable_region(
+            Rectangle(3200, 1277, 1, 1)), None)
 
-        # Reserved Space (fallback)
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(0, 1277, 1, 1)), Rectangle(0, 56, 1280, 994))
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(0, 2000, 1, 1)), Rectangle(0, 56, 1280, 994))
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(3000, 2000, 1, 1)), Rectangle(1280, 0, 1920, 1050))
-        self.assertEqual(test_region.find_usable_rect(
-            Rectangle(3400, 1277, 1, 1)), Rectangle(3200, 56, 1280, 994))
+        # Reserved Space (overlap)
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(0, bottom - panel - 10, 1, 40)),
+            Rectangle(0, bottom - panel - 10, 1, 10))
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(1920, 1080 - panel - 10, 1, 40)),
+            Rectangle(1920, bottom - panel - 10, 1, 10))
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(3200, bottom - panel - 10, 1, 40)),
+            Rectangle(3200, bottom - panel - 10, 1, 10))
 
         # Available Space
-        self.assertEqual(test_region.find_usable_rect(
+        self.assertEqual(test_region.clip_to_usable_region(
             Rectangle(10, 640, 1, 1)),
-            Rectangle(x=0, y=56, width=1280, height=994))
-        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(10, 640, 1, 1))
+        self.assertEqual(test_region.clip_to_usable_region(
             Rectangle(3000, 640, 1, 1)),
-            Rectangle(x=1280, y=0, width=1920, height=1050))
-        self.assertEqual(test_region.find_usable_rect(
+            Rectangle(3000, 640, 1, 1))
+        self.assertEqual(test_region.clip_to_usable_region(
             Rectangle(3300, 640, 1, 1)),
-            Rectangle(x=3200, y=56, width=1280, height=994))
+            Rectangle(3300, 640, 1, 1))
 
         # TODO: Test edge pixels for off-by-one errors
+
+    def test_move_to_usable_region(self):
+        """UsableRegion: move_to_usable_region"""
+        test_region = UsableRegion()
+
+        # Quick integration test for internal call to find_monitor_for
+        self.assertIsNone(
+            test_region.move_to_usable_region(Rectangle(0, 0, 1, 1)))
+
+        # Actual rectangles of my monitors
+        # TODO: Double-check that this matches the real-world API outputs
+        #       (eg. make sure there are no lurking off-by-one errors)
+        test_region.set_monitors([
+            Rectangle(0, 56, 1280, 1024),
+            Rectangle(1280, 0, 1920, 1080),
+            Rectangle(3200, 56, 1280, 1024)])
+
+        # Actual struts harvested from my desktop's panels
+        # (Keep the empty struts at the beginning and end. One from an
+        #  auto-hiding Plasma 5 panel caught an early bug where
+        #  only the last strut subtracted from a monitor was retained)
+        test_region.set_panels([
+            StrutPartial(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+            StrutPartial(0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 3200, 4479),
+            StrutPartial(0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 1280, 3199),
+            StrutPartial(0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 1279),
+            StrutPartial(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        ])
+
+        # Out-of-bounds Space
+        bottom = 1024 + 56
+        panel = 30
+        self.assertEqual(test_region.move_to_usable_region(
+            Rectangle(-3, 1, 2, 3)), Rectangle(0, 56, 2, 3))
+        self.assertEqual(test_region.move_to_usable_region(
+            Rectangle(200, -5, 4, 5)), Rectangle(200, 56, 4, 5))
+        self.assertEqual(test_region.move_to_usable_region(
+            Rectangle(5000, 200, 6, 7)), Rectangle(4480 - 6, 200, 6, 7))
+        self.assertEqual(test_region.move_to_usable_region(
+            Rectangle(200, 5000, 8, 31)),
+            Rectangle(200, bottom - panel - 31, 8, 31))
+        self.assertEqual(test_region.move_to_usable_region(
+            Rectangle(2000, 5000, 10, 32)),
+            Rectangle(2000, 1080 - panel - 32, 10, 32))
+        self.assertEqual(test_region.move_to_usable_region(
+            Rectangle(3300, 5000, 12, 33)),
+            Rectangle(3300, bottom - panel - 33, 12, 33))
+
+        # Dead Space
+        self.assertEqual(test_region.move_to_usable_region(
+            Rectangle(1, 2, 3, 4)), Rectangle(1, 56, 3, 4))
+        self.assertEqual(test_region.move_to_usable_region(
+            Rectangle(3203, 5, 6, 7)), Rectangle(3203, 56, 6, 7))
+
+        # Reserved Space (fallback)
+        self.assertEqual(test_region.move_to_usable_region(
+            Rectangle(0, bottom - panel - 3, 1, 5)),
+            Rectangle(0, bottom - panel - 5, 1, 5))
+        self.assertEqual(test_region.move_to_usable_region(
+            Rectangle(2000, bottom - panel - 4, 1, 6)),
+            Rectangle(2000, bottom - panel - 6, 1, 6))
+        self.assertEqual(test_region.move_to_usable_region(
+            Rectangle(3300, bottom - panel + 5, 1, 7)),
+            Rectangle(3300, bottom - panel - 7, 1, 7))
+
+        # Available Space
+        for test_rect in (
+            Rectangle(10, 640, 1, 1),
+            Rectangle(3000, 640, 1, 1),
+            Rectangle(3300, 640, 1, 1),
+        ):
+            self.assertIs(test_region.move_to_usable_region(test_rect),
+                test_rect)
+
+        # TODO: Test edge pixels for off-by-one errors
+
+    def test_issue_45(self):
+        """UsableRegion: struts on internal monitor edges work properly
+
+        (Test that the ambiguous aspect of the spec is interpreted in
+        accordance with how Unity actually implemented it.)
+
+        """
+        # Use the actual --debug geometry from issue 45 so this is also
+        # a regression test.
+        test_region = UsableRegion()
+        test_region.set_monitors([
+            Rectangle(0, 0, 1920, 1200), Rectangle(1920, 0, 1920, 1200)])
+        test_region.set_panels([StrutPartial(*x) for x in [
+            [49, 0, 0, 0, 24, 1199, 0, 0, 0, 0, 0, 0],
+            [1969, 0, 0, 0, 24, 1199, 0, 0, 0, 0, 0, 0],
+            [0, 0, 24, 0, 0, 0, 0, 0, 0, 1919, 0, 0],
+            [0, 0, 24, 0, 0, 0, 0, 0, 1920, 3839, 0, 0]]])
+        # Right monitor (easy case)
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(1920, 0, 100, 100)),
+            Rectangle(x=1969, y=24, width=100 - 49, height=100 - 24))
+
+        # Left monitor (problem case)
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(0, 0, 100, 100)),
+            Rectangle(x=49, y=24, width=100 - 49, height=100 - 24))
+
+    def test_issue_108(self):
+        """UsableRegion: windows use of space left free by narrow panels
+
+        Regression test for #64, #65, and #108.
+        """
+
+        test_region = UsableRegion()
+        test_region.set_monitors([Rectangle(0, 0, 1920, 1080)])
+        test_region.set_panels([StrutPartial(bottom=25,
+            bottom_start_x=1400, bottom_end_x=1920)])
+
+        # Left half
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(0, 0, 960, 1080)),
+            Rectangle(x=0, y=0, width=960, height=1080))
+
+        # Right half
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(960, 0, 960, 1080)),
+            Rectangle(x=960, y=0, width=960, height=1080 - 25))
+
+    def test_update_no_valid_monitors(self):
+        """UsableRegion: Empty list of monitors doesn't raise exception"""
+        UsableRegion().set_monitors([])
 
     def test_update_typecheck(self):
         """UsableRegion: type enforcement for internal _update function"""
@@ -739,7 +945,7 @@ class TestUsableRegion(unittest.TestCase):
             Rectangle(0, 0, 0, 0)])
 
         # pylint: disable=protected-access
-        self.assertEqual(list(test_region._usable.keys()),
+        self.assertEqual(list(test_region._monitors),
             [Rectangle(1280, 0, 1280, 1024)])
 
     def test_repr(self):

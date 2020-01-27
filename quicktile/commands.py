@@ -80,19 +80,17 @@ class CommandRegistry(object):
                       "and geometry %r", window, window.get_name(), win_rect)
 
         monitor_id, monitor_geom = winman.get_monitor(window)
-        use_rect = winman.usable_region.find_usable_rect(win_rect)
 
         # MPlayer safety hack
-        if not use_rect:
+        if not winman.usable_region:
             logging.debug("Received a worthless value for largest "
                           "rectangular subset of desktop (%r). Doing "
-                          "nothing.", use_rect)
+                          "nothing.", winman.usable_region)
             return False
 
         state.update({
             "monitor_id": monitor_id,
             "monitor_geom": monitor_geom,
-            "usable_rect": use_rect,
         })
         return True
 
@@ -246,16 +244,13 @@ def cycle_dimensions(winman: WindowManager,
     .. todo:: Consider replacing the ``dimensions`` argument to
         :func:`cycle_dimensions` with a custom type.
     """
-    win_geom = Rectangle(*win.get_geometry()).to_relative(
-        state['monitor_geom'])
-
-    # Get the bounding box for the usable region of the current monitor
-    clip_box = state['usable_rect']
+    monitor_rect = state['monitor_geom']
+    win_rect_rel = Rectangle(*win.get_geometry()).to_relative(monitor_rect)
 
     logging.debug("Selected preset sequence:\n\t%r", dimensions)
 
     # Resolve proportional (eg. 0.5) and preserved (None) coordinates
-    dims = [resolve_fractional_geom(i or win_geom, clip_box)
+    dims = [resolve_fractional_geom(i or win_rect_rel, monitor_rect)
         for i in dimensions]
     if not dims:
         return None
@@ -279,23 +274,25 @@ def cycle_dimensions(winman: WindowManager,
     winman.set_property(win, '_QUICKTILE_CYCLE_POS',
         [int(state.get('cmd_idx', 0)), pos],
         prop_type=Xatom.INTEGER, format_size=32)
-    result = Rectangle(*dims[pos]).from_relative(clip_box)
+
+    result = None  # type: Optional[Rectangle]
+    result = Rectangle(*dims[pos]).from_relative(monitor_rect)
 
     logging.debug("Target preset is %s relative to monitor %s",
-                  result, clip_box)
+                  result, monitor_rect)
 
     # If we're overlapping a panel, fall back to a monitor-specific
     # analogue to _NET_WORKAREA to prevent overlapping any panels and
     # risking the WM potentially meddling with the result of resposition()
-    test_result = result.intersect(clip_box)
+    test_result = winman.usable_region.clip_to_usable_region(result)
     if test_result != result:
         result = test_result
         logging.debug("Result exceeds usable (non-rectangular) region of "
                       "desktop. (overlapped a non-fullwidth panel?) Reducing "
-                      "to within largest usable rectangle: %s", clip_box)
+                      "to within largest usable rectangle: %s", test_result)
 
     logging.debug("Calling reposition() with default gravity and dimensions "
-                  "%r", tuple(result))
+                  "%r", result)
     winman.reposition(win, result)
     return result
 
@@ -381,24 +378,27 @@ def move_to_position(winman: WindowManager,
 
     :param win: The window to operate on.
     """
-    # Have to specify types in the description pending a fix for
-    # https://github.com/agronholm/sphinx-autodoc-typehints/issues/124
-
-    usable_rect = state['usable_rect']
-
-    # TODO: Think about ways to refactor scaling for better maintainability
+    monitor_rect = state['monitor_geom']
     win_rect = Rectangle(*win.get_geometry())
-    target = Rectangle(
-        x=gravity.value[0] * usable_rect.width,
-        y=gravity.value[1] * usable_rect.height,
-        width=win_rect.width,
-        height=win_rect.height)
-    logging.debug("Calling reposition() with %r gravity and dimensions %r",
-                  gravity, tuple(target))
 
-    winman.reposition(win, target, usable_rect,
-        keep_maximize=True,
-        gravity=gravity,
+    # Build a target rectangle
+    # TODO: Think about ways to refactor scaling for better maintainability
+    target = Rectangle(
+        x=gravity.value[0] * monitor_rect.width,
+        y=gravity.value[1] * monitor_rect.height,
+        width=win_rect.width,
+        height=win_rect.height
+    ).from_gravity(gravity).from_relative(monitor_rect)
+
+    # Push it out from under any panels
+    logging.debug("Clipping rectangle %r\n\tto usable region %r",
+                  target, winman.usable_region)
+    confined_target = winman.usable_region.move_to_usable_region(target)
+
+    # Actually reposition the window
+    # (and be doubly-sure we're not going to resize it by accident)
+    logging.debug("Calling reposition() with dimensions %r", confined_target)
+    winman.reposition(win, confined_target, keep_maximize=True,
         geometry_mask=Wnck.WindowMoveResizeMask.X |
                       Wnck.WindowMoveResizeMask.Y)
 

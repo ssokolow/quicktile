@@ -731,30 +731,24 @@ del _Rectangle
 
 
 class UsableRegion(object):
-    # pylint: disable=line-too-long
     """A representation of the usable portion of a desktop
 
-    (In essence, this calculates per-monitor `_NET_WORKAREA`_ rectangles
-    and allows lookup of the correct one for a given target rectangle)
-
-    .. todo:: Support a more versatile API which allows windows to be clamped
-        to a non-rectangular usable region.
-
-    .. _`_NET_WORKAREA`: https://specifications.freedesktop.org/wm-spec/1.3/ar01s03.html#idm45126090602128
-    """  # NOQA
+    This stores a set of monitors and a set of :class:`StrutPartial` instances
+    and can be used to clip or move window rectangles to fit within the usable
+    space.
+    """
 
     def __init__(self):
-        self._monitors = []
-        self._struts = []
-
-        # NOTE: Invalidated by resolution changes unless watching notify events
-        self._usable = {}  # type: Mapping[Rectangle, Rectangle]
+        self._monitors_raw = []  # type: List[Rectangle]
+        self._monitors = []  # type: List[Rectangle]
+        self._struts = []    # type: List[StrutPartial]
+        self._strut_rects = []  # type: List[Rectangle]
 
     # TODO: Subscribe to monitor hotplugging in the code which calls this
     def set_monitors(self, monitor_rects: Iterable[Rectangle]):
-        """Set the list of monitors rectangles from which to calculate usable
+        """Set the list of monitor rectangles from which to calculate usable
         regions"""
-        self._monitors = list(monitor_rects)
+        self._monitors_raw = list(monitor_rects)
         self._update()
 
     # TODO: Subscribe to changes to panel geometry in the code which calls this
@@ -779,7 +773,7 @@ class UsableRegion(object):
         """
         # Assert that all monitors are Rectangles
         # and all Struts are StrutPartials
-        for rect in self._monitors:
+        for rect in self._monitors_raw:
             if not isinstance(rect, Rectangle):
                 raise TypeError("monitors must be of type Rectangle")
         for strut in self._struts:
@@ -787,64 +781,91 @@ class UsableRegion(object):
                 raise TypeError("struts must be of type StrutPartial")
                 # ...so they can be re-calculated on resolution change
 
+        # Exclude monitors with zero area
+        self._monitors = [x for x in self._monitors_raw if x]
+
         # Calculate the desktop rectangle (and ensure it extends to (0, 0))
-        desktop_rect = reduce(lambda x, y: x.union(y), self._monitors)
-        desktop_rect = desktop_rect.union(Rectangle(0, 0, 0, 0))
+        desktop_rect = reduce(lambda x, y: x.union(y), self._monitors,
+            Rectangle(0, 0, 0, 0))
 
         # Resolve the struts to Rectangles relative to desktop_rect
         strut_rects = []  # type: List[Rectangle]
         for strut in self._struts:
             # TODO: Test for off-by-one bugs
             strut_rects.extend(strut.as_rects(desktop_rect))
+        self._strut_rects = strut_rects
 
-        # Calculate the *usable* monitor regions by subtracting the strut rects
-        self._usable = {}
-        for monitor in self._monitors:
-            usable = monitor
-            for panel in strut_rects:
-                usable = usable.subtract(panel)
+    def clip_to_usable_region(self, rect: Rectangle) -> Optional[Rectangle]:
+        """Given a rectangle, return a copy that has been shrunk to fit inside
+        the usable region of the monitor.
 
-            # Only add non-empty entries to _usable
-            if usable:
-                self._usable[monitor] = usable
+        This is defined as a rectangle that:
 
-    def find_usable_rect(self,
-            rect: Rectangle, fallback: bool=True) -> Optional[Rectangle]:
-        """Find the usable :class:`Rectangle` for the monitor containing
-        ``rect``
+        1. Does not extend outside the monitor
+        2. Does not overlap any panels
 
-        :param rect: A rectangle (possibly of zero width and height), the
-            center of which will be used to identify a corresponding monitor.
-        :param fallback: If :any:`True`, fall back to the nearest monitor if
-            ``rect``'s center is not within a monitor.
+        The output rectangle will not extend outside the bounds of the input
+        rectangle.
 
-        .. note:: This will necessarily exclude usable space adjacent to short
-            panels. A more versatile API is planned.
+        See :meth:`Rectangle.subtract` for more information on how corner
+        overlaps between windows and panels are resolved.
+
+        :param rect: A rectangle representing desired window geometry that
+            should be shrunk to not overlap any panels or None if there was
+            no overlap.
         """
-        window_center = rect.to_gravity(Gravity.CENTER).to_point()
-        for monitor in self._usable:
-            if window_center in monitor:
-                return self._usable[monitor]  # type: ignore
+        monitor = self.find_monitor_for(rect)
+        if not monitor:
+            return None
 
-        if fallback and self._usable:
-            distances = []
-            for monitor in self._usable:
-                mon_center = monitor.to_gravity(Gravity.CENTER).to_point()
-                distances.append(
-                    (euclidean_dist(window_center.xy, mon_center.xy), monitor))
+        print("---")
+        print(rect, 'V', monitor)
 
-            # Sort by the first tuple field (the euclidean distance)
-            distances.sort()
-            # Return usable region corresponding to second field (monitor)
-            # corresponding to smallest euc. distance.
-            return self._usable[distances[0][1]]  # type: ignore
+        rect = rect.intersect(monitor)
+        for panel in self._strut_rects:
+            print('=', rect, '-', panel)
+            rect = rect.subtract(panel)
+        print('=', rect, bool(rect))
 
-        return None
+        # Apparently MyPy can't see through custom __bool__ implementations
+        return rect or None  # type: ignore
+
+    def move_to_usable_region(self, rect: Rectangle) -> Optional[Rectangle]:
+        """Given a rectangle, return a copy that has been moved to be entirely
+        within the nearest monitor and to not overlap any panels."""
+
+        monitor = self.find_monitor_for(rect)
+        if not monitor:
+            return None
+
+        rect = rect.moved_into(monitor)
+        for panel in self._strut_rects:
+            rect = rect.moved_off_of(panel)
+
+        return rect
+
+    def find_monitor_for(self, rect: Rectangle) -> Optional[Rectangle]:
+        """Find the **full** (including space reserved for panels)
+        :class:`Rectangle` for the monitor containing ``rect`` using
+        :meth:`Rectangle.closest_of`.
+
+        :param rect: A rectangle (possibly of zero width and height),
+            representing a point of reference for the monitor search.
+        """
+        if self._monitors:
+            return rect.closest_of(self._monitors)
+        else:
+            return None
 
     def __bool__(self) -> bool:
-        """A :class:`UsableRegion` is truthy if it has a non-zero area."""
-        return bool(len(self._usable) > 0 and
-            all(self._usable.values()))
+        """A :class:`UsableRegion` is truthy if it has at least one monitor
+        with nonzero area.
+
+        .. todo:: Is it worth it to also verify that panel reservations have
+           not eaten up the entirety of a monitor in :meth:`__bool__`?
+        """
+        return bool(len(self._monitors) > 0 and
+            all(self._monitors))
 
     def __repr__(self) -> str:
         """Override :any:`repr` to be more useful for debugging.
