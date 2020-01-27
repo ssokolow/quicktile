@@ -22,8 +22,8 @@ gi.require_version('Wnck', '3.0')
 
 from gi.repository import Gdk, GdkX11, Wnck
 
-from .util import (clamp_idx, Gravity, Rectangle, UsableRegion,
-                   StrutPartial, XInitError)
+from .util import (clamp_idx, Rectangle, UsableRegion, StrutPartial,
+                   XInitError)
 
 # -- Type-Annotation Imports --
 from typing import Any, Iterable, Optional, Tuple, Union
@@ -378,7 +378,6 @@ class WindowManager(object):
             geom: Optional[Rectangle]=None,
             monitor: Rectangle=Rectangle(0, 0, 0, 0),
             keep_maximize: bool=False,
-            gravity: Gravity=Gravity.TOP_LEFT,
             geometry_mask: Wnck.WindowMoveResizeMask=(
                 Wnck.WindowMoveResizeMask.X |
                 Wnck.WindowMoveResizeMask.Y |
@@ -400,8 +399,6 @@ class WindowManager(object):
             interpreted. The whole desktop if unspecified.
         :param keep_maximize: Whether to re-maximize the window if it had to be
             un-maximized to ensure it would move.
-        :param gravity: A constant specifying which point on the window is
-            referred to by the X and Y coordinates in ``geom``.
         :param geometry_mask: A set of flags determining which aspects of the
             requested geometry should actually be applied to the window.
             (Allows the same geometry definition to easily be shared between
@@ -415,8 +412,6 @@ class WindowManager(object):
             a sequence of differently sized monitors.
         """
 
-        # We need to ensure that ignored values are still present for
-        # gravity calculations.
         old_geom = Rectangle(*win.get_geometry()).to_relative(
             self.get_monitor(win)[1])
 
@@ -427,22 +422,24 @@ class WindowManager(object):
                         attr.upper()):
                     new_args[attr] = getattr(geom, attr)
 
-        new_geom = old_geom._replace(**new_args)
-
-        # Apply gravity and resolve to absolute desktop coordinates.
-        new_geom = new_geom.from_gravity(gravity).from_relative(monitor)
+        # Apply changes and return to absolute desktop coordinates.
+        new_geom = old_geom._replace(**new_args).from_relative(monitor)
 
         # Ensure the window is fully within the monitor
         # TODO: Make this remember the original position and re-derive from it
         #       on each monitor-next call as long as the window hasn't changed
         #       (Ideally, re-derive from the tiling preset if set)
         if bool(monitor) and not geom:
-            new_geom = new_geom.moved_into(
-                self.usable_region.find_usable_rect(monitor))  # type: ignore
+            clipped_geom = self.usable_region.clip_to_usable_region(new_geom)
+        else:
+            clipped_geom = new_geom
 
-        logging.debug(" Repositioning to %s)\n", new_geom)
-        with persist_maximization(win, keep_maximize):
-            # Always use STATIC because either WMs implement window gravity
-            # incorrectly or it's not applicable to this problem
-            win.set_geometry(Wnck.WindowGravity.STATIC,
-                             geometry_mask, *new_geom)
+        if bool(clipped_geom):
+            logging.debug(" Repositioning to %s)\n", clipped_geom)
+            with persist_maximization(win, keep_maximize):
+                # Always use STATIC because either WMs implement window gravity
+                # incorrectly or it's not applicable to this problem
+                win.set_geometry(Wnck.WindowGravity.STATIC,
+                                 geometry_mask, *clipped_geom)
+        else:
+            logging.debug(" Geometry clipping failed: %r", clipped_geom)
