@@ -224,6 +224,11 @@ class TestRectangle(unittest.TestCase):  # pylint: disable=R0904
             self.assertEqual(rect.x2, rect.x + rect.width)
             self.assertEqual(rect.y2, rect.y + rect.height)
             self.assertEqual(rect.xy, (rect.x, rect.y))
+            self.assertEqual(rect.area, rect.width * rect.height)
+
+        self.assertEqual(Rectangle(0, 0, 0, 0).area, 0)
+        self.assertEqual(Rectangle(0, 0, 10, 0).area, 0)
+        self.assertEqual(Rectangle(0, 0, 0, 10).area, 0)
 
     def test_negative_size(self):
         """Rectangle: test normalization of negative sizes"""

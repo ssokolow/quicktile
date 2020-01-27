@@ -398,6 +398,10 @@ class Rectangle(_Rectangle):
         """Y coordinate of the bottom-right corner assuming top-left gravity"""
         return int(self.y + self.height)
 
+    @property
+    def area(self) -> int:
+        """Convenience helper for calculating area of the rectangle"""
+        return int(self.width * self.height)
     def moved_into(self, other: 'Rectangle', clip: bool=True) -> 'Rectangle':
         """Return a new :class:`Rectangle` that does not exceed the bounds of
         `other`
