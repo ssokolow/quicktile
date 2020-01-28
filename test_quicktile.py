@@ -888,6 +888,44 @@ class TestUsableRegion(unittest.TestCase):
             Rectangle(0, 0, 100, 100)),
             Rectangle(x=49, y=24, width=100 - 49, height=100 - 24))
 
+        # Asymmetric monitors (left monitor bigger)
+        test_region = UsableRegion()
+        test_region.set_monitors([
+            Rectangle(0, 0, 1920, 1200), Rectangle(1920, 0, 1280, 1024)])
+        test_region.set_panels([StrutPartial(*x) for x in [
+            [49, 0, 0, 0, 24, 1199, 0, 0, 0, 0, 0, 0],
+            [1969, 0, 0, 0, 24, 1023, 0, 0, 0, 0, 0, 0],
+            [0, 0, 24, 0, 0, 0, 0, 0, 0, 1919, 0, 0],
+            [0, 0, 24, 0, 0, 0, 0, 0, 1920, 3199, 0, 0]]])
+        # Right monitor (easy case)
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(1920, 0, 100, 100)),
+            Rectangle(x=1969, y=24, width=100 - 49, height=100 - 24))
+
+        # Left monitor (problem case)
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(0, 0, 100, 100)),
+            Rectangle(x=49, y=24, width=100 - 49, height=100 - 24))
+
+        # Asymmetric monitors (left monitor smaller)
+        test_region = UsableRegion()
+        test_region.set_monitors([
+            Rectangle(0, 0, 1280, 1024), Rectangle(1280, 0, 1920, 1200)])
+        test_region.set_panels([StrutPartial(*x) for x in [
+            [49, 0, 0, 0, 24, 1023, 0, 0, 0, 0, 0, 0],
+            [1329, 0, 0, 0, 24, 1199, 0, 0, 0, 0, 0, 0],
+            [0, 0, 24, 0, 0, 0, 0, 0, 0, 1023, 0, 0],
+            [0, 0, 24, 0, 0, 0, 0, 0, 1024, 3199, 0, 0]]])
+        # Right monitor (easy case)
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(1280, 0, 100, 100)),
+            Rectangle(x=1329, y=24, width=100 - 49, height=100 - 24))
+
+        # Left monitor (problem case)
+        self.assertEqual(test_region.clip_to_usable_region(
+            Rectangle(0, 0, 100, 100)),
+            Rectangle(x=49, y=24, width=100 - 49, height=100 - 24))
+
     def test_issue_108(self):
         """UsableRegion: windows use of space left free by narrow panels
 
