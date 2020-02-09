@@ -7,4 +7,6 @@ echo "  IdentityFile ~/.ssh/publish-key" >> ~/.ssh/config
 git --version
 git remote set-url origin git@github.com:ssokolow/quicktile.git
 git fetch origin -f gh-pages:gh-pages
+pip3 install -r ../dev_requirements.txt
+make html
 ghp-import -n -p -m "Update gh-pages." _build/html
