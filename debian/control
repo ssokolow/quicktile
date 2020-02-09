@@ -15,7 +15,8 @@ Build-Depends: debhelper (>= 9),
                python3-dbus,
                gir1.2-gtk-3.0,
                gir1.2-wnck-3.0,
-               gir1.2-glib-2.0
+               gir1.2-glib-2.0,
+               python3-sphinx
 Standards-Version: 4.4.0
 
 Package: quicktile
