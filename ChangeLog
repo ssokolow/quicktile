@@ -1,4 +1,6 @@
-0.4.0 (git HEAD):
+0.4.1 (git HEAD):
+
+0.4.0:
 - Port to Python 3.x and GTK 3.x
 - Switch command-line arguments from optparse to argparse
 - Convert the API docs from ePyDoc to Sphinx and add a manual
@@ -14,6 +16,7 @@
 - More FAQ entries
 - Much more automated testing
 - Create a (basic) icon for QuickTile
+- Add infrastructure for building Debian packages (Thanks to Stéphane Gourichon)
 
 0.3.0:
 - Split QuickTile up into multiple files for easier refactoring and improvement
