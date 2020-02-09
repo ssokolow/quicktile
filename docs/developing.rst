@@ -254,17 +254,6 @@ For best results, configure your virtual desktop with the following characterist
    best chance of triggering any dead-space-related bugs in the code for
    calculating usable regions.
 
-.. note:: QuickTile currently fails pathologically when a panel reserves space
-   on an edge between two monitors, due to this eventuality not being mentioned
-   at all in the
-   `specification <https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html#NETWMSTRUT>`_
-   that I was working from.
-
-   This will be something I add to the test recommendations once it is fixed.
-
-   Follow `Issue #45 <https://github.com/ssokolow/quicktile/issues/45>`_ for
-   status updates.
-
 Automated Testing
 ^^^^^^^^^^^^^^^^^
 

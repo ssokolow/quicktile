@@ -32,30 +32,6 @@ to implement global hotkeys by intercepting events before they reach
 
 .. _XGrabKey: https://tronche.com/gui/x/xlib/input/XGrabKey.html
 
-QuickTile positions windows over/under my panels
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The GTK+ 3.x version of QuickTile hasn't yet regained the ability to notice
-changes to the available region of the desktop after it's started. Make sure
-QuickTile gets launched after your panels have appeared.
-
-Follow `Issue 107 <https://github.com/ssokolow/quicktile/issues/107>`_ for
-status updates.
-
-Quicktile treats all panels as if they're full-width/height
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-In the move from GTK+ 2.x to GTK 3.x, the `gtk.gdk.Region`_ class got replaced
-with :class:`cairo.Region` and I've run into so many bugs while attempting to
-use it from Python that I had to settle for implementing my own solution, which
-doesn't yet know how to do anything fancier than calculating a "largest usable
-rectangle" separately for each monitor.
-
-Follow `Issue 108 <https://github.com/ssokolow/quicktile/issues/108>`_ for
-status updates.
-
-.. _gtk.gdk.Region: https://developer.gnome.org/pygtk/stable/class-gdkregion.html
-
 QuickTile resizes windows but doesn't move them
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
