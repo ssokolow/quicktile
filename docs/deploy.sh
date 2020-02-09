@@ -1,3 +1,5 @@
+#!/bin/sh
+cd "$(dirname "$(readlink -f "$0")")"
 openssl aes-256-cbc -K $encrypted_0e452a363468_key -iv $encrypted_0e452a363468_iv -in publish-key.enc -out ~/.ssh/publish-key -d
 chmod u=rw,og= ~/.ssh/publish-key
 echo "Host github.com" >> ~/.ssh/config
