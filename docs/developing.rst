@@ -291,16 +291,19 @@ when I examine your contribution:
   deprecation warnings as I do, I suggest running PyLint as
   ``pylint3 quicktile 2>/dev/null``)
 
-While not yet complete enough to be of much use, as it doesn't yet provide a
-mock window to get QuickTile past the safety check few commands opt out of,
-you are also advised to run what will eventually be a functional test suite:
+While it currently relies on an ugly hack which hard-codes Openbox and
+Zenity as dependencies, and does not yet assert that windows wind up
+in the expected states, you may also find the beginnings of a functional
+test suite useful as a way to exercise the code and check for uncaught
+exceptions:
 
 .. code-block:: sh
 
     ./test_functional.py -v
 
-This is excluded from :file:`run_tests.sh` because it takes too long to be
-part of a comfortable edit-test cycle.
+Bear in mind that, even once it is more mature, it will remain excluded
+from :file:`run_tests.sh` because it takes too long to be part of a
+comfortable edit-test cycle.
 
 In lieu of a proper functional test suite, please manually execute all tiling
 commands which rely on code you've touched and watch for misbehaviour.
