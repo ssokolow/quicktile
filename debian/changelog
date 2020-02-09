@@ -1,5 +1,5 @@
 quicktile (0.4.0gtk3-1) UNRELEASED; urgency=medium
 
-  * First Debian package, based on gtk3_port branch.
+  * First Debian package.
 
  -- Stéphane Gourichon <stephane.gourichon@fidergo.fr>  Wed, 01 Jan 2020 17:57:34 +0100
