@@ -36,7 +36,7 @@ Justin
     Added the ``horizontal-maximize``, ``vertical-maximize``, and
     ``move-to-center`` commands.
 
-Matthias Putz
+`Matthias Putz`_
     Fixed use of an uninitialized variable in a difficult-to-trigger failure
     case.
 
@@ -140,6 +140,7 @@ only to display favicon-style links to their owners' websites.
 .. _David Stygstra: https://github.com/stygstra
 .. _ePyDoc: http://epydoc.sourceforge.net/
 .. _Mark James: https://twitter.com/markjames
+.. _Matthias Putz: https://github.com/mputz86
 .. _Max Weiß: https://github.com/wmax
 .. _Oliver Gerlich: https://github.com/oliver
 .. _Shields.io: https://shields.io/
