@@ -23,6 +23,9 @@ David Stygstra
    Generalized the "move-to-center" command into the "move-to-*"
    family of commands.
 
+Gustavo J A M Carneiro and Filip Van Raemdonck
+   Original authors of the "gtkexcepthook" module.
+
 Justin
    Added the "horizontal-maximize", "vertical-maximize", and "move-to-
    center" commands.
@@ -55,6 +58,9 @@ Stéphane Gourichon
 Stuart Axelbrooke
    Corrected a flaw in the window-tiling heuristics which prevented
    them from functioning correctly on especially large monitors.
+
+Thomas Vander Stichele
+   Helped to clean up the API documentation during the ePyDoc era.
 
 Valdis Vitolins
    Added an omitted dependency on "python-setuptools" to "README.rst"

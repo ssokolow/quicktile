@@ -29,6 +29,9 @@ Thanks go out to the following people:
     Generalized the ``move-to-center`` command into the ``move-to-*`` family
     of commands.
 
+Gustavo J A M Carneiro and Filip Van Raemdonck
+    Created the original version of the ``gtkexcepthook`` module.
+
 Justin
     Added the ``horizontal-maximize``, ``vertical-maximize``, and
     ``move-to-center`` commands.
@@ -58,6 +61,9 @@ Matthias Putz
 `Stuart Axelbrooke`_
     Corrected a flaw in the window-tiling heuristics which prevented them
     from functioning correctly on especially large monitors.
+
+`Thomas Vander Stichele`_
+    Helped to clean up the API documentation during the ePyDoc_ era.
 
 `Valdis Vitolins`_
     Added an omitted dependency on ``python-setuptools`` to :file:`README.rst`
@@ -132,6 +138,7 @@ only to display favicon-style links to their owners' websites.
 .. _Alabaster: https://alabaster.readthedocs.io/
 .. _Creative Commons Attribution 2.5: https://creativecommons.org/licenses/by/2.5/
 .. _David Stygstra: https://github.com/stygstra
+.. _ePyDoc: http://epydoc.sourceforge.net/
 .. _Mark James: https://twitter.com/markjames
 .. _Max Weiß: https://github.com/wmax
 .. _Oliver Gerlich: https://github.com/oliver
@@ -141,6 +148,7 @@ only to display favicon-style links to their owners' websites.
 .. _Stephan Sokolow: http://ssokolow.com/
 .. _Stéphane Gourichon: https://github.com/fidergo-stephane-gourichon
 .. _Stuart Axelbrooke: https://github.com/soaxelbrooke
+.. _Thomas Vander Stichele: https://thomas.apestaart.org/
 .. _Valdis Vitolins: https://github.com/valdisvi
 .. _Valentin Agachi: https://github.com/avaly
 .. _Yuting/Tim Xiao: https://github.com/txiao
