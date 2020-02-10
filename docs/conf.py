@@ -89,7 +89,7 @@ master_doc = 'index'
 # General information about the project.
 project = u'QuickTile'
 author = u'Stephan Sokolow'
-copyright = u'2009-2020, Stephan Sokolow'  # pylint: disable=W0622
+copyright = u'2009-2020, Stephan Sokolow et al'  # pylint: disable=W0622
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

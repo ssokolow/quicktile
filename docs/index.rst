@@ -35,6 +35,7 @@ Manual Contents:
    faq
    apidocs/index
    developing
+   authors/index
 
 * :ref:`modindex`
 * :ref:`genindex`

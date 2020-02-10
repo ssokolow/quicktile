@@ -308,6 +308,56 @@ comfortable edit-test cycle.
 In lieu of a proper functional test suite, please manually execute all tiling
 commands which rely on code you've touched and watch for misbehaviour.
 
+Adding Yourself to the :file:`AUTHORS` List
+-------------------------------------------
+
+When making a contribution, please also add yourself to the
+:doc:`authors/index` section and regenerate the :file:`AUTHORS` file in the
+root of the project.
+
+This can be done as follows:
+
+1. Edit :file:`docs/authors/index.rst`
+2. Regenerate the HTML version of the documentation and verify that it looks
+   right. (Run :command:`make html` from inside the :file:`docs` folder.)
+3. Run :file:`./docs/update_authors.sh` to regenerate :file:`AUTHORS`
+4. Verify that :file:`AUTHORS` looks right.
+5. Commit your changes.
+
+Additions to the "The Program" section should be phrased so that reading the
+definition list title and body together form a sentence in the `simple past
+tense`_. However, the body portion should still be capitalized as if it is
+a complete sentence.
+
+Please combine related changes into a single high-level description of the user-visible changes. This rule may be relaxed when it would unfairly downplay the
+amount of work involved.
+
+Please try to make proper use of Sphinx markup to indicate things such as
+command and function names. Constructs such as ``:py:mod:`round``` may be used
+to reference identifiers within dependencies but be aware that, because
+generation of :file:`AUTHORS` considers the document in isolation,
+markup which attempts to generate cross-references to the rest of the manual
+will trigger warnings when :file:`update_authors.sh` is run and may *not* be
+be used.
+
+.. highlight:: rst
+
+A Good Example::
+
+    Yuting/Tim Xiao
+        Made the wndow-tiling heuristics more robust.
+
+A Bad Example::
+
+    Yuting/Tim Xiao
+
+        * Increase closest-dimension matching fuzziness to 100px.
+        * Update min-distance calculation in cycleDimensions to use
+          lengths instead of area.
+        * Always use the first given configuration for untiled windows.
+
+.. highlight:: default
+
 .. _AdvanceCOMP: https://www.advancemame.it/comp-readme
 .. _ALE: https://github.com/dense-analysis/ale/
 .. _Bandit: https://github.com/PyCQA/bandit
@@ -325,6 +375,7 @@ commands which rely on code you've touched and watch for misbehaviour.
 .. _OptiPNG: http://optipng.sourceforge.net/
 .. _PyLint: https://www.pylint.org/
 .. _pull request: https://github.com/ssokolow/quicktile/pulls
+.. _simple past tense: https://en.wikipedia.org/wiki/Simple_past
 .. _Sphinx: https://www.sphinx-doc.org/
 .. _sphinx-autodoc-typehints: https://pypi.org/project/sphinx-autodoc-typehints/
 .. _sphinxcontrib-autoprogram: https://pypi.org/project/sphinxcontrib-autoprogram/
