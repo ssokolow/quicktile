@@ -17,6 +17,10 @@ QuickTile
    :target: https://coveralls.io/github/ssokolow/quicktile?branch=master
    :alt: Coveralls
 
+.. image:: https://img.shields.io/badge/License-GPLv2%2B-blue
+   :target: https://www.gnu.org/licenses/gpl-2.0.html
+   :alt: License: GPLv2+
+
 Keyboard-driven Window Tiling for your existing X11 window manager
 
 Important Message For Users of GTK+ 2.x QuickTile
