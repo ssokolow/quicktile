@@ -29,7 +29,7 @@ Thanks go out to the following people:
     Generalized the ``move-to-center`` command into the ``move-to-*`` family
     of commands.
 
-Gustavo J A M Carneiro and Filip Van Raemdonck
+`Gustavo J A M Carneiro`_ and Filip Van Raemdonck
     Created the original version of the ``gtkexcepthook`` module.
 
 Justin
@@ -139,6 +139,7 @@ only to display favicon-style links to their owners' websites.
 .. _Creative Commons Attribution 2.5: https://creativecommons.org/licenses/by/2.5/
 .. _David Stygstra: https://github.com/stygstra
 .. _ePyDoc: http://epydoc.sourceforge.net/
+.. _Gustavo J A M Carneiro: https://github.com/gjcarneiro
 .. _Mark James: https://twitter.com/markjames
 .. _Matthias Putz: https://github.com/mputz86
 .. _Max Weiß: https://github.com/wmax
