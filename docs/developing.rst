@@ -111,6 +111,26 @@ To regenerate the animation, run the following command:
 
 **You only need to do this if you've modified the original SVG files.**
 
+Documentation Privacy Policy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Out of respect for user privacy and to make offline use of this documentation
+as robust as possible, this website/manual makes no external HTTP requests
+beyond those needed to ensure that the Travis-CI badge in the sidebar
+is current as of the page load.
+
+To mitigate the risk of such requests slipping in through non-obvious means,
+such as use of the Sphinx ``:math:`` role pulling in a CDN-hosted copy of
+MathJax_, a `Content Security Policy`_ meta-tag has been added to the header of
+the site template.
+
+It is preferred that you check your browser's developer console for reports
+of requests blocked by the :abbr:`CSP (Content Security Policy)` rules on the
+relevant pages before submitting changes to the manual or docstrings.
+
+.. _Content Security Policy: https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
+.. _MathJax: https://www.mathjax.org/
+
 High-Level QuickTile Architecture
 ---------------------------------
 

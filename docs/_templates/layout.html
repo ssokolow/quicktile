@@ -1,4 +1,9 @@
 {% extends '!layout.html' %}
+{%- block extrahead %}
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' https://travis-ci.org https://*.travis-ci.org">
+  {{ super() }}
+{% endblock %}
 {%- block footer %}
     {{super()}}
     <span id="forkongithub"><a href="https://github.com/{{ theme_github_user }}/{{ theme_github_repo }}">Fork me on GitHub</a></span>
