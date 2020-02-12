@@ -234,7 +234,7 @@ html_theme_options = {
     'fixed_sidebar': True,
     'font_family': 'sans-serif',
     'footer_text': '#666',  # Match WCAG contrast guidelines
-    'github_banner': True,
+    'github_banner': False,  # Use my custom pure-CSS one
     'github_button': False,
     'github_user': 'ssokolow',
     'github_repo': 'quicktile',

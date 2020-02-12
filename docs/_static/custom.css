@@ -136,6 +136,68 @@ div.sphinxsidebarwrapper .badges a {
   }
 }
 
+/* Pure CSS "Fork me on GitHub" ribbon
+ * Thanks to Chris Hellmann for the CSS I adapted to make this.
+ * https://codepo8.github.io/css-fork-on-github-ribbon/
+ */
+
+#forkongithub {
+  position: absolute;
+  display: block;
+  top: 0;
+  right: 0;
+  width: 200px;
+  overflow: hidden;
+  height: 200px;
+  z-index: 9999;
+}
+#forkongithub a {
+  background: #000;
+  color: #fff;
+  text-decoration: none;
+  font-family: arial, sans-serif;
+  text-align: center;
+  font-weight: bold;
+  padding: 5px 40px;
+  font-size: 10pt;
+  line-height: 15pt;
+  width: 200px;
+  position: absolute;
+  top: 40px;
+  right: -82px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+#forkongithub a::before,
+#forkongithub a::after {
+  content: "";
+  width: 100%;
+  display: block;
+  position: absolute;
+  top: 1px;
+  left: 0;
+  height: 1px;
+  background: #777;
+}
+#forkongithub a::after {
+  bottom: 1px;
+  top: auto;
+}
+@media screen and (max-width: 979px) {
+  #forkongithub a {
+    display: none;
+  }
+}
+@media print {
+  #forkongithub a {
+    display: none;
+  }
+}
+
 /* Button CSS borrowed from the old site */
 div.sphinxsidebar a.btn {
   color: #3e4349;

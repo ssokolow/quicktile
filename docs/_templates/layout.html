@@ -1,0 +1,5 @@
+{% extends '!layout.html' %}
+{%- block footer %}
+    {{super()}}
+    <span id="forkongithub"><a href="https://github.com/{{ theme_github_user }}/{{ theme_github_repo }}">Fork me on GitHub</a></span>
+{%- endblock %}
