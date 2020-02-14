@@ -30,9 +30,8 @@ Thanks go out to the following people:
     of commands.
 
 `Gustavo J A M Carneiro`_ and Filip Van Raemdonck
-    Created the `original version
-    <https://gist.github.com/sysfs/f0fce1fd90ddede02701fd5fcaee3304>`_ of the
-    ``gtkexcepthook`` module.
+    Created the ``gtkexcepthook`` module in `the form I started from
+    <https://gist.github.com/sysfs/f0fce1fd90ddede02701fd5fcaee3304>`_.
 
 Justin
     Added the ``horizontal-maximize``, ``vertical-maximize``, and

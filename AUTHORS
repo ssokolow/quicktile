@@ -24,7 +24,7 @@ David Stygstra
    family of commands.
 
 Gustavo J A M Carneiro and Filip Van Raemdonck
-   Created the original version of the "gtkexcepthook" module.
+   Created the "gtkexcepthook" module in the form I started from.
 
 Justin
    Added the "horizontal-maximize", "vertical-maximize", and "move-to-
