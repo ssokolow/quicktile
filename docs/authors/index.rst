@@ -29,7 +29,7 @@ Thanks go out to the following people:
     Generalized the ``move-to-center`` command into the ``move-to-*`` family
     of commands.
 
-`Gustavo J A M Carneiro`_ and Filip Van Raemdonck
+`Gustavo J A M Carneiro`_ and `Filip Van Raemdonck`_
     Created the ``gtkexcepthook`` module in `the form I started from
     <https://gist.github.com/sysfs/f0fce1fd90ddede02701fd5fcaee3304>`_.
 
@@ -140,6 +140,7 @@ only to display favicon-style links to their owners' websites.
 .. _Creative Commons Attribution 2.5: https://creativecommons.org/licenses/by/2.5/
 .. _David Stygstra: https://github.com/stygstra
 .. _ePyDoc: http://epydoc.sourceforge.net/
+.. _Filip van Raemdonck: https://www.linkedin.com/in/filip-van-raemdonck/
 .. _Gustavo J A M Carneiro: https://github.com/gjcarneiro
 .. _Mark James: https://twitter.com/markjames
 .. _Matthias Putz: https://github.com/mputz86
