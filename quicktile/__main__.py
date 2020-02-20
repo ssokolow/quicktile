@@ -47,7 +47,7 @@ gi.require_version('Wnck', '3.0')
 from gi.repository import GLib, Gtk, Wnck
 
 from . import commands, layout
-from .util import fmt_table, XInitError
+from .util import fmt_table, XInitError, CycleOrder
 from .version import __version__
 from .wm import WindowManager
 
@@ -72,7 +72,8 @@ DEFAULTS = {
         # Use Ctrl+Alt as the default base for key combinations
         'ModMask': '<Ctrl><Alt>',
         'MovementsWrap': True,
-        'ColumnCount': 3
+        'ColumnCount': 3,
+        'CycleOrder': 'default'
     },
     'keys': {
         "KP_Enter": "monitor-switch",
@@ -224,6 +225,10 @@ def load_config(path) -> ConfigParser:
             config.set('general', key, str(val))
             dirty = True
 
+    order = str(config.get('general', 'CycleOrder'))
+    if order.upper() not in list(x.name for x in CycleOrder):
+        raise TypeError("CycleOrder is invalid")
+
     mk_raw = config.get('general', 'ModMask')
     modkeys = mk_raw.strip()  # pylint: disable=E1101
     if ' ' in modkeys and '<' not in modkeys:
@@ -356,8 +361,10 @@ def main() -> None:
     first_run = not os.path.exists(cfg_path)
     config = load_config(cfg_path)
 
+    columns = config.getint('general', 'ColumnCount')
+    order = CycleOrder[config.get('general', 'CycleOrder').upper()]
     commands.cycle_dimensions = commands.commands.add_many(
-        layout.make_winsplit_positions(config.getint('general', 'ColumnCount'))
+        layout.make_winsplit_positions(columns, order)
     )(commands.cycle_dimensions)
     commands.commands.extra_state = {'config': config}
 
