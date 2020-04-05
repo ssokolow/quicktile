@@ -120,7 +120,8 @@ class WindowManager(object):
         monitors = []
         for idx in range(0, n_screens):
             monitors.append(Rectangle.from_gdk(
-                self.gdk_screen.get_monitor_geometry(idx)))
+                self.gdk_screen.get_monitor_geometry(idx)) *
+                self.gdk_screen.get_monitor_scale_factor(idx))
             # TODO: Look into using python-xlib to match x_root use
 
         logging.debug("Loaded monitor geometry: %r", monitors)
@@ -183,6 +184,9 @@ class WindowManager(object):
         monitor_id = self.gdk_screen.get_monitor_at_window(win)
         monitor_geom = Rectangle.from_gdk(
             self.gdk_screen.get_monitor_geometry(monitor_id))
+
+        # TODO: Unit test this
+        monitor_geom *= self.gdk_screen.get_monitor_scale_factor(monitor_id)
 
         logging.debug(" Window is on monitor %s, which has geometry %s",
                       monitor_id, Rectangle.from_gdk(monitor_geom))

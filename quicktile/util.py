@@ -399,6 +399,20 @@ class Rectangle(_Rectangle):
         return cls.__bases__[0].__new__(  # type: ignore
             cls, x, y, width, height)
 
+    # TODO: Automated tests
+    def __mul__(self, factor: Union[int, float]) -> 'Rectangle':
+        """Return a new Rectangle with all dimensions multiplied by ``factor``
+
+        This is used to apply scaling factors to monitor rectangles returned by
+        GDK so they'll be in the device pixel coordinates that the Wnck APIs
+        expect.
+        """
+        return self._replace(
+            x=int(self.x * factor),
+            y=int(self.y * factor),
+            width=int(self.width * factor),
+            height=int(self.height * factor))
+
     @property
     def xy(self) -> Tuple[int, int]:  # pylint: disable=invalid-name
         """Convenience helper to retrieve an ``(x, y)`` tuple"""

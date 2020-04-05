@@ -325,6 +325,9 @@ def cycle_monitors(winman: WindowManager,  # pylint: disable=too-many-arguments
     new_mon_id = clamp_idx(old_mon_id + step, n_monitors, do_wrapping)
     new_mon_geom = Rectangle.from_gdk(
         winman.gdk_screen.get_monitor_geometry(new_mon_id))
+
+    # TODO: Unit test this
+    new_mon_geom *= winman.gdk_screen.get_monitor_scale_factor(new_mon_id)
     logging.debug("Moving window to monitor %s, which has geometry %s",
                   new_mon_id, new_mon_geom)
 
