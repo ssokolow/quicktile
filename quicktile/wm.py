@@ -181,7 +181,8 @@ class WindowManager(object):
         # (Gdk.Display.get_default_screen().get_root_window()... now why did
         # I want to know?)
         monitor_id = self.gdk_screen.get_monitor_at_window(win)
-        monitor_geom = self.gdk_screen.get_monitor_geometry(monitor_id)
+        monitor_geom = Rectangle.from_gdk(
+            self.gdk_screen.get_monitor_geometry(monitor_id))
 
         logging.debug(" Window is on monitor %s, which has geometry %s",
                       monitor_id, Rectangle.from_gdk(monitor_geom))
