@@ -2,6 +2,6 @@
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
-__version__ = "0.4"
+__version__ = "0.4.1"
 
 # vim: set sw=4 sts=4 expandtab :

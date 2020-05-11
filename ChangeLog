@@ -1,4 +1,7 @@
 0.4.1 (git HEAD):
+- Add support for HiDPI monitors where GDK's pixel units don't necessarily
+  match Wnck pixel units by default.
+- Assorted documentation improvements.
 
 0.4.0:
 - Port to Python 3.x and GTK 3.x
