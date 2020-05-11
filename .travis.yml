@@ -24,7 +24,7 @@ install: "pip3 install mypy coveralls"
 env:
   - MYPYPATH="quicktile"
 script:
-  - mypy quicktile ./*.py functional_harness
+  - mypy --no-warn-unused-ignores quicktile ./*.py functional_harness
   - nosetests3
   - python3 -m doctest quicktile/util.py
 after_success: coveralls
