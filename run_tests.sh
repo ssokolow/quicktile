@@ -2,9 +2,9 @@
 
 cd "$(dirname "$(readlink -f "$0")")"
 echo "-- MyPy --"
-MYPYPATH="quicktile" mypy quicktile ./*.py functional_harness
+MYPYPATH="quicktile" mypy --config-file=setup.cfg quicktile ./*.py functional_harness
 echo " -- Flake8 (static analysis) --"
-python3 -m flake8 quicktile/ ./*.py functional_harness
+python3 -m flake8 --config=setup.cfg quicktile/ ./*.py functional_harness
 echo "-- Nose (unit tests) --"
 nosetests3 "$@"
 echo "-- Doctests (util.py) --"

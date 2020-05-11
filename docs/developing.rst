@@ -309,7 +309,7 @@ when I examine your contribution:
 * Bandit_ (You can run this as ``bandit quicktile`` after installation.)
 * PyLint_ (Assuming you have your system configured to complain about
   deprecation warnings as I do, I suggest running PyLint as
-  ``pylint3 quicktile 2>/dev/null``)
+  ``pylint3 --rcfile=pylintrc quicktile 2>/dev/null``)
 
 While it currently relies on an ugly hack which hard-codes Openbox and
 Zenity as dependencies, and does not yet assert that windows wind up
