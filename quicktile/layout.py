@@ -10,7 +10,7 @@ __license__ = "GNU GPL 2.0 or later"
 
 import math
 
-from .util import Gravity, Rectangle
+from .util import Gravity, Rectangle, CycleOrder
 
 # -- Type-Annotation Imports --
 from typing import Dict, List, Union
@@ -141,7 +141,8 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
                 round(height - (self.margin_y * 2), 3))
 
 
-def make_winsplit_positions(columns: int) -> Dict[str, List[PercentRectTuple]]:
+def make_winsplit_positions(columns: int, order: CycleOrder) -> \
+        Dict[str, List[PercentRectTuple]]:
     """Generate the classic WinSplit Revolution tiling presets
 
     :params columns: The number of columns that each tiling preset should be
@@ -162,8 +163,12 @@ def make_winsplit_positions(columns: int) -> Dict[str, List[PercentRectTuple]]:
     cycle_steps = tuple(round(col_width * x, 3)
                         for x in range(1, columns))
 
-    center_steps = (1.0,) + cycle_steps
-    edge_steps = (0.5,) + cycle_steps
+    if order is CycleOrder.DEFAULT:
+        center_steps = (1.0,) + cycle_steps
+        edge_steps = (0.5,) + cycle_steps
+    elif order is CycleOrder.SMALL_FIRST:
+        center_steps = cycle_steps + (1.0,)
+        edge_steps = cycle_steps[0:1] + (0.5,) + cycle_steps[1:]
 
     positions = {
         'center': [gvlay(width, 1, 'center') for width in center_steps],

@@ -65,6 +65,12 @@ class Gravity(Enum):  # pylint: disable=too-few-public-methods
     BOTTOM_RIGHT = (1.0, 1.0)
 
 
+class CycleOrder(IntEnum):
+    """Window position cycling orders."""
+    DEFAULT = 0
+    SMALL_FIRST = 1
+
+
 def clamp_idx(idx: int, stop: int, wrap: bool=True) -> int:
     """Ensure a 0-based index is within a given range [0, stop).
 
