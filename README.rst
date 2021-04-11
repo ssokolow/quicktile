@@ -68,7 +68,7 @@ QuickTile can be run from the source folder without installation via the
 For system-wide installation, the recommended option is ``pip3``, which will
 record a log to allow easy uninstallation.
 
-``sudo pip3 install https://github.com/ssokolow/quicktile/archive/master.zip``
+``sudo -H pip3 install https://github.com/ssokolow/quicktile/archive/master.zip``
 
 QuickTile's dependence on PyGObject prevents a fully PyPI-based installation
 option.

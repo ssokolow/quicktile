@@ -7,7 +7,7 @@ if [ "$(id -u)" != 0 ]; then
     python3 setup.py build
 
     echo "* Acquiring permissions to perform system-wide install"
-    exec sudo "$0" "$@"
+    exec sudo -H "$0" "$@"
 fi
 
 echo "* Attempting to remove old QuickTile installs"

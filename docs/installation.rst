@@ -118,7 +118,7 @@ QuickTile:
 
 .. code:: sh
 
-    sudo pip3 install https://github.com/ssokolow/quicktile/archive/master.zip
+    sudo -H pip3 install https://github.com/ssokolow/quicktile/archive/master.zip
 
 .. note:: If you attempt to use the ``--upgrade`` option and it fails to
     properly ignore system-provided dependencies, follow the instructions
