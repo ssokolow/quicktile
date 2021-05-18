@@ -230,6 +230,10 @@ def main() -> None:
                         " file and rebooting."
                         % err.__class__.__name__)
 
+    # Work around a "the Gtk.Application ::startup handler does it for you" bug
+    if not Gtk.init_check():
+        raise XInitError("Gtk failed to connect to the X server. Cannot start.")
+
     try:
         winman = WindowManager(x_display=x_display)
     except XInitError as err:
