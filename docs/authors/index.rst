@@ -76,6 +76,11 @@ Justin
 `Yuting/Tim Xiao`_
     Made the window-tiling heuristics more robust.
 
+`Fritz Reichwald`_
+    Added ``Gtk.init_check`` in ``quicktile.__main__`` to work around a 
+    bug in some builds of GTK.
+
+
 The Manual
 ----------
 
@@ -156,6 +161,7 @@ only to display favicon-style links to their owners' websites.
 .. _Valdis Vitolins: https://github.com/valdisvi
 .. _Valentin Agachi: https://github.com/avaly
 .. _Yuting/Tim Xiao: https://github.com/txiao
+.. _Fritz Reichwald: https://github.com/fiete201
 
 ..
     NOTE: For "Yuting/Tim Xiao", the commits are signed "Yuting Xiao" but the
