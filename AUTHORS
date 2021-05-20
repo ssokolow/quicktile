@@ -72,6 +72,10 @@ Valentin Agachi
 Yuting/Tim Xiao
    Made the window-tiling heuristics more robust.
 
+Fritz Reichwald
+   Added "Gtk.init_check" in "quicktile.__main__" to work around a bug
+   in some builds of GTK.
+
 
 The Manual
 ==========
