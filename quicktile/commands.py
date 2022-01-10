@@ -406,6 +406,45 @@ def move_to_position(winman: WindowManager,
                       Wnck.WindowMoveResizeMask.Y)
 
 
+def goto_position_dimension(winman: WindowManager,
+                            win: Wnck.Window,
+                            state: Dict[str, Any],
+                            dim_dividend: int,
+                            dim_divisor: int,
+                            col: int,
+                            y_col: str):
+
+    """Move the active window to a position on the screen with a certain dimension
+    This is the same as the default position command which cycles throught, but without the cycling
+
+    :param dim_dividend: The dividend indicating the width of the screen
+    :param dim_divisor: The divisor indicating the wicth of the screen
+    :param col: The number of the column in the grid
+    :param y_col: None if full, bottom for lower part, top for upper part
+    """
+
+    width = dim_dividend/dim_divisor
+    x = (1/dim_divisor)*(col-1)
+    y = 0.5 if y_col == 'bottom' else 0.0
+    height = 0.5 if y_col else 1
+
+    monitor_rect = state['monitor_geom']
+    dim = resolve_fractional_geom([x, y, width, height], monitor_rect)
+
+    result = Rectangle(*dim).from_relative(monitor_rect)
+    # If we're overlapping a panel, fall back to a monitor-specific
+    # analogue to _NET_WORKAREA to prevent overlapping any panels and
+    # risking the WM potentially meddling with the result of resposition()
+    test_result = winman.usable_region.clip_to_usable_region(result)
+    if test_result != result:
+        result = test_result
+        logging.debug("Result exceeds usable (non-rectangular) region of "
+                      "desktop. (overlapped a non-fullwidth panel?) Reducing "
+                      "to within largest usable rectangle: %s", test_result)
+
+    winman.reposition(win, result)
+
+
 @commands.add('bordered')
 def toggle_decorated(
     winman: WindowManager,
