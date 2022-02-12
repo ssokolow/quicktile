@@ -837,7 +837,27 @@ class UsableRegion(object):
         self._strut_rects = strut_rects
 
     def _trim_strut(self, strut: Tuple[Edge, Rectangle]) -> Rectangle:
-        """Trim a strut rectangle to just the monitor it applies to"""
+        """Trim a strut rectangle to just the monitor it applies to
+
+        This is internal code used by :meth:`_update` but split out to manage
+        complexity and improve testability.
+
+        .. doctest::
+
+            >>> region = UsableRegion()
+            >>> region.set_monitors([Rectangle(0, 0, 1280, 1024),
+            ...                      Rectangle(1280, 0, 1280, 1024),
+            ...                      Rectangle(0, 1024, 1280, 1024),
+            ...                      Rectangle(1280, 1024, 1280, 1024)])
+            >>> region._trim_strut((Edge.LEFT, Rectangle(0, 0, 1304, 1024)))
+            Rectangle(x=1280, y=0, width=24, height=1024)
+            >>> region._trim_strut((Edge.RIGHT, Rectangle(1256, 0, 1304, 800)))
+            Rectangle(x=1256, y=0, width=24, height=800)
+            >>> region._trim_strut((Edge.TOP, Rectangle(0, 0, 1280, 1048)))
+            Rectangle(x=0, y=1024, width=1280, height=24)
+            >>> region._trim_strut((Edge.BOTTOM, Rectangle(0, 1000, 80, 1048)))
+            Rectangle(x=0, y=1000, width=80, height=24)
+        """
         edge, strut_rect = strut
 
         for monitor in self._monitors:
