@@ -1,4 +1,4 @@
-[run]
+[report]
 omit =
     */python?.?/*
     */lib-python/?.?/*.py
@@ -6,3 +6,5 @@ omit =
     */site-packages/*
     */dist-packages/*
     */pyshared/*
+    */gi/*
+    */Xlib/*
