@@ -7,9 +7,7 @@ echo " -- Flake8 (static analysis) --"
 python3 -m flake8 --config=setup.cfg quicktile/ ./*.py functional_harness
 echo "-- Nose (unit tests) --"
 nosetests3 "$@"
-echo "-- Doctests (util.py) --"
-python3 -m doctest quicktile/util.py
 echo "-- Sphinx (documentation syntax) --"
 cd docs
-make coverage
+make coverage | grep -v 'Testing of coverage in the sources finished'
 cat _build/coverage/python.txt
