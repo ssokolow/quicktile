@@ -146,6 +146,22 @@ def fmt_table(rows: Union[Dict, Iterable[List]],
          Bar     Too
          Foo     Wun
 
+        >>> print(fmt_table([
+        ...         ("Foo", "Wun", "Real Words. Really. Honestly."),
+        ...         ("Bar", "Too", "Fake Word"),
+        ...         ("Baz", "Fwee", "Real Words. Really. Honestly.")],
+        ...     ("Things", "Numbers", "Is Real Word?"),
+        ...     group_by=2))
+        Things Numbers
+        ------ -----------------------
+        <BLANKLINE>
+        Fake Word
+         Bar     Too
+        <BLANKLINE>
+        Real Words. Really. Honestly.
+         Foo     Wun
+         Baz     Fwee
+
     .. warning:: This uses :func:`zip` to combine things. The number of columns
         displayed will be defined by the row with the fewest columns.
 
