@@ -373,7 +373,7 @@ class Rectangle(_Rectangle):
         elif x is not None and width is not None:
             x2 = x + width
         else:
-            raise Exception("Unreachable")
+            raise Exception("Unreachable")  # pragma: nocover
 
         if y is not None and y2 is not None:
             height = y2 - y
@@ -382,7 +382,7 @@ class Rectangle(_Rectangle):
         elif y is not None and height is not None:
             y2 = y + height
         else:
-            raise Exception("Unreachable")
+            raise Exception("Unreachable")  # pragma: nocover
 
         # Swap (x1, y1) and (x2, y2) as appropriate to invert negative sizes
         if width < 0:
@@ -407,6 +407,13 @@ class Rectangle(_Rectangle):
         This is used to apply scaling factors to monitor rectangles returned by
         GDK so they'll be in the device pixel coordinates that the Wnck APIs
         expect.
+
+        .. doctest::
+
+            >>> Rectangle(320, 240, 640, 480) * 2
+            Rectangle(x=640, y=480, width=1280, height=960)
+            >>> Rectangle(320, 240, 640, 480) * 0.5
+            Rectangle(x=160, y=120, width=320, height=240)
         """
         return self._replace(
             x=int(self.x * factor),
