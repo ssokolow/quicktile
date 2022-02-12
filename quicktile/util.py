@@ -65,7 +65,7 @@ class Gravity(Enum):  # pylint: disable=too-few-public-methods
     BOTTOM_RIGHT = (1.0, 1.0)
 
 
-def clamp_idx(idx: int, stop: int, wrap: bool=True) -> int:
+def clamp_idx(idx: int, stop: int, wrap: bool = True) -> int:
     """Ensure a 0-based index is within a given range [0, stop).
 
     Uses the same half-open range convention as Python slices.
@@ -78,8 +78,7 @@ def clamp_idx(idx: int, stop: int, wrap: bool=True) -> int:
     """
     if wrap:
         return idx % stop
-    else:
-        return max(min(idx, stop - 1), 0)
+    return max(min(idx, stop - 1), 0)
 
 
 def euclidean_dist(vec1: Iterable, vec2: Iterable) -> float:
@@ -121,7 +120,7 @@ def powerset(iterable: Iterable[Any]) -> Iterator[Sequence[Any]]:
 
 def fmt_table(rows: Union[Dict, Iterable[List]],
               headers: Sequence[str],
-              group_by: int=None,
+              group_by: int = None,
               ) -> str:
     """Format a collection as a textual table.
 
@@ -205,6 +204,7 @@ def fmt_table(rows: Union[Dict, Iterable[List]],
             output.extend(fmt_row(row, indent=1))
 
     return ''.join(output).rstrip('\n')
+
 
 # Internal StrutPartial parent. Exposed so ePyDoc doesn't complain
 _StrutPartial = namedtuple('_StrutPartial', 'left right top bottom '
@@ -305,6 +305,7 @@ class StrutPartial(_StrutPartial):
                 height=-self.bottom).intersect(desktop_rect)),
         ) if bool(x[1])]
 
+
 # Keep _StrutPartial from showing up in automated documentation
 del _StrutPartial
 
@@ -354,9 +355,9 @@ class Rectangle(_Rectangle):
     __slots__ = ()
 
     # pylint: disable=too-many-arguments
-    def __new__(cls, x: int=None, y: int=None,
-                width: int=None, height: int=None,
-                x2: int=None, y2: int=None):
+    def __new__(cls, x: int = None, y: int = None,
+                width: int = None, height: int = None,
+                x2: int = None, y2: int = None):
 
         # -- Check for a valid combination of arguments --
         if (x, width, x2).count(None) != 1:
@@ -756,6 +757,7 @@ class Rectangle(_Rectangle):
         gdk_rect.height = self.height
         return gdk_rect
 
+
 # Keep _Rectangle from showing up in automated documentation
 del _Rectangle
 
@@ -824,7 +826,7 @@ class UsableRegion(object):
             # TODO: Test for off-by-one bugs
             # TODO: Think of a more efficient way to do this
             for strut_pair in strut.as_rects(desktop_rect):
-                    strut_rects.append(self._trim_strut(strut_pair))
+                strut_rects.append(self._trim_strut(strut_pair))
         self._strut_rects = strut_rects
 
     def _trim_strut(self, strut: Tuple[Edge, Rectangle]) -> Rectangle:
@@ -918,8 +920,8 @@ class UsableRegion(object):
         """
         if self._monitors:
             return rect.closest_of(self._monitors)
-        else:
-            return None
+
+        return None
 
     def __bool__(self) -> bool:
         """A :class:`UsableRegion` is truthy if it has at least one monitor

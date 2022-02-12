@@ -31,7 +31,7 @@ from typing import Any, Iterable, Optional, Tuple, Union
 
 
 @contextmanager
-def persist_maximization(win: Wnck.Window, keep_maximize: bool=True):
+def persist_maximization(win: Wnck.Window, keep_maximize: bool = True):
     """Context manager to persist maximization state after a call to
     :any:`WindowManager.reposition`.
 
@@ -54,7 +54,7 @@ def persist_maximization(win: Wnck.Window, keep_maximize: bool=True):
             getattr(win, 'maximize' + maxtype)()
 
 
-class WindowManager(object):
+class WindowManager:
     """A simple API-wrapper class for manipulating window positioning.
 
     :param screen: The screen to operate on. If :any:`None`, the
@@ -73,7 +73,7 @@ class WindowManager(object):
        in KDE 3.x. Not sure what would be equivalent elsewhere.)
     """
 
-    def __init__(self, screen: Gdk.Screen=None, x_display: XDisplay=None):
+    def __init__(self, screen: Gdk.Screen = None, x_display: XDisplay = None):
         self.gdk_screen = screen or Gdk.Screen.get_default()
         if self.gdk_screen is None:
             raise XInitError("GTK+ could not open a connection to the X server"
@@ -134,8 +134,8 @@ class WindowManager(object):
                 logging.error("WorkArea.update_geometry_cache received "
                               "an empty monitor region! Using cached value.")
                 return
-            else:
-                raise Exception("Could not retrieve desktop geometry")
+
+            raise Exception("Could not retrieve desktop geometry")
 
         # Gather all struts
         struts = []
@@ -212,9 +212,9 @@ class WindowManager(object):
             yield window
 
     def get_workspace(self,
-                window: Wnck.Window=None,
-                direction: Union[Wnck.MotionDirection, int]=None,
-                wrap_around: bool=True,
+                window: Wnck.Window = None,
+                direction: Union[Wnck.MotionDirection, int] = None,
+                wrap_around: bool = True,
                       ) -> Optional[Wnck.Workspace]:
         """Get a workspace (virtual desktop) relative to the one containing
         the given or active window.
@@ -280,7 +280,7 @@ class WindowManager(object):
             win: Union[Gdk.Window, Wnck.Window, int],
             name: Union[str, int],
             prop_type: int,
-            empty: Any=None):
+            empty: Any = None):
         """Get the value of the X11 property ``name`` on window ``win``
 
         :param win: A GTK or Wnck Window object or a raw X11 window ID.
@@ -316,8 +316,8 @@ class WindowManager(object):
             win: Union[Gdk.Window, Wnck.Window, int],
             name: Union[str, int],
             value,
-            prop_type: int=Xatom.STRING,
-            format_size: int=8):
+            prop_type: int = Xatom.STRING,
+            format_size: int = 8):
         """Set the value of X11 property ``name`` on window ``win`` to the
         contents of ``value``.
 
@@ -380,10 +380,10 @@ class WindowManager(object):
 
     def reposition(self,  # pylint: disable=too-many-arguments
             win: Wnck.Window,
-            geom: Optional[Rectangle]=None,
-            monitor: Rectangle=Rectangle(0, 0, 0, 0),
-            keep_maximize: bool=False,
-            geometry_mask: Wnck.WindowMoveResizeMask=(
+            geom: Optional[Rectangle] = None,
+            monitor: Rectangle = Rectangle(0, 0, 0, 0),
+            keep_maximize: bool = False,
+            geometry_mask: Wnck.WindowMoveResizeMask = (
                 Wnck.WindowMoveResizeMask.X |
                 Wnck.WindowMoveResizeMask.Y |
                 Wnck.WindowMoveResizeMask.WIDTH |

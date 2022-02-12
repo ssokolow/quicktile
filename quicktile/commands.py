@@ -37,7 +37,7 @@ CommandCBWrapper = Callable[..., Any]  # pylint: disable=invalid-name
 # --
 
 
-class CommandRegistry(object):
+class CommandRegistry:
     """Lookup and dispatch boilerplate for window management commands."""
 
     #: Fields to be added to the ``state`` argument when calling commands
@@ -122,7 +122,7 @@ class CommandRegistry(object):
             @wraps(func)
             # pylint: disable=missing-docstring
             def wrapper(winman: WindowManager,
-                        window: Wnck.Window=None,
+                        window: Wnck.Window = None,
                         *args,
                         **kwargs
                         ) -> None:
@@ -214,9 +214,9 @@ class CommandRegistry(object):
             cmd(winman, *args, **kwargs)
 
             return True
-        else:
-            logging.error("Unrecognized command: %s", command)
-            return False
+
+        logging.error("Unrecognized command: %s", command)
+        return False
 
 
 #: The instance of :class:`CommandRegistry` to be used in 99.9% of use cases.
@@ -303,9 +303,9 @@ def cycle_dimensions(winman: WindowManager,
 def cycle_monitors(winman: WindowManager,  # pylint: disable=too-many-arguments
                    win: Wnck.Window,
                    state: Dict[str, Any],
-                   step: int=1,
-                   force_wrap: bool=False,
-                   n_monitors: Optional[int]=None
+                   step: int = 1,
+                   force_wrap: bool = False,
+                   n_monitors: Optional[int] = None
                    ) -> None:
     """Cycle the active window between monitors.
 
@@ -341,8 +341,8 @@ def cycle_monitors_all(
         winman: WindowManager,
         win: Wnck.Window,
         state: Dict[str, Any],
-        step: int=1,
-        force_wrap: bool=False
+        step: int = 1,
+        force_wrap: bool = False
 ) -> None:
     """Cycle all windows between monitors.
 
@@ -461,7 +461,7 @@ def toggle_state(
         state: Dict[str, Any],  # pylint: disable=unused-argument
         command: str,
         check: str,
-        takes_bool: bool=False) -> None:
+        takes_bool: bool = False) -> None:
     """Toggle window state on the active window.
 
     This is an abstraction to unify a bunch of different :class:`Wnck.Window`

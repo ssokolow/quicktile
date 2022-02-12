@@ -21,7 +21,7 @@ from typing import Dict, Generator, List, Tuple
 log = logging.getLogger(__name__)
 
 
-def _init_x_server(argv: List[str], verbose: bool=False
+def _init_x_server(argv: List[str], verbose: bool = False
                    ) -> Tuple[subprocess.Popen, bytes]:
     """Wrapper for starting an X server with the given command line
 

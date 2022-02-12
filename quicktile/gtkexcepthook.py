@@ -160,7 +160,7 @@ def gather_vars(frame_rec: inspect.FrameInfo,
     all_vars, prev, name, scope = {}, None, '', None
     for token_tuple in tokenize_frame(frame_rec):
         t_type, t_str = token_tuple[0:2]
-        if (t_type == tokenize.NAME and  # pylint: disable=no-member
+        if (t_type == tokenize.NAME and  # noqa pylint: disable=no-member
                 t_str not in keyword.kwlist):
             if not name:
                 assert not name and not scope  # nosec
@@ -177,7 +177,7 @@ def gather_vars(frame_rec: inspect.FrameInfo,
             try:
                 if val:
                     prev = val
-            except:  # pylint: disable=bare-except
+            except:  # noqa pylint: disable=bare-except
                 log.debug('  found %s name %s val %s in %s for token %s',
                           scope, name, val, prev, t_str)
         elif t_str == '.':
@@ -195,8 +195,8 @@ def gather_vars(frame_rec: inspect.FrameInfo,
 def analyse(exctyp: Type[BaseException],
             value: BaseException,
             tracebk: TracebackType,
-            context_lines: int=3,
-            max_width: int=80
+            context_lines: int = 3,
+            max_width: int = 80
             ) -> StringIO:
     """Generate a traceback, including the contents of variables in each
     stack frame.
@@ -256,7 +256,7 @@ class ExceptionHandler(object):
         button which will receive the formatted traceback as a string.
     """
 
-    def __init__(self, reporting_cb: Callable[[str], None]=None) -> None:
+    def __init__(self, reporting_cb: Callable[[str], None] = None) -> None:
         self.reporting_cb = reporting_cb
 
     def make_info_dialog(self) -> Gtk.MessageDialog:
@@ -350,7 +350,7 @@ class ExceptionHandler(object):
         dialog.destroy()
 
 
-def enable(reporting_cb: Callable[[str], None]=None):
+def enable(reporting_cb: Callable[[str], None] = None):
     """Call this to set gtkexcepthook as the default exception handler
 
     :param reporting_cb: If provided, this callback will be exposed in the
@@ -362,6 +362,7 @@ def enable(reporting_cb: Callable[[str], None]=None):
 
     # MyPy disabled pending a release of the fix to #797
     sys.excepthook = ExceptionHandler(reporting_cb)  # type: ignore
+
 
 if __name__ == '__main__':
     class TestFodder(object):  # pylint: disable=too-few-public-methods

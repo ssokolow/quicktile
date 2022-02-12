@@ -22,7 +22,7 @@ Geom = Union[Rectangle, GeomTuple]  # pylint: disable=invalid-name
 
 
 def check_tolerance(distance: int, monitor_geom: Rectangle,
-        tolerance: float=0.1) -> float:
+        tolerance: float = 0.1) -> float:
     """Check whether a distance is within a tolerance value calculated as a
         percentage of a monitor's size.
 
@@ -97,9 +97,9 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
     def __call__(self,
                  width: float,
                  height: float,
-                 gravity: str='top-left',
-                 x: float=None,
-                 y: float=None
+                 gravity: str = 'top-left',
+                 x: float = None,
+                 y: float = None
                  ) -> PercentRectTuple:
         """Return a relative ``(x, y, w, h)`` tuple relative to ``gravity``.
 

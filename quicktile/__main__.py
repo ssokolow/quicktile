@@ -129,7 +129,7 @@ class QuickTileApp(object):
     def __init__(self, winman: WindowManager,
                  commands: commands.CommandRegistry,
                  keys: Dict[str, str],
-                 modmask: str='',
+                 modmask: str = '',
                  ):
         self.winman = winman
         self.commands = commands
@@ -280,7 +280,7 @@ def load_config(path) -> ConfigParser:
 
 
 def wnck_log_filter(domain: str, level: GLib.LogLevelFlags,
-        message: str, userdata: object=None):
+        message: str, userdata: object = None):
     """A custom function for :func:`GLib.log_set_handler` which filters out
     the spurious error about ``_OB_WM_ACTION_UNDECORATE`` being un-handled.
 
@@ -414,6 +414,7 @@ def main() -> None:
             print(commands.commands)
             print("\nUse --help for a list of valid options.")
             sys.exit(errno.ENOENT)
+
 
 if __name__ == '__main__':
     main()

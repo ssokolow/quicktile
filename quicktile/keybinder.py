@@ -56,7 +56,7 @@ class KeyBinder(object):
     #: reported.
     keybind_failed = False
 
-    def __init__(self, x_display: Display=None):
+    def __init__(self, x_display: Display = None):
         try:
             self.xdisp = x_display or Display()
         except (UnicodeDecodeError, DisplayConnectionError) as err:
@@ -138,7 +138,7 @@ class KeyBinder(object):
             self.xdisp.display.default_error_handler(err)
 
     def cb_xevent(self, src: GLib.IOChannel, cond: GLib.IOCondition,
-            handle: Optional[Display]=None) -> bool:
+            handle: Optional[Display] = None) -> bool:
         """:func:`GLib.io_add_watch` callback to dispatch X events to more
         specific handlers.
 
