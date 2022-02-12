@@ -965,7 +965,7 @@ class XInitError(Exception):
         outside QuickTile for the cause.
 
 
-        .. code-block::
+        .. code-block:: text
 
             XInitError: Hello, I am your usual exception message
                 (The cause of this error lies outside of QuickTile)
