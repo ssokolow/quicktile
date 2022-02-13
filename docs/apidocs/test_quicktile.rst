@@ -1,5 +1,5 @@
 Unit Tests (``test_quicktile.py``)
 ==================================
 
-.. automodule:: test_quicktile
+.. automodule:: tests.test_quicktile
    :members:
