@@ -1,4 +1,4 @@
-"""Entry point, configuration parser, and main loop
+"""Entry point and main loop
 
 .. todo::
  - Audit all of my in-code TODOs for accuracy and staleness.
@@ -35,7 +35,6 @@ __license__ = "GNU GPL 2.0 or later"
 
 import errno, logging, os, signal, sys
 from argparse import ArgumentParser
-from configparser import ConfigParser
 
 from Xlib.display import Display as XDisplay
 from Xlib.error import DisplayConnectionError
@@ -47,71 +46,15 @@ gi.require_version('Wnck', '3.0')
 from gi.repository import GLib, Gtk, Wnck
 
 from . import commands, layout
+from .config import load_config, XDG_CONFIG_DIR
 from .util import fmt_table, XInitError
 from .version import __version__
 from .wm import WindowManager
 
 # -- Type-Annotation Imports --
-from typing import Dict, Union
+from typing import Dict
 from typing import Optional  # NOQA pylint: disable=unused-import
-
-#: MyPy type alias for fields loaded from config files
-CfgDict = Dict[str, Union[str, int, float, bool, None]]  # pylint:disable=C0103
 # --
-
-#: Location for config files (determined at runtime).
-XDG_CONFIG_DIR = os.environ.get('XDG_CONFIG_HOME',
-                                os.path.expanduser('~/.config'))
-
-#: Default content for the configuration file
-#:
-#: .. todo:: Figure out a way to show :data:`DEFAULTS` documentation but with
-#:    the structure pretty-printed.
-DEFAULTS = {
-    'general': {
-        # Use Ctrl+Alt as the default base for key combinations
-        'ModMask': '<Ctrl><Alt>',
-        'MovementsWrap': True,
-        'ColumnCount': 3
-    },
-    'keys': {
-        "KP_Enter": "monitor-switch",
-        "KP_0": "maximize",
-        "KP_1": "bottom-left",
-        "KP_2": "bottom",
-        "KP_3": "bottom-right",
-        "KP_4": "left",
-        "KP_5": "center",
-        "KP_6": "right",
-        "KP_7": "top-left",
-        "KP_8": "top",
-        "KP_9": "top-right",
-        "<Shift>KP_1": "move-to-bottom-left",
-        "<Shift>KP_2": "move-to-bottom",
-        "<Shift>KP_3": "move-to-bottom-right",
-        "<Shift>KP_4": "move-to-left",
-        "<Shift>KP_5": "move-to-center",
-        "<Shift>KP_6": "move-to-right",
-        "<Shift>KP_7": "move-to-top-left",
-        "<Shift>KP_8": "move-to-top",
-        "<Shift>KP_9": "move-to-top-right",
-        "V": "vertical-maximize",
-        "H": "horizontal-maximize",
-        "C": "move-to-center",
-    }
-}  # type: Dict[str, CfgDict]
-
-#: Used for resolving certain keysyms
-#:
-#: .. todo:: Figure out how to replace :data:`KEYLOOKUP` with a fallback that
-#:      uses something in `Gtk <http://lazka.github.io/pgi-docs/Gtk-3.0/>`_ or
-#:      ``python-xlib`` to look up the keysym from the character it types.
-KEYLOOKUP = {
-    ',': 'comma',
-    '.': 'period',
-    '+': 'plus',
-    '-': 'minus',
-}
 
 Wnck.set_client_type(Wnck.ClientType.PAGER)
 
@@ -185,98 +128,6 @@ class QuickTileApp(object):
         print("Keybindings defined for use with --daemonize:\n")
         print("Modifier: %s\n" % (self._modmask or '(none)'))
         print(fmt_table(self._keys, ('Key', 'Action')))
-
-
-def load_config(path) -> ConfigParser:
-    """Load the config file from the given path, applying fixes as needed.
-    If it does not exist, create it from the configuration defaults.
-
-    :param path: The path to load or initialize.
-
-    :raises TypeError: Raised if the keys or values in the :ref:`[keys]`
-        section of the configuration file or what they resolve to via
-        :any:`KEYLOOKUP` are not :any:`str` instances.
-
-    .. todo:: Refactor config parsing. It's an ugly blob.
-    """
-    first_run = not os.path.exists(path)
-
-    config = ConfigParser(interpolation=None)
-
-    # Make keys case-sensitive because keysyms must be
-    #
-    # (``type: ignore`` to squash a false positive for something the Python 3.x
-    # documentation specifically *recommends* over using RawConfigParser)
-    config.optionxform = str  # type: ignore
-
-    config.read(path)
-    dirty = False
-
-    if not config.has_section('general'):
-        config.add_section('general')
-        # Change this if you make backwards-incompatible changes to the
-        # section and key naming in the config file.
-        config.set('general', 'cfg_schema', '1')
-        dirty = True
-
-    for key, val in DEFAULTS['general'].items():
-        if not config.has_option('general', key):
-            config.set('general', key, str(val))
-            dirty = True
-
-    mk_raw = config.get('general', 'ModMask')
-    modkeys = mk_raw.strip()  # pylint: disable=E1101
-    if ' ' in modkeys and '<' not in modkeys:
-        modkeys = '<%s>' % '><'.join(modkeys.split())
-        logging.info("Updating modkeys format:\n %r --> %r", mk_raw, modkeys)
-        config.set('general', 'ModMask', modkeys)
-        dirty = True
-
-    # Either load the keybindings or use and save the defaults
-    if config.has_section('keys'):
-        keymap = dict(config.items('keys'))  # type: CfgDict
-    else:
-        keymap = DEFAULTS['keys']
-        config.add_section('keys')
-        for key, cmd in keymap.items():
-            if not isinstance(key, str):
-                raise TypeError("Hotkey name must be a str: {!r}".format(key))
-            if not isinstance(cmd, str):
-                raise TypeError("Command name must be a str: {!r}".format(cmd))
-            config.set('keys', key, cmd)
-        dirty = True
-
-    # Migrate from the deprecated syntax for punctuation keysyms
-    for key in keymap:
-        # Look up unrecognized shortkeys in a hardcoded dict and
-        # replace with valid names like ',' -> 'comma'
-        if key in KEYLOOKUP:
-            cmd = keymap[key]
-            if not isinstance(cmd, str):
-                raise TypeError("Command name must be a str: {!r}".format(cmd))
-
-            logging.warning("Updating config file from deprecated keybind "
-                "syntax:\n\t%r --> %r", key, KEYLOOKUP[key])
-            config.remove_option('keys', key)
-            config.set('keys', KEYLOOKUP[key], cmd)
-            dirty = True
-
-    # Automatically update the old 'middle' command to 'center'
-    for key in keymap:
-        if keymap[key] == 'middle':
-            keymap[key] = cmd = 'center'
-            logging.warning("Updating old command in config file:"
-                    "\n\tmiddle --> center")
-            config.set('keys', key, cmd)
-            dirty = True
-
-    if dirty:
-        with open(path, 'w') as cfg_file:
-            config.write(cfg_file)
-        if first_run:
-            logging.info("Wrote default config file to %s", path)
-
-    return config
 
 
 def wnck_log_filter(domain: str, level: GLib.LogLevelFlags,

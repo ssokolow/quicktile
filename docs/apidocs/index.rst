@@ -8,6 +8,7 @@ QuickTile's code is currently divided into the following modules:
 
    __main__
    commands
+   config
    dbus_api
    gtkexcepthook
    keybinder
