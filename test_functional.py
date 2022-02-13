@@ -150,15 +150,18 @@ def main():
         "unit tested.")
     log.warning("TODO: Inject a test window into the nested X session so "
         "non-windowless commands don't bail out in the common code.")
+    log.info("Starting test instance of %s", args.x_server)
     with x_server(shlex.split(args.x_server),
             {0: '1024x768x24', 1: '800x600x24'}) as env:
         # TODO: Use a custom configuration file for Openbox
         # TODO: Detect once the window manager has started and wait for that
         #       before running the tests.
         # TODO: Proper test windows.
+        log.info("Starting test copy of Openbox...")
         with background_proc(['openbox', '--startup', 'zenity --info'], env):
             # TODO: Rework so the process holding the session open can just
             #       *report* when it's ready.
+            log.info("Sleeping for 5 seconds...")
             import time
             time.sleep(5)
             run_tests(env)
