@@ -8,8 +8,6 @@ __license__ = "GNU GPL 2.0 or later"
 # pylint: disable=unsubscriptable-object
 # pylint: disable=wrong-import-order
 
-import math
-
 from .util import Gravity, Rectangle
 
 # -- Type-Annotation Imports --
@@ -20,32 +18,9 @@ from .util import GeomTuple, PercentRectTuple
 Geom = Union[Rectangle, GeomTuple]  # pylint: disable=invalid-name
 # --
 
-
-def check_tolerance(distance: int, monitor_geom: Rectangle,
-        tolerance: float = 0.1) -> float:
-    """Check whether a distance is within a tolerance value calculated as a
-        percentage of a monitor's size.
-
-    :param distance: A distance in pixels.
-    :param monitor_geom: A ``Rectangle`` representing the monitor geometry.
-    :param tolerance: A value between 0.0 and 1.0, inclusive, which represents
-        a percentage of the monitor size.
-
-    .. note:: This is not currently in use but is retained for when future
-        plans make it necessary to design reliable "invalidate cached data if
-        the window was repositioned/resized without QuickTile" code.
-    """
-
-    # Take the euclidean distance of the monitor's width and height and convert
-    # `distance` into a percentage of it, then test against `tolerance`.
-    return (float(distance) /
-           math.hypot(monitor_geom.width, monitor_geom.height)
-            ) < tolerance
-
-
 def resolve_fractional_geom(fract_geom: Union[PercentRectTuple, Rectangle],
         monitor_rect: Rectangle) -> Rectangle:
-    """Resolve proportional (eg. ``0.5``) and preserved (``None``) coordinates.
+    """Resolve proportional (eg. ``0.5``) coordinates.
 
     :param fract_geom: An ``(x, y, w, h)`` tuple containing monitor-relative
         values in the range from 0.0 to 1.0, inclusive, or a
@@ -56,6 +31,18 @@ def resolve_fractional_geom(fract_geom: Union[PercentRectTuple, Rectangle],
         desktop.
     :returns: A rectangle with absolute coordinates derived from
         ``monitor_rect``.
+
+    .. doctest::
+
+        >>> resolve_fractional_geom(Rectangle(0, 1, 2, 3),
+        ...                         Rectangle(1280, 0, 1280, 1024))
+        Rectangle(x=0, y=1, width=2, height=3)
+        >>> resolve_fractional_geom((0.5, 0.5, 0.5, 0.5),
+        ...                         Rectangle(0, 0, 1280, 1024))
+        Rectangle(x=640, y=512, width=640, height=512)
+        >>> resolve_fractional_geom((0.5, 0.5, 0.5, 0.5),
+        ...                         Rectangle(400, 500, 1280, 1024))
+        Rectangle(x=640, y=512, width=640, height=512)
     """
     if isinstance(fract_geom, Rectangle):
         return fract_geom
@@ -79,6 +66,33 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
     :param margin_y: Vertical margin to apply when calculating window
         positions, as decimal percentage of screen height.
 
+    .. doctest::
+
+        >>> layout = GravityLayout()
+        >>> layout(0.5, 0.5)
+        (0.0, 0.0, 0.5, 0.5)
+        >>> layout(0.5, 0.5, 'bottom-right')
+        (0.5, 0.5, 0.5, 0.5)
+        >>> layout(0.5, 0.5, 'center')
+        (0.25, 0.25, 0.5, 0.5)
+        >>> layout(0.5, 0.5, x=0.2, y=0.2)
+        (0.2, 0.2, 0.5, 0.5)
+
+        >>> layout(0.5, 0.5, 'center', x=0.25, y=0.25)
+        (0.0, 0.0, 0.5, 0.5)
+
+        >>> layout = GravityLayout(0.01, 0.02)
+        >>> layout(0.5, 0.5)
+        (0.01, 0.02, 0.48, 0.46)
+        >>> layout(0.5, 0.5, 'bottom-right')
+        (0.51, 0.52, 0.48, 0.46)
+        >>> layout(0.5, 0.5, 'center')
+        (0.26, 0.27, 0.48, 0.46)
+        >>> layout(0.5, 0.5, x=0.2, y=0.2)
+        (0.21, 0.22, 0.48, 0.46)
+
+        >>> layout(0.5, 0.5, 'center', x=0.25, y=0.25)
+        (0.01, 0.02, 0.48, 0.46)
     """
     # pylint: disable=no-member
     #: A mapping of possible window alignments relative to the monitor/desktop
@@ -155,6 +169,20 @@ def make_winsplit_positions(columns: int) -> Dict[str, List[PercentRectTuple]]:
     .. todo:: Plumb :meth:`GravityLayout` arguments into the config
         file and figure out how to generalize :func:`make_winsplit_positions`
         into user-customizable stuff as much as possible.
+
+    .. doctest::
+
+        >>> from pprint import pprint
+        >>> pprint(make_winsplit_positions(2)) # doctest: +NORMALIZE_WHITESPACE
+        {'bottom': [(0.0, 0.5, 1.0, 0.5), (0.25, 0.5, 0.5, 0.5)],
+        'bottom-left': [(0.0, 0.5, 0.5, 0.5), (0.0, 0.5, 0.5, 0.5)],
+        'bottom-right': [(0.5, 0.5, 0.5, 0.5), (0.5, 0.5, 0.5, 0.5)],
+        'center': [(0.0, 0.0, 1.0, 1), (0.25, 0.0, 0.5, 1)],
+        'left': [(0.0, 0.0, 0.5, 1), (0.0, 0.0, 0.5, 1)],
+        'right': [(0.5, 0.0, 0.5, 1), (0.5, 0.0, 0.5, 1)],
+        'top': [(0.0, 0.0, 1.0, 0.5), (0.25, 0.0, 0.5, 0.5)],
+        'top-left': [(0.0, 0.0, 0.5, 0.5), (0.0, 0.0, 0.5, 0.5)],
+        'top-right': [(0.5, 0.0, 0.5, 0.5), (0.5, 0.0, 0.5, 0.5)]}
     """
 
     gvlay = GravityLayout()
