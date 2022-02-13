@@ -204,6 +204,37 @@ class KeyBinder(object):
         :returns: ``(keycode, modifier_mask)`` or :any:`None` on failure.
         """
 
+        result = self._accel_to_keysym(accel)
+
+        if result is None:
+            return None
+        keysym, modmask = result
+
+        # Convert to what XGrabKey expects
+        keycode = self.xdisp.keysym_to_keycode(keysym)
+        if isinstance(modmask, Gdk.ModifierType):
+            modmask = modmask.real
+
+        return keycode, modmask
+
+    @staticmethod
+    def _accel_to_keysym(accel: str) -> Optional[Tuple[str, int]]:
+        """Internal helper for :meth:`parse_accel` for all operations that
+        don't need an open connection to the X server.
+
+        Parses and validates an :ref:`accelerator string <keybinding-syntax>`
+        but does not convert from a keysym to a keycode.
+
+        (Separated out for testing purposes)
+
+        .. doctest::
+
+            >>> KeyBinder._accel_to_keysym("<Foo>C")
+            >>> KeyBinder._accel_to_keysym("<Control>Foo")
+            >>> KeyBinder._accel_to_keysym("<Super>C")
+            >>> KeyBinder._accel_to_keysym("<Control>C")
+            (99, <flags GDK_CONTROL_MASK of type Gdk.ModifierType>)
+        """
         keysym, modmask = Gtk.accelerator_parse(accel)
         if not Gtk.accelerator_valid(keysym, modmask):
             logging.error("Invalid keybinding: %s", accel)
@@ -215,12 +246,7 @@ class KeyBinder(object):
                           "Did you use <Super> instead of <Mod4>?")
             return None
 
-        # Convert to what XGrabKey expects
-        keycode = self.xdisp.keysym_to_keycode(keysym)
-        if isinstance(modmask, Gdk.ModifierType):
-            modmask = modmask.real
-
-        return keycode, modmask
+        return keysym, modmask
 
     @staticmethod
     def _vary_modmask(
@@ -238,6 +264,16 @@ class KeyBinder(object):
 
         :returns: The :any:`power set <quicktile.util.powerset>` of ``ignored``
             with ``modmask`` bitwise ORed onto each entry.
+
+        .. doctest::
+
+            >>> list(KeyBinder._vary_modmask(Gdk.ModifierType.MOD1_MASK, []))
+            [8]
+            >>> list(KeyBinder._vary_modmask(Gdk.ModifierType.MOD1_MASK,
+            ...                              [Gdk.ModifierType.MOD2_MASK,
+            ...                               Gdk.ModifierType.LOCK_MASK]))
+            [8, 24, 10, 26]
+
 
         .. todo:: Decide whether to make this :meth:`_vary_modmask` public when
             I turn off documenting private members.
