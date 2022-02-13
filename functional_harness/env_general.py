@@ -3,18 +3,19 @@
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "MIT"
 
-import os, subprocess  # nosec
+import subprocess  # nosec
 from contextlib import contextmanager
 
 # Silence PyLint being flat-out wrong about MyPy type annotations
 # pylint: disable=unsubscriptable-object
 
 # -- Type-Annotation Imports --
-from typing import Any, Dict, Generator  # NOQA
+from typing import Any, Dict, Generator, Union # NOQA
 
 
 @contextmanager
-def background_proc(argv, verbose=False, *args: Any, **kwargs: Any
+def background_proc(argv, env: Dict[str, Union[bytes, str]], verbose=False,
+                    *args: Any, **kwargs: Any
                     ) -> Generator[None, None, None]:
     """Context manager for scoping the lifetime of a ``subprocess.Popen`` call
 
@@ -25,32 +26,13 @@ def background_proc(argv, verbose=False, *args: Any, **kwargs: Any
     :param kwargs: Keyword arguments to pass to :class:`subprocess.Popen`
     """
     if verbose:
-        popen_obj = subprocess.Popen(argv, *args, **kwargs)  # nosec
+        popen_obj = subprocess.Popen(  # type: ignore # nosec
+            argv, env=env, *args, **kwargs)
     else:
-        popen_obj = subprocess.Popen(argv,  # type: ignore
+        popen_obj = subprocess.Popen(argv,  # type: ignore # nosec
             stderr=subprocess.STDOUT, stdout=subprocess.DEVNULL,
-            *args, **kwargs)
+            env=env, *args, **kwargs)
     try:
-        yield
+        yield popen_obj
     finally:
         popen_obj.terminate()
-
-
-@contextmanager
-def env_vars(new: Dict[str, str]) -> Generator[None, None, None]:
-    """Context manager to temporarily change environment variables
-
-    :param new: Items to be added to :any:`os.environ` for the lifetime of the
-        context manager.
-    """
-    old_vals = {}
-    try:
-        for key, val in new.items():
-            if key in os.environ:
-                old_vals[key] = os.environ[key]
-            os.environ[key] = val
-
-        yield
-    finally:
-        for key, val in old_vals.items():
-            os.environ[key] = val

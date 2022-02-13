@@ -13,8 +13,6 @@ import logging, os, random, shutil, subprocess, tempfile  # nosec
 from contextlib import contextmanager
 from distutils.spawn import find_executable
 
-from .env_general import env_vars
-
 # -- Type-Annotation Imports --
 from typing import Dict, Generator, List, Tuple
 
@@ -38,12 +36,14 @@ def _init_x_server(argv: List[str], verbose: bool = False
     read_pipe, write_pipe = os.pipe()
     argv += ['+xinerama', '-displayfd', str(write_pipe)]
 
+    env = {}  # type: Dict[str, str]
+
     # pylint: disable=unexpected-keyword-arg,no-member
     if verbose:
-        xproc = subprocess.Popen(argv, pass_fds=[write_pipe])  # nosec
+        xproc = subprocess.Popen(argv, pass_fds=[write_pipe], env=env)  # nosec
     else:
         xproc = subprocess.Popen(argv, pass_fds=[write_pipe],  # nosec
-            stderr=subprocess.STDOUT, stdout=subprocess.DEVNULL)
+            env=env, stderr=subprocess.STDOUT, stdout=subprocess.DEVNULL)
 
     display = os.read(read_pipe, 128).strip()
     return xproc, display
@@ -119,8 +119,7 @@ def x_server(argv: List[str], screens: Dict[int, str]
             env=env)
         # FIXME: This xauth call once had a random failure. Retry.
 
-        with env_vars(env):
-            yield env
+        yield env
 
     finally:
         if x_server:

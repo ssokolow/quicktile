@@ -107,14 +107,14 @@ from functional_harness.x_server import x_server
 log = logging.getLogger(__name__)
 
 
-def run_tests():
+def run_tests(env):
     """Run the old bank of 'commands don't crash' tests"""
     lines = [x.split('#')[0].strip() for x in TEST_SCRIPT.split('\n')]
     lines = [x for x in lines if x]
     for pos, command in enumerate(lines):
         log.info("Testing command %d of %d: %s", pos + 1, len(lines), command)
         subprocess.check_call(['./quicktile.sh', '--no-excepthook',
-            command])  # nosec
+            command], env=env)  # nosec
 
 
 def main():
@@ -151,15 +151,17 @@ def main():
     log.warning("TODO: Inject a test window into the nested X session so "
         "non-windowless commands don't bail out in the common code.")
     with x_server(shlex.split(args.x_server),
-            {0: '1024x768x24', 1: '800x600x24'}):
+            {0: '1024x768x24', 1: '800x600x24'}) as env:
         # TODO: Use a custom configuration file for Openbox
         # TODO: Detect once the window manager has started and wait for that
         #       before running the tests.
         # TODO: Proper test windows.
-        with background_proc(['openbox', '--startup', 'zenity --info']):
+        with background_proc(['openbox', '--startup', 'zenity --info'], env):
+            # TODO: Rework so the process holding the session open can just
+            #       *report* when it's ready.
             import time
             time.sleep(5)
-            run_tests()
+            run_tests(env)
 
 
 if __name__ == '__main__':
