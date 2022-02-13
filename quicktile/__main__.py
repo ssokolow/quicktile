@@ -45,7 +45,7 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('Wnck', '3.0')
 from gi.repository import GLib, Gtk, Wnck
 
-from . import commands, layout
+from . import commands, gtkexcepthook, layout
 from .config import load_config, XDG_CONFIG_DIR
 from .util import fmt_table, XInitError
 from .version import __version__
@@ -59,7 +59,7 @@ from typing import Optional  # NOQA pylint: disable=unused-import
 Wnck.set_client_type(Wnck.ClientType.PAGER)
 
 
-class QuickTileApp(object):
+class QuickTileApp:
     """The basic Glib application itself.
 
     :param commands: The command registry to use to resolve command names.
@@ -89,8 +89,8 @@ class QuickTileApp(object):
 
         # Attempt to set up the global hotkey support
         try:
-            from . import keybinder
-        except ImportError:
+            from . import keybinder  # pylint: disable=C0415
+        except ImportError:  # pragma: nocover
             o_keybinder = None  # type: Optional[keybinder.KeyBinder]
             logging.error("Could not find python-xlib. Cannot bind keys.")
         else:
@@ -99,8 +99,8 @@ class QuickTileApp(object):
 
         # Attempt to set up the D-Bus API
         try:
-            from . import dbus_api
-        except ImportError:
+            from . import dbus_api  # pylint: disable=C0415
+        except ImportError:  # pragma: nocover
             dbus_result = None
             logging.warning("Could not load DBus backend. "
                             "Is python-dbus installed?")
@@ -114,8 +114,7 @@ class QuickTileApp(object):
             except KeyboardInterrupt:
                 pass
             return True
-        else:
-            return False
+        return False
 
     def show_binds(self) -> None:
         """Print a formatted readout of defined keybindings and the modifier
@@ -215,7 +214,6 @@ def main() -> None:
     GLib.log_set_handler('Wnck', GLib.LogLevelFlags.LEVEL_WARNING,
         wnck_log_filter)
 
-    from . import gtkexcepthook
     if not args.no_excepthook:
         gtkexcepthook.enable()
 

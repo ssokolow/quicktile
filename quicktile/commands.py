@@ -120,7 +120,7 @@ class CommandRegistry:
         def decorate(func: CommandCB) -> CommandCB:
             """Closure used to allow decorator to take arguments"""
             @wraps(func)
-            # pylint: disable=missing-docstring
+            # pylint: disable=missing-docstring,keyword-arg-before-vararg
             def wrapper(winman: WindowManager,
                         window: Wnck.Window = None,
                         *args,
@@ -152,6 +152,7 @@ class CommandRegistry:
                     del kwargs['cmd_idx']
 
                 func(winman, window, state, *args, **kwargs)
+                return None
 
             if name in self.commands:
                 logging.warning("Redefining existing command: %s", name)
@@ -250,6 +251,7 @@ def cycle_dimensions(winman: WindowManager,
     logging.debug("Selected preset sequence:\n\t%r", dimensions)
 
     # Resolve proportional (eg. 0.5) and preserved (None) coordinates
+    # TODO: Verify that I didn't break preserved coordinates
     dims = [resolve_fractional_geom(i or win_rect_rel, monitor_rect)
         for i in dimensions]
     if not dims:
