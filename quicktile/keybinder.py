@@ -240,6 +240,7 @@ class KeyBinder(object):
             logging.error("Invalid keybinding: %s", accel)
             return None
 
+        #TODO: See if I can use things like Gdk.keyval_* to make it Just Work
         if modmask > 2**16 - 1:
             logging.error("Modifier out of range for XGrabKey "
                           "(int(modmask) > 65535). "
