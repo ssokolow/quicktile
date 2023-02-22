@@ -25,11 +25,9 @@ override_dh_auto_install:
 	install -D quicktile.desktop debian/quicktile/etc/xdg/autostart/quicktile.desktop
 
 override_dh_installdocs:
-	pip3 install --user sphinx_autodoc_typehints sphinxcontrib.autoprogram
 	( cd docs ; env PATH=$$HOME/.local/bin/:$$PATH make html ; )
 	dh_installdocs
 
 override_dh_installman:
-	pip3 install --user sphinx_autodoc_typehints sphinxcontrib.autoprogram
 	( cd docs ; env PATH=$$HOME/.local/bin/:$$PATH make man ; )
 	dh_installman
