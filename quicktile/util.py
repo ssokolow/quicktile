@@ -936,8 +936,7 @@ class UsableRegion(object):
         for panel in self._strut_rects:
             rect = rect.subtract(panel)
 
-        # Apparently MyPy can't see through custom __bool__ implementations
-        return rect or None  # type: ignore
+        return rect or None
 
     def move_to_usable_region(self, rect: Rectangle) -> Optional[Rectangle]:
         """Given a rectangle, return a copy that has been moved to be entirely
