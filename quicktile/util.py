@@ -417,7 +417,8 @@ class Rectangle(_Rectangle):
             cls, x, y, width, height)
 
     # TODO: Automated tests
-    def __mul__(self, factor: Union[int, float]) -> 'Rectangle':
+    def __mul__(self,  # type: ignore[override] # noqa
+            factor: Union[int, float]) -> 'Rectangle':
         """Return a new Rectangle with all dimensions multiplied by ``factor``
 
         This is used to apply scaling factors to monitor rectangles returned by
