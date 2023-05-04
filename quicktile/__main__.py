@@ -90,12 +90,11 @@ class QuickTileApp:
         # Attempt to set up the global hotkey support
         try:
             from . import keybinder  # pylint: disable=C0415
-        except ImportError:  # pragma: nocover
-            o_keybinder: Optional[keybinder.KeyBinder] = None
-            logging.error("Could not find python-xlib. Cannot bind keys.")
-        else:
-            o_keybinder = keybinder.init(
+            o_keybinder: Optional[keybinder.KeyBinder] = keybinder.init(
                 self._modmask, self._keys, self.commands, self.winman)
+        except ImportError:  # pragma: nocover
+            o_keybinder = None
+            logging.error("Could not find python-xlib. Cannot bind keys.")
 
         # Attempt to set up the D-Bus API
         try:
