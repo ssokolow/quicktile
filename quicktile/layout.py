@@ -8,6 +8,8 @@ __license__ = "GNU GPL 2.0 or later"
 # pylint: disable=unsubscriptable-object
 # pylint: disable=wrong-import-order
 
+import logging
+
 from .util import Gravity, Rectangle
 
 # -- Type-Annotation Imports --
@@ -17,6 +19,8 @@ from .util import GeomTuple, PercentRectTuple
 #: MyPy type alias for either `Rectangle` or `GeomTuple`
 Geom = Union[Rectangle, GeomTuple]  # pylint: disable=invalid-name
 # --
+
+log = logging.getLogger(__name__)
 
 
 def resolve_fractional_geom(fract_geom: Union[PercentRectTuple, Rectangle],
@@ -105,9 +109,18 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
         (x.lower().replace('_', '-'), getattr(Gravity, x)) for
         x in Gravity.__members__)
 
-    def __init__(self, margin_x: int = 0, margin_y: int = 0):
-        self.margin_x = margin_x
-        self.margin_y = margin_y
+    def __init__(self, margin_x: float = 0, margin_y: float = 0):
+        if margin_x >= 1:
+            log.warning("margin_x should be a percentage of the screen width "
+                "less than 100%% (got %d%%)",
+                margin_x * 100)
+        if margin_y >= 1:
+            log.warning("margin_y should be a percentage of the screen height "
+                "less than 100%% (got %d%%)",
+                margin_y * 100)
+
+        self.margin_x = min(margin_x, 1)
+        self.margin_y = min(margin_y, 1)
 
     # pylint: disable=too-many-arguments
     def __call__(self,
@@ -157,7 +170,9 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
                 round(height - (self.margin_y * 2), 3))
 
 
-def make_winsplit_positions(columns: int) -> Dict[str, List[PercentRectTuple]]:
+def make_winsplit_positions(columns: int,
+                            margin_x: float = 0, margin_y: float = 0
+                            ) -> Dict[str, List[PercentRectTuple]]:
     """Generate the classic WinSplit Revolution tiling presets
 
     :params columns: The number of columns that each tiling preset should be
@@ -187,7 +202,7 @@ def make_winsplit_positions(columns: int) -> Dict[str, List[PercentRectTuple]]:
         'top-right': [(0.5, 0.0, 0.5, 0.5), (0.5, 0.0, 0.5, 0.5)]}
     """
 
-    gvlay = GravityLayout()
+    gvlay = GravityLayout(margin_x, margin_y)
     col_width = 1.0 / columns
     cycle_steps = tuple(round(col_width * x, 3)
                         for x in range(1, columns))

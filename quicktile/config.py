@@ -21,7 +21,9 @@ DEFAULTS: Dict[str, CfgDict] = {
         # Use Ctrl+Alt as the default base for key combinations
         'ModMask': '<Ctrl><Alt>',
         'MovementsWrap': True,
-        'ColumnCount': 3
+        'ColumnCount': 3,
+        'MarginX_Percent': 0,
+        'MarginY_Percent': 0,
     },
     'keys': {
         "KP_Enter": "monitor-switch",
@@ -95,6 +97,7 @@ def load_config(path) -> ConfigParser:
         config.set('general', 'cfg_schema', '1')
         dirty = True
 
+    # Transparently update the config to add missing keys
     for key, val in DEFAULTS['general'].items():
         if not config.has_option('general', key):
             config.set('general', key, str(val))
