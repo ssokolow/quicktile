@@ -206,7 +206,11 @@ def main() -> None:
     config = load_config(cfg_path)
 
     commands.cycle_dimensions = commands.commands.add_many(
-        layout.make_winsplit_positions(config.getint('general', 'ColumnCount'))
+        layout.make_winsplit_positions(
+            config.getint('general', 'ColumnCount'),
+            config.getfloat('general', 'MarginX_Percent') / 100,
+            config.getfloat('general', 'MarginY_Percent') / 100
+        )
     )(commands.cycle_dimensions)
     commands.commands.extra_state = {'config': config}
 
