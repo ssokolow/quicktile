@@ -18,6 +18,7 @@ from .util import GeomTuple, PercentRectTuple
 Geom = Union[Rectangle, GeomTuple]  # pylint: disable=invalid-name
 # --
 
+
 def resolve_fractional_geom(fract_geom: Union[PercentRectTuple, Rectangle],
         monitor_rect: Rectangle) -> Rectangle:
     """Resolve proportional (eg. ``0.5``) coordinates.
@@ -100,10 +101,11 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
     #: the :any:`quicktile.util.Gravity` enum can take on.
     #:
     #: .. todo:: Look into whether I can factor :any:`GRAVITIES` away entirely.
-    GRAVITIES = dict((x.lower().replace('_', '-'), getattr(Gravity, x)) for
-        x in Gravity.__members__)  # type: Dict[str, Gravity]
+    GRAVITIES: Dict[str, Gravity] = dict(
+        (x.lower().replace('_', '-'), getattr(Gravity, x)) for
+        x in Gravity.__members__)
 
-    def __init__(self, margin_x=0, margin_y=0):  # type: (int, int) -> None
+    def __init__(self, margin_x: int = 0, margin_y: int = 0):
         self.margin_x = margin_x
         self.margin_y = margin_y
 

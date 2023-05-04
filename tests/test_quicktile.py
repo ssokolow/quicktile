@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 
 # class TestCommandRegistry(unittest.TestCase):
 #     """Tests for the `CommandRegistry` class"""
-#     def setUp(self):  # type: () -> None
+#     def setUp(self):
 #         self.registry = commands.CommandRegistry()
 #
 #     # TODO: Implement tests for CommandRegistry

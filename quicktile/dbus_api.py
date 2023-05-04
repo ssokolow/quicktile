@@ -36,7 +36,7 @@ class QuickTile(Object):
 
     @method(dbus_interface='com.ssokolow.QuickTile',
             in_signature='s', out_signature='b')
-    def doCommand(self, command):  # type: (str) -> bool
+    def doCommand(self, command: str) -> bool:
         """Execute a QuickTile tiling command
 
         :param command: The name of the command to attempt to run.

@@ -358,7 +358,7 @@ class WindowManager:
 
     # XXX: Move `if not window` into a decorator and use it everywhere?
     @staticmethod
-    def is_relevant(window):  # type: (Wnck.Window) -> bool
+    def is_relevant(window: Wnck.Window) -> bool:
         """Return :any:`False` if the window should be ignored.
 
         (i.e. If it's the desktop or a panel)

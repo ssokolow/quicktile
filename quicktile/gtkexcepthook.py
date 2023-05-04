@@ -286,8 +286,8 @@ class ExceptionHandler(object):
         return dialog
 
     @staticmethod
-    def make_details_dialog(parent, text):
-        # type: (Gtk.MessageDialog, str) -> Gtk.MessageDialog
+    def make_details_dialog(parent: Gtk.MessageDialog, text: str
+                            ) -> Gtk.MessageDialog:
         """Initialize and return the details dialog
 
         :param parent: A reference to the dialog from :any:`make_info_dialog`.
@@ -369,7 +369,7 @@ if __name__ == '__main__':
         """Just something interesting to show in the augmented traceback"""
         y = 'Test'
 
-        def __init__(self):  # type: () -> None
+        def __init__(self):
             self.z = self  # pylint: disable=invalid-name
     x = TestFodder()
     w = ' e'

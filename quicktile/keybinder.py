@@ -68,11 +68,11 @@ class KeyBinder(object):
                              % err.__class__.__name__)
 
         self.xroot = self.xdisp.screen().root
-        self._keys = {}  # type: Dict[Tuple[int, int], Callable]
+        self._keys: Dict[Tuple[int, int], Callable] = {}
 
         # Resolve these at runtime to avoid NameErrors
-        self._ignored_modifiers = [getattr(X, name) for name in
-                                   self.ignored_modifiers]  # type: List[int]
+        self._ignored_modifiers: List[int] = [getattr(X, name) for name in
+                                   self.ignored_modifiers]
 
         # We want to receive KeyPress events
         self.xroot.change_attributes(event_mask=X.KeyPressMask)

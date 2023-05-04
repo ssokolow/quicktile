@@ -9,11 +9,14 @@ from typing import Dict, Union
 XDG_CONFIG_DIR = os.environ.get('XDG_CONFIG_HOME',
                                 os.path.expanduser('~/.config'))
 
+#: MyPy type alias for fields loaded from config files
+CfgDict = Dict[str, Union[str, int, float, bool, None]]  # pylint:disable=C0103
+
 #: Default content for the configuration file
 #:
 #: .. todo:: Figure out a way to show :data:`DEFAULTS` documentation but with
 #:    the structure pretty-printed.
-DEFAULTS = {
+DEFAULTS: Dict[str, CfgDict] = {
     'general': {
         # Use Ctrl+Alt as the default base for key combinations
         'ModMask': '<Ctrl><Alt>',
@@ -45,7 +48,7 @@ DEFAULTS = {
         "H": "horizontal-maximize",
         "C": "move-to-center",
     }
-}  # type: Dict[str, CfgDict]
+}
 
 #: Used for resolving certain keysyms
 #:
@@ -58,9 +61,6 @@ KEYLOOKUP = {
     '+': 'plus',
     '-': 'minus',
 }
-
-#: MyPy type alias for fields loaded from config files
-CfgDict = Dict[str, Union[str, int, float, bool, None]]  # pylint:disable=C0103
 
 
 def load_config(path) -> ConfigParser:
@@ -110,7 +110,7 @@ def load_config(path) -> ConfigParser:
 
     # Either load the keybindings or use and save the defaults
     if config.has_section('keys'):
-        keymap = dict(config.items('keys'))  # type: CfgDict
+        keymap: CfgDict = dict(config.items('keys'))
     else:
         keymap = DEFAULTS['keys']
         config.add_section('keys')

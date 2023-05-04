@@ -41,11 +41,11 @@ class CommandRegistry:
     """Lookup and dispatch boilerplate for window management commands."""
 
     #: Fields to be added to the ``state`` argument when calling commands
-    extra_state = {}  # type: Dict[str, Any]
+    extra_state: Dict[str, Any] = {}
 
     def __init__(self):
-        self.commands = {}  # type: Dict[str, CommandCBWrapper]
-        self.help = {}      # type: Dict[str, str]
+        self.commands: Dict[str, CommandCBWrapper] = {}
+        self.help: Dict[str, str] = {}
 
     def __iter__(self) -> Iterator[str]:
         for name in self.commands:
@@ -277,7 +277,7 @@ def cycle_dimensions(winman: WindowManager,
         [int(state.get('cmd_idx', 0)), pos],
         prop_type=Xatom.INTEGER, format_size=32)
 
-    result = None  # type: Optional[Rectangle]
+    result: Optional[Rectangle] = None
     result = Rectangle(*dims[pos]).from_relative(monitor_rect)
 
     logging.debug("Target preset is %s relative to monitor %s",

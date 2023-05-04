@@ -168,7 +168,7 @@ def fmt_table(rows: Union[Dict, Iterable[List]],
     .. todo:: Refactor :func:`fmt_table`. Even I don't fully understand what
         my past self wrote by now.
     """
-    output = []  # type: List[str]
+    output: List[str] = []
 
     # Ensure that, internally, we have a list of lists
     if isinstance(rows, dict):
@@ -177,7 +177,7 @@ def fmt_table(rows: Union[Dict, Iterable[List]],
     rows = [list(row) for row in rows]
 
     # Group rows if requested
-    groups = {}  # type: Dict[str, List[Any]]
+    groups: Dict[str, List[Any]] = {}
     if group_by is not None:
         headers = list(headers)
         headers.pop(group_by)
@@ -794,10 +794,10 @@ class UsableRegion(object):
     """
 
     def __init__(self):
-        self._monitors_raw = []  # type: List[Rectangle]
-        self._monitors = []  # type: List[Rectangle]
-        self._struts = []    # type: List[StrutPartial]
-        self._strut_rects = []  # type: List[Rectangle]
+        self._monitors_raw: List[Rectangle] = []
+        self._monitors: List[Rectangle] = []
+        self._struts: List[StrutPartial] = []
+        self._strut_rects: List[Rectangle] = []
 
     # TODO: Subscribe to monitor hotplugging in the code which calls this
     def set_monitors(self, monitor_rects: Iterable[Rectangle]):
@@ -844,7 +844,7 @@ class UsableRegion(object):
             Rectangle(0, 0, 0, 0))
 
         # Resolve the struts to Rectangles relative to desktop_rect
-        strut_rects = []  # type: List[Rectangle]
+        strut_rects: List[Rectangle] = []
         for strut in self._struts:
             # TODO: Test for off-by-one bugs
             # TODO: Think of a more efficient way to do this

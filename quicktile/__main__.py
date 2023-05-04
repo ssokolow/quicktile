@@ -91,7 +91,7 @@ class QuickTileApp:
         try:
             from . import keybinder  # pylint: disable=C0415
         except ImportError:  # pragma: nocover
-            o_keybinder = None  # type: Optional[keybinder.KeyBinder]
+            o_keybinder: Optional[keybinder.KeyBinder] = None
             logging.error("Could not find python-xlib. Cannot bind keys.")
         else:
             o_keybinder = keybinder.init(

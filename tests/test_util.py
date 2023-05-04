@@ -24,21 +24,21 @@ class TestHelpers(unittest.TestCase):
         for x in range(-5, 15):
             self.assertEqual(clamp_idx(x, 10), clamp_idx(x, 10, wrap=True))
 
-    def test_clamp_idx_wrap(self):  # type: () -> None
+    def test_clamp_idx_wrap(self):
         """Test that clamp_idx(wrap=True) wraps as expected"""
         self.assertEqual(clamp_idx(5, 10, wrap=True), 5)
         self.assertEqual(clamp_idx(-1, 10, wrap=True), 9)
         self.assertEqual(clamp_idx(11, 10, wrap=True), 1)
         self.assertEqual(clamp_idx(15, 10, wrap=True), 5)
 
-    def test_clamp_idx(self):  # type: () -> None
+    def test_clamp_idx(self):
         """Test that clamp_idx(wrap=False) saturates as expected"""
         self.assertEqual(clamp_idx(5, 10, wrap=False), 5)
         self.assertEqual(clamp_idx(-1, 10, wrap=False), 0)
         self.assertEqual(clamp_idx(11, 10, wrap=False), 9)
         self.assertEqual(clamp_idx(15, 10, wrap=False), 9)
 
-    def test_euclidean_dist(self):  # type: () -> None
+    def test_euclidean_dist(self):
         """euclidean_dist: basic functionality"""
         # TODO: Improve type signature
 
@@ -64,7 +64,7 @@ class TestHelpers(unittest.TestCase):
         self.assertAlmostEqual(euclidean_dist((1, 2), (4, 5)), 4.24264068)
         self.assertAlmostEqual(euclidean_dist((4, 5), (1, 2)), 4.24264068)
 
-    def test_powerset(self):  # type: () -> None
+    def test_powerset(self):
         """Test that powerset() behaves as expected"""
         src_set = (1, 2, 3)
         expected = [(), (1,), (2,), (3,), (1, 2), (1, 3), (2, 3), (1, 2, 3)]
@@ -79,13 +79,13 @@ class TestHelpers(unittest.TestCase):
             # Check that only subsets are returned
             for subset in expected:
                 # Workaround for MyPy thinking `expected` isn't a list
-                for item in subset:  # type: ignore
+                for item in subset:
                     self.assertIn(item, test_set)
 
             # Check that ALL subsets are returned
             self.assertEqual(list(powerset([1, 2, 3])), expected)
 
-    def test_xiniterror_str(self):  # type: () -> None
+    def test_xiniterror_str(self):
         """XInitError.__str__ output contains provided text"""
         self.assertIn("Testing 123", str(XInitError("Testing 123")))
 
@@ -475,7 +475,7 @@ class TestRectangle(unittest.TestCase):  # pylint: disable=R0904
                 rel_rect = test_rect.to_relative(ref_rect)
                 self.assertEqual(test_rect, rel_rect.from_relative(ref_rect))
 
-    def test_gravity_noop(self):  # type: () -> None
+    def test_gravity_noop(self):
         """Rectangle: gravity conversions on top-left corner are no-ops."""
         start_rect = Rectangle(x=2, y=4, width=8, height=6)
         self.assertEqual(start_rect, start_rect.to_gravity(Gravity.TOP_LEFT))
