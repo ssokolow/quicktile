@@ -118,10 +118,12 @@ def load_config(path) -> ConfigParser:
         keymap = DEFAULTS['keys']
         config.add_section('keys')
         for key, cmd in keymap.items():
-            if not isinstance(key, str):
-                raise TypeError("Hotkey name must be a str: {!r}".format(key))
-            if not isinstance(cmd, str):
-                raise TypeError("Command name must be a str: {!r}".format(cmd))
+            if not isinstance(key, str):  # pragma: nobranch
+                raise TypeError(  # pragma: nocover
+                    "Hotkey name must be a str: {!r}".format(key))
+            if not isinstance(cmd, str):  # pragma: nobranch
+                raise TypeError(  # pragma: nocover
+                    "Command name must be a str: {!r}".format(cmd))
             config.set('keys', key, cmd)
         dirty = True
 
@@ -131,8 +133,9 @@ def load_config(path) -> ConfigParser:
         # replace with valid names like ',' -> 'comma'
         if key in KEYLOOKUP:
             cmd = keymap[key]
-            if not isinstance(cmd, str):
-                raise TypeError("Command name must be a str: {!r}".format(cmd))
+            if not isinstance(cmd, str):  # pragma: nobranch
+                raise TypeError(  # pragma: nocover
+                    "Command name must be a str: {!r}".format(cmd))
 
             logging.warning("Updating config file from deprecated keybind "
                 "syntax:\n\t%r --> %r", key, KEYLOOKUP[key])
