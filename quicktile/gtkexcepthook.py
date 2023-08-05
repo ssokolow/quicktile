@@ -226,9 +226,12 @@ def analyse(exctyp: Type[BaseException],
         args_tuple = inspect.getargvalues(frame)
         all_vars = gather_vars(frame_rec, args_tuple[3])
 
+        def formatvalue(v):
+            return "=" + pydoc.text.repr(v)
+        pretty_spec = inspect.formatargvalues(*args_tuple,
+            formatvalue=formatvalue)
         trace_frame = 'File {!r}, line {:d}, {}{}'.format(
-            fname, lineno, funcname, inspect.formatargvalues(*args_tuple,
-            formatvalue=lambda v: '=' + pydoc.text.repr(v)))
+            fname, lineno, funcname, pretty_spec)
 
         trace.write(frame_wrapper.fill(trace_frame) + '\n')
         trace.write(''.join(['    ' + x.replace('\t', '  ')
