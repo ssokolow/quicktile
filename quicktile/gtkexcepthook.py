@@ -57,7 +57,7 @@ __license__ = "whatever you want"
 # pylint: disable=unsubscriptable-object
 # pylint: disable=wrong-import-order
 
-import enum, inspect, linecache, logging, pydoc, textwrap, tokenize, keyword
+import enum, inspect, linecache, logging, pydoc, tokenize, keyword
 import sys
 from io import StringIO
 from gettext import gettext as _
@@ -196,7 +196,6 @@ def analyse(exctyp: Type[BaseException],
             value: BaseException,
             tracebk: TracebackType,
             context_lines: int = 3,
-            max_width: int = 80
             ) -> StringIO:
     """Generate a traceback, including the contents of variables in each
     stack frame.
@@ -206,18 +205,10 @@ def analyse(exctyp: Type[BaseException],
     :param tracebk: Used for everything else.
     :param context_lines: See the ``context`` argument to
         :any:`inspect.getinnerframes`
-    :param max_width: Width to hard word-wrap to.
     :returns: The formatted traceback
-
-    .. todo:: Rethink ``max_width`` for :any:`quicktile.gtkexcepthook.analyse`.
-        Both it and no hard-wrapping make readability sub-optimal. I really
-        want some form of indent-aware word-wrapping.
     """
     trace = StringIO()
     frame_records = inspect.getinnerframes(tracebk, context_lines)
-
-    frame_wrapper = textwrap.TextWrapper(width=max_width,
-        initial_indent='\n  ', subsequent_indent=' ' * 4)
 
     trace.write('Traceback (most recent call last):')
     for frame_rec in frame_records:
@@ -233,18 +224,17 @@ def analyse(exctyp: Type[BaseException],
         trace_frame = 'File {!r}, line {:d}, {}{}'.format(
             fname, lineno, funcname, pretty_spec)
 
-        trace.write(frame_wrapper.fill(trace_frame) + '\n')
+        trace.write('\n' + trace_frame + '\n')
         trace.write(''.join(['    ' + x.replace('\t', '  ')
             for x in context or [] if x.strip()]))
 
         if all_vars:
             trace.write('    Variables (B=Builtin, G=Global, L=Local):\n')
             for key, (scope, val) in all_vars.items():
-                wrapper = textwrap.TextWrapper(width=max_width,
-                    initial_indent='     - {:>12} ({}): '.format(
-                        key, str(scope)[0].upper()),
-                    subsequent_indent=' ' * 7)
-                trace.write(wrapper.fill(pformat(val)) + '\n')
+                trace.write('     - {:>12} ({}): {}'.format(
+                    key, str(scope)[0].upper(),
+                    '\n'.join('       {}'.format(x) for x in
+                        pformat(val).split('\n')) + '\n'))
 
     trace.write('%s: %s' % (exctyp.__name__, value))
     return trace
