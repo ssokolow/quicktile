@@ -29,6 +29,10 @@ Thanks go out to the following people:
     Generalized the ``move-to-center`` command into the ``move-to-*`` family
     of commands.
 
+`Fritz Reichwald`_
+    Added ``Gtk.init_check`` in ``quicktile.__main__`` to work around a
+    bug in some builds of GTK.
+
 `Gustavo J A M Carneiro`_ and `Filip Van Raemdonck`_
     Created the ``gtkexcepthook`` module in `the form I started from
     <https://gist.github.com/sysfs/f0fce1fd90ddede02701fd5fcaee3304>`_.
@@ -75,10 +79,6 @@ Justin
 
 `Yuting/Tim Xiao`_
     Made the window-tiling heuristics more robust.
-
-`Fritz Reichwald`_
-    Added ``Gtk.init_check`` in ``quicktile.__main__`` to work around a 
-    bug in some builds of GTK.
 
 
 The Manual
