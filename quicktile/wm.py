@@ -12,7 +12,7 @@ import logging
 from contextlib import contextmanager
 
 from Xlib.display import Display as XDisplay
-from Xlib.error import DisplayConnectionError
+from Xlib.error import BadWindow, DisplayConnectionError
 from Xlib import Xatom
 
 import gi
@@ -142,19 +142,27 @@ class WindowManager:
         for wid in [self.x_root.id] + list(self.get_property(
                 self.x_root.id, '_NET_CLIENT_LIST', Xatom.WINDOW, [])):
             win = self.x_display.create_resource_object('window', wid)
-            result = self.get_property(
-                win, '_NET_WM_STRUT_PARTIAL', Xatom.CARDINAL)
-            if result:
-                struts.append(StrutPartial(*result))
-                logging.debug("Gathered _NET_WM_STRUT_PARTIAL value: %s",
-                              struts)
-            else:
-                # TODO: Unit test this fallback
+            try:
                 result = self.get_property(
-                    win, '_NET_WM_STRUT', Xatom.CARDINAL)
+                    win, '_NET_WM_STRUT_PARTIAL', Xatom.CARDINAL)
                 if result:
                     struts.append(StrutPartial(*result))
-                    logging.debug("Gathered _NET_WM_STRUT value: %s", struts)
+                    logging.debug("Gathered _NET_WM_STRUT_PARTIAL value: %s",
+                                struts)
+                else:
+                    # TODO: Unit test this fallback
+                    result = self.get_property(
+                        win, '_NET_WM_STRUT', Xatom.CARDINAL)
+                    if result:
+                        struts.append(StrutPartial(*result))
+                        logging.debug("Gathered _NET_WM_STRUT value: %s",
+                                      struts)
+            except BadWindow:
+                logging.warning("Received BadWindow when trying to query a "
+                    "window for its panel reservations. This is probably "
+                    "harmless since it usually just means that a window with "
+                    "no reservations closed at just the wrong time during "
+                    "startup.")
 
         # Get the list of struts from the root window
         self.usable_region.set_panels(struts)
