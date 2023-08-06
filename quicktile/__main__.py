@@ -232,7 +232,7 @@ def main() -> None:
 
     # Work around a "the Gtk.Application ::startup handler does it for you" bug
     if not Gtk.init_check():
-        raise XInitError("Gtk failed to connect to the X server. Cannot start.")
+        raise XInitError("Gtk failed to connect to the X server. Exiting.")
 
     try:
         winman = WindowManager(x_display=x_display)
