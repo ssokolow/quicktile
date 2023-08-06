@@ -23,9 +23,13 @@ David Stygstra
    Generalized the "move-to-center" command into the "move-to-*"
    family of commands.
 
+Fábio C. Barrionuevo da Luz
+   Fixed some permissioning warts in the install procedure.
+
 Fritz Reichwald
    Added "Gtk.init_check" in "quicktile.__main__" to work around a bug
-   in some builds of GTK.
+   in some builds of GTK as well as a "gi.require_version" that is
+   only necessary on some systems.
 
 Gustavo J A M Carneiro and Filip Van Raemdonck
    Created the "gtkexcepthook" module in the form I started from.

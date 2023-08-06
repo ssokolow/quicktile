@@ -29,9 +29,13 @@ Thanks go out to the following people:
     Generalized the ``move-to-center`` command into the ``move-to-*`` family
     of commands.
 
+`Fábio C. Barrionuevo da Luz`_
+    Fixed some permissioning warts in the install procedure.
+
 `Fritz Reichwald`_
     Added ``Gtk.init_check`` in ``quicktile.__main__`` to work around a
-    bug in some builds of GTK.
+    bug in some builds of GTK as well as a ``gi.require_version`` that
+    is only necessary on some systems.
 
 `Gustavo J A M Carneiro`_ and `Filip Van Raemdonck`_
     Created the ``gtkexcepthook`` module in `the form I started from
@@ -145,7 +149,9 @@ only to display favicon-style links to their owners' websites.
 .. _Creative Commons Attribution 2.5: https://creativecommons.org/licenses/by/2.5/
 .. _David Stygstra: https://github.com/stygstra
 .. _ePyDoc: http://epydoc.sourceforge.net/
+.. _Fábio C. Barrionuevo da Luz: https://github.com/luzfcb
 .. _Filip van Raemdonck: https://www.linkedin.com/in/filip-van-raemdonck/
+.. _Fritz Reichwald: https://github.com/fiete201
 .. _Gustavo J A M Carneiro: https://github.com/gjcarneiro
 .. _Mark James: https://twitter.com/markjames
 .. _Matthias Putz: https://github.com/mputz86
@@ -161,7 +167,6 @@ only to display favicon-style links to their owners' websites.
 .. _Valdis Vitolins: https://github.com/valdisvi
 .. _Valentin Agachi: https://github.com/avaly
 .. _Yuting/Tim Xiao: https://github.com/txiao
-.. _Fritz Reichwald: https://github.com/fiete201
 
 ..
     NOTE: For "Yuting/Tim Xiao", the commits are signed "Yuting Xiao" but the
