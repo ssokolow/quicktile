@@ -1,6 +1,7 @@
 0.4.1 (git HEAD):
 - Add support for HiDPI monitors where GDK's pixel units don't necessarily
   match Wnck pixel units by default.
+- Expose existing margin support via config file
 - Assorted documentation improvements.
 - Continued efforts to increase automated testing
 

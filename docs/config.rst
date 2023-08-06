@@ -63,6 +63,44 @@ without editing the code.
 if you need to and can be found in
 :func:`quicktile.layout.make_winsplit_positions`.)
 
+.. _MarginX_Percent:
+
+``MarginX_Percent = 0``
+"""""""""""""""""""""""
+
+This allows you to add a gap on the left and right edges of your tiled windows.
+In order for it to cleanly handle desktops with multiple non-equally-sized
+monitors, it is specified as a percentage of the monitor width from ``0`` to
+``100``... though your window manager's rules about how to enforce minimum
+window widths still take precedence.
+
+For example, setting a value of ``1`` will result in a gap on the left and
+right sides of each window that is 1% of the total monitor width.
+
+Margins will not be collapsed, so the gap between two windows will be 2% wide.
+(This is an artifact of how tiling is currently implemented which was
+considered too much work to fix when there are plans to rewrite the whole thing
+anyway.)
+
+.. _MarginY_Percent:
+
+``MarginY_Percent = 0``
+"""""""""""""""""""""""
+
+This allows you to add a gap on the top and bottom edges of your tiled windows.
+In order for it to cleanly handle desktops with multiple non-equally-sized
+monitors, it is specified as a percentage of the monitor height from ``0`` to
+``100``... though your window manager's rules about how to enforce minimum
+window heights still take precedence.
+
+For example, setting a value of ``1`` will result in a gap on the top and
+bottom sides of each window that is 1% of the total monitor height.
+
+Margins will not be collapsed, so the gap between two windows will be 2% wide.
+(This is an artifact of how tiling is currently implemented which was
+considered too much work to fix when there are plans to rewrite the whole thing
+anyway.)
+
 .. _ModMask:
 
 ``ModMask = <Ctrl><Alt>``
