@@ -1,6 +1,7 @@
 0.4.1 (git HEAD):
 - Add support for HiDPI monitors where GDK's pixel units don't necessarily
   match Wnck pixel units by default.
+- Add minimal support for querying  _GTK_WORKAREAS_D0 (GNOME Shell on X11)
 - Expose existing margin support via config file
 - Work around inherent race condition in gathering strut reservations
 - Fix some PyGI-related warnings that only happen on certain systems

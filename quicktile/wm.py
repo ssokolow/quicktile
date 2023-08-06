@@ -101,8 +101,40 @@ class WindowManager:
 
     def update_geometry_cache(self):
         """Update the internal cache of monitor & panel shapes by querying
-        them from the desktop and processing them into a
+        them from the desktop, either using ``_GTK_WORKAREAS_D0`` or by
+        running and processing them into a
         :class:`quicktile.util.UsableRegion`.
+
+        :raises Exception: Unable to retrieve monitor geometries
+
+        .. todo:: Use a more specific exception when
+           :meth:`update_geometry_cache` fails to retrieve monitor geometries.
+        """
+
+        # TODO: Decide how to support having different struts on different
+        # desktops like with GNOME Shell under X11
+        result = self.get_property(self.x_root.id,
+            '_GTK_WORKAREAS_D0', Xatom.CARDINAL)
+        if result:
+            logging.debug("Found GNOME Shell workarea information...")
+            monitors = []
+            for monitor in [result[x:x + 4] for x in range(0, len(result), 4)]:
+                if len(monitor) == 4:
+                    monitors.append(Rectangle(x=monitor[0], y=monitor[1],
+                        width=monitor[2], height=monitor[3]))
+                else:
+                    logging.error("_GTK_WORKAREAS_D0 length was not a "
+                        "multiple of 4. Trailing data found: %r", monitor)
+            self.usable_region.set_monitors(monitors)
+            self.usable_region.set_panels([])
+            logging.debug("Usable desktop region calculated as: %s",
+                self.usable_region)
+        else:
+            logging.debug("Gathering usable areas manually...")
+            self.update_workarea_manually()
+
+    def update_workarea_manually(self):
+        """Query strut information manually to update the geometry cache.
 
         :raises Exception: Unable to retrieve monitor geometries
 
@@ -137,7 +169,14 @@ class WindowManager:
 
             raise Exception("Could not retrieve desktop geometry")
 
-        # Gather all struts
+        # Get the list of struts from the root window
+        self.usable_region.set_panels(self._gather_struts())
+        logging.debug("Usable desktop region calculated as: %s",
+            self.usable_region)
+        return
+
+    def _gather_struts(self):
+        """Gather all toplevel _NET_WM_STRUT/_NET_WM_STRUT_PARTIAL values"""
         struts = []
         for wid in [self.x_root.id] + list(self.get_property(
                 self.x_root.id, '_NET_CLIENT_LIST', Xatom.WINDOW, [])):
@@ -164,11 +203,7 @@ class WindowManager:
                     "no reservations closed at just the wrong time during "
                     "startup.")
 
-        # Get the list of struts from the root window
-        self.usable_region.set_panels(struts)
-        logging.debug("Usable desktop region calculated as: %s",
-            self.usable_region)
-        return
+        return struts
 
     def get_monitor(self, win: Wnck.Window) -> Tuple[int, Rectangle]:
         """Given a window, retrieve the ID and geometry of the monitor it's on.
