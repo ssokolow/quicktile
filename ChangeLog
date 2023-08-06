@@ -2,6 +2,10 @@
 - Add support for HiDPI monitors where GDK's pixel units don't necessarily
   match Wnck pixel units by default.
 - Expose existing margin support via config file
+- Work around inherent race condition in gathering strut reservations
+- Fix some PyGI-related warnings that only happen on certain systems
+- Adjust installation instruction/scripts to avoid creating root-permissioned
+  pip cache files in the user's home directory.
 - Assorted documentation improvements.
 - Continued efforts to increase automated testing
 
