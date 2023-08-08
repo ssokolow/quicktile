@@ -115,9 +115,7 @@ Documentation Privacy Policy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Out of respect for user privacy and to make offline use of this documentation
-as robust as possible, this website/manual makes no external HTTP requests
-beyond those needed to ensure that the Travis-CI badge in the sidebar
-is current as of the page load.
+as robust as possible, this website/manual makes no external HTTP requests.
 
 To mitigate the risk of such requests slipping in through non-obvious means,
 such as use of the Sphinx ``:math:`` role pulling in a CDN-hosted copy of

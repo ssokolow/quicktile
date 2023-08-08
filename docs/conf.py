@@ -58,6 +58,7 @@ def setup(app):
 # If your documentation needs a minimal Sphinx version, state it here.
 # needs_sphinx = '1.0'
 
+
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
@@ -215,6 +216,8 @@ def format_annotation(annotation, *args, **kwargs):
         if override is not None:
             return ':py:{}:`~{}`'.format(*override)
     return fa_orig(annotation, *args, **kwargs)
+
+
 sphinx_autodoc_typehints.format_annotation = format_annotation
 
 # -- Options for HTML output ----------------------------------------------
@@ -227,7 +230,6 @@ html_theme = 'alabaster'
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    'badge_branch': "master",
     'canonical_url': 'http://ssokolow.com/quicktile/',
     'description': 'Keyboard-driven Window Tiling for your existing X11 '
                    'window manager',
@@ -243,7 +245,6 @@ html_theme_options = {
     'link_hover': '#004B6B',
     'show_powered_by': False,
     'show_related': True,
-    'travis_button': True,
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
