@@ -230,7 +230,7 @@ Testing Your Changes
 Testing Environment Concerns
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-QuickTile's current minimum compatibility target is Kubuntu Linux 16.04 LTS.
+QuickTile's current minimum compatibility target is Kubuntu Linux 20.04 LTS.
 
 If this is not what you are running, I suggest using VirtualBox_ for
 compatibility testing, as it is easy to set up and has support for virtual
@@ -298,7 +298,7 @@ The following will be run:
 While the dependency on system packages such as PyGObject limits its utility,
 you may also use tox_ to test that QuickTile's ``setup.py`` packaging process
 works properly. (However, bear in mind that you will need to edit ``tox.ini``
-if your system Python is not version 3.5 as found on Kubuntu Linux 16.04 LTS.)
+if your system Python is not version 3.8 as found on Kubuntu Linux 20.04 LTS.)
 
 Bear in mind that, while not yet incorporated into convenient scripts, the
 following tests will also be run by the ALE_ analysis plugin for my text editor

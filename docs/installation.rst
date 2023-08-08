@@ -30,8 +30,8 @@ A desktop based on the X11 windowing system
     If you are running Windows and don't want to download WinSplit Revolution
     from an archive of discontinued software, there are some links which
     include Windows offerings in the :ref:`quicktile-windows` FAQ entry.
-Python_ 3.5+
-    QuickTile is developed in Python 3.x with Kubuntu Linux 16.04 LTS as its
+Python_ 3.8+
+    QuickTile is developed in Python 3.8 with Kubuntu Linux 20.04 LTS as its
     earliest explicitly tested compatibility target.
 GTK_ 3.x
     QuickTile is built around a GLib event loop and also relies on GDK for
@@ -296,7 +296,7 @@ do the following.
  2. Remove QuickTile from your Python packages folder.
 
     While QuickTile itself should be installed as a single folder with a name
-    like :file:`QuickTile-0.4-py3.5.egg`, the paths have varied from distro to
+    like :file:`QuickTile-0.4-py3.8.egg`, the paths have varied from distro to
     distro and Python version to Python version.
 
     To ensure a clean removal, I recommend running the following command,
