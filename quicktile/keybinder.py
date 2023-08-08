@@ -7,7 +7,7 @@ __license__ = "GNU GPL 2.0 or later"
 # complaining about my grouped imports
 # pylint: disable=unsubscriptable-object,wrong-import-order
 
-import logging
+import logging, traceback
 from functools import reduce  # pylint: disable=redefined-builtin
 
 import gi
@@ -320,7 +320,12 @@ def init(modmask: Optional[str],
             def call(func=func):
                 """Closure to resolve `func` and call it on a
                    `WindowManager` instance"""
-                commands.call(func, winman)
+                try:
+                    commands.call(func, winman)
+                except Exception:
+                    logging.error("Uncaught exception while executing tiling "
+                        "command:\n\t%s",
+                        '\n\t'.join(traceback.format_exc()))
 
             keybinder.bind(modmask + key, call)
     return keybinder
