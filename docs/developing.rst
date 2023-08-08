@@ -90,7 +90,7 @@ be searched for by running the following command in the project root:
 
 .. code-block:: sh
 
-    egrep 'XXX|TODO|FIXME' -nR *.py quicktile functional_harness
+    grep -E 'XXX|TODO|FIXME' -nR *.py quicktile functional_harness
 
 PyLint_ should also report these.
 
