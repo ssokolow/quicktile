@@ -322,7 +322,7 @@ def init(modmask: Optional[str],
                    `WindowManager` instance"""
                 try:
                     commands.call(func, winman)
-                except Exception:
+                except Exception:  # pylint: disable=W0703
                     logging.error("Uncaught exception while executing tiling "
                         "command:\n\t%s",
                         '\n\t'.join(traceback.format_exc()))
