@@ -37,6 +37,9 @@ Thanks go out to the following people:
     bug in some builds of GTK as well as a ``gi.require_version`` that
     is only necessary on some systems.
 
+`Gui Ambros`_
+    Identified the solution for a misalignment that occurs on HiDPI screens.
+
 `Gustavo J A M Carneiro`_ and `Filip Van Raemdonck`_
     Created the ``gtkexcepthook`` module in `the form I started from
     <https://gist.github.com/sysfs/f0fce1fd90ddede02701fd5fcaee3304>`_.
@@ -152,6 +155,7 @@ only to display favicon-style links to their owners' websites.
 .. _Fábio C. Barrionuevo da Luz: https://github.com/luzfcb
 .. _Filip van Raemdonck: https://www.linkedin.com/in/filip-van-raemdonck/
 .. _Fritz Reichwald: https://github.com/fiete201
+.. _Gui Ambros: https://github.com/guiambros
 .. _Gustavo J A M Carneiro: https://github.com/gjcarneiro
 .. _Mark James: https://twitter.com/markjames
 .. _Matthias Putz: https://github.com/mputz86

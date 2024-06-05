@@ -31,6 +31,10 @@ Fritz Reichwald
    in some builds of GTK as well as a "gi.require_version" that is
    only necessary on some systems.
 
+Gui Ambros
+   Identified the solution for a misalignment that occurs on HiDPI
+   screens.
+
 Gustavo J A M Carneiro and Filip Van Raemdonck
    Created the "gtkexcepthook" module in the form I started from.
 

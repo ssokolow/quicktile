@@ -164,10 +164,10 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
         offset_x = width * self.GRAVITIES[gravity].value[0]
         offset_y = height * self.GRAVITIES[gravity].value[1]
 
-        return (round(x - offset_x + self.margin_x, 3),
-                round(y - offset_y + self.margin_y, 3),
-                round(width - (self.margin_x * 2), 3),
-                round(height - (self.margin_y * 2), 3))
+        return (round(x - offset_x + self.margin_x, 10),
+                round(y - offset_y + self.margin_y, 10),
+                round(width - (self.margin_x * 2), 10),
+                round(height - (self.margin_y * 2), 10))
 
 
 def make_winsplit_positions(columns: int,
@@ -204,7 +204,7 @@ def make_winsplit_positions(columns: int,
 
     gvlay = GravityLayout(margin_x, margin_y)
     col_width = 1.0 / columns
-    cycle_steps = tuple(round(col_width * x, 3)
+    cycle_steps = tuple(round(col_width * x, 10)
                         for x in range(1, columns))
 
     center_steps = (1.0,) + cycle_steps
