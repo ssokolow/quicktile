@@ -11,6 +11,11 @@
   pip cache files in the user's home directory.
 - Assorted documentation improvements.
 - Continued efforts to increase automated testing
+- Honor GTK3 client‑side decoration shadows by reading the
+  `_GTK_FRAME_EXTENTS` X11 property and adjusting window geometry so that
+  the *content* area (rather than the drop shadow) snaps flush to the monitor
+  edge when tiling.
+
 
 0.4.0:
 - Port to Python 3.x and GTK 3.x
