@@ -30,8 +30,8 @@ A desktop based on the X11 windowing system
     If you are running Windows and don't want to download WinSplit Revolution
     from an archive of discontinued software, there are some links which
     include Windows offerings in the :ref:`quicktile-windows` FAQ entry.
-Python_ 3.8+
-    QuickTile is developed in Python 3.8 with Kubuntu Linux 20.04 LTS as its
+Python_ 3.12+
+    QuickTile is developed in Python 3.12 with Kubuntu Linux 24.04 LTS as its
     earliest explicitly tested compatibility target.
 GTK_ 3.x
     QuickTile is built around a GLib event loop and also relies on GDK for
