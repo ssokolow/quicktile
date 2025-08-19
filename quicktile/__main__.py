@@ -151,8 +151,8 @@ def argparser() -> ArgumentParser:
     """:class:`argparse.ArgumentParser` definition that is compatible with
         `sphinxcontrib.autoprogram
         <https://sphinxcontrib-autoprogram.readthedocs.io/en/stable/>`_"""
-    parser = ArgumentParser(description='Window Tiling addon for X11-based '
-        'desktops')
+    parser = ArgumentParser(prog='QuickTile',
+        description='Window Tiling addon for X11-based desktops')
     parser.add_argument('-V', '--version', action='version',
             version="%%(prog)s v%s" % __version__)
     parser.add_argument('-d', '--daemonize', action="store_true",
