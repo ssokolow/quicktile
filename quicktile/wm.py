@@ -73,7 +73,9 @@ class WindowManager:
        in KDE 3.x. Not sure what would be equivalent elsewhere.)
     """
 
-    def __init__(self, screen: Gdk.Screen = None, x_display: XDisplay = None):
+    def __init__(self,
+            screen: Gdk.Screen = None,
+            x_display: Optional[XDisplay] = None):
         self.gdk_screen = screen or Gdk.Screen.get_default()
         if self.gdk_screen is None:
             raise XInitError("GTK+ could not open a connection to the X server"

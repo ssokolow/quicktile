@@ -13,7 +13,7 @@ import logging
 from .util import Gravity, Rectangle
 
 # -- Type-Annotation Imports --
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 from .util import GeomTuple, PercentRectTuple
 
 #: MyPy type alias for either `Rectangle` or `GeomTuple`
@@ -127,8 +127,8 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
                  width: float,
                  height: float,
                  gravity: str = 'top-left',
-                 x: float = None,
-                 y: float = None
+                 x: Optional[float] = None,
+                 y: Optional[float] = None
                  ) -> PercentRectTuple:
         """Return a relative ``(x, y, w, h)`` tuple relative to ``gravity``.
 

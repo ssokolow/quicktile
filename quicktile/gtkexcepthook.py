@@ -70,7 +70,7 @@ gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk, Gtk
 
 # -- Type-Annotation Imports --
-from typing import Any, Callable, Dict, Generator, Type, Tuple
+from typing import Any, Callable, Dict, Generator, Optional, Type, Tuple
 from types import FrameType, TracebackType
 # --
 
@@ -249,7 +249,8 @@ class ExceptionHandler(object):
         button which will receive the formatted traceback as a string.
     """
 
-    def __init__(self, reporting_cb: Callable[[str], None] = None) -> None:
+    def __init__(self, reporting_cb: Optional[Callable[[str], None]] = None
+                 ) -> None:
         self.reporting_cb = reporting_cb
 
     def make_info_dialog(self) -> Gtk.MessageDialog:
@@ -343,7 +344,7 @@ class ExceptionHandler(object):
         dialog.destroy()
 
 
-def enable(reporting_cb: Callable[[str], None] = None):
+def enable(reporting_cb: Optional[Callable[[str], None]] = None):
     """Call this to set gtkexcepthook as the default exception handler
 
     :param reporting_cb: If provided, this callback will be exposed in the

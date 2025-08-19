@@ -44,7 +44,7 @@ class CommandRegistry:
     #: Fields to be added to the ``state`` argument when calling commands
     extra_state: Dict[str, Any] = {}
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.commands: Dict[str, CommandCBWrapper] = {}
         self.help: Dict[str, str] = {}
 

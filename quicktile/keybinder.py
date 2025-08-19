@@ -56,7 +56,7 @@ class KeyBinder(object):
     #: reported.
     keybind_failed = False
 
-    def __init__(self, x_display: Display = None):
+    def __init__(self, x_display: Optional[Display] = None):
         try:
             self.xdisp = x_display or Display()
         except (UnicodeDecodeError, DisplayConnectionError) as err:
@@ -163,7 +163,7 @@ class KeyBinder(object):
 
         for _ in range(0, handle.pending_events()):
             xevent = handle.next_event()
-            if xevent.type == X.KeyPress:
+            if isinstance(xevent, XKeyPress) and xevent.type == X.KeyPress:
                 self.handle_keypress(xevent)
 
         # Necessary for proper function
@@ -218,7 +218,7 @@ class KeyBinder(object):
         return keycode, modmask
 
     @staticmethod
-    def _accel_to_keysym(accel: str) -> Optional[Tuple[str, int]]:
+    def _accel_to_keysym(accel: str) -> Optional[Tuple[int, int]]:
         """Internal helper for :meth:`parse_accel` for all operations that
         don't need an open connection to the X server.
 

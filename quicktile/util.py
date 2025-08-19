@@ -120,7 +120,7 @@ def powerset(iterable: Iterable[Any]) -> Iterator[Sequence[Any]]:
 
 def fmt_table(rows: Union[Dict, Iterable[List]],
               headers: Sequence[str],
-              group_by: int = None,
+              group_by: Optional[int] = None,
               ) -> str:
     """Format a collection as a textual table.
 
@@ -371,9 +371,10 @@ class Rectangle(_Rectangle):
     __slots__ = ()
 
     # pylint: disable=too-many-arguments
-    def __new__(cls, x: int = None, y: int = None,
-                width: int = None, height: int = None,
-                x2: int = None, y2: int = None):
+    def __new__(cls,
+                x: Optional[int] = None, y: Optional[int] = None,
+                width: Optional[int] = None, height: Optional[int] = None,
+                x2: Optional[int] = None, y2: Optional[int] = None):
 
         # -- Check for a valid combination of arguments --
         if (x, width, x2).count(None) != 1:
@@ -794,7 +795,7 @@ class UsableRegion(object):
     space.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._monitors_raw: List[Rectangle] = []
         self._monitors: List[Rectangle] = []
         self._struts: List[StrutPartial] = []
@@ -814,7 +815,7 @@ class UsableRegion(object):
         self._struts = list(panel_struts)
         self._update()
 
-    def _update(self):
+    def _update(self) -> None:
         """Check input values and regenerate internal caches
 
         This is internal code shared by :meth:`set_monitors` and
