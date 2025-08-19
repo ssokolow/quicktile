@@ -5,7 +5,7 @@ Developer's Guide
    :local:
 
 .. todo:: Aside from the obvious factor that it exposes a lot of architectural
-   cleanup that needs to be done, something about :doc:`developing` feels
+   cleanup that needs to be done, something about ``developing.rst`` feels
    sloppy to me. I think reading some O'Reilly books to examine how they're
    written might help me to figure out what's wrong.
 

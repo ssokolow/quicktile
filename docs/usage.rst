@@ -5,7 +5,7 @@ QuickTile is built around a simple model of applying :doc:`tiling commands
 <commands>` to either the active window or, for some commands, the
 desktop as a whole.
 
-.. todo:: I'm not satisfied with the style I've written :doc:`usage` in. I'll
+.. todo:: I'm not satisfied with the style I've written ``usage.rst`` in. I'll
     need to come back to it later and try to puzzle out why.
 
 These commands can be invoked in one of three ways:
