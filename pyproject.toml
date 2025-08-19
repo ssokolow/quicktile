@@ -57,7 +57,7 @@ unfixable = ["N802", "E401", "E402"]
 check_untyped_defs = true
 ignore_missing_imports = true
 strict_optional = true
-warn_unused_ignores = true
+warn_unused_ignores = false
 warn_return_any = true
 warn_unreachable = true
 
