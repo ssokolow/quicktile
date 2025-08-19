@@ -10,11 +10,11 @@ from contextlib import contextmanager
 # pylint: disable=unsubscriptable-object
 
 # -- Type-Annotation Imports --
-from typing import Any, Dict, Generator, Union # NOQA
+from typing import Any, Generator, Mapping, Union # NOQA
 
 
 @contextmanager
-def background_proc(argv, env: Dict[str, Union[bytes, str]], verbose=False,
+def background_proc(argv, env: Mapping[str, Union[bytes, str]], verbose=False,
                     *args: Any, **kwargs: Any
                     ) -> Generator[None, None, None]:
     """Context manager for scoping the lifetime of a ``subprocess.Popen`` call

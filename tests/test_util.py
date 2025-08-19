@@ -202,7 +202,7 @@ class TestRectangle(unittest.TestCase):  # pylint: disable=R0904
 
     def test_float_input(self):
         """Rectangle: test truncating of float inputs to integers"""
-        test_rect = Rectangle(1.0, 0.5, 1.3, 2.8)
+        test_rect = Rectangle(1.0, 0.5, 1.3, 2.8)  # type: ignore
         self.assertIsInstance(test_rect.x, int)
         self.assertIsInstance(test_rect.y, int)
         self.assertIsInstance(test_rect.width, int)
@@ -329,7 +329,7 @@ class TestRectangle(unittest.TestCase):  # pylint: disable=R0904
 
         # Basic test that unrecognized types fail properly
         with self.assertRaises(TypeError):
-            print(self.rect1.intersect(5))
+            print(self.rect1.intersect(5))  # type: ignore
 
     def test_to_point(self):
         """Rectangle: to_point"""
@@ -353,7 +353,7 @@ class TestRectangle(unittest.TestCase):  # pylint: disable=R0904
 
         # Basic test that unrecognized types fail properly
         with self.assertRaises(TypeError):
-            print(self.rect1.union(5))
+            print(self.rect1.union(5))  # type: ignore
 
     def test_moved_into(self):
         """Rectangle: moved_into"""
@@ -379,7 +379,7 @@ class TestRectangle(unittest.TestCase):  # pylint: disable=R0904
 
         # Wrong Type
         with self.assertRaises(TypeError):
-            Rectangle(0, 0, 0, 0).moved_into("hello")
+            Rectangle(0, 0, 0, 0).moved_into("hello")  # type: ignore
 
     def test_moved_off_of(self):
         """Rectangle: moved_off_of"""
@@ -562,7 +562,6 @@ class TestUsableRegion(unittest.TestCase):
         # treated as falsy
         # pylint: disable=protected-access
         test_region._monitors = [mon1]
-        test_region._usable = {mon1: mon1}
         self.assertFalse(test_region)
 
         # TODO: Figure out how `Virtual` settings larger than the physical
@@ -922,7 +921,7 @@ class TestUsableRegion(unittest.TestCase):
         with self.assertRaises(TypeError):
             # Use a tuple as a test because, just because it's a namedtuple
             # doesn't mean we want *any* tuple with the right arity
-            test_region.set_monitors([(0, 0, 1280, 1024)])
+            test_region.set_monitors([(0, 0, 1280, 1024)])  # type: ignore
 
         test_region = UsableRegion()
         with self.assertRaises(TypeError):
@@ -934,7 +933,8 @@ class TestUsableRegion(unittest.TestCase):
         with self.assertRaises(TypeError):
             # Use a tuple as a test because, just because it's a namedtuple
             # doesn't mean we want *any* tuple with the right arity
-            test_region.set_panels([(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)])
+            test_region.set_panels([
+                (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)])  # type: ignore
 
     def test_update_nonempty(self):
         """UsableRegion: only add non-empty entries to _usable"""
