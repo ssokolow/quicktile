@@ -1,44 +1,7 @@
 QuickTile
 =========
 
-.. image:: https://scrutinizer-ci.com/g/ssokolow/quicktile/badges/quality-score.png?b=master
-   :target: https://scrutinizer-ci.com/g/ssokolow/quicktile/?branch=master
-   :alt: Scrutinizer Code Quality
-
-.. image:: https://codeclimate.com/github/ssokolow/quicktile/badges/gpa.svg
-   :target: https://codeclimate.com/github/ssokolow/quicktile
-   :alt: Code Climate
-
-.. image:: https://travis-ci.org/ssokolow/quicktile.svg?branch=master
-   :target: https://travis-ci.org/ssokolow/quicktile
-   :alt: Travis-CI
-
-.. image:: https://coveralls.io/repos/github/ssokolow/quicktile/badge.svg?branch=master
-   :target: https://coveralls.io/github/ssokolow/quicktile?branch=master
-   :alt: Coveralls
-
-.. image:: https://img.shields.io/badge/License-GPLv2%2B-blue
-   :target: https://www.gnu.org/licenses/gpl-2.0.html
-   :alt: License: GPLv2+
-
 Keyboard-driven Window Tiling for your existing X11 window manager
-
-Important Message For Users of GTK+ 2.x QuickTile
--------------------------------------------------
-
-In addition to migrating from GTK+ 2.x to GTK 3, QuickTile 0.4.0 makes the
-following changes:
-
-* The PyGTK to PyGI migration has changed the list of dependencies
-  significantly.
-* Regressions in certain GDK APIs have made python-xlib a mandatory dependency.
-* The ``middle`` command has been renamed to ``center`` for consistency with
-  ``move-to-center``. You will have to update anything which calls ``middle``
-  via the command-line or D-Bus APIs, but ``quicktile.cfg`` will update
-  automatically.
-* Please contact me if you maintain your own QuickTile patches.
-  I have begun a major refactoring and want to make sure your changes
-  get updated accordingly.
 
 Requirements:
 -------------
