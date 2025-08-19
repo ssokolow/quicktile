@@ -36,7 +36,7 @@ jobs:
           packages: python3 python3-pip python3-setuptools python3-nose python3-gi python3-xlib python3-dbus gir1.2-glib-2.0 gir1.2-gtk-3.0 gir1.2-wnck-3.0
           version: 1.0
       - name: Set up Python
-      - uses: actions/setup-python@v5
+        uses: actions/setup-python@v5
         with:
           cache: "pip" # caching pip dependencies
           cache-dependency-path: "**/dev_requirements.txt"
