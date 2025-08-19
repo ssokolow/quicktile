@@ -294,7 +294,6 @@ html_sidebars = {
         'relations.html',
         'searchbox.html',
         'sidebar_badges.html',
-        'donate.html',
     ]
 }
 
