@@ -15,6 +15,7 @@ serve to show the default.
 # pylint: disable=wrong-import-order
 import sys
 import os
+from importlib.resources import files
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -98,7 +99,8 @@ copyright = u'2009-2022, Stephan Sokolow et al'  # pylint: disable=W0622
 #
 
 # The short X.Y version.
-from quicktile.version import __version__ as version
+version = files("quicktile").joinpath("VERSION").read_text()
+
 # The full version, including alpha/beta/rc tags.
 release = version
 

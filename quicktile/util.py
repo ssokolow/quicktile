@@ -277,7 +277,8 @@ class StrutPartial(_StrutPartial):
             top_start_x=0, top_end_x=sys.maxsize,
             bottom_start_x=0, bottom_end_x=sys.maxsize):
 
-        return cls.__bases__[0].__new__(cls, left, right, top, bottom,
+        return cls.__bases__[0].__new__(cls, # type: ignore
+            left, right, top, bottom,
             left_start_y, left_end_y, right_start_y, right_end_y,
             top_start_x, top_end_x, bottom_start_x, bottom_end_x)
 

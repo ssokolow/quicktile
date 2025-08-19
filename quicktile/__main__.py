@@ -35,6 +35,7 @@ __license__ = "GNU GPL 2.0 or later"
 
 import errno, logging, os, signal, sys
 from argparse import ArgumentParser
+from importlib.resources import files
 
 from Xlib.display import Display as XDisplay
 from Xlib.error import DisplayConnectionError
@@ -48,13 +49,14 @@ from gi.repository import GLib, Gtk, Wnck
 from . import commands, gtkexcepthook, layout
 from .config import load_config, XDG_CONFIG_DIR
 from .util import fmt_table, XInitError
-from .version import __version__
 from .wm import WindowManager
 
 # -- Type-Annotation Imports --
 from typing import Dict
 from typing import Optional  # NOQA pylint: disable=unused-import
 # --
+
+__version__ = files("quicktile").joinpath("VERSION").read_text()
 
 Wnck.set_client_type(Wnck.ClientType.PAGER)
 

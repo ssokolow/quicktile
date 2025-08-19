@@ -96,7 +96,41 @@ dependencies:
 Installation Options
 --------------------
 
-A. :command:`pip3` from a URL
+A. Run QuickTile without installing it
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Advantages:**
+
+* No additional dependencies
+* :command:`sudo` not required
+* Allows full customization of QuickTile
+* Allows parallel installation of multiple QuickTile versions for development
+  or testing purposes.
+* Easy removal or upgrade (just delete/replace the folder)
+
+**Disadvantages:**
+
+* Multiple copies of QuickTile may be present on a multi-user system
+* QuickTile must be set to run on startup manually
+* Must manually make provisions for being able to call :file:`quicktile.sh`
+  without placing it in your :envvar:`PATH`.
+
+**Instructions:**
+
+ 1. `Download <http://github.com/ssokolow/quicktile/zipball/master>`_ or
+    `clone <https://github.com/ssokolow/quicktile.git>`_ QuickTile.
+ 2. Copy the :file:`quicktile` folder and the :file:`quicktile.sh` script into
+     a folder of your choice.
+ 3. Make sure :file:`quicktile.sh` is marked executable.
+
+.. note:: If you'd rather roll your own, the :file:`quicktile.sh` shell script
+    is just three simple lines:
+
+    1. The shebang
+    2. A line to ``cd`` to wherever the :file:`quicktile` folder is
+    3. A line to run :code:`python3 -m quicktile "$@"`
+
+B. :command:`pip3` from a URL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Advantages:**
@@ -110,6 +144,7 @@ A. :command:`pip3` from a URL
 * Setting QuickTile to run on login must be done manually
 * Does not allow you to modify QuickTile code before installation
 * Requires :command:`pip3` to be installed
+* **Deprecated by pip upstream**
 
 **Instructions:**
 
@@ -124,7 +159,7 @@ QuickTile:
     properly ignore system-provided dependencies, follow the instructions
     in the `Removal`_ section and then try again.
 
-B. :file:`install.sh` from a local folder
+C. :file:`install.sh` from a local folder
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Advantages:**
@@ -142,6 +177,7 @@ B. :file:`install.sh` from a local folder
 * Does not allow per-user modifications to the code after installation
 * Must manually download and unpack QuickTile before running the installation
   command.
+* **Deprecated by pip upstream**
 
 **Instructions:**
 
@@ -176,40 +212,6 @@ You will be prompted for your :command:`sudo` password.
     uninstallable on platforms that no proper package is provided for.
 
 .. _install_quicktile.sh:
-
-C. Run QuickTile without installing it
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**Advantages:**
-
-* No additional dependencies
-* :command:`sudo` not required
-* Allows full customization of QuickTile
-* Allows parallel installation of multiple QuickTile versions for development
-  or testing purposes.
-* Easy removal or upgrade (just delete/replace the folder)
-
-**Disadvantages:**
-
-* Multiple copies of QuickTile may be present on a multi-user system
-* QuickTile must be set to run on startup manually
-* Must manually make provisions for being able to call :file:`quicktile.sh`
-  without placing it in your :envvar:`PATH`.
-
-**Instructions:**
-
- 1. `Download <http://github.com/ssokolow/quicktile/zipball/master>`_ or
-    `clone <https://github.com/ssokolow/quicktile.git>`_ QuickTile.
- 2. Copy the :file:`quicktile` folder and the :file:`quicktile.sh` script into
-     a folder of your choice.
- 3. Make sure :file:`quicktile.sh` is marked executable.
-
-.. note:: If you'd rather roll your own, the :file:`quicktile.sh` shell script
-    is just three simple lines:
-
-    1. The shebang
-    2. A line to ``cd`` to wherever the :file:`quicktile` folder is
-    3. A line to run :code:`python3 -m quicktile "$@"`
 
 Setting Up Global Hotkeys
 -------------------------
@@ -263,22 +265,53 @@ Removal
 As QuickTile does not yet have a one-command uninstall script, you will need to
 do the following.
 
-**A. If you installed via pip3...**
+A. If you run QuickTile without installing
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Delete your :file:`quicktile` folder and :file:`quicktile.sh` script.
+2. Undo whatever changes you made to call :file:`quicktile.sh`. (eg.
+   :envvar:`PATH` modifications, shell aliases, desktop session autorun
+   entries, etc.)
+
+B. If you installed via :command:`pip3`...
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. code:: sh
 
-    sudo pip3 uninstall quicktile
+    sudo pip3 uninstall --break-system-packages quicktile
     sudo rm /usr/local/bin/quicktile
 
-.. todo:: Check whether :command:`pip3` is still failing to remove the
-    ``console_scripts`` entry-points that it generates.
+The ``--break-system-packages`` is required to remove something installed
+outside a virtualenv. It just means "I understand that I can use this to rip
+out packages my package manager installed which other things may depend on"
+and should be harmless if you use it to remove a non-library package that
+wasn't installed by the package manager.
 
+If the ``Would remove:`` prompt just has one line for the launch script and one
+line for the package, like this, then you're safe:
 
-**B. If you installed via install.sh...**
+::
 
- ``install.sh`` doesn't yet log what it installed the way ``pip3`` does, so
- this will be a bit more involved.
+    Would remove:
+      /usr/local/bin/quicktile
+      /usr/local/lib/python3.12/dist-packages/QuickTile-0.4.1-py3.12.egg
+  Proceed (Y/n)?
+
+C. If you installed via :file:`install.sh`...
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For modern Python, if pip is present, ``install.sh`` should delegate to
+``pip``, so start by trying the ``pip3`` removal instructions given above.
+
+If that works, then all that should be left is the ``.desktop`` file for
+automatically starting it:
+
+.. code:: sh
+
+    sudo rm /etc/xdg/autostart/quicktile.desktop
+
+Otherwise, the removal process is a bit more manual:
 
  1. Remove the system integration files:
 
@@ -289,9 +322,6 @@ do the following.
 
         # Remove the autostart file
         sudo rm /etc/xdg/autostart/quicktile.desktop
-
-        # Remove the launcher menu entry
-        sudo rm /usr/local/share/applications/quicktile.desktop
 
  2. Remove QuickTile from your Python packages folder.
 
@@ -306,10 +336,3 @@ do the following.
     .. code:: sh
 
        find /usr/local/lib -iname 'quicktile*'
-
-**C. If you run quicktile.sh without installing**
-
-1. Delete your :file:`quicktile` folder and :file:`quicktile.sh` script.
-2. Undo whatever changes you made to call :file:`quicktile.sh`. (eg.
-   :envvar:`PATH` modifications, shell aliases, desktop session autorun
-   entries, etc.)

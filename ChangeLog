@@ -11,6 +11,7 @@
   pip cache files in the user's home directory.
 - Assorted documentation improvements.
 - Continued efforts to increase automated testing
+- Significantly modernize project boilerplate to account for how long it's been
 
 0.4.0:
 - Port to Python 3.x and GTK 3.x

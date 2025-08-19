@@ -1,6 +1,6 @@
-flake8
 mypy
 nose
+ruff
 coverage
 sphinx
 sphinx-autodoc-typehints[type_comment]
