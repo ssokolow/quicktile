@@ -51,6 +51,24 @@ command:
 
    gconftool-2 --set "/apps/metacity/general/disable_workarounds" false --type bool
 
+QuickTile can't move windows tiled using KWin or Xfwm4
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+There's nothing I can do about this. The window manager always has final say.
+
+QuickTile has always functioned by making polite requests to the window
+manager using the same APIs applications use to reposition their own windows
+and tiling modes/WMs have a long history of overruling applications' attempts
+to reposition/reshape their own windows.
+
+Your only option is to un-tile windows in your WM's built-in tiling features
+before using QuickTile to position them.
+
+If your WM supports a non-toggling "un-tile" keybinding, you could consider
+writing a wrapper script which uses ``xdotool`` to fake pressing that key
+combination and then runs a "one operation, then exit" command like ``quicktile
+top-left``.)
+
 Terminator animates to zero width/height when resized
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
