@@ -1,0 +1,60 @@
+name: Deploy docs to GitHub Pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["master"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Single deploy job since we're just deploying
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install APT dependencies
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: python3 python3-pip python3-setuptools python3-nose python3-gi python3-xlib python3-dbus gir1.2-glib-2.0 gir1.2-gtk-3.0 gir1.2-wnck-3.0
+          version: 1.0
+      - name: Set up Python
+      - uses: actions/setup-python@v5
+        with:
+          cache: "pip" # caching pip dependencies
+          cache-dependency-path: "**/dev_requirements.txt"
+      - name: Install pip dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f dev_requirements.txt ]; then pip install -r dev_requirements.txt; fi
+      - name: Build Sphinx docs
+        run: |
+          cd docs
+          make html
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload Sphinx HTML output
+          path: 'docs/_build/html'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
