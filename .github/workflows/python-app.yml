@@ -1,10 +1,6 @@
 name: "MyPy, Tests, and Linting"
 
-on:
-  push:
-    branches: ["master"]
-  pull_request:
-    branches: ["master"]
+on: ["push", "pull_request"]
 
 permissions:
   contents: read
@@ -39,3 +35,5 @@ jobs:
       - name: Test with Nose
         run: |
           nosetests3
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
