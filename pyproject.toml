@@ -52,10 +52,24 @@ quicktile = ["*.desktop"]
 [tool.pytest.ini_options]
 addopts = [
     "--doctest-modules",
-    "--cov-config=.coveragerc",
     "--cov=.",
-    "--cov-branch"
     ]
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+omit = [
+    "*/python?.?/*",
+    "*/python?.??/*",
+    "*/lib-python/?.?/*.py",
+    "*/lib_pypy/_*.py",
+    "*/site-packages/*",
+    "*/dist-packages/*",
+    "*/pyshared/*",
+    "*/gi/*",
+    "*/Xlib/*",
+]
 
 [tool.ruff.lint]
 ignore = ["N802", "E401", "E402"]
