@@ -1,5 +1,6 @@
 build
 .coverage
+coverage.lcov
 dist
 docs/_build
 .mypy_cache

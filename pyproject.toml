@@ -52,6 +52,7 @@ quicktile = ["*.desktop"]
 [tool.pytest.ini_options]
 addopts = [
     "--doctest-modules",
+    "--cov-report=lcov",
     "--cov=.",
     ]
 
