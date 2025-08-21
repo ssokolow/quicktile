@@ -28,13 +28,12 @@ Installation
 QuickTile can be run from the source folder without installation via the
 ``./quicktile.sh`` script.
 
-For system-wide installation, the recommended option is ``pip3``, which will
+For system-wide installation, the current option is ``pip3``, which will
 record a log to allow easy uninstallation.
 
 ``sudo -H pip3 install https://github.com/ssokolow/quicktile/archive/master.zip``
 
-QuickTile's dependence on PyGObject prevents a fully PyPI-based installation
-option.
+Now that PyGObject is available on PyPI, other options are being explored.
 
 Consult the `Installation <http://ssokolow.com/quicktile/installation.html>`_
 section of the manual for full details and alternative installation options.
@@ -92,17 +91,22 @@ manual for alternative ways to interact with QuickTile.
 Removal
 -------
 
-If you used the installation instructions listed above, a system-wide
-installation of QuickTile can be removed with the following commands:
+If you installed QuickTile system-wide using `pip3`, it can be removed
+with the following commands:
 
 .. code:: sh
 
-    sudo pip3 uninstall quicktile
+    sudo pip3 uninstall --break-system-packages quicktile
     sudo rm /usr/local/bin/quicktile
 
+Without ``--break-system-packages``, it will refuse to remove things installed
+outside a virtualenv (including things it installed) because it **may** remove
+things the system package manager is managing.
+
 See the `Removal <http://ssokolow.com/quicktile/installation.html#removal>`_
-section of the manual for instructions on clearing out files left behind by
-other installation methods.
+section of the manual for more details on what a safe use of
+``--break-system-packages`` looks like and instructions on clearing out files
+left behind by other installation methods
 
 Contributing
 ------------
