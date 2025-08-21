@@ -49,6 +49,14 @@ version = {file = "quicktile/VERSION"}
 [tool.setuptools.package-data]
 quicktile = ["*.desktop"]
 
+[tool.pytest.ini_options]
+addopts = [
+    "--doctest-modules",
+    "--cov-config=.coveragerc",
+    "--cov=.",
+    "--cov-branch"
+    ]
+
 [tool.ruff.lint]
 ignore = ["N802", "E401", "E402"]
 unfixable = ["N802", "E401", "E402"]

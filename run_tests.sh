@@ -5,8 +5,8 @@ echo "-- MyPy --"
 mypy --exclude=build --warn-unused-ignores .
 echo " -- Ruff (static analysis) --"
 ruff check .
-echo "-- Nose (unit tests) --"
-nosetests3 "$@"
+echo "-- PyTest (unit tests) --"
+pytest "$@"
 echo "-- Sphinx (documentation syntax) --"
 cd docs || exit 1
 make coverage | grep -v 'Testing of coverage in the sources finished'
