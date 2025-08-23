@@ -222,6 +222,9 @@ def format_annotation(annotation, *args, **kwargs):
 
 sphinx_autodoc_typehints.format_annotation = format_annotation
 
+coverage_write_headline = False
+doctest_show_successes = False
+
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
