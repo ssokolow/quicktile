@@ -33,7 +33,7 @@ jobs:
       - name: Install APT dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: python3 python3-pip python3-setuptools python3-nose python3-gi python3-xlib python3-dbus gir1.2-glib-2.0 gir1.2-gtk-3.0 gir1.2-wnck-3.0
+          packages: python3 python3-pip python3-setuptools python3-pytest python3-pytest-cov python3-gi python3-xlib python3-dbus gir1.2-glib-2.0 gir1.2-gtk-3.0 gir1.2-wnck-3.0
           version: 1.0
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -54,7 +54,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload Sphinx HTML output
-          path: 'docs/_build/html'
+          path: "docs/_build/html"
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
