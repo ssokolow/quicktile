@@ -18,7 +18,7 @@ def os_environ(new_vars):
     """Helper to work around APIs that don't [seem] to [easily] take custom
     environment variables for things like specifying the X session to use."""
 
-    old_vars: Dict[str] = {}
+    old_vars: Dict[str, str] = {}
     for key in new_vars:
         old_vars[key] = os.environ[key]
         os.environ[key] = new_vars[key]
