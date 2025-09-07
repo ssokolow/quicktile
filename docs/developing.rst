@@ -31,8 +31,8 @@ On the operating system you intend to use for development:
 
 2. Install the :ref:`runtime dependencies <Dependencies>`.
 
-3. Install Openbox and Xvfb (eg. ``sudo apt install xvfb openbox``) for the
-   functional tests.
+3. Install Xvfb, Openbox, and Zenity (eg. ``sudo apt install xvfb openbox
+   zenity``) for the functional tests.
 
 3. Either use the following command to install QuickTile's additional
    development-time dependencies, or manually install the dependencies listed

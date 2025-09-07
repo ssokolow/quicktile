@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: python3 python3-pip python3-setuptools python3-pytest python3-pytest-cov python3-gi python3-xlib python3-dbus xvfb openbox gir1.2-glib-2.0 gir1.2-gtk-3.0 gir1.2-wnck-3.0
+          packages: python3 python3-pip python3-setuptools python3-pytest python3-pytest-cov python3-gi python3-xlib python3-dbus xvfb openbox zenity gir1.2-glib-2.0 gir1.2-gtk-3.0 gir1.2-wnck-3.0
           version: 1.0
       - uses: actions/setup-python@v5
         with:
