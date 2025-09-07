@@ -134,4 +134,8 @@ def test_functional(openbox_session, command):
         command], env=openbox_session)  # nosec
 
 
+def test_quicktile_sh_reports_failure(openbox_session):
+    """Verify that quicktile.sh passes the return code through"""
+    assert subprocess.call(['./quicktile.sh', '--i-am-an-invalid-option']) == 2
+
 # vim: set sw=4 sts=4 expandtab :
