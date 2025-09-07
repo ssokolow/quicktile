@@ -99,17 +99,18 @@ maximize
 minimize
 """.split() if x.split('#')[0].strip()]
 
-import logging, subprocess  # nosec
+import logging, subprocess, time  # nosec
 
 import pytest
+from quicktile.wm import WindowManager, Xatom
 
-from tests.functional_harness.env_general import background_proc
+from tests.functional_harness.env_general import background_proc, os_environ
 from tests.functional_harness.x_server import x_server
 
 log = logging.getLogger(__name__)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def icewm_session():
     # TODO: Re-add support for specifying 'Xephyr'
     with x_server(["Xvfb"], {0: '1024x768x24', 1: '800x600x24'}) as env:
@@ -119,12 +120,18 @@ def icewm_session():
         # TODO: Proper test windows.
         log.info("Starting test copy of Openbox...")
         with background_proc(['openbox', '--startup', 'zenity --info'], env):
-            # TODO: Rework so the process holding the session open can just
-            #       *report* when it's ready.
-            log.info("Sleeping for 5 seconds...")
-            import time
-            time.sleep(5)
-            yield env
+            with os_environ(env):
+                wm = WindowManager()
+
+                start = time.time()
+                while wm.get_property(wm.x_root.id, '_NET_SUPPORTING_WM_CHECK',
+                        Xatom.WINDOW) is None:
+                    if time.time() - start > 5:
+                        raise Exception("Timed out waiting for window manager")
+                    else:
+                        time.sleep(0.1)
+
+                yield env
 
 
 @pytest.mark.parametrize("command", TEST_SCRIPT)
