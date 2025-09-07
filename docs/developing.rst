@@ -31,6 +31,9 @@ On the operating system you intend to use for development:
 
 2. Install the :ref:`runtime dependencies <Dependencies>`.
 
+3. Install Openbox and Xvfb (eg. ``sudo apt install xvfb openbox``) for the
+   functional tests.
+
 3. Either use the following command to install QuickTile's additional
    development-time dependencies, or manually install the dependencies listed
    therein:
@@ -90,7 +93,7 @@ be searched for by running the following command in the project root:
 
 .. code-block:: sh
 
-    grep -E 'XXX|TODO|FIXME' -nR *.py quicktile functional_harness
+    grep -E 'XXX|TODO|FIXME' -nR *.py quicktile tests
 
 Regenerating Documentation Graphics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
