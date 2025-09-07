@@ -111,7 +111,7 @@ log = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope="module")
-def icewm_session():
+def openbox_session():
     # TODO: Re-add support for specifying 'Xephyr'
     with x_server(["Xvfb"], {0: '1024x768x24', 1: '800x600x24'}) as env:
         # TODO: Use a custom configuration file for Openbox
@@ -135,11 +135,11 @@ def icewm_session():
 
 
 @pytest.mark.parametrize("command", TEST_SCRIPT)
-def test_functional(icewm_session, command):
+def test_functional(openbox_session, command):
     """Run the old bank of 'commands don't crash' tests"""
     log.info("Testing command: %s", command)
     subprocess.check_call(['./quicktile.sh', '--no-excepthook',
-        command], env=icewm_session)  # nosec
+        command], env=openbox_session)  # nosec
 
 
 # vim: set sw=4 sts=4 expandtab :
