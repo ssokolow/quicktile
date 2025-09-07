@@ -11,5 +11,4 @@ rest of the code.
 
    test_util
    test_functional
-   functional_harness/x_server
    functional_harness/env_general

@@ -83,7 +83,7 @@ class WindowManager:
         self.gdk_display = self.gdk_screen.get_display()
 
         try:
-            self.x_display = x_display or XDisplay()
+            self.x_display = x_display or XDisplay(self.gdk_display.get_name())
         except (UnicodeDecodeError, DisplayConnectionError) as err:
             raise XInitError("python-xlib failed with %s when asked to open"
                              " a connection to the X server. Cannot bind keys."
