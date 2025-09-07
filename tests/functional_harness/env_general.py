@@ -3,14 +3,31 @@
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "MIT"
 
-import subprocess  # nosec
+import os, subprocess  # nosec
 from contextlib import contextmanager
 
 # Silence PyLint being flat-out wrong about MyPy type annotations
 # pylint: disable=unsubscriptable-object
 
 # -- Type-Annotation Imports --
-from typing import Any, Generator, Mapping, Union # NOQA
+from typing import Any, Dict, Generator, Mapping, Union  # NOQA
+
+
+@contextmanager
+def os_environ(new_vars):
+    """Helper to work around APIs that don't [seem] to [easily] take custom
+    environment variables for things like specifying the X session to use."""
+
+    old_vars: Dict[str] = {}
+    for key in new_vars:
+        old_vars[key] = os.environ[key]
+        os.environ[key] = new_vars[key]
+
+    try:
+        yield new_vars
+    finally:
+        for key in old_vars:
+            os.environ[key] = old_vars[key]
 
 
 @contextmanager
