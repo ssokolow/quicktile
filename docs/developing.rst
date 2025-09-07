@@ -214,9 +214,10 @@ revise them:
   not be feasible until further refactoring and test harness work is
   completed.)
 
-Once your changes are ready, the recommended way to submit them is via
-`pull request`_, as this will automatically trigger a test run, as well
-as making it as simple as possible for me to examine and accept them.
+Once your changes are ready, the standard way to submit them is via `pull
+request`_ against the ``master`` branch, as this will automatically trigger
+a test run, as well as making it as simple as possible for me to examine and
+accept them.
 
 .. _testing-quicktile:
 
