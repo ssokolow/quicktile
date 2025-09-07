@@ -20,7 +20,8 @@ def os_environ(new_vars):
 
     old_vars: Dict[str, str] = {}
     for key in new_vars:
-        old_vars[key] = os.environ[key]
+        if key in os.environ:
+            old_vars[key] = os.environ[key]
         os.environ[key] = new_vars[key]
 
     try:
