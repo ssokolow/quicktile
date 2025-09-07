@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Unit Test Suite for QuickTile using Nose test discovery"""
+"""Unit Test Suite for QuickTile using PyTest test discovery"""
 
 __author__ = "Stephan Sokolow (deitarion/SSokolow)"
 __license__ = "GNU GPL 2.0 or later"
