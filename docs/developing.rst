@@ -41,8 +41,8 @@ On the operating system you intend to use for development:
 
    These dependencies fall into one of two categories:
 
-   * Source code verification (Flake8_ for static analysis and code style,
-     MyPy_ for checking type hints, Nose_ for test discovery, and
+   * Source code verification (Ruff_ for static analysis and code style,
+     MyPy_ for checking type hints, PyTest_ for test discovery, and
      `Coverage.py`_ for determining test coverage)
    * Documentation generation (Sphinx_, `sphinx-autodoc-typehints`_, and
      `sphinxcontrib-autoprogram`_)
@@ -91,8 +91,6 @@ be searched for by running the following command in the project root:
 .. code-block:: sh
 
     grep -E 'XXX|TODO|FIXME' -nR *.py quicktile functional_harness
-
-PyLint_ should also report these.
 
 Regenerating Documentation Graphics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -175,10 +173,6 @@ Quirks of the Codebase's Structure
   commands and the shared setup code for them (lumped into a single class) as
   well as all of the commands themselves.
 
-* The :mod:`quicktile.version` module exists only to allow :file:`setup.py` and
-  the rest of QuickTile to share a single definition of the version number
-  without :file:`setup.py` having to import actual QuickTile code.
-
 .. todo:: Figure out a way to get URLs working in Sphinx's Graphviz_ extension
    that doesn't break when the default CSS downscales the diagram to keep it
    fitting in the document and then diagram QuickTile's functional
@@ -203,8 +197,8 @@ revise them:
 * All function arguments should bear complete type annotations which pass
   MyPy's scrutiny and use of :any:`typing.Any` or ``# type: ignore`` must be
   approved on a case-by-case basis.
-* All Flake8_ and PyLint_ complaints must either be resolved or whitelisted.
-  New ``NOQA`` or ``pylint: disable=`` annotations must include comments
+* All Ruff_ complaints must either be resolved or whitelisted.
+  New whitelisting annotations must include comments
   justifying their presence, except in self-evident cases such as URLs in
   docstrings which exceed the line-length limit.
 * All code within the ``quicktile`` package must have complete API
@@ -218,8 +212,7 @@ revise them:
   completed.)
 
 Once your changes are ready, the recommended way to submit them is via
-`pull request`_, as this will automatically submit them to the various
-continuous testing services that run on the QuickTile repository, as well
+`pull request`_, as this will automatically trigger a test run, as well
 as making it as simple as possible for me to examine and accept them.
 
 .. _testing-quicktile:
@@ -230,7 +223,9 @@ Testing Your Changes
 Testing Environment Concerns
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-QuickTile's current minimum compatibility target is Kubuntu Linux 20.04 LTS.
+As of this writing, QuickTile's current minimum compatibility target is Kubuntu
+Linux 24.04 LTS. This may be broadened as the testing infrastructure is
+modernized.
 
 If this is not what you are running, I suggest using VirtualBox_ for
 compatibility testing, as it is easy to set up and has support for virtual
@@ -275,53 +270,21 @@ For best results, configure your virtual desktop with the following characterist
 Automated Testing
 ^^^^^^^^^^^^^^^^^
 
-To run a complete set of everything that can be completed quickly, please use
+To run a complete set of all tests, please use
 the following command from the root of the project:
 
 .. code-block:: sh
 
     ./run_tests.sh
 
-It will perform the majority of the tests which will be run by Travis-CI when
-you open a pull request, while still completing in under 5 seconds with a hot
-cache on an old 2-core Althon with no SSD.
-
 The following will be run:
 
 * MyPy_ to check for violations of the type annotations.
-* Flake8_ for basic static analysis and code style checking
-* Nose_ and doctest_ to run the unit tests (currently of limited scope)
+* Ruff_ for basic static analysis and code style checking
+* PyTest_ and doctest_ to run the unit tests (currently of limited scope)
 * doctest_ to check for broken code examples in the API documentation
 * Sphinx_'s ``make coverage`` to check documentation coverage
   (currently of questionable reliability)
-
-While the dependency on system packages such as PyGObject limits its utility,
-you may also use tox_ to test that QuickTile's ``setup.py`` packaging process
-works properly. (However, bear in mind that you will need to edit ``tox.ini``
-if your system Python is not version 3.8 as found on Kubuntu Linux 20.04 LTS.)
-
-Bear in mind that, while not yet incorporated into convenient scripts, the
-following tests will also be run by the ALE_ analysis plugin for my text editor
-when I examine your contribution:
-
-* Bandit_ (You can run this as ``bandit quicktile`` after installation.)
-* PyLint_ (Assuming you have your system configured to complain about
-  deprecation warnings as I do, I suggest running PyLint as
-  ``pylint3 --rcfile=pylintrc quicktile 2>/dev/null``)
-
-While it currently relies on an ugly hack which hard-codes Openbox and
-Zenity as dependencies, and does not yet assert that windows wind up
-in the expected states, you may also find the beginnings of a functional
-test suite useful as a way to exercise the code and check for uncaught
-exceptions:
-
-.. code-block:: sh
-
-    ./test_functional.py -v
-
-Bear in mind that, even once it is more mature, it will remain excluded
-from :file:`run_tests.sh` because it takes too long to be part of a
-comfortable edit-test cycle.
 
 In lieu of a proper functional test suite, please manually execute all tiling
 commands which rely on code you've touched and watch for misbehaviour.
@@ -381,7 +344,7 @@ A Bad Example::
 .. _Bandit: https://github.com/PyCQA/bandit
 .. _Coverage.py: https://coverage.readthedocs.io/
 .. _doctest: https://docs.python.org/3/library/doctest.html
-.. _Flake8: https://pypi.org/project/flake8/
+.. _Ruff: https://docs.astral.sh/ruff/
 .. _Gifsicle: https://www.lcdf.org/gifsicle/
 .. _GNU Make: https://www.gnu.org/software/make/
 .. _Graphviz: https://www.graphviz.org/
@@ -389,9 +352,8 @@ A Bad Example::
 .. _Inkscape: https://inkscape.org/
 .. _issue tracker: https://github.com/ssokolow/quicktile/issues
 .. _MyPy: http://mypy-lang.org/
-.. _Nose: https://nose.readthedocs.io/
+.. _PyTest: https://docs.pytest.org/
 .. _OptiPNG: http://optipng.sourceforge.net/
-.. _PyLint: https://www.pylint.org/
 .. _pull request: https://github.com/ssokolow/quicktile/pulls
 .. _simple past tense: https://en.wikipedia.org/wiki/Simple_past
 .. _Sphinx: https://www.sphinx-doc.org/
