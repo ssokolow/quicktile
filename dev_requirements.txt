@@ -1,6 +1,7 @@
 mypy
 pytest
 pytest-cov
+pytest-xvfb
 ruff
 sphinx
 sphinx-autodoc-typehints[type_comment]
