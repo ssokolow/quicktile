@@ -23,3 +23,11 @@ include /usr/share/dpkg/default.mk
 override_dh_auto_install:
 	dh_auto_install
 	install -D quicktile.desktop debian/quicktile/etc/xdg/autostart/quicktile.desktop
+
+override_dh_installdocs:
+	( cd docs ; env PATH=$$HOME/.local/bin/:$$PATH make html ; )
+	dh_installdocs
+
+override_dh_installman:
+	( cd docs ; env PATH=$$HOME/.local/bin/:$$PATH make man ; )
+	dh_installman
