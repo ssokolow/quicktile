@@ -227,25 +227,31 @@ When will you support Wayland?
 
 Does QuickTile run on macOS?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    It's not a primary target, since I don't have a Mac to test with, but if
-    `SpectrWM <https://github.com/conformal/spectrwm/wiki/OSX>`_ can run via
-    X11.app, QuickTile isn't out of the question.
 
-    The GTK+ 2.x version of libwnck failed to retrieve the active window and
-    development of a workaround
-    `[1] <https://github.com/ssokolow/quicktile/issues/28>`_
-    `[2] <https://github.com/ssokolow/quicktile/tree/xquartz>`_ stalled when I
-    fell out of contact with the person who wanted it and no longer had anyone
-    to test changes.
+    Probably not (maybe with ``X11.app``?), but there are already more native
+    options available for free.
 
-    I don't know whether the GTK 3.x version of libwnck is any better, but, if
-    not and you're willing to test rapid-fire changes to the code, macOS
-    support isn't out of the question.
+    Suggested alternatives are:
 
-    A list of shareware alternatives with official OSX support is also
-    available on `StackOverflow <http://stackoverflow.com/questions/273242/is-there-anything-like-winsplit-revolution-for-mac-os-x>`_
+    * **Modern macOS:** `Rectangle <https://rectangleapp.com/>`_
+    * **High Sierra (10.13):** `Spectacle 1.2 <https://github.com/eczarny/spectacle/releases/tag/1.2>`_ (GitHub Releases)
+    * **Snow Leopard (10.6):** `Spectacle 0.7 <https://web.archive.org/web/20210120190004/https://s3.amazonaws.com/spectacle/downloads/Spectacle+0.7.zip>`_ (Wayback Machine)
 
 .. _quicktile-windows:
+
+Does QuickTile run on Windows?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    Certainly not without an X server and possibly not even then.
+
+    Use QuickTile's inspiration, WinSplit Revolution:
+
+    * **Windows 10+:** `Revived Version <https://github.com/dozius/winsplit-revolution/releases>`_ (GitHub Releases)
+    * **Windows 2000/XP/Vista/7:** `v11.04 <https://web.archive.org/web/20130127090450/http://www.winsplit-revolution.com/download>`_ (Wayback Machine)
+
+    If anyone has a Windows 9x-compatible build, please contact me. (I'm told
+    that they existed for v8.x and below, but the only v1.9 I could find is for
+    NT-lineage Windows only.)
 
 QuickTile doesn't meet my needs. What can I do?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
