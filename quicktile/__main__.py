@@ -154,7 +154,7 @@ def argparser() -> ArgumentParser:
         `sphinxcontrib.autoprogram
         <https://sphinxcontrib-autoprogram.readthedocs.io/en/stable/>`_"""
     parser = ArgumentParser(prog='QuickTile',
-        description='Window Tiling addon for X11-based desktops')
+        description='Add tiling hotkeys to X11-based desktops')
     parser.add_argument('-V', '--version', action='version',
             version="%%(prog)s v%s" % __version__)
     parser.add_argument('-d', '--daemonize', action="store_true",
@@ -162,12 +162,13 @@ def argparser() -> ArgumentParser:
         "keybindings using python-xlib and a D-Bus service using dbus-python. "
         "Exit if neither succeeds.")
     parser.add_argument('-b', '--bindkeys', action="store_true",
-        dest="daemonize", default=False, help="Old alias for --daemonize")
+        dest="daemonize", default=False, help="Old alias for --daemonize from "
+        "before it also did D-Bus")
     parser.add_argument('--debug', action="store_true", default=False,
         help="Display debug messages")
     parser.add_argument('--no-excepthook', action="store_true",
         default=False, help="Disable the error-handling dialog to allow for "
-        "use in unattended scripting.")
+        "more reliable use in unattended scripting")
     parser.add_argument('--no-workarea', action="store_true",
         default=False, help="No effect. Retained for compatibility.")
     parser.add_argument('command', action="store", nargs="*",

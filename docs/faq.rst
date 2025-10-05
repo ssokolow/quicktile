@@ -20,7 +20,7 @@ and back in to ensure that the changes get applied.
 
 To help in diagnosing this problem, QuickTile will attempt to report failure to
 grab hotkeys when you start it with
-`-\\-daemonize <cli.html#cmdoption-quicktile-d>`_ in a terminal.
+`-\-daemonize <cli.html#cmdoption-quicktile-d>`_ in a terminal.
 
 .. code-block:: none
 
@@ -212,9 +212,12 @@ Other Questions
 
 When will you support Wayland?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    Never. Wayland's security model makes it impossible to move and resize
-    windows belonging to other applications unless you are the compositor
-    itself.
+    If/when it grows the APIs I need.
+
+    Wayland's security model for regular
+    applications makes it impossible to move and resize windows belonging to
+    other applications unless you are the compositor itself and it would be too
+    much work to try to support each compositor's plugin API individually.
 
     You'll have to poke the creators of your compositor to improve tiling
     support or switch to a different compositor.
@@ -250,8 +253,8 @@ Does QuickTile run on Windows?
     * **Windows 2000/XP/Vista/7:** `v11.04 <https://web.archive.org/web/20130127090450/http://www.winsplit-revolution.com/download>`_ (Wayback Machine)
 
     If anyone has a Windows 9x-compatible build, please contact me. (I'm told
-    that they existed for v8.x and below, but the only v1.9 I could find is for
-    NT-lineage Windows only.)
+    that they existed for v8.x and below, but the only one I could find was
+    a copy of the NT build of v1.9 in a collection of Windows 2000 stuff.)
 
 QuickTile doesn't meet my needs. What can I do?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

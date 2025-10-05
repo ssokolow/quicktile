@@ -11,4 +11,4 @@ rest of the code.
 
    test_util
    test_functional
-   functional_harness/env_general
+   functional_harness/env

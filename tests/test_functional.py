@@ -104,7 +104,7 @@ import logging, subprocess, time  # nosec
 import pytest
 from quicktile.wm import WindowManager, Xatom
 
-from tests.functional_harness.env_general import background_proc
+from tests.functional_harness.env import background_proc
 
 log = logging.getLogger(__name__)
 
