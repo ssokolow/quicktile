@@ -3,7 +3,7 @@ Command Reference
 
 .. note:: All keybindings are customizable. This list shows their defaults.
           You can use the
-          `-\\-show-bindings <cli.html#cmdoption-quicktile-show-bindings>`_
+          `-\-show-bindings <cli.html#cmdoption-quicktile-show-bindings>`_
           option to view your current keybindings.
 
 .. contents::
@@ -17,7 +17,7 @@ Window Tiling
 ``top-left``
 ^^^^^^^^^^^^
 
-Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 7`
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad_7`
 
 Tile the active window to span the top-left quarter of the screen. Press the hotkey multiple times to cycle through different width presets.
 
@@ -27,7 +27,7 @@ Tile the active window to span the top-left quarter of the screen. Press the hot
 ``top``
 ^^^^^^^
 
-Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 8`
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad_8`
 
 Tile the active window to span the top half of the screen. Press the hotkey multiple times to cycle through different width presets.
 
@@ -37,7 +37,7 @@ Tile the active window to span the top half of the screen. Press the hotkey mult
 ``top-right``
 ^^^^^^^^^^^^^
 
-Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 9`
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad_9`
 
 Tile the active window to span the top-right quarter of the screen. Press the hotkey multiple times to cycle through different width presets.
 
@@ -47,7 +47,7 @@ Tile the active window to span the top-right quarter of the screen. Press the ho
 ``left``
 ^^^^^^^^
 
-Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 4`
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad_4`
 
 Tile the active window to span the left half of the screen. Press the hotkey multiple times to cycle through different width presets.
 
@@ -57,7 +57,7 @@ Tile the active window to span the left half of the screen. Press the hotkey mul
 ``center``
 ^^^^^^^^^^
 
-Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 5`
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad_5`
 
 Tile the active window to fill the screen. Press the hotkey multiple times to cycle through different width presets.
 
@@ -67,7 +67,7 @@ Tile the active window to fill the screen. Press the hotkey multiple times to cy
 ``right``
 ^^^^^^^^^
 
-Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 6`
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad_6`
 
 Tile the active window to span the right half of the screen. Press the hotkey multiple times to cycle through different width presets.
 
@@ -77,7 +77,7 @@ Tile the active window to span the right half of the screen. Press the hotkey mu
 ``bottom-left``
 ^^^^^^^^^^^^^^^
 
-Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 1`
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad_1`
 
 Tile the active window to span the bottom-left quarter of the screen. Press the hotkey multiple times to cycle through different width presets.
 
@@ -87,7 +87,7 @@ Tile the active window to span the bottom-left quarter of the screen. Press the 
 ``bottom``
 ^^^^^^^^^^
 
-Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 2`
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad_2`
 
 Tile the active window to span the bottom half of the screen. Press the hotkey multiple times to cycle through different width presets.
 
@@ -98,7 +98,7 @@ Tile the active window to span the bottom half of the screen. Press the hotkey m
 ``bottom-right``
 ^^^^^^^^^^^^^^^^
 
-Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad 3`
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad_3`
 
 Tile the active window to span the bottom-right quarter of the screen. Press the hotkey multiple times to cycle through different width presets.
 
@@ -262,7 +262,7 @@ Toggle whether the active window is minimized to the taskbar or equivalent.
 ``shade``
 ^^^^^^^^^
 
-Toggle whether the active window is as only a titlebar (like a rolled-up windowshade).
+Toggle whether the active window is displayed as only a titlebar (like a rolled-up windowshade).
 
 .. image:: diagrams/png/shade.png
    :alt: diagram
@@ -325,7 +325,7 @@ Move *all* windows to the next monitor, as defined by the
 ``monitor-switch``
 ^^^^^^^^^^^^^^^^^^
 
-Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad Enter`
+Default Keybinding: :kbd:`Ctrl` + :kbd:`Alt` + :kbd:`Keypad_Enter`
 
 An alias for :ref:`monitor-next <monitor-next>` which will wrap around
 regardless of the value of the :ref:`MovementsWrap <MovementsWrap>` setting in

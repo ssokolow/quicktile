@@ -109,7 +109,7 @@ anyway.)
 This provides an easy way to set a shared prefix for all QuickTile keybindings.
 
 For example, setting ``<Mod4>`` would turn a binding to ``KP_0`` into
-:kbd:`Win` + :kbd:`Keypad 0`.
+:kbd:`Win` + :kbd:`Keypad_0`.
 
 .. _MovementsWrap:
 
@@ -134,10 +134,11 @@ sequences in to QuickTile commands.
 
 A list of valid commands is available either in the :doc:`commands` section
 or by running QuickTile with the
-`-\\-show-actions <cli.html#cmdoption-quicktile-show-actions>`_ option in a
+`-\-show-actions <cli.html#cmdoption-quicktile-show-actions>`_ option in a
 terminal.
 
-Both the keys and values must parse as :any:`str`.
+Both the keys and values must be things the parser will treat as :any:`strings
+<str>`.
 
 As an example of the correct format, here is the default contents of the
 ``[keys]`` section as of QuickTile 0.4:
@@ -218,6 +219,9 @@ consistent mappings:
   * ``<Super>``
   * ``<Hyper>``
 
+.. todo:: Did I forget to catch these and display a human-friendly error
+   message?
+
 Valid Key Names
 ^^^^^^^^^^^^^^^
 
@@ -258,5 +262,5 @@ Troubleshooting :program:`xev`
 
     * Move the descriptions of configuration file fields into the source
       code and then make the reference ReST programmatically generated.
-    * Decide how the print stylesheet rules should handle code blocks too wide
-      to fit on a portrait page.
+    * Decide how the ``@media print`` CSS rules should handle code blocks too
+      wide to fit on a portrait page.

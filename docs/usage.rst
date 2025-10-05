@@ -5,9 +5,6 @@ QuickTile is built around a simple model of applying :doc:`tiling commands
 <commands>` to either the active window or, for some commands, the
 desktop as a whole.
 
-.. todo:: I'm not satisfied with the style I've written ``usage.rst`` in. I'll
-    need to come back to it later and try to puzzle out why.
-
 These commands can be invoked in one of three ways:
 
 .. contents::
@@ -17,51 +14,46 @@ Global Hotkeys
 --------------
 
 If QuickTile is started with the
-`-\\-daemonize <cli.html#cmdoption-quicktile-d>`_ option, it will
-attempt to bind global hotkeys as defined by the mappings in
+`-\-daemonize <cli.html#cmdoption-quicktile-d>`_ option, it will
+try to bind global hotkeys as defined by the mappings in
 :doc:`quicktile.cfg <config>`.
 
-A typical use of QuickTile's hotkeys is as follows:
+A typical use of QuickTile's hotkeys is:
 
-1. Focus the window you want to tile
-2. Hold the modifiers defined in :ref:`ModMask <ModMask>` (:kbd:`Ctrl` +
+1. Focus the window you want to tile (eg. with :kbd:`Alt` + :kbd:`Tab`)
+2. Hold the modifiers defined in :ref:`ModMask <ModMask>` (:kbd:`Ctrl`
    :kbd:`Alt` by default).
-3. Repeatedly press one of the defined keybindings to cycle through window
-   sizes available at the desired location on the screen.
-
-This works best when combined with functionality your existing window manager
-provides (eg. :kbd:`Alt` + :kbd:`Tab`) to minimize the need to switch your hand between your
-keyboard and your mouse.
+3. Repeatedly press one of the keybindings to cycle through window
+   sizes available at the requested location.
 
 See the :doc:`commands` section for a listing of default keybindings and what
-they do, or run ``quicktile --show-bindings`` and ``quicktile --show-actions``.
+they do, or run ``quicktile --show-actions`` to list all available commands and ``quicktile --show-bindings`` to list commands that have hotkeys bound to them.
 
 Command-Line Invocation
 -----------------------
 
 If QuickTile is started without ``--daemonize`` but with one or more positional
-arguments, it will perform the specified sequence of actions on the active
+arguments, it will perform the given sequence of actions on the active
 window (or, depending on the command, on the desktop as a whole) and then exit.
 
 .. code-block:: shell-session
 
     $ quicktile top-left top-left
 
-This is useful for invoking QuickTile from incorporating it into shell scripts
-or binding tiling commands to things `XGrabKey`_ can't see, such as
+This is intended for incorporating QuickTile into shell scripts
+or triggering it from places its internal keybinding system can't watch, such as
 LIRC_-based remote controls via :manpage:`irexec(1)`.
 
 If running this in a context where it is undesirable for your script to block
-and display an error dialog on encountering an exception within QuickTile,
-please pass `-\\-no-excepthook <cli.html#cmdoption-quicktile-no-excepthook>`_
+and display an error dialog upon encountering an unexpected bug in QuickTile,
+please pass `-\-no-excepthook <cli.html#cmdoption-quicktile-no-excepthook>`_
 when invoking QuickTile.
 
 For more details on QuickTile's command-line interface, run ``quicktile
 --help`` or see the :doc:`cli` section of this manual.
 
-.. note:: Historically, most of the attention paid to QuickTile has been to
-    its function under the influence of
-    `-\\-daemonize <cli.html#cmdoption-quicktile-d>`_ and command-line
+.. note:: Historically, QuickTile has received most of its testing under
+    `-\-daemonize <cli.html#cmdoption-quicktile-d>`_ and command-line
     invocation has known bugs in how it interacts with the X server.
 
     Most notably, when multiple commands are specified on a single
@@ -74,7 +66,7 @@ For more details on QuickTile's command-line interface, run ``quicktile
     reverse the effect of the ``monitor-next``.
 
     A fix for this is intended, but the non-trivial re-architecting involved
-    means that I don't want to do until after the automated test suite is
+    means that I don't want to do it until after the automated test suite is
     sufficiently complete.
 
 .. todo:: Fix the race conditions which prevent non-resident operation from
@@ -91,7 +83,7 @@ a perceptible delay between pressing a key/button and having the window
 respond.
 
 If `dbus-python <https://pypi.org/project/dbus-python/>`_ is installed, the
-`-\\-daemonize <cli.html#cmdoption-quicktile-d>`_ command-line option will also
+`-\-daemonize <cli.html#cmdoption-quicktile-d>`_ command-line option will also
 attempt to claim the ``com.ssokolow.QuickTile`` service name.
 
 It will expose a single object path (``/com/ssokolow/QuickTile``) with a single
@@ -137,14 +129,13 @@ Both of these commands can also be used as drop-in replacements for the
 command-line interface as long as ``quicktile --daemonize`` has been started
 beforehand.
 
-Regardless of how you invoke the D-Bus interface, it has two advantages over
+While it takes more work to set up, the D-Bus interface has two advantages over
 the command-line interface:
 
 * :command:`qdbus` and :command:`dbus-send` start more quickly than QuickTile,
   so this is likely to have lower latency even if being invoked from a shell
   script rather than doing a direct D-Bus call from a resident process to
   QuickTile.
-* Because it uses `-\\-daemonize <cli.html#cmdoption-quicktile-d>`_ to spin up
-  a persistent event loop shared by the D-Bus and X server client libraries,
-  the D-Bus interface is demonstrably free from all race conditions currently
-  known to affect the command-line interface.
+* Because the D-Bus and X11 client libraries share the same `-\-daemonize <cli.html#cmdoption-quicktile-d>`_ event loop,
+  the D-Bus interface is free from known race conditions currently
+  affecting the command-line interface.

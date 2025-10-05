@@ -27,9 +27,7 @@ A desktop based on the X11 windowing system
 
     If you are running MacOS, see the :ref:`quicktile-macos` FAQ entry.
 
-    If you are running Windows and don't want to download WinSplit Revolution
-    from an archive of discontinued software, there are some links which
-    include Windows offerings in the :ref:`quicktile-windows` FAQ entry.
+    If you are running Windows see the :ref:`quicktile-windows` FAQ entry.
 Python_ 3.12+
     QuickTile is developed in Python 3.12 with Kubuntu Linux 24.04 LTS as its
     earliest explicitly tested compatibility target.

@@ -81,11 +81,17 @@ To enable inclusion of these development notes...
 3. Your developer documentation should now exist in :file:`docs/_build/html/`.
 
 The resulting API documentation will include in-line TODO annotations, as well
-as a complete listing at the bottom of the doc:`apidocs/index` page.
+as a complete listing at the bottom of the :doc:`apidocs/index` page.
 
 .. note:: If Sphinx fails to notice that part of the documentation should be
    rebuilt, a rebuild can be forced either by deleting the :file:`_build/html`
    directory or by running ``(cd docs; make html SPHINXOPTS=-E)`` instead.
+
+   Generated documentation, such :doc:`cli` may also require deleting other
+   files under ``_build`` but it is advised to delete individual files such as
+   ``_build/doctrees/cli.doctree`` instead of the entire ``_build`` folder
+   to avoid re-downloading the InterSphinx indexes, which could
+   get you temporarily rate-limited.
 
 There also exist TODO comments in the source code (usually ones that shouldn't
 be seen as drawing attention away from the ones in the Sphinx docs) which can
@@ -147,10 +153,8 @@ as X11 window properties using the
 Quirks of the Codebase's Structure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* The :mod:`quicktile.__main__` module is currently responsible for parsing
-  configuration files and command-line arguments, migrating old configuration
-  versions, initializing other components, and stitching them together. It is
-  slated to be broken up into smaller, more task-specific modules.
+* The :mod:`quicktile.__main__.main` function is currently responsible for
+  gluing everything together.
 
 * At the moment, due to an incomplete refactoring during the GTK+ 3 port, the
   :mod:`quicktile.keybinder` module is still structured as if optional, though
@@ -244,10 +248,9 @@ machines with multiple monitors.
 
     Those using only VirtualBox packages provided by their Linux distribution's
     official package repositories should have no need to worry, but its absence
-    can be confirmed by choosing :menuselection:`File --> Preferences...` from
-    the VirtualBox menu bar, selecting the :guilabel:`Extensions` section in
-    the resulting dialog, and verifying that no extensions other than
-    :guilabel:`VNC` are present.
+    can be confirmed by choosing :menuselection:`File --> Tools --> Extension
+    Pack Manager` from the VirtualBox menu bar, and verifying that no
+    extensions other than :guilabel:`VNC` are present.
 
     Should this prove too concerning, KVM-based solutions such as virt-manager_
     or `GNOME Boxes`_ should also serve equally well though I can give no
@@ -342,6 +345,8 @@ A Bad Example::
         * Always use the first given configuration for untiled windows.
 
 .. highlight:: default
+
+.. todo:: Add a section containing a 'how to spin a release' checklist.
 
 .. _AdvanceCOMP: https://www.advancemame.it/comp-readme
 .. _ALE: https://github.com/dense-analysis/ale/
