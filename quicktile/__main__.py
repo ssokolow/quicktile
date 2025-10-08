@@ -215,6 +215,15 @@ def main() -> None:
             config.getfloat('general', 'MarginY_Percent') / 100
         )
     )(commands.cycle_dimensions)
+
+    goto_commands = {}
+    for dim_dividend in range(1, config.getint('general', 'ColumnCount')+1):
+        for dim_divisor in range(1, config.getint('general', 'ColumnCount')+1):
+            for col in range(1, dim_divisor+1):
+                for addition, y_col in {'': None, '-top': 'top', '-bottom': 'bottom'}.items():
+                    goto_commands[f'goto-{dim_dividend}/{dim_divisor}-{col}{addition}'] = (dim_dividend, dim_divisor, col, y_col)
+    commands.goto_position_dimension = commands.commands.add_many(goto_commands)(commands.goto_position_dimension)
+
     commands.commands.extra_state = {'config': config}
 
     GLib.log_set_handler('Wnck', GLib.LogLevelFlags.LEVEL_WARNING,
