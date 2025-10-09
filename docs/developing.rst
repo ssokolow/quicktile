@@ -402,10 +402,13 @@ a new release:
 
 2. Make the release
 
-   1. Run :command:`git tag vXXX` to mint the release, where ``XXX`` is the
-      string from :file:`quicktile/VERSION`. (At present, QuickTile does not
-      use annotated commits)
-   2. Run :command:`git push --tags` to push the release live.
+   1. Copy the commit hash which was merged into ``master`` and passed CI from
+      GitHub to ensure that you're getting the exact one you intend.
+   2. Run :command:`git tag vXXX <commit-hash>` to mint the release, where
+      ``XXX`` is the string from :file:`quicktile/VERSION` and
+      ``<commit-hash>`` is the commit hash from GitHub. (At present, QuickTile
+      does not use annotated commits)
+   3. Run :command:`git push --tags` to push the release live.
 
 3. Bump the development version
 
