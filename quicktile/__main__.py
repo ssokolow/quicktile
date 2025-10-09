@@ -214,12 +214,12 @@ def main() -> None:
         logging.debug("Host OS is {} {} {}".format(
             uname.system, uname.release, uname.version))
 
-        if hasattr(platform, 'freedesktop_os_release'):
+        if hasattr(platform, 'freedesktop_os_release'):  # pragma: no branch
             try:
                 logging.debug("Host distro is {}".format(
                     platform.freedesktop_os_release().get(
                         'PRETTY_NAME', '(unknown)')))
-            except OSError:
+            except OSError:  # pragma: no cover
                 logging.debug("Couldn't identify host distro")
 
         if 'WAYLAND_DISPLAY' in os.environ:
