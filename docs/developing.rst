@@ -379,7 +379,42 @@ A Bad Example::
 
 .. highlight:: default
 
-.. todo:: Add a section containing a 'how to spin a release' checklist.
+How to Make A New Release
+-------------------------
+
+While contributors don't need to know this, both for maintainer reference and
+in case QuickTile ever needs to be forked, this is the checklist for making
+a new release:
+
+1. Prepare the corresponding commit
+
+   1. Verify that :file:`AUTHORS` and :file:`ChangeLog` are up to date and
+      remove ``(git HEAD)`` from the newest :file:`ChangeLog` entry's title.
+   2. Make sure that all changes have been committed.
+   3. Run :command:`(cd docs; make html)` and :command:`./run_tests.sh` locally
+      and confirm that nothing looks wrong.
+   4. Run :command:`./test_functional.sh`
+   5. Manually test the internal keybinder using
+      :command:`./quicktile.sh --daemonize`.
+   6. Push any remaining changes to GitHub.
+   7. If they pass CI testing, merge them into ``master``.
+   8. Wait for the CI tests and site update to pass on ``master``.
+
+2. Make the release
+
+   1. Run :command:`git tag vXXX` to mint the release, where ``XXX`` is the
+      string from :file:`quicktile/VERSION`. (At present, QuickTile does not
+      use annotated commits)
+   2. Run :command:`git push --tags` to push the release live.
+
+3. Bump the development version
+
+   1. Bump :file:`quicktile/VERSION`
+   2. Add a new blank entry to :file:`ChangeLog` with ``(git HEAD)`` before the
+      terminal colon.
+
+.. todo:: Automate this more so it's harder to overlook steps or do them out of
+          order and add linting for CI.
 
 .. _AdvanceCOMP: https://www.advancemame.it/comp-readme
 .. _ALE: https://github.com/dense-analysis/ale/
