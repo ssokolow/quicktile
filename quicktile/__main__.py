@@ -33,7 +33,7 @@ __license__ = "GNU GPL 2.0 or later"
 # pylint: disable=unsubscriptable-object
 # pylint: disable=wrong-import-order
 
-import errno, logging, os, signal, sys
+import errno, logging, os, platform, signal, sys
 from argparse import ArgumentParser
 from importlib.resources import files
 
@@ -203,6 +203,27 @@ def main() -> None:
     # Set up the output verbosity
     logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO,
                         format='%(levelname)s: %(message)s')
+
+    if args.debug:
+        logging.debug("Starting QuickTile v{} on {} under Python v{}".format(
+            __version__,
+            os.environ.get('XDG_CURRENT_DESKTOP', '(unknown DE)').strip(),
+            platform.python_version()))
+
+        uname = platform.uname()
+        logging.debug("Host OS is {} {} {}".format(
+            uname.system, uname.release, uname.version))
+
+        if hasattr(platform, 'freedesktop_os_release'):
+            try:
+                logging.debug("Host distro is {}".format(
+                    platform.freedesktop_os_release().get(
+                        'PRETTY_NAME', '(unknown)')))
+            except OSError:
+                logging.debug("Couldn't identify host distro")
+
+        if 'WAYLAND_DISPLAY' in os.environ:
+            logging.warning("QuickTile appears to be running under Wayland")
 
     cfg_path = os.path.join(XDG_CONFIG_DIR, 'quicktile.cfg')
     first_run = not os.path.exists(cfg_path)
