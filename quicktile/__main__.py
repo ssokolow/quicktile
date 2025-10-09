@@ -56,7 +56,7 @@ from typing import Dict
 from typing import Optional  # NOQA pylint: disable=unused-import
 # --
 
-__version__ = files("quicktile").joinpath("VERSION").read_text()
+__version__ = files("quicktile").joinpath("VERSION").read_text().strip()
 
 Wnck.set_client_type(Wnck.ClientType.PAGER)
 
