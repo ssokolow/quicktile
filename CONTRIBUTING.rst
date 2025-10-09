@@ -18,3 +18,11 @@ Before You Open An Issue...
    traceback from the ``Details...`` button.
 
 Thanks for making it easier for me to help you.
+
+Before You Open A PR...
+=======================
+
+1. Please open an issue so you don't risk contributing code that won't be
+   accepted.
+
+2. Read the `Developer's Guide <https://ssokolow.com/quicktile/developing.html>`_.
