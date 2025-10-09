@@ -1,4 +1,6 @@
-0.4.1 (git HEAD):
+0.5.0 (git HEAD):
+
+0.4.1:
 - Add support for HiDPI monitors where GDK's pixel units don't necessarily
   match Wnck pixel units by default.
 - Add minimal support for querying  _GTK_WORKAREAS_D0 (GNOME Shell on X11)
