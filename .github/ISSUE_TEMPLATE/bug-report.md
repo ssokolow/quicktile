@@ -2,7 +2,7 @@
 name: Bug Report
 about: Report a misbehaviour in existing functionality
 title: ''
-labels: bug
+labels: bug, feature
 assignees: ''
 
 ---
@@ -27,3 +27,6 @@ Run QuickTile with the `--debug` option (eg. `./quicktile.sh --debug`) and cause
 
 Then paste the resulting console output here.
 ```
+
+**Traceback:**
+If you're reporting a bug that resulted in the "A programming error has been detected during the execution of this program." dialog, please attach the traceback from the `Details...` button to your bug report.
