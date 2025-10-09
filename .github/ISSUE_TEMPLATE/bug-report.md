@@ -2,7 +2,7 @@
 name: Bug Report
 about: Report a misbehaviour in existing functionality
 title: ''
-labels: bug, feature
+labels: bug
 assignees: ''
 
 ---
