@@ -307,6 +307,28 @@ The following will be run:
 In lieu of a proper functional test suite, please manually execute all tiling
 commands which rely on code you've touched and watch for misbehaviour.
 
+Semi-Automated Testing
+^^^^^^^^^^^^^^^^^^^^^^
+
+While QuickTile does not yet have a proper functional test suite, the
+``test_functional.sh`` script can be used to quickly perform human testing of
+most of the commands for both the CLI and D-Bus interfaces.
+
+1. Open a free-floating terminal window which is not set to be always on top or
+   on all desktops.
+2. Run ``./test_functional.sh``
+3. Follow the instructions
+
+The script will temporarily make the terminal window always-on-top and
+on-all-desktops, open a test window (FeatherPad by default), and then walk it
+through a predefined sequence of QuickTile commands, with a one-second delay
+between each.
+
+The intended way to use it is to keep your eyes focused on the "Testing
+[command name]..." messages in the terminal, while you confirm that the
+movement you're seeing in your peripheral vision matches what it's claiming to
+do.
+
 Adding Yourself to the :file:`AUTHORS` List
 -------------------------------------------
 
