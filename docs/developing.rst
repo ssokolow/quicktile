@@ -274,6 +274,17 @@ For best results, configure your virtual desktop with the following characterist
    best chance of triggering any dead-space-related bugs in the code for
    calculating usable regions.
 
+.. note:: The following two behaviours are currently known bugs where a proper
+   solution is blocked on reworking how window state is tracked and you don't
+   need to worry that you've caused them:
+
+   1. If a window is so far down or to the right that it would be outside the
+      bounds of the destination monitor, QuickTile will refuse to honor a request to move it to that monitor to avoid the risk of your window manager allowing it to get lost off the edge of the desktop. This can block commands like ``monitor-switch``.
+   2. If a window's top-left corner is within the bounds of the destination
+      montiro, but its bottom-right corner extends beyond it, the window will
+      be resized to fit, but it won't remember its old size if it's moved back
+      to its original monitor.
+
 Automated Testing
 ^^^^^^^^^^^^^^^^^
 
