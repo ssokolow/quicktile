@@ -20,6 +20,30 @@ ICON_PATH = os.path.join(os.path.dirname(__file__), 'icon.svg')
 log = logging.getLogger(__name__)
 
 
+class GeneralConfigPane(Gtk.VBox):
+    def __init__(self, *args, **kwargs):
+        super(GeneralConfigPane, self).__init__(*args, **kwargs)
+
+        self.movements_wrap = Gtk.CheckButton.new_with_label(
+            " *-next and *-prev actions wrap around")
+        self.margin_x = Gtk.SpinButton.new(
+            Gtk.Adjustment(0, 0, 101, 1, 10, 1), 1, 0)
+        self.margin_y = Gtk.SpinButton.new(
+            Gtk.Adjustment(0, 0, 101, 1, 10, 1), 1, 0)
+
+        margin_row = Gtk.HBox()
+        margin_row.pack_start(
+            Gtk.Label(label="Window margins: "), False, False, 0)
+        margin_row.pack_start(self.margin_x, False, False, 0)
+        margin_row.pack_start(Gtk.Label(label=" x "), False, False, 0)
+        margin_row.pack_start(self.margin_y, False, False, 0)
+
+        self.set_border_width(10)
+        self.set_spacing(10)
+        self.pack_start(margin_row, False, False, 0)
+        self.pack_start(self.movements_wrap, False, False, 0)
+
+
 class HotkeyConfigPane(Gtk.ScrolledWindow):
     """Scrolling list of editable keybindings"""
 
@@ -254,8 +278,10 @@ class ConfigDialog(Gtk.Dialog):
                          Gtk.STOCK_OK, Gtk.ResponseType.OK)
         self.set_icon(GdkPixbuf.Pixbuf.new_from_file(ICON_PATH))
 
+        self.general = GeneralConfigPane()
         self.hotkeys = HotkeyConfigPane()
         notebook = Gtk.Notebook()
+        notebook.append_page(self.general, Gtk.Label(label="General"))
         notebook.append_page(self.hotkeys, Gtk.Label(label="Keybindings"))
         self.get_content_area().pack_start(notebook, True, True, 0)
 
