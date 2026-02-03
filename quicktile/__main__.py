@@ -1,5 +1,10 @@
 """Entry point and main loop
 
+Supports both X11 and Wayland (GNOME Shell) sessions.
+
+For Wayland support, install the Window Calls extension:
+https://extensions.gnome.org/extension/4724/window-calls/
+
 .. todo::
  - Audit all of my in-code TODOs for accuracy and staleness.
  - Move :func:`Wnck.set_client_type` call to a more appropriate place
@@ -37,19 +42,15 @@ import errno, logging, os, platform, signal, sys
 from argparse import ArgumentParser
 from importlib.resources import files
 
-from Xlib.display import Display as XDisplay
-from Xlib.error import DisplayConnectionError
-
 import gi
 gi.require_version('GLib', '2.0')
 gi.require_version('Gtk', '3.0')
-gi.require_version('Wnck', '3.0')
-from gi.repository import GLib, Gtk, Wnck
+from gi.repository import GLib, Gtk
 
 from . import commands, gtkexcepthook, layout
 from .config import load_config, XDG_CONFIG_DIR
 from .util import fmt_table, XInitError
-from .wm import WindowManager
+from .wayland_wm import is_wayland
 
 # -- Type-Annotation Imports --
 from typing import Dict
@@ -58,7 +59,12 @@ from typing import Optional  # NOQA pylint: disable=unused-import
 
 __version__ = files("quicktile").joinpath("VERSION").read_text().strip()
 
-Wnck.set_client_type(Wnck.ClientType.PAGER)
+
+def _init_x11():
+    """Initialize X11-specific imports and settings"""
+    gi.require_version('Wnck', '3.0')
+    from gi.repository import Wnck
+    Wnck.set_client_type(Wnck.ClientType.PAGER)
 
 
 class QuickTileApp:
@@ -69,17 +75,20 @@ class QuickTileApp:
         command names.
     :param modmask: A modifier mask to prepend to all ``keys``.
     :param winman: The window manager to invoke commands with so they can act.
+    :param use_wayland: Whether to use Wayland backends.
     """
 
-    def __init__(self, winman: WindowManager,
+    def __init__(self, winman,
                  commands: commands.CommandRegistry,
                  keys: Dict[str, str],
                  modmask: str = '',
+                 use_wayland: bool = False,
                  ):
         self.winman = winman
         self.commands = commands
         self._keys = keys or {}
         self._modmask = modmask or ''
+        self._use_wayland = use_wayland
 
     def run(self) -> bool:
         """Initialize keybinding and D-Bus if available, then call
@@ -88,15 +97,36 @@ class QuickTileApp:
         :returns: :any:`False` if none of the supported backends
             were available.
         """
+        o_keybinder = None
+        dbus_result = None
 
-        # Attempt to set up the global hotkey support
-        try:
-            from . import keybinder  # pylint: disable=C0415
-            o_keybinder: Optional[keybinder.KeyBinder] = keybinder.init(
-                self._modmask, self._keys, self.commands, self.winman)
-        except ImportError:  # pragma: nocover
-            o_keybinder = None
-            logging.error("Could not find python-xlib. Cannot bind keys.")
+        if self._use_wayland:
+            # Use Wayland keybinder
+            try:
+                from .wayland_keybinder import WaylandKeyBinder
+                o_keybinder = WaylandKeyBinder()
+
+                for key, cmd in self._keys.items():
+                    accel = self._modmask + key if self._modmask else key
+                    callback = lambda c=cmd: self.commands.call(c, self.winman)
+                    if o_keybinder.bind(accel, callback):
+                        logging.debug("Bound %s to %s", accel, cmd)
+                    else:
+                        logging.warning("Failed to bind %s to %s", accel, cmd)
+
+                logging.info("Wayland keybindings initialized")
+            except Exception as e:
+                logging.error("Could not initialize Wayland keybinder: %s", e)
+                o_keybinder = None
+        else:
+            # Use X11 keybinder
+            try:
+                from . import keybinder  # pylint: disable=C0415
+                o_keybinder = keybinder.init(
+                    self._modmask, self._keys, self.commands, self.winman)
+            except ImportError:  # pragma: nocover
+                o_keybinder = None
+                logging.error("Could not find python-xlib. Cannot bind keys.")
 
         # Attempt to set up the D-Bus API
         try:
@@ -154,12 +184,13 @@ def argparser() -> ArgumentParser:
         `sphinxcontrib.autoprogram
         <https://sphinxcontrib-autoprogram.readthedocs.io/en/stable/>`_"""
     parser = ArgumentParser(prog='QuickTile',
-        description='Add tiling hotkeys to X11-based desktops')
+        description='Add tiling hotkeys to X11 and Wayland desktops')
     parser.add_argument('-V', '--version', action='version',
             version="%%(prog)s v%s" % __version__)
     parser.add_argument('-d', '--daemonize', action="store_true",
         default=False, help="Attempt to set up global "
-        "keybindings using python-xlib and a D-Bus service using dbus-python. "
+        "keybindings using python-xlib (X11) or GNOME Shell D-Bus (Wayland) "
+        "and a D-Bus service using dbus-python. "
         "Exit if neither succeeds.")
     parser.add_argument('-b', '--bindkeys', action="store_true",
         dest="daemonize", default=False, help="Old alias for --daemonize from "
@@ -204,6 +235,9 @@ def main() -> None:
     logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO,
                         format='%(levelname)s: %(message)s')
 
+    # Detect Wayland session
+    use_wayland = is_wayland()
+
     if args.debug:
         logging.debug("Starting QuickTile v{} on {} under Python v{}".format(
             __version__,
@@ -222,8 +256,10 @@ def main() -> None:
             except OSError:  # pragma: no cover
                 logging.debug("Couldn't identify host distro")
 
-        if 'WAYLAND_DISPLAY' in os.environ:
-            logging.warning("QuickTile appears to be running under Wayland")
+        if use_wayland:
+            logging.info("Running under Wayland - using Wayland backend")
+        else:
+            logging.info("Running under X11 - using X11 backend")
 
     cfg_path = os.path.join(XDG_CONFIG_DIR, 'quicktile.cfg')
     first_run = not os.path.exists(cfg_path)
@@ -238,36 +274,57 @@ def main() -> None:
     )(commands.cycle_dimensions)
     commands.commands.extra_state = {'config': config}
 
-    GLib.log_set_handler('Wnck', GLib.LogLevelFlags.LEVEL_WARNING,
-        wnck_log_filter)
+    if not use_wayland:
+        GLib.log_set_handler('Wnck', GLib.LogLevelFlags.LEVEL_WARNING,
+            wnck_log_filter)
 
     if not args.no_excepthook:
         gtkexcepthook.enable()
 
-    try:
-        x_display = XDisplay()
-    except (UnicodeDecodeError, DisplayConnectionError) as err:
-        raise XInitError("python-xlib failed with %s when asked to open"
-                        " a connection to the X server. Cannot bind keys."
-                        "\n\tIt's unclear why this happens, but it is"
-                        " usually fixed by deleting your ~/.Xauthority"
-                        " file and rebooting."
-                        % err.__class__.__name__)
-
     # Work around a "the Gtk.Application ::startup handler does it for you" bug
     if not Gtk.init_check():
-        raise XInitError("Gtk failed to connect to the X server. Exiting.")
+        raise XInitError("Gtk failed to initialize. Exiting.")
 
-    try:
-        winman = WindowManager(x_display=x_display)
-    except XInitError as err:
-        logging.critical("%s", err)
-        sys.exit(1)
+    if use_wayland:
+        # Use Wayland backend
+        try:
+            from .wayland_wm import WaylandWindowManager
+            winman = WaylandWindowManager()
+            logging.info("Wayland WindowManager initialized")
+        except Exception as err:
+            logging.critical("Failed to initialize Wayland backend: %s", err)
+            logging.critical("Make sure Window Calls extension is installed:")
+            logging.critical("https://extensions.gnome.org/extension/4724/window-calls/")
+            sys.exit(1)
+    else:
+        # Use X11 backend
+        _init_x11()
+
+        from Xlib.display import Display as XDisplay
+        from Xlib.error import DisplayConnectionError
+        from .wm import WindowManager
+
+        try:
+            x_display = XDisplay()
+        except (UnicodeDecodeError, DisplayConnectionError) as err:
+            raise XInitError("python-xlib failed with %s when asked to open"
+                            " a connection to the X server. Cannot bind keys."
+                            "\n\tIt's unclear why this happens, but it is"
+                            " usually fixed by deleting your ~/.Xauthority"
+                            " file and rebooting."
+                            % err.__class__.__name__)
+
+        try:
+            winman = WindowManager(x_display=x_display)
+        except XInitError as err:
+            logging.critical("%s", err)
+            sys.exit(1)
 
     app = QuickTileApp(winman,
                        commands.commands,
                        keys=dict(config.items('keys')),
-                       modmask=config.get('general', 'ModMask'))
+                       modmask=config.get('general', 'ModMask'),
+                       use_wayland=use_wayland)
 
     if args.show_bindings:
         app.show_binds()
@@ -279,12 +336,13 @@ def main() -> None:
         signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         if not app.run():
-            logging.critical("Neither the Xlib nor the D-Bus backends were "
+            logging.critical("Neither the keybinder nor the D-Bus backends were "
                              "available")
             sys.exit(errno.ELIBACC)
     elif not first_run:
-        if args:
-            winman.screen.force_update()
+        if args.command:
+            if not use_wayland:
+                winman.screen.force_update()
 
             for arg in args.command:
                 commands.commands.call(arg, winman)
