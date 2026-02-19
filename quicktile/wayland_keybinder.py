@@ -1,6 +1,6 @@
 """Wayland keybinder using GNOME Shell's GrabAccelerator D-Bus API"""
 
-__author__ = "QuickTile Wayland Adaptation"
+__author__ = "Julio Jiménez (juljimm)"
 __license__ = "GNU GPL 2.0 or later"
 
 import logging
@@ -8,7 +8,7 @@ from typing import Callable, Dict, Optional
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gio, GLib, Gtk, Gdk
+from gi.repository import Gio, GLib, Gtk
 
 
 class WaylandKeyBinder:
@@ -29,6 +29,9 @@ class WaylandKeyBinder:
         self._bindings: Dict[int, Callable] = {}  # action_id -> callback
         self._accel_map: Dict[str, int] = {}  # accelerator -> action_id
         self._proxy: Optional[Gio.DBusProxy] = None
+        #: Set to True when GrabAccelerator returns AccessDenied
+        #: (normal on GNOME 41+ which restricts this API)
+        self.grab_denied = False
         self._init_dbus()
 
     def _init_dbus(self):
@@ -102,7 +105,13 @@ class WaylandKeyBinder:
             return True
 
         except GLib.Error as e:
-            logging.error("Failed to grab accelerator %s: %s", accel, e)
+            # GLib.Error doesn't expose structured D-Bus error names;
+            # string matching is the standard approach in Python GI bindings.
+            if 'AccessDenied' in str(e):
+                self.grab_denied = True
+                logging.debug("GrabAccelerator denied for %s", accel)
+            else:
+                logging.error("Failed to grab accelerator %s: %s", accel, e)
             return False
 
     def unbind(self, accel: str) -> bool:
@@ -163,39 +172,13 @@ class WaylandKeyBinder:
     def _normalize_accel(self, accel: str) -> Optional[str]:
         """Normalize accelerator string for GNOME Shell.
 
-        Converts GTK-style accelerators to GNOME Shell format.
+        Converts GTK-style accelerators to the canonical format
+        expected by GNOME Shell's ``GrabAccelerator``.
         """
-        # Parse with GTK
         key, mods = Gtk.accelerator_parse(accel)
-
         if key == 0:
             return None
-
-        # Get key name
-        keyname = Gdk.keyval_name(key)
-        if not keyname:
-            return None
-
-        # Build GNOME Shell format accelerator
-        parts = []
-
-        if mods & Gdk.ModifierType.CONTROL_MASK:
-            parts.append('<Control>')
-        if mods & Gdk.ModifierType.MOD1_MASK:  # Alt
-            parts.append('<Alt>')
-        if mods & Gdk.ModifierType.SHIFT_MASK:
-            parts.append('<Shift>')
-        if mods & Gdk.ModifierType.SUPER_MASK:
-            parts.append('<Super>')
-
-        parts.append(keyname)
-
-        return ''.join(parts)
-
-    @staticmethod
-    def parse_accel(accel: str):
-        """Parse accelerator string and return (keyval, modmask)"""
-        return Gtk.accelerator_parse(accel)
+        return Gtk.accelerator_name(key, mods) or None
 
 
 def init_wayland_keybinder() -> WaylandKeyBinder:

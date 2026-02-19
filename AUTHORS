@@ -42,6 +42,9 @@ Justin
    Added the "horizontal-maximize", "vertical-maximize", and "move-to-
    center" commands.
 
+Julio Jiménez
+   Added Wayland/GNOME Shell support via the Window Calls extension.
+
 Matthias Putz
    Fixed use of an uninitialized variable in a difficult-to-trigger
    failure case.

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Unit Test Suite for QuickTile Wayland Window Manager"""
 
-__author__ = "QuickTile Contributors"
+__author__ = "Julio Jiménez (juljimm)"
 __license__ = "GNU GPL 2.0 or later"
 
 import json
@@ -9,6 +9,10 @@ import os
 import tempfile
 import unittest
 from unittest.mock import MagicMock, patch
+
+import gi
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gio, GLib
 
 from quicktile.util import Rectangle
 
@@ -153,6 +157,57 @@ class TestPartialMaximize(unittest.TestCase):
         win.maximize_horizontally()
 
         manager.maximize_horizontally.assert_called_once_with(win)
+
+
+class TestInitDbus(unittest.TestCase):
+    """Tests for WaylandWindowManager._init_dbus() initialization"""
+
+    @patch('quicktile.wayland_wm.Gdk')
+    @patch('quicktile.wayland_wm.Gio.DBusProxy.new_for_bus_sync')
+    def test_init_dbus_success(self, mock_new_proxy, mock_gdk):
+        """Constructor succeeds when Window Calls extension responds"""
+        from quicktile.wayland_wm import WaylandWindowManager
+
+        mock_proxy = MagicMock()
+        mock_new_proxy.return_value = mock_proxy
+        mock_gdk.Screen.get_default.return_value = None
+        mock_gdk.Display.get_default.return_value = None
+
+        manager = WaylandWindowManager()
+
+        mock_proxy.call_sync.assert_called_once_with(
+            'List', None, Gio.DBusCallFlags.NONE, -1, None)
+        self.assertIs(manager._proxy, mock_proxy)
+
+    @patch('quicktile.wayland_wm.Gdk')
+    @patch('quicktile.wayland_wm.Gio.DBusProxy.new_for_bus_sync')
+    def test_init_dbus_extension_not_responding(self, mock_new_proxy, mock_gdk):
+        """Constructor raises RuntimeError when List call fails"""
+        from quicktile.wayland_wm import WaylandWindowManager
+
+        mock_proxy = MagicMock()
+        mock_proxy.call_sync.side_effect = GLib.Error('No such interface')
+        mock_new_proxy.return_value = mock_proxy
+        mock_gdk.Screen.get_default.return_value = None
+        mock_gdk.Display.get_default.return_value = None
+
+        with self.assertRaises(RuntimeError) as ctx:
+            WaylandWindowManager()
+        self.assertIn('Window Calls extension not available', str(ctx.exception))
+
+    @patch('quicktile.wayland_wm.Gdk')
+    @patch('quicktile.wayland_wm.Gio.DBusProxy.new_for_bus_sync')
+    def test_init_dbus_proxy_creation_fails(self, mock_new_proxy, mock_gdk):
+        """Constructor raises RuntimeError when proxy creation fails"""
+        from quicktile.wayland_wm import WaylandWindowManager
+
+        mock_new_proxy.side_effect = GLib.Error('DBus connection failed')
+        mock_gdk.Screen.get_default.return_value = None
+        mock_gdk.Display.get_default.return_value = None
+
+        with self.assertRaises(RuntimeError) as ctx:
+            WaylandWindowManager()
+        self.assertIn('Window Calls extension not available', str(ctx.exception))
 
 
 if __name__ == '__main__':

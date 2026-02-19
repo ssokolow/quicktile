@@ -38,50 +38,15 @@ Now that PyGObject is available on PyPI, other options are being explored.
 Consult the `Installation <http://ssokolow.com/quicktile/installation.html>`_
 section of the manual for full details and alternative installation options.
 
-Wayland/GNOME Support
----------------------
+Wayland Support (GNOME Shell only, Beta)
+-----------------------------------------
 
-QuickTile now supports GNOME on Wayland using the Window Calls extension.
+**Note:** Wayland support is currently limited to GNOME Shell, is in beta,
+and is maintained on a best-effort basis. It requires the third-party
+`Window Calls <https://extensions.gnome.org/extension/4724/window-calls/>`_
+extension.
 
-**Requirements:**
-
-- GNOME Shell
-- `Window Calls <https://extensions.gnome.org/extension/4724/window-calls/>`_ extension
-
-**Installation:**
-
-.. code:: sh
-
-    # 1. Install dependencies (Debian/Ubuntu)
-    sudo apt install python3 python3-pip python3-setuptools python3-gi \
-        python3-xlib python3-dbus gir1.2-glib-2.0 gir1.2-gtk-3.0 \
-        gir1.2-wnck-3.0 pipx git
-
-    # 2. Install Window Calls extension from extensions.gnome.org
-
-    # 3. Clone and install
-    git clone https://github.com/ssokolow/quicktile.git ~/.local/src/quicktile
-    pipx install ~/.local/src/quicktile --system-site-packages
-
-    # 4. Generate default configuration
-    quicktile
-
-    # 5. Setup GNOME custom keybindings
-    ~/.local/src/quicktile/setup-wayland-keybindings.sh
-
-Or use the one-line installer:
-
-.. code:: sh
-
-    curl -fsSL https://raw.githubusercontent.com/ssokolow/quicktile/master/install-wayland.sh | bash
-
-**Note:** On Wayland, QuickTile cannot capture global hotkeys directly.
-Instead, GNOME custom keybindings are used to invoke QuickTile commands.
-
-See ``WAYLAND.md`` for detailed documentation.
-
-X11 Installation
-----------------
+See ``WAYLAND.md`` for installation instructions and detailed documentation.
 
 **First-Run Instructions for Global Hotkeys:**
 

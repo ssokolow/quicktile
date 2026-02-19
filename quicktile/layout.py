@@ -207,9 +207,8 @@ def make_winsplit_positions(columns: int,
     cycle_steps = tuple(round(col_width * x, 10)
                         for x in range(1, columns))
 
-    # Sort steps from smallest to largest
-    center_steps = tuple(sorted(set((1.0,) + cycle_steps)))
-    edge_steps = tuple(sorted(set((0.5,) + cycle_steps)))
+    center_steps = (1.0,) + cycle_steps
+    edge_steps = (0.5,) + cycle_steps
 
     positions = {
         'center': [gvlay(width, 1, 'center') for width in center_steps],

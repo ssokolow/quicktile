@@ -53,8 +53,10 @@ from .util import fmt_table, XInitError
 from .wayland_wm import is_wayland
 
 # -- Type-Annotation Imports --
-from typing import Dict
+from typing import Dict, Union
 from typing import Optional  # NOQA pylint: disable=unused-import
+from .wm import WindowManager  # NOQA pylint: disable=unused-import
+from .wayland_wm import WaylandWindowManager  # NOQA pylint: disable=unused-import
 # --
 
 __version__ = files("quicktile").joinpath("VERSION").read_text().strip()
@@ -78,7 +80,7 @@ class QuickTileApp:
     :param use_wayland: Whether to use Wayland backends.
     """
 
-    def __init__(self, winman,
+    def __init__(self, winman: 'Union[WindowManager, WaylandWindowManager]',
                  commands: commands.CommandRegistry,
                  keys: Dict[str, str],
                  modmask: str = '',
@@ -90,10 +92,12 @@ class QuickTileApp:
         self._modmask = modmask or ''
         self._use_wayland = use_wayland
 
-    def run(self) -> bool:
+    def run(self, daemonize: bool = False) -> bool:
         """Initialize keybinding and D-Bus if available, then call
         :func:`Gtk.main`.
 
+        :param daemonize: If :any:`True`, fork to the background before
+            entering the main loop so the calling shell gets its prompt back.
         :returns: :any:`False` if none of the supported backends
             were available.
         """
@@ -106,15 +110,31 @@ class QuickTileApp:
                 from .wayland_keybinder import WaylandKeyBinder
                 o_keybinder = WaylandKeyBinder()
 
+                bound_count = 0
                 for key, cmd in self._keys.items():
                     accel = self._modmask + key if self._modmask else key
                     callback = lambda c=cmd: self.commands.call(c, self.winman)
                     if o_keybinder.bind(accel, callback):
                         logging.debug("Bound %s to %s", accel, cmd)
-                    else:
-                        logging.warning("Failed to bind %s to %s", accel, cmd)
+                        bound_count += 1
 
-                logging.info("Wayland keybindings initialized")
+                if o_keybinder.grab_denied:
+                    logging.warning(
+                        "GNOME Shell blocked GrabAccelerator (normal on "
+                        "GNOME 41+). Hotkey capture in --daemonize is not "
+                        "supported on this version.\n"
+                        "  To use keyboard shortcuts, run "
+                        "setup-wayland-keybindings.sh from the QuickTile "
+                        "source directory.\n"
+                        "  Re-run it after any changes to quicktile.cfg.\n"
+                        "  The D-Bus service will still be available.")
+                    o_keybinder = None
+                elif bound_count == 0:
+                    logging.warning("No keybindings were registered")
+                    o_keybinder = None
+                else:
+                    logging.info("Wayland keybindings initialized "
+                                 "(%d bindings)", bound_count)
             except Exception as e:
                 logging.error("Could not initialize Wayland keybinder: %s", e)
                 o_keybinder = None
@@ -140,6 +160,15 @@ class QuickTileApp:
 
         # If either persistent backend loaded, start the GTK main loop.
         if o_keybinder or dbus_result:
+            if daemonize:
+                pid = os.fork()
+                if pid > 0:
+                    logging.info("Forked to background (PID %d)", pid)
+                    return True
+                # Child: start a new session so we don't get killed
+                # when the terminal closes
+                os.setsid()
+
             try:
                 Gtk.main()
             except KeyboardInterrupt:
@@ -292,9 +321,25 @@ def main() -> None:
             winman = WaylandWindowManager()
             logging.info("Wayland WindowManager initialized")
         except Exception as err:
-            logging.critical("Failed to initialize Wayland backend: %s", err)
-            logging.critical("Make sure Window Calls extension is installed:")
-            logging.critical("https://extensions.gnome.org/extension/4724/window-calls/")
+            msg = ("Failed to initialize Wayland backend: %s\n\n"
+                   "Make sure the Window Calls GNOME extension is "
+                   "installed:\nhttps://extensions.gnome.org/"
+                   "extension/4724/window-calls/"
+                   % err)
+            logging.critical("%s", msg)
+            try:
+                dialog = Gtk.MessageDialog(
+                    transient_for=None, flags=0,
+                    message_type=Gtk.MessageType.ERROR,
+                    buttons=Gtk.ButtonsType.CLOSE)
+                dialog.set_title("QuickTile")
+                dialog.set_markup(
+                    "<b>Wayland backend unavailable</b>")
+                dialog.format_secondary_text(str(msg))
+                dialog.run()
+                dialog.destroy()
+            except Exception as err:
+                logging.debug("Could not show error dialog: %s", err)
             sys.exit(1)
     else:
         # Use X11 backend
@@ -335,7 +380,7 @@ def main() -> None:
         # Restore PyGTK-like Ctrl+C behaviour for easy development
         signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-        if not app.run():
+        if not app.run(daemonize=True):
             logging.critical("Neither the keybinder nor the D-Bus backends were "
                              "available")
             sys.exit(errno.ELIBACC)

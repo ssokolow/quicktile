@@ -1,10 +1,21 @@
 #!/bin/bash
 # Setup QuickTile keybindings for GNOME Wayland using custom shortcuts
 
-QUICKTILE="/home/leone/apps/quicktile/run-quicktile.sh"
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 SCHEMA="org.gnome.settings-daemon.plugins.media-keys"
 CUSTOM_SCHEMA="org.gnome.settings-daemon.plugins.media-keys.custom-keybinding"
 PATH_BASE="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings"
+
+if ! command -v gsettings &> /dev/null; then
+    echo "Error: gsettings not found. This script requires GNOME."
+    exit 1
+fi
+
+QUICKTILE="$SCRIPT_DIR/quicktile.sh"
+if [ ! -f "$QUICKTILE" ]; then
+    echo "Error: quicktile.sh not found at $QUICKTILE"
+    exit 1
+fi
 
 # Read keybindings from quicktile config
 CONFIG="$HOME/.config/quicktile.cfg"
@@ -35,26 +46,37 @@ echo ""
 MODMASK=$(grep -E "^ModMask\s*=" "$CONFIG" | sed 's/ModMask\s*=\s*//' | tr -d ' ')
 echo "Using modifier: $MODMASK"
 
-# Define keybindings array (key:command)
-declare -a BINDINGS=(
-    "C:move-to-center"
-    "F:fullscreen"
-    "V:vertical-maximize"
-    "H:horizontal-maximize"
-    "Up:maximize"
-    "Down:minimize"
-    "B:bordered"
-    "K:left"
-    "L:center"
-    "ntilde:right"
-    "I:top-left"
-    "O:top"
-    "P:top-right"
-    "slash:bottom-right"
-    "comma:bottom-left"
-    "period:bottom"
-    "semicolon:right"
-)
+# Read keybindings from the [keys] section of the config
+declare -a BINDINGS=()
+in_keys=false
+while IFS= read -r line; do
+    # Detect [keys] section
+    if [[ "$line" =~ ^\[keys\] ]]; then
+        in_keys=true
+        continue
+    fi
+    # Exit when another section starts
+    if [[ "$line" =~ ^\[.+\] ]]; then
+        in_keys=false
+        continue
+    fi
+    if $in_keys; then
+        # Skip comments and empty lines
+        [[ "$line" =~ ^[[:space:]]*[#\;] ]] && continue
+        [[ -z "${line// }" ]] && continue
+        # Parse "key = command"
+        key=$(echo "$line" | sed 's/\s*=.*//' | tr -d ' ')
+        cmd=$(echo "$line" | sed 's/^[^=]*=\s*//' | tr -d ' ')
+        [ -n "$key" ] && [ -n "$cmd" ] && BINDINGS+=("$key:$cmd")
+    fi
+done < "$CONFIG"
+
+if [ ${#BINDINGS[@]} -eq 0 ]; then
+    echo "No keybindings found in [keys] section of $CONFIG"
+    exit 1
+fi
+
+echo "Found ${#BINDINGS[@]} keybindings in config"
 
 # Build paths array
 PATHS=()

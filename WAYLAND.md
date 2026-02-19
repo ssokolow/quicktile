@@ -1,5 +1,8 @@
 # QuickTile Wayland/GNOME Support
 
+**Note:** Wayland support is currently limited to GNOME Shell, is in beta,
+and is maintained on a best-effort basis.
+
 This document describes how to use QuickTile on GNOME with Wayland.
 
 ## Overview
@@ -15,16 +18,9 @@ moving windows arbitrarily. QuickTile overcomes these limitations using:
 
 - GNOME Shell (tested on GNOME 42+)
 - [Window Calls](https://extensions.gnome.org/extension/4724/window-calls/) extension
+  (required on **all** GNOME versions for window management via D-Bus)
 
 ## Installation
-
-### Quick Install (One-Line)
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/ssokolow/quicktile/master/install-wayland.sh | bash
-```
-
-### Manual Installation
 
 1. **Install system dependencies:**
 
@@ -93,6 +89,11 @@ After editing, re-run the keybindings setup:
 ~/.local/src/quicktile/setup-wayland-keybindings.sh
 ```
 
+> **Note:** Keybindings are managed by GNOME's custom shortcuts system, not by
+> QuickTile's daemon. After any change to `quicktile.cfg` (keys or modifier),
+> you must re-run `setup-wayland-keybindings.sh` for changes to take effect.
+> Simply restarting QuickTile is not sufficient.
+
 ## Default Keybindings
 
 All keybindings use `Ctrl+Alt` as modifier:
@@ -129,17 +130,19 @@ through the Window Calls extension. It can:
 
 ### Keybinding Integration
 
-Since Wayland prevents global hotkey capture, QuickTile uses GNOME's custom
-keybindings system. The `setup-wayland-keybindings.sh` script:
+Wayland's security model prevents applications from capturing global hotkeys
+directly. QuickTile supports two approaches depending on your GNOME version:
 
-1. Clears any conflicting Tiling Assistant keybindings
-2. Registers custom keybindings in `org.gnome.settings-daemon.plugins.media-keys`
-3. Each keybinding runs `quicktile <command>`
+QuickTile uses GNOME's custom keybindings via `gsettings`. The
+`setup-wayland-keybindings.sh` script registers shortcuts in
+`org.gnome.settings-daemon.plugins.media-keys` that invoke
+`quicktile <command>`.
 
 ### State Persistence
 
 Window state (for features like cycle position and maximize toggle) is stored
-in `$XDG_RUNTIME_DIR/quicktile-wayland-state.json`.
+in `$XDG_RUNTIME_DIR/quicktile/wayland-state.json`. If `XDG_RUNTIME_DIR` is
+not set, QuickTile falls back to `/tmp/quicktile-<uid>/wayland-state.json`.
 
 ## Troubleshooting
 
@@ -161,7 +164,7 @@ in `$XDG_RUNTIME_DIR/quicktile-wayland-state.json`.
 
 1. Test QuickTile manually:
    ```bash
-   ~/.local/src/quicktile/run-quicktile.sh left
+   ~/.local/src/quicktile/quicktile.sh left
    ```
 
 2. Check if Window Calls is responding:
@@ -184,15 +187,14 @@ gsettings set org.gnome.shell.extensions.tiling-assistant tile-right-half "[]"
 
 ## Limitations
 
-- **No daemon mode:** On Wayland, QuickTile runs per-invocation instead of as
-  a persistent daemon
-- **GNOME only:** This implementation is specific to GNOME Shell
+- **No native hotkey daemon:** QuickTile relies on GNOME custom keybindings
+  (via `setup-wayland-keybindings.sh`) to trigger commands per-invocation.
+- **GNOME only:** This implementation is specific to GNOME Shell.
 - **Some features unavailable:** Window shading, always-on-top, and pinning
-  are not supported in Wayland
+  are not supported under Wayland.
 
 ## Files
 
 - `quicktile/wayland_wm.py` - Wayland window manager implementation
+- `quicktile/wayland_keybinder.py` - Wayland keybinder (GNOME Shell GrabAccelerator D-Bus API)
 - `setup-wayland-keybindings.sh` - GNOME keybindings configuration script
-- `run-quicktile.sh` - Wrapper script for running QuickTile
-- `install.sh` - Automated installer

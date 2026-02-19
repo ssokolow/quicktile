@@ -1,12 +1,12 @@
 """Window manager wrapper for Wayland using GNOME Shell D-Bus APIs"""
 
-__author__ = "QuickTile Wayland Adaptation"
+__author__ = "Julio Jiménez (juljimm)"
 __license__ = "GNU GPL 2.0 or later"
 
 import logging
 import json
 import os
-import subprocess
+import tempfile
 from typing import Any, Dict, List, Optional, Tuple
 
 import gi
@@ -168,7 +168,8 @@ class WaylandWindowManager:
         self.usable_region = UsableRegion()
         self._proxy = None
         self._state_storage: Dict[int, Any] = {}
-        self._top_bar_height = self._detect_top_bar_height()
+        self._state_file = self._get_state_file_path()
+        self._panel_offsets = self._detect_panel_offsets()
 
         # Compatibility attributes
         self.gdk_screen = Gdk.Screen.get_default()
@@ -177,19 +178,107 @@ class WaylandWindowManager:
         self._init_dbus()
         self.update_geometry_cache()
 
-    def _detect_top_bar_height(self) -> int:
-        """Detect GNOME top bar height based on display scale"""
+    @staticmethod
+    def _detect_dock_settings() -> Optional[Dict[str, Any]]:
+        """Detect Ubuntu/GNOME dock configuration via GSettings.
+
+        Checks that a dock extension (``ubuntu-dock`` or ``dash-to-dock``)
+        is both installed *and* listed in the GNOME Shell enabled-extensions,
+        then reads its position and icon size.
+
+        Returns ``{'position': str, 'size': int}`` or ``None``.
+        """
+        # Map GSettings schema → possible extension UUIDs.
+        # Ubuntu Dock is a fork of dash-to-dock and reuses its schema.
+        dock_extensions = [
+            ('org.gnome.shell.extensions.ubuntu-dock',
+             ['ubuntu-dock@ubuntu.com']),
+            ('org.gnome.shell.extensions.dash-to-dock',
+             ['dash-to-dock@micxgx.gmail.com', 'ubuntu-dock@ubuntu.com']),
+        ]
+
+        schema_source = Gio.SettingsSchemaSource.get_default()
+        if not schema_source:
+            return None
+
+        # Read the list of enabled extensions once
+        enabled = set()
+        shell_schema = schema_source.lookup('org.gnome.shell', True)
+        if shell_schema:
+            try:
+                shell_settings = Gio.Settings.new('org.gnome.shell')
+                enabled = set(shell_settings.get_strv('enabled-extensions'))
+            except Exception:
+                pass
+
+        for schema_id, ext_uuids in dock_extensions:
+            schema = schema_source.lookup(schema_id, True)
+            if not schema:
+                continue
+            if enabled and not enabled.intersection(ext_uuids):
+                logging.debug("Dock schema %s found but none of %s "
+                              "enabled", schema_id, ext_uuids)
+                continue
+            try:
+                settings = Gio.Settings.new(schema_id)
+                position = settings.get_string('dock-position')
+                icon_size = settings.get_int('dash-max-icon-size')
+                dock_size = icon_size + 16
+
+                logging.debug("Dock detected: position=%s, icon_size=%d, "
+                              "dock_size=%d (schema=%s)",
+                              position, icon_size, dock_size, schema_id)
+                return {'position': position.upper(), 'size': dock_size}
+            except Exception as e:
+                logging.debug("Could not read dock settings from %s: %s",
+                              schema_id, e)
+        return None
+
+    def _detect_panel_offsets(self) -> Dict[str, int]:
+        """Detect offsets for all screen edges (top bar + dock).
+
+        Strategy:
+        1. Start from GDK ``get_workarea()`` vs ``get_geometry()`` deltas.
+        2. Supplement with dock info from GSettings on any edge where GDK
+           reported zero (GDK often detects the top bar but misses the dock).
+        3. If GDK detected nothing at all, assume 32 px GNOME top bar.
+        """
+        offsets = {'top': 0, 'bottom': 0, 'left': 0, 'right': 0}
+        gdk_detected_any = False
+
         display = Gdk.Display.get_default()
         if display and display.get_n_monitors() > 0:
-            for i in range(display.get_n_monitors()):
-                monitor = display.get_monitor(i)
-                geom = monitor.get_geometry()
-                if geom.y == 0:
-                    scale = monitor.get_scale_factor()
-                    if geom.height > 1440 and scale == 1:
-                        return 32  # HiDPI: 64 / 2
-                    return 16 * scale  # Normal: 32 / 2
-        return 16
+            monitor = display.get_monitor(0)
+            geom = monitor.get_geometry()
+            workarea = monitor.get_workarea()
+
+            gdk_top = workarea.y - geom.y
+            gdk_bottom = (geom.y + geom.height) - (workarea.y + workarea.height)
+            gdk_left = workarea.x - geom.x
+            gdk_right = (geom.x + geom.width) - (workarea.x + workarea.width)
+
+            if gdk_top or gdk_bottom or gdk_left or gdk_right:
+                gdk_detected_any = True
+                offsets = {
+                    'top': max(gdk_top, 0),
+                    'bottom': max(gdk_bottom, 0),
+                    'left': max(gdk_left, 0),
+                    'right': max(gdk_right, 0),
+                }
+
+        if not gdk_detected_any:
+            offsets['top'] = 32
+
+        # Supplement with dock from GSettings on edges GDK missed
+        dock = self._detect_dock_settings()
+        if dock:
+            edge = dock['position'].lower()
+            if edge in offsets and offsets[edge] == 0:
+                offsets[edge] = dock['size']
+
+        logging.debug("Panel offsets (gdk_detected=%s): %s",
+                      gdk_detected_any, offsets)
+        return offsets
 
     def _init_dbus(self):
         """Initialize D-Bus connection to Window Calls extension"""
@@ -203,6 +292,9 @@ class WaylandWindowManager:
                 self.DBUS_INTERFACE,
                 None
             )
+            # Validate that the extension is actually responding
+            self._proxy.call_sync(
+                'List', None, Gio.DBusCallFlags.NONE, -1, None)
             logging.info("Connected to Window Calls extension via D-Bus")
         except GLib.Error as e:
             logging.error("Failed to connect to Window Calls extension: %s", e)
@@ -264,7 +356,6 @@ class WaylandWindowManager:
 
         for i in range(n_monitors):
             monitor = display.get_monitor(i)
-            geom = monitor.get_geometry()
             workarea = monitor.get_workarea()
 
             monitors.append(Rectangle(
@@ -315,20 +406,12 @@ class WaylandWindowManager:
                 geom = monitor.get_geometry()
                 if (geom.x <= center_x < geom.x + geom.width and
                     geom.y <= center_y < geom.y + geom.height):
-                    workarea = monitor.get_workarea()
-
-                    # Adjust for GNOME top bar if workarea doesn't account for it
-                    # (Wayland often doesn't report correct workarea)
-                    top_offset = 0
-                    if geom.y == 0 and workarea.y == 0:
-                        # Monitor at top of screen - apply top bar offset
-                        top_offset = self._top_bar_height
-
+                    off = self._panel_offsets
                     return i, Rectangle(
-                        x=workarea.x,
-                        y=workarea.y + top_offset,
-                        width=workarea.width,
-                        height=workarea.height - top_offset
+                        x=geom.x + off['left'],
+                        y=geom.y + off['top'],
+                        width=geom.width - off['left'] - off['right'],
+                        height=geom.height - off['top'] - off['bottom'],
                     )
 
         # Fallback to first monitor
@@ -501,16 +584,43 @@ class WaylandWindowManager:
         self._call_dbus("MoveToWorkspace", win.id, workspace)
 
     # State storage (replaces X11 properties)
-    # Use a file to persist state between invocations
-    _STATE_FILE = os.path.join(os.environ.get('XDG_RUNTIME_DIR', '/tmp'),
-                                'quicktile-wayland-state.json')
+
+    def _get_state_file_path(self) -> str:
+        """Determine the path for the state persistence file.
+
+        Handles ``XDG_RUNTIME_DIR`` not being set and creates the
+        containing directory with appropriate permissions per the
+        `XDG Base Directory specification
+        <https://wiki.archlinux.org/title/XDG_Base_Directory>`_.
+        """
+        runtime_dir = os.environ.get('XDG_RUNTIME_DIR')
+        if runtime_dir and os.path.isdir(runtime_dir):
+            state_dir = os.path.join(runtime_dir, 'quicktile')
+        else:
+            state_dir = os.path.join(
+                tempfile.gettempdir(),
+                'quicktile-{}'.format(os.getuid()))
+
+        os.makedirs(state_dir, mode=0o700, exist_ok=True)
+        path = os.path.join(state_dir, 'wayland-state.json')
+
+        # Set sticky bit per XDG spec to prevent periodic cleanup
+        try:
+            os.chmod(state_dir, 0o1700)
+        except OSError as err:
+            logging.debug("Could not set sticky bit on %s: %s", state_dir, err)
+
+        return path
 
     def _load_state(self) -> Dict:
         """Load state from file"""
         try:
-            if os.path.exists(self._STATE_FILE):
-                with open(self._STATE_FILE, 'r') as f:
-                    return json.load(f)
+            if os.path.exists(self._state_file):
+                with open(self._state_file, 'r') as f:
+                    state = json.load(f)
+                # Touch the file to maintain mtime
+                os.utime(self._state_file)
+                return state
         except (json.JSONDecodeError, IOError) as e:
             logging.debug("Could not load state: %s", e)
         return {}
@@ -518,7 +628,7 @@ class WaylandWindowManager:
     def _save_state(self, state: Dict):
         """Save state to file"""
         try:
-            with open(self._STATE_FILE, 'w') as f:
+            with open(self._state_file, 'w') as f:
                 json.dump(state, f)
         except IOError as e:
             logging.error("Could not save state: %s", e)
@@ -591,7 +701,6 @@ class WaylandWindowManager:
 
 def is_wayland() -> bool:
     """Check if running under Wayland"""
-    import os
     session_type = os.environ.get('XDG_SESSION_TYPE', '').lower()
     wayland_display = os.environ.get('WAYLAND_DISPLAY', '')
     return session_type == 'wayland' or bool(wayland_display)

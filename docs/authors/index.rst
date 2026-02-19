@@ -48,6 +48,9 @@ Justin
     Added the ``horizontal-maximize``, ``vertical-maximize``, and
     ``move-to-center`` commands.
 
+`Julio Jiménez`_
+    Added Wayland/GNOME Shell support via the Window Calls extension.
+
 `Matthias Putz`_
     Fixed use of an uninitialized variable in a difficult-to-trigger failure
     case.
@@ -157,6 +160,7 @@ only to display favicon-style links to their owners' websites.
 .. _Fritz Reichwald: https://github.com/fiete201
 .. _Gui Ambros: https://github.com/guiambros
 .. _Gustavo J A M Carneiro: https://github.com/gjcarneiro
+.. _Julio Jiménez: https://github.com/juljimm
 .. _Mark James: https://twitter.com/markjames
 .. _Matthias Putz: https://github.com/mputz86
 .. _Max Weiß: https://github.com/wmax
