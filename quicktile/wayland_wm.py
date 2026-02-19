@@ -221,6 +221,12 @@ class WaylandWindowManager:
                 continue
             try:
                 settings = Gio.Settings.new(schema_id)
+                dock_fixed = settings.get_boolean('dock-fixed')
+                if not dock_fixed:
+                    logging.debug("Dock is not fixed (auto-hide active), "
+                                  "skipping reservation (schema=%s)",
+                                  schema_id)
+                    return None
                 position = settings.get_string('dock-position')
                 icon_size = settings.get_int('dash-max-icon-size')
                 dock_size = icon_size + 16
