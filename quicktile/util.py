@@ -783,6 +783,21 @@ class Rectangle(_Rectangle):
         gdk_rect.height = self.height
         return gdk_rect
 
+    def center_in(self, other: 'Rectangle') -> 'Rectangle':
+        """Return a copy of ``self`` centered within ``other``.
+
+        .. doctest::
+
+            >>> monitor = Rectangle(0, 0, 1000, 800)
+            >>> window = Rectangle(0, 0, 200, 100)
+            >>> window.center_in(monitor)
+            Rectangle(x=400, y=350, width=200, height=100)
+        """
+        return Rectangle(
+            x=other.x + (other.width - self.width) // 2,
+            y=other.y + (other.height - self.height) // 2,
+            width=self.width, height=self.height)
+
 
 # Keep _Rectangle from showing up in automated documentation
 del _Rectangle

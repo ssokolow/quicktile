@@ -539,6 +539,79 @@ class TestRectangle(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual(self.rect1.y2, self.rect1.y + self.rect1.height)
 
 
+class TestRectangle_center_in(unittest.TestCase):
+    """Tests for Rectangle.center_in"""
+
+    def setUp(self):
+        self.monitor = Rectangle(0, 0, 1000, 800)
+
+    def test_center_in_basic(self):
+        """center_in: basic centering within monitor"""
+        window = Rectangle(0, 0, 200, 100)
+        result = window.center_in(self.monitor)
+        self.assertEqual(result, Rectangle(x=400, y=350, width=200, height=100))
+
+    def test_center_in_with_offset(self):
+        """center_in: centering when monitor has non-zero origin"""
+        monitor_offset = Rectangle(1920, 0, 1920, 1080)
+        window = Rectangle(0, 0, 400, 300)
+        result = window.center_in(monitor_offset)
+        self.assertEqual(result, Rectangle(x=2680, y=390, width=400, height=300))
+
+    def test_center_in_odd_dimensions(self):
+        """center_in: rounding behavior with odd dimensions"""
+        monitor = Rectangle(0, 0, 1001, 801)
+        window = Rectangle(0, 0, 3, 3)
+        result = window.center_in(monitor)
+        self.assertEqual(result, Rectangle(x=499, y=399, width=3, height=3))
+
+    def test_center_in_fullscreen(self):
+        """center_in: window same size as monitor"""
+        window = Rectangle(0, 0, 1000, 800)
+        result = window.center_in(self.monitor)
+        self.assertEqual(result, Rectangle(x=0, y=0, width=1000, height=800))
+
+
+class TestCalculateOptimalGrid(unittest.TestCase):
+    """Tests for _calculate_optimal_grid"""
+
+    def setUp(self):
+        from quicktile.commands import _calculate_optimal_grid
+        self.func = _calculate_optimal_grid
+
+    def test_single_window(self):
+        """_calculate_optimal_grid: single window returns 1x1"""
+        self.assertEqual(self.func(1, 1920, 1080), (1, 1))
+
+    def test_two_windows(self):
+        """_calculate_optimal_grid: two windows"""
+        cols, rows = self.func(2, 1920, 1080)
+        self.assertEqual(cols * rows, 2)
+        self.assertGreaterEqual(cols, 1)
+        self.assertGreaterEqual(rows, 1)
+
+    def test_four_windows_wide(self):
+        """_calculate_optimal_grid: four windows on wide screen"""
+        cols, rows = self.func(4, 1920, 1080)
+        self.assertEqual(cols * rows, 4)
+        self.assertLessEqual(cols, 4)
+        self.assertLessEqual(rows, 4)
+
+    def test_three_windows(self):
+        """_calculate_optimal_grid: three windows"""
+        cols, rows = self.func(3, 1920, 1080)
+        self.assertGreaterEqual(cols * rows, 3)
+
+    def test_aspect_ratio_preserved(self):
+        """_calculate_optimal_grid: grid cells approximate screen aspect ratio"""
+        cols, rows = self.func(6, 1920, 1080)
+        self.assertEqual(cols * rows, 6)
+        cell_ratio = (1920 / cols) / (1080 / rows)
+        screen_ratio = 1920 / 1080
+        diff = abs(cell_ratio - screen_ratio)
+        self.assertLess(diff, 1.0)
+
+
 class TestUsableRegion(unittest.TestCase):
     """Tests for my per-monitor ``_NET_WORKAREA`` calculation class"""
 

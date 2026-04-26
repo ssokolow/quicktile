@@ -159,8 +159,8 @@ class GravityLayout(object):  # pylint: disable=too-few-public-methods
             :class:`quicktile.util.Rectangle`.
         """
 
-        x = x or self.GRAVITIES[gravity].value[0]
-        y = y or self.GRAVITIES[gravity].value[1]
+        x = self.GRAVITIES[gravity].value[0] if x is None else x
+        y = self.GRAVITIES[gravity].value[1] if y is None else y
         offset_x = width * self.GRAVITIES[gravity].value[0]
         offset_y = height * self.GRAVITIES[gravity].value[1]
 

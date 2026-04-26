@@ -11,7 +11,7 @@ __license__ = "GNU GPL 2.0 or later"
 # pylint: disable=unsubscriptable-object,invalid-sequence-index
 # pylint: disable=wrong-import-order
 
-import logging, time
+import logging, math, time
 from functools import wraps
 
 from Xlib import Xatom
@@ -120,6 +120,9 @@ class CommandRegistry:
 
         def decorate(func: CommandCB) -> CommandCB:
             """Closure used to allow decorator to take arguments"""
+            # Extract windowless before wrapper so it's stable across calls
+            windowless = p_kwargs.pop('windowless', False)
+
             @wraps(func)
             # pylint: disable=missing-docstring,keyword-arg-before-vararg
             def wrapper(winman: WindowManager,
@@ -133,11 +136,6 @@ class CommandRegistry:
                 state = {}
                 state.update(self.extra_state)
                 state["cmd_name"] = name
-
-                # FIXME: Refactor to avoid this hack
-                windowless = p_kwargs.get('windowless', False)
-                if 'windowless' in p_kwargs:
-                    del p_kwargs['windowless']
 
                 # Bail out early on None or things like the desktop window
                 if not (windowless or self.get_window_meta(
@@ -387,14 +385,15 @@ def move_to_position(winman: WindowManager,
     monitor_rect = state['monitor_geom']
     win_rect = Rectangle(*win.get_geometry())
 
-    # Build a target rectangle
-    # TODO: Think about ways to refactor scaling for better maintainability
-    target = Rectangle(
-        x=gravity.value[0] * monitor_rect.width,
-        y=gravity.value[1] * monitor_rect.height,
-        width=win_rect.width,
-        height=win_rect.height
-    ).from_gravity(gravity).from_relative(monitor_rect)
+    if gravity == Gravity.CENTER:
+        target = win_rect.center_in(monitor_rect)
+    else:
+        target = Rectangle(
+            x=gravity.value[0] * monitor_rect.width,
+            y=gravity.value[1] * monitor_rect.height,
+            width=win_rect.width,
+            height=win_rect.height
+        ).from_gravity(gravity).from_relative(monitor_rect)
 
     # Push it out from under any panels
     logging.debug("Clipping rectangle %r\n\tto usable region %r",
@@ -585,5 +584,196 @@ def workspace_send_window(
         return
 
     win.move_to_workspace(target)
+
+
+@commands.add('cascade')
+def cascade_windows(
+        winman: WindowManager,
+        win: Wnck.Window,
+        state: Dict[str, Any]
+) -> None:
+    """Cascade all visible windows on the current workspace.
+
+    Arranges windows in a diagonal stair-step pattern starting from the
+    top-left of the usable screen area. Each window is offset by 25 pixels
+    from the previous one.
+
+    :param winman: The WindowManager instance.
+    :param win: The currently active window (used to determine workspace).
+    :param state: Command state dictionary.
+    """
+    curr_workspace = win.get_workspace()
+    if not curr_workspace:
+        logging.debug("Cannot cascade: no current workspace")
+        return
+
+    # Get all relevant windows on the current workspace
+    windows = list(winman.get_relevant_windows(curr_workspace))
+
+    if not windows:
+        logging.debug("No windows to cascade")
+        return
+
+    # Sort windows so active window comes last (appears on top)
+    active = winman.screen.get_active_window()
+    windows.sort(key=lambda w: 1 if w == active else 0)
+
+    # Get monitor geometry from state (respects panels)
+    monitor_geom = state.get('monitor_geom')
+    if not monitor_geom:
+        logging.debug("No monitor geometry available")
+        return
+
+    offset = 25  # pixels
+
+    logging.debug("Cascading %d windows starting at %r",
+                  len(windows), monitor_geom)
+
+    for i, window in enumerate(windows):
+        # Get current window geometry
+        geom = window.get_geometry()
+        win_rect = Rectangle(*geom)
+
+        # Calculate cascade position
+        new_x = monitor_geom.x + (i * offset)
+        new_y = monitor_geom.y + (i * offset)
+
+        # Create target rectangle (preserve original size)
+        target = Rectangle(new_x, new_y, win_rect.width, win_rect.height)
+
+        # Make sure window is visible (de-minimize if needed)
+        if window.is_minimized():
+            window.unminimize(Gdk.CURRENT_TIME)
+
+        # Unshade if shaded
+        if window.is_shaded():
+            window.unshade()
+
+        logging.debug("Cascading window %r to %r", window, target)
+
+        # Reposition window (unmaximize first if maximized)
+        if window.is_maximized():
+            window.unmaximize()
+
+        winman.reposition(window, target)
+
+
+@commands.add('tile-all')
+def tile_all_windows(
+        winman: WindowManager,
+        win: Wnck.Window,
+        state: Dict[str, Any]
+) -> None:
+    """Tile all visible windows in a grid layout.
+
+    Resizes and positions windows to fill the usable screen area in an
+    optimal grid arrangement. Grid dimensions are calculated based on
+    window count and screen aspect ratio.
+
+    :param winman: The WindowManager instance.
+    :param win: The currently active window (used to determine workspace).
+    :param state: Command state dictionary.
+    """
+    curr_workspace = win.get_workspace()
+    if not curr_workspace:
+        logging.debug("Cannot tile: no current workspace")
+        return
+
+    # Get all relevant windows on the current workspace
+    windows = list(winman.get_relevant_windows(curr_workspace))
+
+    if not windows:
+        logging.debug("No windows to tile")
+        return
+
+    n_windows = len(windows)
+
+    # Get monitor geometry from state
+    monitor_geom = state.get('monitor_geom')
+    if not monitor_geom:
+        logging.debug("No monitor geometry available")
+        return
+
+    logging.debug("Tiling %d windows in monitor %r",
+                  n_windows, monitor_geom)
+
+    # Calculate optimal grid dimensions
+    n_cols, n_rows = _calculate_optimal_grid(
+        n_windows, monitor_geom.width, monitor_geom.height
+    )
+
+    # Calculate base cell dimensions
+    cell_width = monitor_geom.width // n_cols
+    cell_height = monitor_geom.height // n_rows
+
+    # Position and resize each window
+    for i, window in enumerate(windows):
+        col = i % n_cols
+        row = i // n_cols
+
+        # Calculate position
+        x = monitor_geom.x + (col * cell_width)
+        y = monitor_geom.y + (row * cell_height)
+
+        # Handle last row (may have fewer windows)
+        width = cell_width
+        if row == n_rows - 1:
+            remaining = n_windows - (row * n_cols)
+            if remaining < n_cols and remaining > 0:
+                # Expand cells in last row to fill remaining width
+                width = monitor_geom.width // remaining
+                x = monitor_geom.x + ((i % n_cols) * width)
+
+        height = cell_height
+
+        # Create target rectangle
+        target = Rectangle(x, y, width, height)
+
+        # Make sure window is visible
+        if window.is_minimized():
+            window.unminimize(Gdk.CURRENT_TIME)
+
+        if window.is_shaded():
+            window.unshade()
+
+        logging.debug("Tiling window %r to %r", window, target)
+
+        # Unmaximize if maximized, then reposition
+        if window.is_maximized():
+            window.unmaximize()
+
+        winman.reposition(window, target)
+
+
+def _calculate_optimal_grid(n: int, width: int, height: int) -> Tuple[int, int]:
+    """Calculate optimal grid dimensions for n windows.
+
+    Strategy: Minimize difference from screen aspect ratio while ensuring
+    all windows fit (cols * rows >= n).
+
+    :param n: Number of windows.
+    :param width: Screen width.
+    :param height: Screen height.
+    :returns: Tuple of (columns, rows).
+    """
+    if n <= 1:
+        return (1, 1)
+
+    screen_ratio = width / height
+
+    best_cols, best_rows = n, 1
+    best_diff = float('inf')
+
+    for cols in range(1, n + 1):
+        rows = math.ceil(n / cols)
+        cell_ratio = (width / cols) / (height / rows)
+        diff = abs(cell_ratio - screen_ratio)
+
+        if diff < best_diff:
+            best_diff = diff
+            best_cols, best_rows = cols, rows
+
+    return (int(best_cols), int(best_rows))
+
 
 # vim: set sw=4 sts=4 expandtab :
