@@ -489,7 +489,11 @@ class WindowManager:
             with persist_maximization(win, keep_maximize):
                 # Always use STATIC because either WMs implement window gravity
                 # incorrectly or it's not applicable to this problem
-                win.set_geometry(Wnck.WindowGravity.STATIC,
+                #
+                # TODO: Re-evaluate `type: ignore` with new versions of MyPy to
+                # determine if they've fixed spurious
+                # "Expected iterable as variadic argument"
+                win.set_geometry(Wnck.WindowGravity.STATIC,  # type: ignore
                                  geometry_mask, *clipped_geom)
         else:
             logging.debug(" Geometry clipping failed: %r", clipped_geom)
