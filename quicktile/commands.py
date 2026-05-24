@@ -776,4 +776,43 @@ def _calculate_optimal_grid(n: int, width: int, height: int) -> Tuple[int, int]:
     return (int(best_cols), int(best_rows))
 
 
+@commands.add('grid-overlay')
+def grid_overlay(
+        winman: WindowManager,
+        win: Wnck.Window,
+        state: Dict[str, Any]
+) -> None:
+    """Show a grid overlay to visually select window position.
+
+    Allows clicking two corners or using keyboard to select a grid area.
+    The active window will be resized to fill the selected area.
+
+    :param winman: The WindowManager instance.
+    :param win: The currently active window.
+    :param state: Command state dictionary.
+    """
+    from .overlay import GridOverlay
+
+    # Get monitor geometry
+    monitor_id, monitor_geom = winman.get_monitor(win)
+    if not monitor_geom:
+        logging.debug("No monitor geometry available")
+        return
+
+    # Get grid dimensions from config
+    config = state.get('config')
+    rows = config.getint('general', 'GridRows') if config else 3
+    cols = config.getint('general', 'GridCols') if config else 3
+
+    logging.debug("Showing grid overlay: %dx%d on monitor %d",
+                  cols, rows, monitor_id)
+    logging.debug("Monitor geometry: %s", monitor_geom)
+
+    # Create and show overlay
+    overlay = GridOverlay(winman, monitor_geom, rows, cols)
+    logging.debug("Overlay created, calling show_overlay()")
+    overlay.show_overlay()
+    logging.debug("show_overlay() returned")
+
+
 # vim: set sw=4 sts=4 expandtab :

@@ -29,6 +29,10 @@ Thanks go out to the following people:
     Generalized the ``move-to-center`` command into the ``move-to-*`` family
     of commands.
 
+Greg Marthews
+    Added the ``cascade`` and ``tile-all`` commands. Fixed ``move-to-center``
+    positioning and ``workspace-go-*`` / ``show-desktop`` behaviour.
+
 `Fábio C. Barrionuevo da Luz`_
     Fixed some permissioning warts in the install procedure.
 

@@ -1,5 +1,16 @@
-0.5.0 (git HEAD):
-- Add a releasing section to the Developer's Guide
+0.4.2:
+- Add cascade command to arrange windows in diagonal stair-step pattern
+- Add tile-all command to tile all workspace windows in optimal grid layout
+- Fix move-to-center positioning (incorrect from_gravity for CENTER gravity)
+- Fix windowless commands (show-desktop, workspace-go-*) breaking after
+  first invocation
+- Fix GravityLayout treating explicit x=0.0 as unset (falsy check)
+- Add Rectangle.center_in() utility method
+- Add _calculate_optimal_grid() for grid dimension calculation
+- (Thanks to Greg Marthews for the above contributions)
+
+0.4.1:
+- Add support for HiDPI monitors where GDK's pixel units don't necessarily
 
 0.4.1:
 - Add support for HiDPI monitors where GDK's pixel units don't necessarily

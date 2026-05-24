@@ -24,6 +24,8 @@ DEFAULTS: Dict[str, CfgDict] = {
         'ColumnCount': 3,
         'MarginX_Percent': 0,
         'MarginY_Percent': 0,
+        'GridRows': 3,
+        'GridCols': 3,
     },
     'keys': {
         "KP_Enter": "monitor-switch",
@@ -49,6 +51,7 @@ DEFAULTS: Dict[str, CfgDict] = {
         "V": "vertical-maximize",
         "H": "horizontal-maximize",
         "C": "move-to-center",
+        "<Super>Return": "grid-overlay",
     }
 }
 
