@@ -595,8 +595,8 @@ def cascade_windows(
     """Cascade all visible windows on the current workspace.
 
     Arranges windows in a diagonal stair-step pattern starting from the
-    top-left of the usable screen area. Each window is offset by 25 pixels
-    from the previous one.
+    top-left of the usable screen area. Each window is offset by the
+    CascadeOffset value (default 25 pixels) from the previous one.
 
     :param winman: The WindowManager instance.
     :param win: The currently active window (used to determine workspace).
@@ -624,7 +624,8 @@ def cascade_windows(
         logging.debug("No monitor geometry available")
         return
 
-    offset = 25  # pixels
+    config = state.get('config')
+    offset = config.getint('general', 'CascadeOffset') if config else 25
 
     logging.debug("Cascading %d windows starting at %r",
                   len(windows), monitor_geom)

@@ -240,17 +240,33 @@ class WindowManager:
     def get_relevant_windows(self, workspace: Wnck.Workspace
                              ) -> Iterable[Wnck.Window]:
         """Wrapper for :meth:`Wnck.Screen.get_windows` that filters out windows
-        of type :any:`Wnck.WindowType.DESKTOP` or :any:`Wnck.WindowType.DOCK`.
+        of type :any:`Wnck.WindowType.DESKTOP` or :any:`Wnck.WindowType.DOCK`,
+        plus utility windows that should not be rearranged in bulk operations.
 
         :param workspace: The virtual desktop to retrieve windows from.
         """
+        excluded_types = [
+            Wnck.WindowType.DESKTOP,
+            Wnck.WindowType.DOCK,
+            Wnck.WindowType.TOOLBAR,
+            Wnck.WindowType.MENU,
+            Wnck.WindowType.UTILITY,
+            Wnck.WindowType.SPLASH,
+        ]
         for window in self.screen.get_windows():
             # Skip windows on other virtual desktops for intuitiveness
             if workspace and not window.is_on_workspace(workspace):
                 logging.debug("Skipping window on other workspace: %r", window)
                 continue
 
-            # Don't cycle elements of the desktop
+            if window.get_window_type() in excluded_types:
+                logging.debug("Skipping excluded window type: %r", window)
+                continue
+
+            if window.is_skip_tasklist():
+                logging.debug("Skipping skip-tasklist window: %r", window)
+                continue
+
             if not self.is_relevant(window):
                 continue
 

@@ -26,6 +26,7 @@ DEFAULTS: Dict[str, CfgDict] = {
         'MarginY_Percent': 0,
         'GridRows': 3,
         'GridCols': 3,
+        'CascadeOffset': 25,
     },
     'keys': {
         "KP_Enter": "monitor-switch",
