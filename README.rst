@@ -111,7 +111,16 @@ left behind by other installation methods
 Contributing
 ------------
 
-I welcome contributions.
+I welcome contributions with one caveat: I have plans to make Flathub 
+into QuickTile's primary distribution channel and they `disallow AI-generated
+or AI-assisted applications
+<https://docs.flathub.org/docs/for-app-authors/requirements#generative-ai-policy>`_.
+
+Also, at the moment, my time for working on hobby projects is very limited
+so it may take me a while to accept any PR that I can't ``git pull``, review,
+and QA-test in 15-30 minutes between non-hobby things. (eg. Major architectural changes to implement additional backends. Functionality
+which I can only QA-test under GNOME, since GNOME runs so badly under Virtualbox
+on KDE and requires me to pull out and set up a hand-me-down laptop for testing it.)
 
 The recommended approach to make sure minimal effort is wasted is to open an
 issue indicating your interest in working on something. That way, I can let you
