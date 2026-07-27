@@ -320,6 +320,33 @@ class WindowManager:
             name = self.x_display.get_atom(name)
         return win, name
 
+    def get_csd_extents(self,
+            win: Union[Gdk.Window, Wnck.Window, int]
+            ) -> Optional[Tuple[int, int, int, int]]:
+        """Retrieve the invisible client-side decoration margins of ``win``.
+
+        GTK applications which draw their own window decorations (Nautilus,
+        GNOME Console, and most libadwaita apps) request an X window that is
+        larger than the window the user actually sees, reserving a margin
+        around it to draw their own drop-shadow into. The size of that margin
+        is published via the ``_GTK_FRAME_EXTENTS`` property and varies with
+        focus (51px per side focused, 25px unfocused, on GTK 4.22).
+
+        Window managers account for this, but any code which positions windows
+        by their X geometry has to compensate for it explicitly, or the
+        *visible* window ends up inset by the margin on every side.
+
+        :param win: A GTK or Wnck Window object or a raw X11 window ID.
+        :returns: ``(left, right, top, bottom)`` in pixels, or :any:`None` for
+            windows which do not use client-side decorations.
+        """
+        extents = self.get_property(win, '_GTK_FRAME_EXTENTS', Xatom.CARDINAL)
+        if not extents or len(extents) != 4:
+            return None
+
+        return (int(extents[0]), int(extents[1]),
+                int(extents[2]), int(extents[3]))
+
     # pylint: disable=line-too-long
     def get_property(self,
             win: Union[Gdk.Window, Wnck.Window, int],
@@ -462,8 +489,24 @@ class WindowManager:
             a sequence of differently sized monitors.
         """
 
-        old_geom = Rectangle(*win.get_geometry()).to_relative(
-            self.get_monitor(win)[1])
+        # Perform all tiling maths in terms of the window the user actually
+        # sees, so invisible client-side decoration margins cannot skew it.
+        csd_extents = self.get_csd_extents(win)
+
+        raw_geom = Rectangle(*win.get_geometry())
+        if csd_extents:
+            left, right, top, bottom = csd_extents
+            if (raw_geom.width > left + right
+                    and raw_geom.height > top + bottom):
+                raw_geom = Rectangle(
+                    raw_geom.x + left,
+                    raw_geom.y + top,
+                    raw_geom.width - left - right,
+                    raw_geom.height - top - bottom)
+            else:  # Too small to be sane; treat as though undecorated
+                csd_extents = None
+
+        old_geom = raw_geom.to_relative(self.get_monitor(win)[1])
 
         new_args = {}
         if geom:
@@ -486,6 +529,21 @@ class WindowManager:
 
         if bool(clipped_geom):
             logging.debug(" Repositioning to %s)\n", clipped_geom)
+
+            # Convert the target back from visible coordinates to the X
+            # geometry the window needs, so its invisible shadow margin falls
+            # outside the region rather than eating into it.
+            target_geom = clipped_geom
+            if csd_extents:
+                left, right, top, bottom = csd_extents
+                target_geom = Rectangle(
+                    clipped_geom.x - left,
+                    clipped_geom.y - top,
+                    clipped_geom.width + left + right,
+                    clipped_geom.height + top + bottom)
+                logging.debug(" Compensating for CSD extents %r -> %s",
+                              csd_extents, target_geom)
+
             with persist_maximization(win, keep_maximize):
                 # Always use STATIC because either WMs implement window gravity
                 # incorrectly or it's not applicable to this problem
@@ -494,6 +552,6 @@ class WindowManager:
                 # determine if they've fixed spurious
                 # "Expected iterable as variadic argument"
                 win.set_geometry(Wnck.WindowGravity.STATIC,  # type: ignore
-                                 geometry_mask, *clipped_geom)
+                                 geometry_mask, *target_geom)
         else:
             logging.debug(" Geometry clipping failed: %r", clipped_geom)
