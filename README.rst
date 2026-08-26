@@ -35,6 +35,10 @@ record a log to allow easy uninstallation.
 
 Now that PyGObject is available on PyPI, other options are being explored.
 
+For externally-managed environments, install through pipx.
+
+``pipx install https://github.com/ssokolow/quicktile/archive/master.zip``
+
 Consult the `Installation <http://ssokolow.com/quicktile/installation.html>`_
 section of the manual for full details and alternative installation options.
 
