@@ -153,6 +153,9 @@ def load_config(path) -> ConfigParser:
             dirty = True
 
     if dirty:
+        parent = os.path.dirname(path)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
         with open(path, 'w') as cfg_file:
             config.write(cfg_file)
         if first_run:
